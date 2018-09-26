@@ -3,7 +3,8 @@
 
 using namespace BOSS;
 
-ActionSet::ActionSet()
+ActionSet::ActionSet() :
+    m_abilityTargetIndex (0)
 {
 
 }
@@ -25,7 +26,9 @@ bool ActionSet::contains(const ActionType & action) const
 
 void ActionSet::add(const ActionType & action)
 {
-    if (!contains(action))
+    // can add multiple ability actions because the ability can potentially be used
+    // on multiple targets
+    if (action.isAbility() || !contains(action))
     {
         m_actions.push_back(action);
     }
@@ -39,18 +42,26 @@ void ActionSet::add(const ActionSet & set)
     }
 }
 
+void ActionSet::add(const ActionType & action, const size_t & abilityTargetID)
+{ 
+    add(action);
+    m_abilityTargets.push_back(abilityTargetID);
+}
+
 void ActionSet::remove(const ActionType & action)
 {
     m_actions.erase(std::remove(m_actions.begin(), m_actions.end(), action), m_actions.end());
 }
 
-void ActionSet::remove(const ActionSet & set)
+//  incorrect implementation
+/*void ActionSet::remove(const ActionSet & set)
 {
     for (const auto & val : set.m_actions)
     {
         add(val);
     }
 }
+*/
 
 const std::string ActionSet::toString() const
 {
@@ -67,6 +78,8 @@ const std::string ActionSet::toString() const
 void ActionSet::clear()
 {
     m_actions.clear();
+    m_abilityTargets.clear();
+    //m_abilityTargetIndex = 0;
 }
 
 ActionType & ActionSet::operator[] (const size_t & index)
@@ -77,4 +90,14 @@ ActionType & ActionSet::operator[] (const size_t & index)
 const ActionType & ActionSet::operator[] (const size_t & index) const
 {
     return m_actions[index];
+}
+
+const size_t & ActionSet::getAbilityTarget()
+{
+    return m_abilityTargets[m_abilityTargetIndex++];
+}
+
+const std::vector<size_t> & ActionSet::getAbilityTargets() const
+{
+    return m_abilityTargets;
 }

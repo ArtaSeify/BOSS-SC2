@@ -25,20 +25,35 @@ void CombatSearch_Integral::recurse(const GameState & state, size_t depth)
 
     ActionSet legalActions;
     generateLegalActions(state, legalActions, m_params);
-    
+    //std::cout << legalActions.toString() << std::endl;
     for (size_t a(0); a < legalActions.size(); ++a)
     {
         const size_t index = legalActions.size()-1-a;
 
         GameState child(state);
-        child.doAction(legalActions[index]);
-        m_buildOrder.add(legalActions[index]);
-        m_integral.update(state, m_buildOrder);
-        
-        recurse(child,depth+1);
 
-        m_buildOrder.pop_back();
-        m_integral.pop();
+        // abilities need a target
+        if (legalActions[index].isAbility())
+        {
+            child.doAction(legalActions[index], legalActions.getAbilityTarget());
+        }
+
+        else
+        {
+            child.doAction(legalActions[index]);
+        }
+
+        // can't go over the time limit
+        if (child.getCurrentFrame() <= m_params.getFrameTimeLimit())
+        {
+            m_buildOrder.add(legalActions[index]);
+            m_integral.update(child, m_buildOrder);
+
+            recurse(child, depth + 1);
+
+            m_buildOrder.pop_back();
+            m_integral.pop();
+        }
     }
 }
 

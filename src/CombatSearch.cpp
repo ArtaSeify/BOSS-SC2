@@ -55,6 +55,18 @@ void CombatSearch::generateLegalActions(const GameState & state, ActionSet & leg
         legalActions.add(action);
     }
 
+    //std::cout << "before adding chronoboost" << std::endl;
+    //std::cout << legalActions.toString() << std::endl;
+    // special actions
+    // store a chronoboost action for each eligible target
+    if (state.canChronoBoost())
+    {
+        state.storeChronoBoostTargets(legalActions);
+    }
+
+    //std::cout << "after adding chronoboost" << std::endl;
+    //std::cout << legalActions.toString() << std::endl;
+
     // if we enabled the always make workers flag, and workers are legal
     const ActionType & worker = ActionTypes::GetWorker(state.getRace());
     if (m_params.getAlwaysMakeWorkers() && legalActions.contains(worker))
@@ -76,11 +88,15 @@ void CombatSearch::generateLegalActions(const GameState & state, ActionSet & leg
         for (size_t a(0); a < legalActions.size(); ++a)
         {
             const ActionType & actionType = legalActions[a];
-            const int whenCanPerformAction = state.whenCanBuild(actionType);
-            if (whenCanPerformAction < workerReady)
+            // abilities are instant and have no build time, so we won't consider them
+            if (!actionType.isAbility())
             {
-                actionLegalBeforeWorker = true;
-                break;
+                const int whenCanPerformAction = state.whenCanBuild(actionType);
+                if (whenCanPerformAction < workerReady)
+                {
+                    actionLegalBeforeWorker = true;
+                    break;
+                }
             }
         }
 
@@ -96,6 +112,9 @@ void CombatSearch::generateLegalActions(const GameState & state, ActionSet & leg
             legalActions.add(worker);
         }
     }
+
+    //std::cout << "after always make workers check" << std::endl;
+    //std::cout << legalActions.toString() << std::endl;
 }
 
 const CombatSearchResults & CombatSearch::getResults() const

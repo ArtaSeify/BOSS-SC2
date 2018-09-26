@@ -87,6 +87,26 @@ void ActionTypeData::Init(const json & j)
         }
     }
 
+    // Special actions: Chrono Boost, MULE, and Spawn Larvae
+    ActionTypeData data;
+
+    data.id = AllActionTypeData.size();
+    data.name = "ChronoBoost";
+    data.raceName = "Protoss";
+    data.race = Races::GetRaceID(data.raceName);
+    data.energyCost = 50;
+    data.buildTime = 320;
+    data.isAbility = true;
+    data.whatBuildsStr = "Nexus";
+    data.whatBuildsCount = 1;
+    data.whatBuildsStatus = "None";
+
+    // the name map stores the index that will hold this data, which is the current size
+    ActionTypeNameMap[data.name] = AllActionTypeData.size();
+
+    // then we add the data to the vector
+    AllActionTypeData.push_back(data);
+
     // now we have to re-iterate over all established types to get the ids
     for (auto & data : AllActionTypeData)
     {

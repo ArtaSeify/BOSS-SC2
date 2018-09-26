@@ -26,8 +26,11 @@ public:
 	int  mineralPrice()     const;
     int  gasPrice()         const;
     int  supplyCost()       const;
+    int  energyCost()       const;
     int  supplyProvided()   const;
     int  numProduced()      const;
+	int  startingEnergy()	const;
+	int  maxEnergy()		const;
     bool isUnit()           const;
     bool isUpgrade()        const;
     bool isAbility()        const;
@@ -40,6 +43,7 @@ public:
     bool isMorphed()        const;
     
     ActionType whatBuilds() const;
+    const std::string & whatBuildsStatus() const;
     ActionType whatBuildsAddon() const;
     const std::vector<ActionType> & required() const;
     const std::vector<ActionType> & equivalent() const;
@@ -59,6 +63,7 @@ namespace ActionTypes
     const ActionType & GetSupplyProvider(const RaceID raceID);
     const ActionType & GetRefinery(const RaceID raceID);
     const ActionType & GetResourceDepot(const RaceID raceID);
+    const ActionType & GetSpecialAction(const RaceID raceID);
     const ActionType & GetActionType(const std::string & name);
     const bool         TypeExists(const std::string & name);
 

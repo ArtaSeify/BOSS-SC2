@@ -24,6 +24,7 @@ class Unit
     int         m_timeUntilFree;    // time remaining until this Unit can build again
 	int			m_timeChronoBoost;	// time remaining on Chrono Boost. 
 	int         m_numLarva;         // number of larva this building currently has (Hatch only)
+	double		m_energy;			// energy of the building
 
 public:
 
@@ -35,6 +36,11 @@ public:
     const ActionType & getAddon() const;
     const ActionType & getBuildType() const;
     const size_t & getID() const;
+    void applyChronoBoost(const int & time);
+
+    void castAbility(const ActionType & type, Unit & Unit);
+	const double & getEnergy() const;
+    void reduceEnergy(const double & energy);
 
     int whenCanBuild(const ActionType & type) const;
 

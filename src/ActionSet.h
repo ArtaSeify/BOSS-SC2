@@ -10,6 +10,9 @@ class ActionType;
 class ActionSet
 {
 	std::vector<ActionType> m_actions;
+    std::vector<size_t>     m_abilityTargets;
+
+    size_t                  m_abilityTargetIndex;
 
 public:
 
@@ -21,12 +24,16 @@ public:
     bool contains(const ActionType & action) const;
     void add(const ActionType & action);
     void add(const ActionSet & set);
+    void add(const ActionType & action, const size_t & abilityTargetID);
     void remove(const ActionType & action);
     void remove(const ActionSet & set);
     void clear();
 
           ActionType & operator[] (const size_t & index);
     const ActionType & operator[] (const size_t & index) const;
+
+    const size_t              & getAbilityTarget();
+    const std::vector<size_t> & getAbilityTargets() const;
 
     const std::string toString() const;
 };

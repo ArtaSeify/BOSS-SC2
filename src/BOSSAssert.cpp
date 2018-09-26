@@ -21,28 +21,46 @@ namespace Assert
     void ReportFailure(const GameState * state, const char * condition, const char * file, int line, const char * msg, ...)
     {
         std::cerr << "Assertion thrown!\n";
-
-		// get the extra parameters
+        // get the extra parameters
         char messageBuffer[4096] = "";
-		sprintf(messageBuffer, msg);
+        
         if (msg != NULL)
         {
-			char* arg;
-            va_list args;
-            va_start(args, msg);
-			while (true) {
-				// get the argument. assuming all extra arguments are chars
-				arg = va_arg(args, char*);
+            // count the number of arguments
+            char temp;
+            size_t index = 0;
+            size_t num_args = 0;
+            do
+            {
+                temp = msg[index++];
+                if (temp == '%')
+                {
+                    ++num_args;
+                }
+            } while (temp != NULL);
 
-				// there are no more arguments
-				if (arg)
-					break;
+            // if there are no arguments, just copy the string 
+            if (num_args == 0)
+            {
+                strcpy(messageBuffer, msg);
+            }
 
-				// put the extra parameters inside of msg
-				sprintf(messageBuffer, msg, arg);
-			}
-            
-			va_end(args);
+            // fill string with the extra arguments
+            else
+            {
+                char* arg;
+                va_list args;
+                va_start(args, msg);
+                for (size_t i(0); i < num_args; ++i)
+                {
+                    // get the argument. assuming all extra arguments are chars
+                    arg = va_arg(args, char*);
+
+                    // put the extra parameters inside of msg
+                    sprintf(messageBuffer, msg, arg);
+                }
+                va_end(args);
+            }
         }	
 
         std::stringstream ss;

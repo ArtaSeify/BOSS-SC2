@@ -52,7 +52,10 @@ public:
     int			    getSupplyInProgress() const;
     int             getLastActionFinishTime() const;
     int             getNextFinishTime(const ActionType & type) const;
+
+    void            storeChronoBoostTargets(ActionSet & actionSet) const;
     
+    bool            canChronoBoost()    const;
     size_t			getNumMineralWorkers() const;
     size_t			getNumGasWorkers() const;
     size_t			getNumInProgress(const ActionType & action) const;
@@ -63,7 +66,7 @@ public:
     bool			haveType(const ActionType & action) const;
     int				getRace() const;
 
-    void			doAction(const ActionType & type);
+    void			doAction(const ActionType & type, const size_t & targetID = -1);
     void			fastForward(const int & frames);
     void			addUnit(const ActionType & Unit, int builderID = -1);
     void			setMinerals(const double & minerals);

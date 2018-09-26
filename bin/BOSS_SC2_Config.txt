@@ -24,10 +24,10 @@
             "Race"              : "Protoss",
             "State"             : "Protoss Start State",
             "PrintNewBest"      : true,
-            "OutputDir"         : "results",
+            "OutputDir"         : "../bin/results",
             "SearchTimeLimitMS" : 1200000,
-            "FrameTimeLimit"    : 4000,
-            "RelevantActions"   : [ "Probe", "Pylon", "Nexus", "Assimilator", "Gateway", "CyberneticsCore", "Stalker", "Zealot"],
+            "FrameTimeLimit"    : 2000,
+            "RelevantActions"   : [ "Probe", "Pylon", "Nexus", "Assimilator", "Gateway", "CyberneticsCore", "Stalker", "Zealot", "ChronoBoost"],
             "MaxActions"        : [ ["Nexus", 1], ["Assimilator", 2], ["CyberneticsCore", 1] ],
             "AlwaysMakeWorkers" : true,
             "OpeningBuildOrder" : "Empty"
