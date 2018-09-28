@@ -21,8 +21,8 @@ class Unit
     size_t      m_buildID;          // id of the Unit currently being built by this Unit
     int         m_job;              // current job this Unit has (UnitJobs::XXX)
     int         m_timeUntilBuilt;   // time remaining until this Unit is completed
-    int         m_timeUntilFree;    // time remaining until this Unit can build again
-	int			m_timeChronoBoost;	// time remaining on Chrono Boost. 
+    double      m_timeUntilFree;    // time remaining until this Unit can build again
+	double		m_timeChronoBoost;	// time remaining on Chrono Boost. 
 	int         m_numLarva;         // number of larva this building currently has (Hatch only)
 	double		m_energy;			// energy of the building
 
@@ -30,13 +30,13 @@ public:
 
     Unit(const ActionType & type, const size_t & id, int builderID);
 
-    const int & getTimeUntilFree() const;
+    const int getTimeUntilFree() const;
     const int & getTimeUntilBuilt() const;
     const ActionType & getType() const;
     const ActionType & getAddon() const;
     const ActionType & getBuildType() const;
     const size_t & getID() const;
-    void applyChronoBoost(const int & time);
+    void applyChronoBoost(const double & time);
 
     void castAbility(const ActionType & type, Unit & Unit);
 	const double & getEnergy() const;

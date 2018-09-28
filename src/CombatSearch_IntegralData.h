@@ -45,7 +45,7 @@ public:
     CombatSearch_IntegralData();
 
     void update(const GameState & state, const BuildOrder & buildOrder);
-    void pop();
+    void pop_back();
 
     void printIntegralData(const size_t index) const;
     void print() const;

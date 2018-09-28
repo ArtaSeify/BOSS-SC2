@@ -24,7 +24,7 @@ void BuildOrderPlotData::calculateStartEndTimes()
     for (size_t i(0); i < m_buildOrder.size(); ++i)
     {
         const ActionType & type = m_buildOrder[i];
-        state.doAction(type);
+        state.doAction(type, m_buildOrder.getAbilityTarget(i));
 
         m_startTimes.push_back(state.getCurrentFrame());
 

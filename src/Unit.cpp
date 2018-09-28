@@ -37,6 +37,12 @@ void Unit::startBuilding(const Unit & Unit)
     {
         m_type = Unit.getType();
     }
+
+    // the building might still be chrono boosted
+    if (m_timeChronoBoost > 0)
+    {
+        applyChronoBoost(m_timeChronoBoost);
+    }
 }
 
 void Unit::complete()
@@ -63,9 +69,9 @@ void Unit::fastForward(const int & frames)
 	m_energy = std::min(m_energy + std::max(0, frames - m_timeUntilBuilt) * CONSTANTS::ERPF, 
 						double(m_type.maxEnergy()));
 
-    m_timeUntilFree = std::max(0, m_timeUntilFree - frames);
+    m_timeUntilFree = std::max(0.0, m_timeUntilFree - frames);
     m_timeUntilBuilt = std::max(0, m_timeUntilBuilt - frames);
-    m_timeChronoBoost = std::max(0, m_timeChronoBoost - frames);
+    m_timeChronoBoost = std::max(0.0, m_timeChronoBoost - frames);
 }
 
 // returns when this Unit can build a given type, -1 if it can't
@@ -93,7 +99,7 @@ int Unit::whenCanBuild(const ActionType & type) const
         return ((int)std::ceil(std::max(0.0, (type.energyCost() - m_energy)/CONSTANTS::ERPF)));
     }
 
-    return m_timeUntilFree;
+    return (int)std::ceil(m_timeUntilFree);
 }
 
 void Unit::castAbility(const ActionType & type, Unit & Unit)
@@ -110,11 +116,28 @@ void Unit::castAbility(const ActionType & type, Unit & Unit)
     }
 }
 
-void Unit::applyChronoBoost(const int & time)
+void Unit::applyChronoBoost(const double & time)
 {
+    //std::cout << "Chronoboost on: " << m_type.getName() << std::endl;
+    //std::cout << "Current target has chronoboost timer: " << m_timeChronoBoost << std::endl;
+    //std::cout << "Current target will have chronoboost timer: " << time << std::endl;
     m_timeChronoBoost = time;
 
+    BOSS_ASSERT(m_timeUntilFree > 0, "Chrono Boost used on target that is not producing anything");
 
+    // Chrono Boost speeds up production by 50%
+    double newTimeUntilFree = std::max(0.0, m_timeUntilFree - m_timeChronoBoost * 1.50);
+
+    //std::cout << "Previous build time: " << m_timeUntilFree << std::endl;;
+    //std::cout << "New build time: " << newTimeUntilFree << std::endl;
+    //std::cout << "Previous chrono boost time: " << m_timeChronoBoost << std::endl;
+
+    //BOSS_ASSERT(std::fmod(newTimeUntilFree, 1.0) == 0, "loss of frames in ChronoBoost speedup. Value: %f", newTimeUntilFree);
+
+    // make changes to remaining production time and chronoboost time
+    m_timeChronoBoost = m_timeChronoBoost - (m_timeUntilFree - newTimeUntilFree) / 1.50;
+    m_timeUntilFree = newTimeUntilFree;
+    //std::cout << "New chrono boost time: " << m_timeChronoBoost << std::endl;
 }
 
 const int & Unit::getTimeUntilBuilt() const
@@ -122,9 +145,9 @@ const int & Unit::getTimeUntilBuilt() const
     return m_timeUntilBuilt;
 }
 
-const int & Unit::getTimeUntilFree() const
+const int Unit::getTimeUntilFree() const
 {
-    return m_timeUntilFree;
+    return static_cast<int>(std::ceil(m_timeUntilFree));
 }
 
 const ActionType & Unit::getType() const

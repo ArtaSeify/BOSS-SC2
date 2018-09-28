@@ -31,7 +31,7 @@ void CombatSearch_IntegralData::update(const GameState & state, const BuildOrder
     }
 }
 
-void CombatSearch_IntegralData::pop()
+void CombatSearch_IntegralData::pop_back()
 {
     m_integralStack.pop_back();
 }

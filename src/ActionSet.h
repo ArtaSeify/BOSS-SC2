@@ -12,10 +12,7 @@ class ActionSet
 	std::vector<ActionType> m_actions;
     std::vector<size_t>     m_abilityTargets;
 
-    size_t                  m_abilityTargetIndex;
-
 public:
-
     ActionSet();
 
     size_t size() const;
@@ -32,7 +29,7 @@ public:
           ActionType & operator[] (const size_t & index);
     const ActionType & operator[] (const size_t & index) const;
 
-    const size_t              & getAbilityTarget();
+    const size_t & getAbilityTarget(const size_t & index) const;
     const std::vector<size_t> & getAbilityTargets() const;
 
     const std::string toString() const;

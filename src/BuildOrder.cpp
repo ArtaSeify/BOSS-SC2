@@ -14,6 +14,13 @@ void BuildOrder::add(const ActionType & type)
 
     m_buildOrder.push_back(type);
     m_typeCount[type.getID()]++;
+    m_abilityTargets.push_back(-1);
+}
+
+void BuildOrder::add(const ActionType & type, const size_t & abilityTargetID)
+{
+    add(type);
+    m_abilityTargets.back() = abilityTargetID;
 }
 
 void BuildOrder::add(const ActionType & type, const int & amount)
@@ -43,6 +50,10 @@ const bool BuildOrder::empty() const
     return size() == 0;
 }
 
+const size_t & BuildOrder::getAbilityTarget(const size_t & index) const
+{
+    return m_abilityTargets[index];
+}
 
 const size_t BuildOrder::getTypeCount(const ActionType & type) const
 {
@@ -59,6 +70,7 @@ const size_t BuildOrder::getTypeCount(const ActionType & type) const
 void BuildOrder::pop_back()
 {
     m_buildOrder.pop_back();
+    m_abilityTargets.pop_back();
 }
 
 const ActionType & BuildOrder::operator [] (const size_t & i) const

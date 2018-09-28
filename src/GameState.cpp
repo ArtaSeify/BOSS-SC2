@@ -88,6 +88,8 @@ void GameState::doAction(const ActionType & type, const size_t & targetID)
 
     if (type.isAbility())
     {
+        std::string temp = "hello";
+        BOSS_ASSERT(targetID == -1, "Target of ability %s is invalid. Target ID: %s", type.getName().c_str(), temp.c_str());
         getUnit(buildID).castAbility(type, getUnit(targetID));
         return;
     }    
@@ -476,12 +478,26 @@ void GameState::storeChronoBoostTargets(ActionSet & actionSet) const
 {
     for (const Unit & unit : m_units)
     {
-        if (unit.getType().isBuilding() && unit.getTimeUntilBuilt() == 0 && unit.getTimeUntilFree() == 0)
+        if (canChronoBoostTarget(unit))
         {
             //std::cout << ActionTypes::GetSpecialAction(m_race).getName() << " " << unit.getID() << std::endl;
             actionSet.add(ActionTypes::GetSpecialAction(m_race), unit.getID());
         }
     }
+}
+
+bool GameState::canChronoBoostTarget(const Unit & unit) const
+{
+    // can only ne used on buildings
+    if (!unit.getType().isBuilding()) { return false; }
+
+    // the unit must be fully built
+    if (unit.getTimeUntilBuilt() > 0) { return false; }
+
+    // the unit must be producing something
+    if (unit.getTimeUntilFree() == 0) { return false; }
+
+    return true;
 }
 
 const Unit & GameState::getUnit(const size_t & id) const

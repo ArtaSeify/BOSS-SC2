@@ -66,6 +66,15 @@ void CombatSearch::generateLegalActions(const GameState & state, ActionSet & leg
 
     //std::cout << "after adding chronoboost" << std::endl;
     //std::cout << legalActions.toString() << std::endl;
+    /*auto & targets = legalActions.getAbilityTargets();
+    for (auto & target : targets)
+    {
+        auto & u = state.getUnit(target);
+        std::cout << "chronoboost target: " << u.getType().getName() << std::endl;
+        std::cout << "chronoboost target is producing: " << u.getBuildType().getName() << std::endl;
+        std::cout << "chronoboost target will finish producing: " << u.getTimeUntilFree() << std::endl;
+        std::cout << "chronoboost target will finish itself: " << u.getTimeUntilBuilt() << std::endl;
+    }*/
 
     // if we enabled the always make workers flag, and workers are legal
     const ActionType & worker = ActionTypes::GetWorker(state.getRace());

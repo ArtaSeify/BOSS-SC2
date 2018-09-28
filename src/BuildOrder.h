@@ -11,12 +11,14 @@ class BuildOrder
 {
     std::vector<ActionType>	m_buildOrder;
     std::vector<size_t>		m_typeCount;
+    std::vector<size_t>     m_abilityTargets;
 
 public:
 
     BuildOrder();
 
     void                    add(const ActionType & type);
+    void                    add(const ActionType & type, const size_t & abilityTargetID);
     void                    add(const ActionType & type, const int & amount);
     void                    add(const BuildOrder & other);
     void                    clear();
@@ -29,6 +31,7 @@ public:
     const size_t            size() const;
     const size_t            getTypeCount(const ActionType & type) const;
     const bool              empty() const;
+    const size_t &          getAbilityTarget(const size_t & index) const;
 
     std::string             getJSONString() const;
     std::string             getNumberedString() const;

@@ -54,6 +54,7 @@ public:
     int             getNextFinishTime(const ActionType & type) const;
 
     void            storeChronoBoostTargets(ActionSet & actionSet) const;
+    bool            canChronoBoostTarget(const Unit & unit) const;
     
     bool            canChronoBoost()    const;
     size_t			getNumMineralWorkers() const;

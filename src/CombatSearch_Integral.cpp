@@ -32,27 +32,18 @@ void CombatSearch_Integral::recurse(const GameState & state, size_t depth)
 
         GameState child(state);
 
-        // abilities need a target
-        if (legalActions[index].isAbility())
-        {
-            child.doAction(legalActions[index], legalActions.getAbilityTarget());
-        }
-
-        else
-        {
-            child.doAction(legalActions[index]);
-        }
+        child.doAction(legalActions[index], legalActions.getAbilityTarget(index));
 
         // can't go over the time limit
         if (child.getCurrentFrame() <= m_params.getFrameTimeLimit())
         {
-            m_buildOrder.add(legalActions[index]);
+            m_buildOrder.add(legalActions[index], legalActions.getAbilityTarget(index));
             m_integral.update(child, m_buildOrder);
 
             recurse(child, depth + 1);
 
             m_buildOrder.pop_back();
-            m_integral.pop();
+            m_integral.pop_back();
         }
     }
 }
