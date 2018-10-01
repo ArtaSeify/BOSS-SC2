@@ -88,8 +88,7 @@ void GameState::doAction(const ActionType & type, const size_t & targetID)
 
     if (type.isAbility())
     {
-        std::string temp = "hello";
-        BOSS_ASSERT(targetID == -1, "Target of ability %s is invalid. Target ID: %s", type.getName().c_str(), temp.c_str());
+        BOSS_ASSERT(targetID != -1, "Target of ability %s is invalid. Target ID: %u", type.getName().c_str(), targetID);
         getUnit(buildID).castAbility(type, getUnit(targetID));
         return;
     }    

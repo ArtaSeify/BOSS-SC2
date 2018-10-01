@@ -12,7 +12,7 @@ namespace BOSS
 class GameState;
 namespace Assert
 {
-    /*struct error
+    struct error
     {
         int integer;
         size_t unsigned_integer;
@@ -24,22 +24,15 @@ namespace Assert
         bool floating_set = false;
         bool string_set = false;
         
-        error(int new_integer) { integer = new_integer; }
-        error(size_t new_unsigned) { unsigned_integer = new_unsigned; }
-        error(double new_floating) { floating = new_floating; }
-        error(char* new_string) { string = new_string; }
-        return_value()
-        {
-            if (integer_set)
-            {
-                return integer;
-            }
-            else if (unsigned_integer_set)
-            {
-                retu
-            }
-        }
-    };*/
+        error(int & new_integer) { integer = new_integer; }
+        error(size_t & new_unsigned) { unsigned_integer = new_unsigned; }
+        error(double & new_floating) { floating = new_floating; }
+        error(char* & new_string) { string = new_string; }
+        int & return_int() { return integer; }
+        size_t & return_uint() { return unsigned_integer; }
+        double & return_double() { return floating; }
+        char* & return_char() { return string; }
+    };
 
     const std::string CurrentDateTime();
     void ReportFailure(const GameState * state, const char * condition, const char * file, int line, const char * msg, ...);

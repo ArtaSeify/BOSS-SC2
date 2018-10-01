@@ -23,81 +23,76 @@ namespace Assert
         std::cerr << "Assertion thrown!\n";
         // get the extra parameters
         char messageBuffer[4096] = "";
-        
+        std::string error_message;
         if (msg != NULL)
         {
             // count the number of arguments
-            /*char temp;
+            char curr_char;
             size_t index = 0;
+            size_t prev_substring_index = 0;
             std::vector<char> arg_types;
+            std::vector<std::pair<int, int>> sub_msgs;
             do
             {
-                temp = msg[index++];
-                if (temp == '%')
+                curr_char = msg[index++];
+                if (curr_char == '%')
                 {
                     arg_types.push_back(msg[index++]);
+                    sub_msgs.push_back(std::make_pair(prev_substring_index, index));
+                    prev_substring_index = index + 1;   // +1 to get rid of the empty space in between words
                 }
-            } while (temp != NULL);
+            } while (curr_char != NULL);
 
             // if there are no arguments, just copy the string 
             if (arg_types.size() == 0)
             {
-                strcpy(messageBuffer, msg);
+                error_message = msg;
             }
 
-            // get the values of all the extra arguments
-            std::vector<error> error_args;
-            va_list args;
-            va_start(args, msg);
-            for (size_t i(0); i < arg_types.size(); ++i)
+            else
             {
-                // put the extra parameters inside of msg
-                if (arg_types[i] == 's')
+                // get the values of all the extra arguments and place them inside the strings
+                va_list args;
+                va_start(args, msg);
+                std::vector<std::string> messages;
+                for (size_t i(0); i < arg_types.size(); ++i)
                 {
-                    error_args.push_back(error(va_arg(args, char*)));
+                    char message[4096] = "";
+                    char temp[4096] = "";
+                    memcpy(temp, msg + sub_msgs[i].first, sub_msgs[i].second - sub_msgs[i].first + 1);
+                    // put the extra parameters inside of msg
+                    if (arg_types[i] == 's')
+                    {
+                        sprintf(message, temp, va_arg(args, char*));
+                    }
+                    else if (arg_types[i] == 'd')
+                    {
+                        sprintf(message, temp, va_arg(args, int));
+                    }
+                    else if (arg_types[i] == 'f')
+                    {
+                        sprintf(message, temp, va_arg(args, double));
+                    }
+                    else if (arg_types[i] == 'u')
+                    {
+                        sprintf(message, temp, va_arg(args, size_t));
+                    }
+                    messages.push_back(message);
                 }
-                else if (arg_types[i] == 'd')
+                va_end(args);
+
+                for (size_t i(0); i < messages.size(); ++i)
                 {
-                    error_args.push_back(error(va_arg(args, int)));
+                    error_message += messages[i];
                 }
-                else if (arg_types[i] == 'f')
-                {
-                    error_args.push_back(error(va_arg(args, double)));
-                }
-                else if (arg_types[i] == 'u')
-                {
-                    error_args.push_back(error(va_arg(args, size_t)));
-                }
-            }
-            va_end(args);
-            
-            for (size_t i(0); i < 1; ++i)
-            {
-                // put the extra parameters inside of msg
-                if (arg_types[i] == 's')
-                {
-                    sprintf(messageBuffer, msg, arg1, arg2);
-                }
-                else if (arg_types[i] == 'd')
-                {
-                    sprintf(messageBuffer, msg, va_arg(args, int));
-                }
-                else if (arg_types[i] == 'f')
-                {
-                    sprintf(messageBuffer, msg, va_arg(args, double));
-                }
-                else if (arg_types[i] == 'u')
-                {
-                    sprintf(messageBuffer, msg, va_arg(args, size_t));
-                }
-            }*/
+            }            
         }	
 
         std::stringstream ss;
         ss                                      << std::endl;
         ss << "!Assert:   " << condition        << std::endl;
         ss << "File:      " << file             << std::endl;
-        ss << "Message:   " << messageBuffer    << std::endl;
+        ss << "Message:   " << error_message    << std::endl;
         ss << "Line:      " << line             << std::endl;
         
         #if !defined(EMSCRIPTEN)
