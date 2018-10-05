@@ -157,10 +157,32 @@ std::string BuildOrder::getNameString(const size_t charactersPerName) const
 
     for (size_t i(0); i < m_buildOrder.size(); ++i)
     {
-        std::string name = charactersPerName == 0 ? m_buildOrder[i].getName() : m_buildOrder[i].getName().substr(0, charactersPerName);
+        std::string name = charactersPerName == 0 ? m_buildOrder[i].getName() : m_buildOrder[i].getName().substr(0, charactersPerName);;
+        if (m_buildOrder[i].getName() == "ChronoBoost")
+        {
+            name += "_" + m_buildOrder[m_abilityTargets[i]].getName().substr(0, charactersPerName);
+        }
 
         ss << name << " ";
     }
+    
+    return ss.str();
+}
 
+std::string BuildOrder::getNameString(const GameState & state, const size_t charactersPerName) const
+{
+    std::stringstream ss;
+
+    for (size_t i(0); i < m_buildOrder.size(); ++i)
+    {
+        std::string name = charactersPerName == 0 ? m_buildOrder[i].getName() : m_buildOrder[i].getName().substr(0, charactersPerName);;
+        if (m_buildOrder[i].getName() == "ChronoBoost")
+        {
+            name += "_" +  state.getUnit(m_abilityTargets[i]).getType().getName().substr(0, charactersPerName);
+        }
+
+        ss << name << " ";
+    }
+    
     return ss.str();
 }

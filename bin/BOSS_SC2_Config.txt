@@ -28,7 +28,7 @@
             "SearchTimeLimitMS" : 1200000,
             "FrameTimeLimit"    : 2000,
             "RelevantActions"   : [ "Probe", "Pylon", "Nexus", "Assimilator", "Gateway", "CyberneticsCore", "Stalker", "Zealot", "ChronoBoost"],
-            "MaxActions"        : [ ["Nexus", 1], ["Assimilator", 2], ["CyberneticsCore", 1] ],
+            "MaxActions"        : [ ["Nexus", 2], ["CyberneticsCore", 1]],
             "AlwaysMakeWorkers" : true,
             "OpeningBuildOrder" : "Empty"
         },

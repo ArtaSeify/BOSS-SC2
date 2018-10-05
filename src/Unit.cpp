@@ -175,6 +175,11 @@ const double & Unit::getEnergy() const
 	return m_energy;
 }
 
+const double & Unit::getChronoBoostTime() const
+{
+    return m_timeChronoBoost;
+}
+
 void Unit::reduceEnergy(const double & energy)
 {
     m_energy -= energy;

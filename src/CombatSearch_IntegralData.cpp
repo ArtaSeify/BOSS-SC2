@@ -25,6 +25,7 @@ void CombatSearch_IntegralData::update(const GameState & state, const BuildOrder
         m_bestIntegralValue = m_integralStack.back().integral;
         m_bestIntegralStack = m_integralStack;
         m_bestIntegralBuildOrder = buildOrder;
+        m_bestIntegralGameState = state;
 
         // print the newly found best to console
         printIntegralData(m_integralStack.size()-1);
@@ -39,7 +40,7 @@ void CombatSearch_IntegralData::pop_back()
 void CombatSearch_IntegralData::printIntegralData(const size_t index) const
 {
     printf("%7d %10.2lf %13.2lf   ", m_bestIntegralStack[index].timeAdded, m_bestIntegralStack[index].eval, m_bestIntegralStack[index].integral);
-    std::cout << m_bestIntegralBuildOrder.getNameString(2) << std::endl;   
+    std::cout << m_bestIntegralBuildOrder.getNameString(m_bestIntegralGameState, 2) << std::endl;   
 }
 
 void CombatSearch_IntegralData::print() const

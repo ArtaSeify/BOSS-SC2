@@ -36,6 +36,7 @@ public:
     const ActionType & getAddon() const;
     const ActionType & getBuildType() const;
     const size_t & getID() const;
+    const double & getChronoBoostTime() const;
     void applyChronoBoost(const double & time);
 
     void castAbility(const ActionType & type, Unit & Unit);

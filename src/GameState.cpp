@@ -61,7 +61,7 @@ bool GameState::isLegal(const ActionType & action) const
     if ((m_minerals < action.mineralPrice()) && (mineralWorkers == 0)) { return false; }
 
     // don't build more refineries than resource depots
-    if (action.isRefinery() && (numRefineries >= numDepots)) { return false; }
+    if (action.isRefinery() && (numRefineries >= 2 * numDepots)) { return false; }
 
     // we don't need to go over the maximum supply limit with supply providers
     if (action.isSupplyProvider() && (m_maxSupply + getSupplyInProgress() > 400)) { return false; }
@@ -183,7 +183,7 @@ void GameState::completeUnit(Unit & unit)
     else if (unit.getType().isRefinery())
     {
         m_numRefineries++;
-        BOSS_ASSERT(m_numRefineries <= m_numDepots, "Shouldn't have more refineries than depots");
+        BOSS_ASSERT(m_numRefineries <= 2 * (int)(m_numDepots + getNumInProgress(ActionTypes::GetResourceDepot(m_race))), "Shouldn't have more refineries than 2*depots");
         int needGasWorkers = std::max(0, (CONSTANTS::WorkersPerRefinery*m_numRefineries - m_gasWorkers));
         BOSS_ASSERT(needGasWorkers < m_mineralWorkers, "Shouldn't need more gas workers than we have mineral workers");
         m_mineralWorkers -= needGasWorkers;
@@ -418,13 +418,6 @@ int GameState::getBuilderID(const ActionType & action) const
     return builderID;
 }
 
-// checks whether any Nexus has 50 energy to cast Chrono Boost
-bool GameState::canChronoBoost() const
-{
-    return std::any_of(m_units.begin(), m_units.end(),
-           [this](const Unit & u) { return (u.getType() == ActionTypes::GetResourceDepot(this->getRace()) && u.getEnergy() >= 50.0); });
-}
-
 bool GameState::haveBuilder(const ActionType & type) const
 {
     return std::any_of(m_units.begin(), m_units.end(), 
@@ -473,6 +466,16 @@ int GameState::getSupplyInProgress() const
     2. The building must be fully built
     3. The building must be producing something
 */
+// checks whether any Nexus has 50 energy to cast Chrono Boost
+bool GameState::canChronoBoost() const
+{
+    if (m_race != Races::Protoss)
+        return false;
+
+    return std::any_of(m_units.begin(), m_units.end(),
+        [this](const Unit & u) { return (u.getType() == ActionTypes::GetResourceDepot(this->getRace()) && u.getEnergy() >= 50.0); });
+}
+
 void GameState::storeChronoBoostTargets(ActionSet & actionSet) const
 {
     for (const Unit & unit : m_units)
@@ -487,7 +490,7 @@ void GameState::storeChronoBoostTargets(ActionSet & actionSet) const
 
 bool GameState::canChronoBoostTarget(const Unit & unit) const
 {
-    // can only ne used on buildings
+    // can only be used on buildings
     if (!unit.getType().isBuilding()) { return false; }
 
     // the unit must be fully built
@@ -495,6 +498,9 @@ bool GameState::canChronoBoostTarget(const Unit & unit) const
 
     // the unit must be producing something
     if (unit.getTimeUntilFree() == 0) { return false; }
+
+    // can't chronoboost a building that is already chronoboosted
+    if (unit.getChronoBoostTime() > 0) { return false; }
 
     return true;
 }

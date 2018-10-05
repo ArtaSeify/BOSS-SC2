@@ -39,6 +39,7 @@ class CombatSearch_IntegralData
     std::vector<IntegralData>       m_bestIntegralStack;
     double                          m_bestIntegralValue;
     BuildOrder                      m_bestIntegralBuildOrder;
+    GameState                       m_bestIntegralGameState;
 
 public:
 

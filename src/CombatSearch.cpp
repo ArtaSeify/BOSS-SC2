@@ -13,7 +13,6 @@ void CombatSearch::search()
     GameState initialState(m_params.getInitialState());
     m_buildOrder = m_params.getOpeningBuildOrder();
     Tools::DoBuildOrder(initialState, m_buildOrder);
-
     try
     {
         recurse(initialState, 0);
@@ -39,8 +38,16 @@ void CombatSearch::generateLegalActions(const GameState & state, ActionSet & leg
     for (ActionID a(0); a<allActions.size(); ++a)
     {
         const ActionType & action = allActions[a];
-        bool isLegal = state.isLegal(action);
+        
+        // special actions
+        // store a chronoboost action for each eligible target
+        if (action.getName() == "ChronoBoost" && state.canChronoBoost())
+        {
+            state.storeChronoBoostTargets(legalActions);
+            continue;
+        }
 
+        bool isLegal = state.isLegal(action);
         if (!isLegal)
         {
             continue;
@@ -54,27 +61,6 @@ void CombatSearch::generateLegalActions(const GameState & state, ActionSet & leg
         
         legalActions.add(action);
     }
-
-    //std::cout << "before adding chronoboost" << std::endl;
-    //std::cout << legalActions.toString() << std::endl;
-    // special actions
-    // store a chronoboost action for each eligible target
-    if (state.canChronoBoost())
-    {
-        state.storeChronoBoostTargets(legalActions);
-    }
-
-    //std::cout << "after adding chronoboost" << std::endl;
-    //std::cout << legalActions.toString() << std::endl;
-    /*auto & targets = legalActions.getAbilityTargets();
-    for (auto & target : targets)
-    {
-        auto & u = state.getUnit(target);
-        std::cout << "chronoboost target: " << u.getType().getName() << std::endl;
-        std::cout << "chronoboost target is producing: " << u.getBuildType().getName() << std::endl;
-        std::cout << "chronoboost target will finish producing: " << u.getTimeUntilFree() << std::endl;
-        std::cout << "chronoboost target will finish itself: " << u.getTimeUntilBuilt() << std::endl;
-    }*/
 
     // if we enabled the always make workers flag, and workers are legal
     const ActionType & worker = ActionTypes::GetWorker(state.getRace());
@@ -121,9 +107,6 @@ void CombatSearch::generateLegalActions(const GameState & state, ActionSet & leg
             legalActions.add(worker);
         }
     }
-
-    //std::cout << "after always make workers check" << std::endl;
-    //std::cout << legalActions.toString() << std::endl;
 }
 
 const CombatSearchResults & CombatSearch::getResults() const

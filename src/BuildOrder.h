@@ -2,6 +2,7 @@
 
 #include "Common.h"
 #include "ActionType.h"
+#include "GameState.h"
 
 
 namespace BOSS
@@ -37,6 +38,7 @@ public:
     std::string             getNumberedString() const;
     std::string             getIDString() const;
     std::string             getNameString(const size_t charactersPerName = 0) const;
+    std::string             getNameString(const GameState & state, const size_t charactersPerName = 0) const;
 };
 
 }
