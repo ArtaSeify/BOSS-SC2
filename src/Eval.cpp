@@ -4,7 +4,7 @@ namespace BOSS
 {
 namespace Eval
 {
-    double ArmyCompletedResourceSum(const GameState & state)
+    /*double ArmyCompletedResourceSum(const GameState & state)
     {
         double sum(0);
 	    
@@ -18,6 +18,20 @@ namespace Eval
 	    }
 	    
 	    return sum;
+    }*/
+
+    double ArmyCompletedResourceSum(const GameState & state)
+    {
+        double sum(0);
+
+        auto & army_units = state.getFinishedArmyUnits();
+        for (const Unit & unit : army_units)
+        {
+            sum += unit.getType().mineralPrice();
+            sum += 2 * unit.getType().gasPrice();
+        }
+
+        return sum;
     }
 
     double ArmyTotalResourceSum(const GameState & state)

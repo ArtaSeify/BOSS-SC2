@@ -124,20 +124,23 @@ void Unit::applyChronoBoost(const double & time)
     m_timeChronoBoost = time;
 
     BOSS_ASSERT(m_timeUntilFree > 0, "Chrono Boost used on target that is not producing anything");
-
-    // Chrono Boost speeds up production by 50%
-    double newTimeUntilFree = std::max(0.0, m_timeUntilFree - m_timeChronoBoost * 1.50);
-
     //std::cout << "Previous build time: " << m_timeUntilFree << std::endl;;
-    //std::cout << "New build time: " << newTimeUntilFree << std::endl;
     //std::cout << "Previous chrono boost time: " << m_timeChronoBoost << std::endl;
-
-    //BOSS_ASSERT(std::fmod(newTimeUntilFree, 1.0) == 0, "loss of frames in ChronoBoost speedup. Value: %f", newTimeUntilFree);
-
+    // Chrono Boost speeds up production by 50%
+    double newTimeUntilFree;
     // make changes to remaining production time and chronoboost time
-    m_timeChronoBoost = m_timeChronoBoost - (m_timeUntilFree - newTimeUntilFree) / 1.50;
+    if (m_timeChronoBoost >= m_timeUntilFree / 1.5)
+    {
+        newTimeUntilFree = m_timeUntilFree / 1.5;
+        m_timeChronoBoost -= newTimeUntilFree;
+    }
+    else
+    {
+        newTimeUntilFree = m_timeUntilFree - (m_timeChronoBoost / 2.0);
+        m_timeChronoBoost = 0;
+    }
+
     m_timeUntilFree = newTimeUntilFree;
-    //std::cout << "New chrono boost time: " << m_timeChronoBoost << std::endl;
 }
 
 const int & Unit::getTimeUntilBuilt() const

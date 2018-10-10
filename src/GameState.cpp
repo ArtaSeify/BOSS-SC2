@@ -168,6 +168,9 @@ void GameState::fastForward(const int & toFrame)
 
 void GameState::completeUnit(Unit & unit)
 {
+    addUnitToSpecialVector(unit);
+    m_unitsFinished.push_back(std::pair<Unit, size_t>(unit, m_currentFrame));
+
     unit.complete();
     m_maxSupply += unit.getType().supplyProvided();
 
@@ -229,6 +232,15 @@ void GameState::addUnit(const ActionType & type, int builderID)
     else
     {
         completeUnit(m_units.back());
+    }
+}
+
+void GameState::addUnitToSpecialVector(const Unit & unit)
+{
+    const ActionType & type = unit.getType();
+    if (!type.isBuilding() && !type.isWorker() && !type.isSupplyProvider())
+    {
+        m_armyUnits.push_back(unit);
     }
 }
 
@@ -482,7 +494,7 @@ void GameState::storeChronoBoostTargets(ActionSet & actionSet) const
     {
         if (canChronoBoostTarget(unit))
         {
-            //std::cout << ActionTypes::GetSpecialAction(m_race).getName() << " " << unit.getID() << std::endl;
+            //std::cout << "Chronoboost target: " << unit.getType().getName() << std::endl;
             actionSet.add(ActionTypes::GetSpecialAction(m_race), unit.getID());
         }
     }
@@ -503,6 +515,16 @@ bool GameState::canChronoBoostTarget(const Unit & unit) const
     if (unit.getChronoBoostTime() > 0) { return false; }
 
     return true;
+}
+
+const std::vector<Unit> & GameState::getFinishedArmyUnits() const
+{
+    return m_armyUnits;
+}
+
+const std::vector< std::pair<Unit, size_t> > & GameState::getUnitsFinished() const
+{
+    return m_unitsFinished;
 }
 
 const Unit & GameState::getUnit(const size_t & id) const

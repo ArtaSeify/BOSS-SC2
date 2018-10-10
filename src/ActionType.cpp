@@ -47,7 +47,7 @@ int  ActionType::energyCost()        const { return ActionTypeData::GetActionTyp
 int  ActionType::supplyProvided()    const { return ActionTypeData::GetActionTypeData(m_id).supplyProvided; }
 int  ActionType::numProduced()       const { return ActionTypeData::GetActionTypeData(m_id).numProduced; }
 int  ActionType::startingEnergy()	 const { return ActionTypeData::GetActionTypeData(m_id).startingEnergy; }
-int  ActionType::maxEnergy()		 const { return ActionTypeData::GetActionTypeData(m_id).maxEnergy; }
+double ActionType::maxEnergy()		 const { return ActionTypeData::GetActionTypeData(m_id).maxEnergy; }
 bool ActionType::isAddon()           const { return ActionTypeData::GetActionTypeData(m_id).isAddon; }
 bool ActionType::isRefinery()        const { return ActionTypeData::GetActionTypeData(m_id).isRefinery; }
 bool ActionType::isWorker()          const { return ActionTypeData::GetActionTypeData(m_id).isWorker; }

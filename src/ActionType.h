@@ -30,7 +30,7 @@ public:
     int  supplyProvided()   const;
     int  numProduced()      const;
 	int  startingEnergy()	const;
-	int  maxEnergy()		const;
+	double  maxEnergy()		const;
     bool isUnit()           const;
     bool isUpgrade()        const;
     bool isAbility()        const;

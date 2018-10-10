@@ -25,6 +25,9 @@ class GameState
     int					m_numDepots;
     ActionType			m_previousAction;
 
+    std::vector< std::pair<Unit, size_t> >   m_unitsFinished;
+    std::vector<Unit>   m_armyUnits;
+
     int			getBuilderID(const ActionType & type) const;
     bool		haveBuilder(const ActionType & type) const;
     bool		havePrerequisites(const ActionType & type) const;
@@ -33,6 +36,8 @@ class GameState
     int			whenPrerequisitesReady(const ActionType & action)   const;
     int			whenResourcesReady(const ActionType & action)       const;
     int			whenBuilderReady(const ActionType & action)         const;
+
+    void        addUnitToSpecialVector(const Unit & unit);
 
     Unit &		getUnit(const size_t & id);
     void		completeUnit(Unit & Unit);
@@ -52,7 +57,7 @@ public:
     int			    getSupplyInProgress() const;
     int             getLastActionFinishTime() const;
     int             getNextFinishTime(const ActionType & type) const;
-
+    
     void            storeChronoBoostTargets(ActionSet & actionSet) const;
     bool            canChronoBoostTarget(const Unit & unit) const;
     
@@ -72,6 +77,9 @@ public:
     void			addUnit(const ActionType & Unit, int builderID = -1);
     void			setMinerals(const double & minerals);
     void			setGas(const double & gas);
+    
+    const std::vector<Unit> & getFinishedArmyUnits() const;
+    const std::vector< std::pair<Unit, size_t> > & getUnitsFinished() const;
 
     std::string		toString() const;
 };

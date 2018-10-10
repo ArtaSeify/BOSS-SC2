@@ -169,11 +169,16 @@ std::string BuildOrder::getNameString(const size_t charactersPerName) const
     return ss.str();
 }
 
-std::string BuildOrder::getNameString(const GameState & state, const size_t charactersPerName) const
+std::string BuildOrder::getNameString(const GameState & state, const size_t charactersPerName, size_t printUpToIndex) const
 {
     std::stringstream ss;
 
-    for (size_t i(0); i < m_buildOrder.size(); ++i)
+    if (printUpToIndex == -1)
+    {
+        printUpToIndex = m_buildOrder.size();
+    }
+
+    for (size_t i(0); i < printUpToIndex; ++i)
     {
         std::string name = charactersPerName == 0 ? m_buildOrder[i].getName() : m_buildOrder[i].getName().substr(0, charactersPerName);;
         if (m_buildOrder[i].getName() == "ChronoBoost")

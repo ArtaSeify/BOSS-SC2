@@ -38,7 +38,8 @@ void CombatSearch_Integral::recurse(const GameState & state, size_t depth)
         if (child.getCurrentFrame() <= m_params.getFrameTimeLimit())
         {
             m_buildOrder.add(legalActions[index], legalActions.getAbilityTarget(index));
-            m_integral.update(child, m_buildOrder);
+            //m_integral.update(child, m_buildOrder);
+            m_integral.update(child, m_buildOrder, m_params);
 
             recurse(child, depth + 1);
 

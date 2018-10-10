@@ -8,13 +8,15 @@
 #include "CombatSearchParameters.h"
 #include "CombatSearchResults.h"
 #include "CombatSearch_IntegralData.h"
+#include "CombatSearch_IntegralDataFinishedUnits.h"
 
 namespace BOSS
 {
 
 class CombatSearch_Integral : public CombatSearch
 {
-    CombatSearch_IntegralData   m_integral;
+    //CombatSearch_IntegralData   m_integral;
+    CombatSearch_IntegralDataFinishedUnits  m_integral;
 
 	virtual void                recurse(const GameState & s, size_t depth);
 
