@@ -21,8 +21,9 @@ class Unit
     size_t      m_buildID;          // id of the Unit currently being built by this Unit
     int         m_job;              // current job this Unit has (UnitJobs::XXX)
     int         m_timeUntilBuilt;   // time remaining until this Unit is completed
-    double      m_timeUntilFree;    // time remaining until this Unit can build again
-	double		m_timeChronoBoost;	// time remaining on Chrono Boost. 
+    int         m_timeUntilFree;    // time remaining until this Unit can build again
+	double		m_timeChronoBoost;	// time remaining on Chrono Boost
+    int         m_timeChronoBoostAgain; // time until chronoboost can be used on this building again
 	int         m_numLarva;         // number of larva this building currently has (Hatch only)
 	double		m_energy;			// energy of the building
 
@@ -32,14 +33,17 @@ public:
 
     const int getTimeUntilFree() const;
     const int & getTimeUntilBuilt() const;
+    void setTimeUntilBuilt(const int & time);
     const ActionType & getType() const;
     const ActionType & getAddon() const;
     const ActionType & getBuildType() const;
     const size_t & getID() const;
-    const double & getChronoBoostTime() const;
-    void applyChronoBoost(const double & time);
+    const size_t & getBuilderID() const;
+    const double & getChronoBoostAgainTime() const;
+    const size_t & getBuildID() const;
+    void applyChronoBoost(const double & time, Unit & unitBeingProduced);
 
-    void castAbility(const ActionType & type, Unit & Unit);
+    void castAbility(const ActionType & type, Unit & abilityTarget, Unit & abilityTargetProduction);
 	const double & getEnergy() const;
     void reduceEnergy(const double & energy);
 
@@ -47,7 +51,7 @@ public:
 
     void complete();
     void setBuilderID(const int & id);
-    void startBuilding(const Unit & Unit);
+    void startBuilding(Unit & Unit);
     void fastForward(const int & frames);
 };
 

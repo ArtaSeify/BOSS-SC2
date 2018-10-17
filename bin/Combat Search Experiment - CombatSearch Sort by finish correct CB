@@ -1,0 +1,632 @@
+Combat Search Experiment - CombatSearch
+Could not make directory: ../bin/results
+
+************************************************
+* Running Experiment: CombatSearch [Integral]
+************************************************
+
+CombatSearchIntegral Results
+
+BuildOrder sorted by start times
+Pr Ch_Ne Ga
+  Start   Finish   ArmyEval  ArmyIntegral_N   ArmyIntegral_E   BuildOrder
+      0        0       0.00            0.00             0.00   Ch_Ne
+      0      182       0.00            0.00             0.00   Ch_Ne Pr
+
+CombatSearchIntegral Results
+
+BuildOrder sorted by start times
+Pr Ch_Ne Ga Pr Cy
+  Start   Finish   ArmyEval  ArmyIntegral_N   ArmyIntegral_E   BuildOrder
+      0        0       0.00            0.00             0.00   Ch_Ne
+      0      182       0.00            0.00             0.00   Ch_Ne Pr
+    356      628       0.00            0.00             0.00   Ch_Ne Pr Pr
+    271     1311       0.00            0.00             0.00   Ch_Ne Pr Pr Ga
+
+CombatSearchIntegral Results
+
+BuildOrder sorted by start times
+Pr Ch_Ne Ga Pr Cy Pr Ga
+  Start   Finish   ArmyEval  ArmyIntegral_N   ArmyIntegral_E   BuildOrder
+      0        0       0.00            0.00             0.00   Ch_Ne
+      0      182       0.00            0.00             0.00   Ch_Ne Pr
+    356      628       0.00            0.00             0.00   Ch_Ne Pr Pr
+    271     1311       0.00            0.00             0.00   Ch_Ne Pr Pr Ga
+   1311     1583       0.00            0.00             0.00   Ch_Ne Pr Pr Ga Pr
+
+CombatSearchIntegral Results
+
+BuildOrder sorted by start times
+Pr Ch_Ne Ga Pr Cy Pr Ga Ga Ga Py Ga As Pr
+  Start   Finish   ArmyEval  ArmyIntegral_N   ArmyIntegral_E   BuildOrder
+      0        0       0.00            0.00             0.00   Ch_Ne
+      0      182       0.00            0.00             0.00   Ch_Ne Pr
+    356      628       0.00            0.00             0.00   Ch_Ne Pr Pr
+    271     1311       0.00            0.00             0.00   Ch_Ne Pr Pr Ga
+   1311     1583       0.00            0.00             0.00   Ch_Ne Pr Pr Ga Pr
+   1583     1983       0.00            0.00             0.00   Ch_Ne Pr Pr Ga Pr Py
+
+CombatSearchIntegral Results
+
+BuildOrder sorted by start times
+Pr Ch_Ne Ga Pr Cy Pr As As Py Ze Pr Ch_Ga
+  Start   Finish   ArmyEval  ArmyIntegral_N   ArmyIntegral_E   BuildOrder
+      0        0       0.00            0.00             0.00   Ch_Ne
+      0      182       0.00            0.00             0.00   Ch_Ne Pr
+    356      628       0.00            0.00             0.00   Ch_Ne Pr Pr
+    271     1311       0.00            0.00             0.00   Ch_Ne Pr Pr Ga
+   1311     1583       0.00            0.00             0.00   Ch_Ne Pr Pr Ga Pr
+   1311     1711       0.00            0.00             0.00   Ch_Ne Pr Pr Ga Pr Py
+   1711     1711       0.00            0.00             0.00   Ch_Ne Pr Pr Ga Pr Py Ch_Ga
+   1311     1791       0.00            0.00             0.00   Ch_Ne Pr Pr Ga Pr Py Ch_Ga As
+   1311     1791       0.00            0.00             0.00   Ch_Ne Pr Pr Ga Pr Py Ch_Ga As As
+   1711     1983       0.00            0.00             0.00   Ch_Ne Pr Pr Ga Pr Py Ch_Ga As As Pr
+
+CombatSearchIntegral Results
+
+BuildOrder sorted by start times
+Pr Ch_Ne Ga Pr Cy Pr As As Py Ze Pr Ch_Ga Py Py Py Pr
+  Start   Finish   ArmyEval  ArmyIntegral_N   ArmyIntegral_E   BuildOrder
+      0        0       0.00            0.00             0.00   Ch_Ne
+      0      182       0.00            0.00             0.00   Ch_Ne Pr
+    356      628       0.00            0.00             0.00   Ch_Ne Pr Pr
+    271     1311       0.00            0.00             0.00   Ch_Ne Pr Pr Ga
+   1311     1583       0.00            0.00             0.00   Ch_Ne Pr Pr Ga Pr
+   1311     1711       0.00            0.00             0.00   Ch_Ne Pr Pr Ga Pr Py
+   1711     1711       0.00            0.00             0.00   Ch_Ne Pr Pr Ga Pr Py Ch_Ga
+   1311     1791       0.00            0.00             0.00   Ch_Ne Pr Pr Ga Pr Py Ch_Ga As
+   1311     1791       0.00            0.00             0.00   Ch_Ne Pr Pr Ga Pr Py Ch_Ga As As
+   1711     1983       0.00            0.00             0.00   Ch_Ne Pr Pr Ga Pr Py Ch_Ga As As Pr
+
+CombatSearchIntegral Results
+
+BuildOrder sorted by start times
+Pr Ch_Ne Ga Pr Cy Pr As As Py Ze Pr Py Py Py Pr
+  Start   Finish   ArmyEval  ArmyIntegral_N   ArmyIntegral_E   BuildOrder
+      0        0       0.00            0.00             0.00   Ch_Ne
+      0      182       0.00            0.00             0.00   Ch_Ne Pr
+    356      628       0.00            0.00             0.00   Ch_Ne Pr Pr
+    271     1311       0.00            0.00             0.00   Ch_Ne Pr Pr Ga
+   1311     1583       0.00            0.00             0.00   Ch_Ne Pr Pr Ga Pr
+   1311     1711       0.00            0.00             0.00   Ch_Ne Pr Pr Ga Pr Py
+   1311     1791       0.00            0.00             0.00   Ch_Ne Pr Pr Ga Pr Py As
+   1311     1791       0.00            0.00             0.00   Ch_Ne Pr Pr Ga Pr Py As As
+   1711     1983       0.00            0.00             0.00   Ch_Ne Pr Pr Ga Pr Py As As Pr
+
+CombatSearchIntegral Results
+
+BuildOrder sorted by start times
+Pr Ch_Ne Ga Pr Cy Pr As As Py Ga Ga Pr Ze Pr
+  Start   Finish   ArmyEval  ArmyIntegral_N   ArmyIntegral_E   BuildOrder
+      0        0       0.00            0.00             0.00   Ch_Ne
+      0      182       0.00            0.00             0.00   Ch_Ne Pr
+    356      628       0.00            0.00             0.00   Ch_Ne Pr Pr
+    271     1311       0.00            0.00             0.00   Ch_Ne Pr Pr Ga
+   1311     1583       0.00            0.00             0.00   Ch_Ne Pr Pr Ga Pr
+   1311     1711       0.00            0.00             0.00   Ch_Ne Pr Pr Ga Pr Py
+   1311     1791       0.00            0.00             0.00   Ch_Ne Pr Pr Ga Pr Py As
+   1311     1791       0.00            0.00             0.00   Ch_Ne Pr Pr Ga Pr Py As As
+   1711     1983       0.00            0.00             0.00   Ch_Ne Pr Pr Ga Pr Py As As Pr
+
+CombatSearchIntegral Results
+
+BuildOrder sorted by start times
+Pr Ch_Ne Ga Pr Cy Pr As As Py Ne Pr Ch_Ne Pr
+  Start   Finish   ArmyEval  ArmyIntegral_N   ArmyIntegral_E   BuildOrder
+      0        0       0.00            0.00             0.00   Ch_Ne
+      0      182       0.00            0.00             0.00   Ch_Ne Pr
+    356      628       0.00            0.00             0.00   Ch_Ne Pr Pr
+    271     1311       0.00            0.00             0.00   Ch_Ne Pr Pr Ga
+   1311     1583       0.00            0.00             0.00   Ch_Ne Pr Pr Ga Pr
+   1311     1711       0.00            0.00             0.00   Ch_Ne Pr Pr Ga Pr Py
+   1790     1790       0.00            0.00             0.00   Ch_Ne Pr Pr Ga Pr Py Ch_Ne
+   1311     1791       0.00            0.00             0.00   Ch_Ne Pr Pr Ga Pr Py Ch_Ne As
+   1311     1791       0.00            0.00             0.00   Ch_Ne Pr Pr Ga Pr Py Ch_Ne As As
+   1790     1972       0.00            0.00             0.00   Ch_Ne Pr Pr Ga Pr Py Ch_Ne As As Pr
+
+CombatSearchIntegral Results
+
+BuildOrder sorted by start times
+Pr Ch_Ne Ga Pr Ga Pr Cy Py Ze Pr Ne Pr
+  Start   Finish   ArmyEval  ArmyIntegral_N   ArmyIntegral_E   BuildOrder
+      0        0       0.00            0.00             0.00   Ch_Ne
+      0      182       0.00            0.00             0.00   Ch_Ne Pr
+    356      628       0.00            0.00             0.00   Ch_Ne Pr Pr
+    693      965       0.00            0.00             0.00   Ch_Ne Pr Pr Pr
+    271     1311       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Ga
+    628     1668       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Ga Ga
+   1311     1711       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Ga Ga Py
+   1711     1983       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Ga Ga Py Pr
+
+CombatSearchIntegral Results
+
+BuildOrder sorted by start times
+Pr Ch_Ne Ga Pr Ga Pr Ga As Py Ze Pr Cy Ch_Ne Pr As Pr
+  Start   Finish   ArmyEval  ArmyIntegral_N   ArmyIntegral_E   BuildOrder
+      0        0       0.00            0.00             0.00   Ch_Ne
+      0      182       0.00            0.00             0.00   Ch_Ne Pr
+    356      628       0.00            0.00             0.00   Ch_Ne Pr Pr
+    693      965       0.00            0.00             0.00   Ch_Ne Pr Pr Pr
+    271     1311       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Ga
+   1045     1525       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Ga As
+   1193     1593       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Ga As Py
+    628     1668       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Ga As Py Ga
+   1668     1668       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Ga As Py Ga Ch_Ne
+   1593     1800       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Ga As Py Ga Ch_Ne Pr
+   1800     1982       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Ga As Py Ga Ch_Ne Pr Pr
+
+CombatSearchIntegral Results
+
+BuildOrder sorted by start times
+Pr Ch_Ne Ga Pr Ga Pr Ga Py Ze Pr Ze Ch_Ga Ze
+  Start   Finish   ArmyEval  ArmyIntegral_N   ArmyIntegral_E   BuildOrder
+      0        0       0.00            0.00             0.00   Ch_Ne
+      0      182       0.00            0.00             0.00   Ch_Ne Pr
+    356      628       0.00            0.00             0.00   Ch_Ne Pr Pr
+    693      965       0.00            0.00             0.00   Ch_Ne Pr Pr Pr
+    271     1311       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Ga
+   1082     1482       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Ga Py
+    628     1668       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Ga Py Ga
+   1668     1668       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Ga Py Ga Ch_Ga
+   1482     1754       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Ga Py Ga Ch_Ga Pr
+   1482     1950     100.00            0.00          5000.00   Ch_Ne Pr Pr Pr Ga Py Ga Ch_Ga Pr Ze
+
+CombatSearchIntegral Results
+
+BuildOrder sorted by start times
+Pr Ch_Ne Ga Pr Ga Pr Ga Py Ze Pr Ze Ch_Ga Ga Pr Ze
+  Start   Finish   ArmyEval  ArmyIntegral_N   ArmyIntegral_E   BuildOrder
+      0        0       0.00            0.00             0.00   Ch_Ne
+      0      182       0.00            0.00             0.00   Ch_Ne Pr
+    356      628       0.00            0.00             0.00   Ch_Ne Pr Pr
+    693      965       0.00            0.00             0.00   Ch_Ne Pr Pr Pr
+    271     1311       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Ga
+   1082     1482       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Ga Py
+    628     1668       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Ga Py Ga
+   1668     1668       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Ga Py Ga Ch_Ga
+   1482     1754       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Ga Py Ga Ch_Ga Pr
+   1482     1950     100.00            0.00          5000.00   Ch_Ne Pr Pr Pr Ga Py Ga Ch_Ga Pr Ze
+
+CombatSearchIntegral Results
+
+BuildOrder sorted by start times
+Pr Ch_Ne Ga Pr Ga Pr Ga Py Ze Pr Ze Ch_Ga Ga Pr
+  Start   Finish   ArmyEval  ArmyIntegral_N   ArmyIntegral_E   BuildOrder
+      0        0       0.00            0.00             0.00   Ch_Ne
+      0      182       0.00            0.00             0.00   Ch_Ne Pr
+    356      628       0.00            0.00             0.00   Ch_Ne Pr Pr
+    693      965       0.00            0.00             0.00   Ch_Ne Pr Pr Pr
+    271     1311       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Ga
+   1082     1482       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Ga Py
+    628     1668       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Ga Py Ga
+   1668     1668       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Ga Py Ga Ch_Ga
+   1482     1754       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Ga Py Ga Ch_Ga Pr
+   1482     1950     100.00            0.00          5000.00   Ch_Ne Pr Pr Pr Ga Py Ga Ch_Ga Pr Ze
+
+CombatSearchIntegral Results
+
+BuildOrder sorted by start times
+Pr Ch_Ne Ga Pr Ga Pr Ga Py Cy Ze Pr As Ch_Ga Ze Pr Ze
+  Start   Finish   ArmyEval  ArmyIntegral_N   ArmyIntegral_E   BuildOrder
+      0        0       0.00            0.00             0.00   Ch_Ne
+      0      182       0.00            0.00             0.00   Ch_Ne Pr
+    356      628       0.00            0.00             0.00   Ch_Ne Pr Pr
+    693      965       0.00            0.00             0.00   Ch_Ne Pr Pr Pr
+    271     1311       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Ga
+   1082     1482       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Ga Py
+   1637     1637       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Ga Py Ch_Ga
+    628     1668       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Ga Py Ch_Ga Ga
+   1526     1798       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Ga Py Ch_Ga Ga Pr
+   1482     1939     100.00            0.00          6100.00   Ch_Ne Pr Pr Pr Ga Py Ch_Ga Ga Pr Ze
+
+CombatSearchIntegral Results
+
+BuildOrder sorted by start times
+Pr Ch_Ne Ga Pr Ga Pr Ga Py Cy Ze Pr As Ch_Ga Ze Pr
+  Start   Finish   ArmyEval  ArmyIntegral_N   ArmyIntegral_E   BuildOrder
+      0        0       0.00            0.00             0.00   Ch_Ne
+      0      182       0.00            0.00             0.00   Ch_Ne Pr
+    356      628       0.00            0.00             0.00   Ch_Ne Pr Pr
+    693      965       0.00            0.00             0.00   Ch_Ne Pr Pr Pr
+    271     1311       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Ga
+   1082     1482       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Ga Py
+   1637     1637       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Ga Py Ch_Ga
+    628     1668       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Ga Py Ch_Ga Ga
+   1526     1798       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Ga Py Ch_Ga Ga Pr
+   1482     1939     100.00            0.00          6100.00   Ch_Ne Pr Pr Pr Ga Py Ch_Ga Ga Pr Ze
+
+CombatSearchIntegral Results
+
+BuildOrder sorted by start times
+Pr Ch_Ne Ga Pr Ga Pr As Py Ze Pr Ze Pr Ch_Ga Ze
+  Start   Finish   ArmyEval  ArmyIntegral_N   ArmyIntegral_E   BuildOrder
+      0        0       0.00            0.00             0.00   Ch_Ne
+      0      182       0.00            0.00             0.00   Ch_Ne Pr
+    356      628       0.00            0.00             0.00   Ch_Ne Pr Pr
+    693      965       0.00            0.00             0.00   Ch_Ne Pr Pr Pr
+    812     1292       0.00            0.00             0.00   Ch_Ne Pr Pr Pr As
+    271     1311       0.00            0.00             0.00   Ch_Ne Pr Pr Pr As Ga
+    971     1371       0.00            0.00             0.00   Ch_Ne Pr Pr Pr As Ga Py
+   1371     1643       0.00            0.00             0.00   Ch_Ne Pr Pr Pr As Ga Py Pr
+    628     1668       0.00            0.00             0.00   Ch_Ne Pr Pr Pr As Ga Py Pr Ga
+   1668     1668       0.00            0.00             0.00   Ch_Ne Pr Pr Pr As Ga Py Pr Ga Ch_Ga
+   1371     1876     100.00            0.00         12400.00   Ch_Ne Pr Pr Pr As Ga Py Pr Ga Ch_Ga Ze
+
+CombatSearchIntegral Results
+
+BuildOrder sorted by start times
+Pr Ch_Ne Ga Pr Ga Pr As Py Ze Pr Ze Pr Ch_Ga Cy As Pr
+  Start   Finish   ArmyEval  ArmyIntegral_N   ArmyIntegral_E   BuildOrder
+      0        0       0.00            0.00             0.00   Ch_Ne
+      0      182       0.00            0.00             0.00   Ch_Ne Pr
+    356      628       0.00            0.00             0.00   Ch_Ne Pr Pr
+    693      965       0.00            0.00             0.00   Ch_Ne Pr Pr Pr
+    812     1292       0.00            0.00             0.00   Ch_Ne Pr Pr Pr As
+    271     1311       0.00            0.00             0.00   Ch_Ne Pr Pr Pr As Ga
+    971     1371       0.00            0.00             0.00   Ch_Ne Pr Pr Pr As Ga Py
+   1371     1643       0.00            0.00             0.00   Ch_Ne Pr Pr Pr As Ga Py Pr
+    628     1668       0.00            0.00             0.00   Ch_Ne Pr Pr Pr As Ga Py Pr Ga
+   1668     1668       0.00            0.00             0.00   Ch_Ne Pr Pr Pr As Ga Py Pr Ga Ch_Ga
+   1371     1876     100.00            0.00         12400.00   Ch_Ne Pr Pr Pr As Ga Py Pr Ga Ch_Ga Ze
+   1668     1940     100.00         6400.00         12400.00   Ch_Ne Pr Pr Pr As Ga Py Pr Ga Ch_Ga Ze Pr
+
+CombatSearchIntegral Results
+
+BuildOrder sorted by start times
+Pr Ch_Ne Ga Pr Ga Pr As Py Ze Pr Ga Pr Ch_Ga Ze Ze
+  Start   Finish   ArmyEval  ArmyIntegral_N   ArmyIntegral_E   BuildOrder
+      0        0       0.00            0.00             0.00   Ch_Ne
+      0      182       0.00            0.00             0.00   Ch_Ne Pr
+    356      628       0.00            0.00             0.00   Ch_Ne Pr Pr
+    693      965       0.00            0.00             0.00   Ch_Ne Pr Pr Pr
+    812     1292       0.00            0.00             0.00   Ch_Ne Pr Pr Pr As
+    271     1311       0.00            0.00             0.00   Ch_Ne Pr Pr Pr As Ga
+    971     1371       0.00            0.00             0.00   Ch_Ne Pr Pr Pr As Ga Py
+   1371     1643       0.00            0.00             0.00   Ch_Ne Pr Pr Pr As Ga Py Pr
+   1643     1643       0.00            0.00             0.00   Ch_Ne Pr Pr Pr As Ga Py Pr Ch_Ga
+    628     1668       0.00            0.00             0.00   Ch_Ne Pr Pr Pr As Ga Py Pr Ch_Ga Ga
+   1371     1867     100.00            0.00         13300.00   Ch_Ne Pr Pr Pr As Ga Py Pr Ch_Ga Ga Ze
+
+CombatSearchIntegral Results
+
+BuildOrder sorted by start times
+Pr Ch_Ne Ga Pr Ga Pr As Py Ze Pr Ga Pr Ch_Ga Ze As Pr
+  Start   Finish   ArmyEval  ArmyIntegral_N   ArmyIntegral_E   BuildOrder
+      0        0       0.00            0.00             0.00   Ch_Ne
+      0      182       0.00            0.00             0.00   Ch_Ne Pr
+    356      628       0.00            0.00             0.00   Ch_Ne Pr Pr
+    693      965       0.00            0.00             0.00   Ch_Ne Pr Pr Pr
+    812     1292       0.00            0.00             0.00   Ch_Ne Pr Pr Pr As
+    271     1311       0.00            0.00             0.00   Ch_Ne Pr Pr Pr As Ga
+    971     1371       0.00            0.00             0.00   Ch_Ne Pr Pr Pr As Ga Py
+   1371     1643       0.00            0.00             0.00   Ch_Ne Pr Pr Pr As Ga Py Pr
+   1643     1643       0.00            0.00             0.00   Ch_Ne Pr Pr Pr As Ga Py Pr Ch_Ga
+    628     1668       0.00            0.00             0.00   Ch_Ne Pr Pr Pr As Ga Py Pr Ch_Ga Ga
+   1371     1867     100.00            0.00         13300.00   Ch_Ne Pr Pr Pr As Ga Py Pr Ch_Ga Ga Ze
+   1643     1915     100.00         4800.00         13300.00   Ch_Ne Pr Pr Pr As Ga Py Pr Ch_Ga Ga Ze Pr
+
+CombatSearchIntegral Results
+
+BuildOrder sorted by start times
+Pr Ch_Ne Ga Pr Ga Pr As Py Ze Pr Ga Pr Ch_Ga Cy Pr
+  Start   Finish   ArmyEval  ArmyIntegral_N   ArmyIntegral_E   BuildOrder
+      0        0       0.00            0.00             0.00   Ch_Ne
+      0      182       0.00            0.00             0.00   Ch_Ne Pr
+    356      628       0.00            0.00             0.00   Ch_Ne Pr Pr
+    693      965       0.00            0.00             0.00   Ch_Ne Pr Pr Pr
+    812     1292       0.00            0.00             0.00   Ch_Ne Pr Pr Pr As
+    271     1311       0.00            0.00             0.00   Ch_Ne Pr Pr Pr As Ga
+    971     1371       0.00            0.00             0.00   Ch_Ne Pr Pr Pr As Ga Py
+   1371     1643       0.00            0.00             0.00   Ch_Ne Pr Pr Pr As Ga Py Pr
+   1643     1643       0.00            0.00             0.00   Ch_Ne Pr Pr Pr As Ga Py Pr Ch_Ga
+    628     1668       0.00            0.00             0.00   Ch_Ne Pr Pr Pr As Ga Py Pr Ch_Ga Ga
+   1371     1867     100.00            0.00         13300.00   Ch_Ne Pr Pr Pr As Ga Py Pr Ch_Ga Ga Ze
+   1643     1915     100.00         4800.00         13300.00   Ch_Ne Pr Pr Pr As Ga Py Pr Ch_Ga Ga Ze Pr
+
+CombatSearchIntegral Results
+
+BuildOrder sorted by start times
+Pr Ch_Ne Ga Pr Ga Pr Py Ze Pr Ze Pr Ch_Ga Ze
+  Start   Finish   ArmyEval  ArmyIntegral_N   ArmyIntegral_E   BuildOrder
+      0        0       0.00            0.00             0.00   Ch_Ne
+      0      182       0.00            0.00             0.00   Ch_Ne Pr
+    356      628       0.00            0.00             0.00   Ch_Ne Pr Pr
+    693      965       0.00            0.00             0.00   Ch_Ne Pr Pr Pr
+    852     1252       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Py
+    271     1311       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Py Ga
+   1311     1583       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Py Ga Pr
+    628     1668       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Py Ga Pr Ga
+   1668     1668       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Py Ga Pr Ga Ch_Ga
+   1311     1836     100.00            0.00         16400.00   Ch_Ne Pr Pr Pr Py Ga Pr Ga Ch_Ga Ze
+
+CombatSearchIntegral Results
+
+BuildOrder sorted by start times
+Pr Ch_Ne Ga Pr Ga Pr Py Ze Pr Ze Pr Ch_Ga Cy As As Py Pr
+  Start   Finish   ArmyEval  ArmyIntegral_N   ArmyIntegral_E   BuildOrder
+      0        0       0.00            0.00             0.00   Ch_Ne
+      0      182       0.00            0.00             0.00   Ch_Ne Pr
+    356      628       0.00            0.00             0.00   Ch_Ne Pr Pr
+    693      965       0.00            0.00             0.00   Ch_Ne Pr Pr Pr
+    852     1252       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Py
+    271     1311       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Py Ga
+   1311     1583       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Py Ga Pr
+    628     1668       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Py Ga Pr Ga
+   1668     1668       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Py Ga Pr Ga Ch_Ga
+   1311     1836     100.00            0.00         16400.00   Ch_Ne Pr Pr Pr Py Ga Pr Ga Ch_Ga Ze
+   1668     1940     100.00        10400.00         16400.00   Ch_Ne Pr Pr Pr Py Ga Pr Ga Ch_Ga Ze Pr
+
+CombatSearchIntegral Results
+
+BuildOrder sorted by start times
+Pr Ch_Ne Ga Pr Ga Pr Py Ze Pr Ze Pr Ch_Ga Ne Pr
+  Start   Finish   ArmyEval  ArmyIntegral_N   ArmyIntegral_E   BuildOrder
+      0        0       0.00            0.00             0.00   Ch_Ne
+      0      182       0.00            0.00             0.00   Ch_Ne Pr
+    356      628       0.00            0.00             0.00   Ch_Ne Pr Pr
+    693      965       0.00            0.00             0.00   Ch_Ne Pr Pr Pr
+    852     1252       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Py
+    271     1311       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Py Ga
+   1311     1583       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Py Ga Pr
+    628     1668       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Py Ga Pr Ga
+   1668     1668       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Py Ga Pr Ga Ch_Ga
+   1311     1836     100.00            0.00         16400.00   Ch_Ne Pr Pr Pr Py Ga Pr Ga Ch_Ga Ze
+   1668     1940     100.00        10400.00         16400.00   Ch_Ne Pr Pr Pr Py Ga Pr Ga Ch_Ga Ze Pr
+
+CombatSearchIntegral Results
+
+BuildOrder sorted by start times
+Pr Ch_Ne Ga Pr Ga Pr Py Ze Pr Ga Pr As Py Ch_Ga Ze Pr
+  Start   Finish   ArmyEval  ArmyIntegral_N   ArmyIntegral_E   BuildOrder
+      0        0       0.00            0.00             0.00   Ch_Ne
+      0      182       0.00            0.00             0.00   Ch_Ne Pr
+    356      628       0.00            0.00             0.00   Ch_Ne Pr Pr
+    693      965       0.00            0.00             0.00   Ch_Ne Pr Pr Pr
+    852     1252       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Py
+    271     1311       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Py Ga
+   1311     1583       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Py Ga Pr
+   1634     1634       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Py Ga Pr Ch_Ga
+    628     1668       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Py Ga Pr Ch_Ga Ga
+   1311     1824     100.00            0.00         17600.00   Ch_Ne Pr Pr Pr Py Ga Pr Ch_Ga Ga Ze
+   1583     1855     100.00         3100.00         17600.00   Ch_Ne Pr Pr Pr Py Ga Pr Ch_Ga Ga Ze Pr
+
+CombatSearchIntegral Results
+
+BuildOrder sorted by start times
+Pr Ch_Ne Ga Pr Ga Pr Py As Py Ze Pr As Pr Ch_Ga Ze Pr
+  Start   Finish   ArmyEval  ArmyIntegral_N   ArmyIntegral_E   BuildOrder
+      0        0       0.00            0.00             0.00   Ch_Ne
+      0      182       0.00            0.00             0.00   Ch_Ne Pr
+    356      628       0.00            0.00             0.00   Ch_Ne Pr Pr
+    693      965       0.00            0.00             0.00   Ch_Ne Pr Pr Pr
+    852     1252       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Py
+    271     1311       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Py Ga
+    971     1451       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Py Ga As
+   1119     1519       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Py Ga As Py
+   1341     1613       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Py Ga As Py Pr
+   1613     1613       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Py Ga As Py Pr Ch_Ga
+    628     1668       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Py Ga As Py Pr Ch_Ga Ga
+   1311     1817     100.00            0.00         18300.00   Ch_Ne Pr Pr Pr Py Ga As Py Pr Ch_Ga Ga Ze
+   1613     1885     100.00         6800.00         18300.00   Ch_Ne Pr Pr Pr Py Ga As Py Pr Ch_Ga Ga Ze Pr
+
+CombatSearchIntegral Results
+
+BuildOrder sorted by start times
+Pr Ch_Ne Ga Pr Py Pr Ze Pr Ne Ch_Ga Ze
+  Start   Finish   ArmyEval  ArmyIntegral_N   ArmyIntegral_E   BuildOrder
+      0        0       0.00            0.00             0.00   Ch_Ne
+      0      182       0.00            0.00             0.00   Ch_Ne Pr
+    356      628       0.00            0.00             0.00   Ch_Ne Pr Pr
+    628      900       0.00            0.00             0.00   Ch_Ne Pr Pr Pr
+    527      927       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Py
+    271     1311       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Py Ga
+   1448     1448       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Py Ga Ch_Ga
+   1311     1583       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Py Ga Ch_Ga Pr
+   1311     1762     100.00            0.00         23800.00   Ch_Ne Pr Pr Pr Py Ga Ch_Ga Pr Ze
+
+CombatSearchIntegral Results
+
+BuildOrder sorted by start times
+Pr Ch_Ne Ga Pr Py Pr Ze Pr Ne Ch_Ga Ze Pr Ch_Ne
+  Start   Finish   ArmyEval  ArmyIntegral_N   ArmyIntegral_E   BuildOrder
+      0        0       0.00            0.00             0.00   Ch_Ne
+      0      182       0.00            0.00             0.00   Ch_Ne Pr
+    356      628       0.00            0.00             0.00   Ch_Ne Pr Pr
+    628      900       0.00            0.00             0.00   Ch_Ne Pr Pr Pr
+    527      927       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Py
+    271     1311       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Py Ga
+   1448     1448       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Py Ga Ch_Ga
+   1311     1583       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Py Ga Ch_Ga Pr
+   1311     1762     100.00            0.00         23800.00   Ch_Ne Pr Pr Pr Py Ga Ch_Ga Pr Ze
+   1762     1762     100.00            0.00         23800.00   Ch_Ne Pr Pr Pr Py Ga Ch_Ga Pr Ze Ch_Ne
+   1762     1944     100.00        18200.00         23800.00   Ch_Ne Pr Pr Pr Py Ga Ch_Ga Pr Ze Ch_Ne Pr
+
+CombatSearchIntegral Results
+
+BuildOrder sorted by start times
+Pr Ch_Ne Ga Pr Py Pr Ze Pr Ne Ch_Ga Ze Pr Ch_Ne As As Pr
+  Start   Finish   ArmyEval  ArmyIntegral_N   ArmyIntegral_E   BuildOrder
+      0        0       0.00            0.00             0.00   Ch_Ne
+      0      182       0.00            0.00             0.00   Ch_Ne Pr
+    356      628       0.00            0.00             0.00   Ch_Ne Pr Pr
+    628      900       0.00            0.00             0.00   Ch_Ne Pr Pr Pr
+    527      927       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Py
+    271     1311       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Py Ga
+   1448     1448       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Py Ga Ch_Ga
+   1311     1583       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Py Ga Ch_Ga Pr
+   1311     1762     100.00            0.00         23800.00   Ch_Ne Pr Pr Pr Py Ga Ch_Ga Pr Ze
+   1762     1762     100.00            0.00         23800.00   Ch_Ne Pr Pr Pr Py Ga Ch_Ga Pr Ze Ch_Ne
+   1762     1944     100.00        18200.00         23800.00   Ch_Ne Pr Pr Pr Py Ga Ch_Ga Pr Ze Ch_Ne Pr
+
+CombatSearchIntegral Results
+
+BuildOrder sorted by start times
+Pr Ch_Ne Ga Pr Py Pr Ze Pr Ne Ch_Ga Cy Pr Ch_Ne Ze Pr
+  Start   Finish   ArmyEval  ArmyIntegral_N   ArmyIntegral_E   BuildOrder
+      0        0       0.00            0.00             0.00   Ch_Ne
+      0      182       0.00            0.00             0.00   Ch_Ne Pr
+    356      628       0.00            0.00             0.00   Ch_Ne Pr Pr
+    628      900       0.00            0.00             0.00   Ch_Ne Pr Pr Pr
+    527      927       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Py
+    271     1311       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Py Ga
+   1448     1448       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Py Ga Ch_Ga
+   1311     1583       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Py Ga Ch_Ga Pr
+   1311     1762     100.00            0.00         23800.00   Ch_Ne Pr Pr Pr Py Ga Ch_Ga Pr Ze
+   1762     1762     100.00            0.00         23800.00   Ch_Ne Pr Pr Pr Py Ga Ch_Ga Pr Ze Ch_Ne
+   1762     1944     100.00        18200.00         23800.00   Ch_Ne Pr Pr Pr Py Ga Ch_Ga Pr Ze Ch_Ne Pr
+
+CombatSearchIntegral Results
+
+BuildOrder sorted by start times
+Pr Ch_Ne Ga Pr Py Pr Ze Pr Ne Ch_Ga As Pr Cy Pr
+  Start   Finish   ArmyEval  ArmyIntegral_N   ArmyIntegral_E   BuildOrder
+      0        0       0.00            0.00             0.00   Ch_Ne
+      0      182       0.00            0.00             0.00   Ch_Ne Pr
+    356      628       0.00            0.00             0.00   Ch_Ne Pr Pr
+    628      900       0.00            0.00             0.00   Ch_Ne Pr Pr Pr
+    527      927       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Py
+    271     1311       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Py Ga
+   1448     1448       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Py Ga Ch_Ga
+   1311     1583       0.00            0.00             0.00   Ch_Ne Pr Pr Pr Py Ga Ch_Ga Pr
+   1311     1762     100.00            0.00         23800.00   Ch_Ne Pr Pr Pr Py Ga Ch_Ga Pr Ze
+   1630     1902     100.00        14000.00         23800.00   Ch_Ne Pr Pr Pr Py Ga Ch_Ga Pr Ze Pr
+
+CombatSearchIntegral Results
+
+BuildOrder sorted by start times
+Pr Ga Pr Ga Pr Py Ze Pr Ch_Ga Ze Pr Ch_Ga Ze
+  Start   Finish   ArmyEval  ArmyIntegral_N   ArmyIntegral_E   BuildOrder
+      0      272       0.00            0.00             0.00   Pr
+    363      635       0.00            0.00             0.00   Pr Pr
+    700      972       0.00            0.00             0.00   Pr Pr Pr
+    859     1259       0.00            0.00             0.00   Pr Pr Pr Py
+    278     1318       0.00            0.00             0.00   Pr Pr Pr Py Ga
+   1318     1318       0.00            0.00             0.00   Pr Pr Pr Py Ga Ch_Ga
+   1318     1590       0.00            0.00             0.00   Pr Pr Pr Py Ga Ch_Ga Pr
+    635     1675       0.00            0.00             0.00   Pr Pr Pr Py Ga Ch_Ga Pr Ga
+   1675     1675       0.00            0.00             0.00   Pr Pr Pr Py Ga Ch_Ga Pr Ga Ch_Ga
+   1318     1736     100.00            0.00         26400.00   Pr Pr Pr Py Ga Ch_Ga Pr Ga Ch_Ga Ze
+
+CombatSearchIntegral Results
+
+BuildOrder sorted by start times
+Pr Ga Pr Ga Pr Py Ze Pr Ch_Ga Ze Pr Ch_Ga Cy As As Py Pr
+  Start   Finish   ArmyEval  ArmyIntegral_N   ArmyIntegral_E   BuildOrder
+      0      272       0.00            0.00             0.00   Pr
+    363      635       0.00            0.00             0.00   Pr Pr
+    700      972       0.00            0.00             0.00   Pr Pr Pr
+    859     1259       0.00            0.00             0.00   Pr Pr Pr Py
+    278     1318       0.00            0.00             0.00   Pr Pr Pr Py Ga
+   1318     1318       0.00            0.00             0.00   Pr Pr Pr Py Ga Ch_Ga
+   1318     1590       0.00            0.00             0.00   Pr Pr Pr Py Ga Ch_Ga Pr
+    635     1675       0.00            0.00             0.00   Pr Pr Pr Py Ga Ch_Ga Pr Ga
+   1675     1675       0.00            0.00             0.00   Pr Pr Pr Py Ga Ch_Ga Pr Ga Ch_Ga
+   1318     1736     100.00            0.00         26400.00   Pr Pr Pr Py Ga Ch_Ga Pr Ga Ch_Ga Ze
+   1675     1947     100.00        21100.00         26400.00   Pr Pr Pr Py Ga Ch_Ga Pr Ga Ch_Ga Ze Pr
+
+CombatSearchIntegral Results
+
+BuildOrder sorted by start times
+Pr Ga Pr Ga Pr Py Ze Pr Ch_Ga Ze Pr Ch_Ga Ne Pr
+  Start   Finish   ArmyEval  ArmyIntegral_N   ArmyIntegral_E   BuildOrder
+      0      272       0.00            0.00             0.00   Pr
+    363      635       0.00            0.00             0.00   Pr Pr
+    700      972       0.00            0.00             0.00   Pr Pr Pr
+    859     1259       0.00            0.00             0.00   Pr Pr Pr Py
+    278     1318       0.00            0.00             0.00   Pr Pr Pr Py Ga
+   1318     1318       0.00            0.00             0.00   Pr Pr Pr Py Ga Ch_Ga
+   1318     1590       0.00            0.00             0.00   Pr Pr Pr Py Ga Ch_Ga Pr
+    635     1675       0.00            0.00             0.00   Pr Pr Pr Py Ga Ch_Ga Pr Ga
+   1675     1675       0.00            0.00             0.00   Pr Pr Pr Py Ga Ch_Ga Pr Ga Ch_Ga
+   1318     1736     100.00            0.00         26400.00   Pr Pr Pr Py Ga Ch_Ga Pr Ga Ch_Ga Ze
+   1675     1947     100.00        21100.00         26400.00   Pr Pr Pr Py Ga Ch_Ga Pr Ga Ch_Ga Ze Pr
+
+CombatSearchIntegral Results
+
+BuildOrder sorted by start times
+Pr Ga Pr Ga Pr Py Ze Pr Ch_Ga Ga Pr As Py Ch_Ga Ze
+  Start   Finish   ArmyEval  ArmyIntegral_N   ArmyIntegral_E   BuildOrder
+      0      272       0.00            0.00             0.00   Pr
+    363      635       0.00            0.00             0.00   Pr Pr
+    700      972       0.00            0.00             0.00   Pr Pr Pr
+    859     1259       0.00            0.00             0.00   Pr Pr Pr Py
+    278     1318       0.00            0.00             0.00   Pr Pr Pr Py Ga
+   1318     1318       0.00            0.00             0.00   Pr Pr Pr Py Ga Ch_Ga
+   1318     1590       0.00            0.00             0.00   Pr Pr Pr Py Ga Ch_Ga Pr
+   1641     1641       0.00            0.00             0.00   Pr Pr Pr Py Ga Ch_Ga Pr Ch_Ga
+    635     1675       0.00            0.00             0.00   Pr Pr Pr Py Ga Ch_Ga Pr Ch_Ga Ga
+   1318     1725     100.00            0.00         27500.00   Pr Pr Pr Py Ga Ch_Ga Pr Ch_Ga Ga Ze
+
+CombatSearchIntegral Results
+
+BuildOrder sorted by start times
+Pr Ga Pr Ga Pr Py Ze Pr Ch_Ga Ga Pr As Py Ch_Ga Ze Pr
+  Start   Finish   ArmyEval  ArmyIntegral_N   ArmyIntegral_E   BuildOrder
+      0      272       0.00            0.00             0.00   Pr
+    363      635       0.00            0.00             0.00   Pr Pr
+    700      972       0.00            0.00             0.00   Pr Pr Pr
+    859     1259       0.00            0.00             0.00   Pr Pr Pr Py
+    278     1318       0.00            0.00             0.00   Pr Pr Pr Py Ga
+   1318     1318       0.00            0.00             0.00   Pr Pr Pr Py Ga Ch_Ga
+   1318     1590       0.00            0.00             0.00   Pr Pr Pr Py Ga Ch_Ga Pr
+   1641     1641       0.00            0.00             0.00   Pr Pr Pr Py Ga Ch_Ga Pr Ch_Ga
+    635     1675       0.00            0.00             0.00   Pr Pr Pr Py Ga Ch_Ga Pr Ch_Ga Ga
+   1318     1725     100.00            0.00         27500.00   Pr Pr Pr Py Ga Ch_Ga Pr Ch_Ga Ga Ze
+   1590     1862     100.00        13700.00         27500.00   Pr Pr Pr Py Ga Ch_Ga Pr Ch_Ga Ga Ze Pr
+
+CombatSearchIntegral Results
+
+BuildOrder sorted by start times
+Pr Ga Pr Ga Pr Py As Ze Pr Ch_Ga Ga Pr As Ch_Ga Ze
+  Start   Finish   ArmyEval  ArmyIntegral_N   ArmyIntegral_E   BuildOrder
+      0      272       0.00            0.00             0.00   Pr
+    363      635       0.00            0.00             0.00   Pr Pr
+    700      972       0.00            0.00             0.00   Pr Pr Pr
+    859     1259       0.00            0.00             0.00   Pr Pr Pr Py
+    278     1318       0.00            0.00             0.00   Pr Pr Pr Py Ga
+   1318     1318       0.00            0.00             0.00   Pr Pr Pr Py Ga Ch_Ga
+    978     1458       0.00            0.00             0.00   Pr Pr Pr Py Ga Ch_Ga As
+   1318     1590       0.00            0.00             0.00   Pr Pr Pr Py Ga Ch_Ga As Pr
+   1640     1640       0.00            0.00             0.00   Pr Pr Pr Py Ga Ch_Ga As Pr Ch_Ga
+    635     1675       0.00            0.00             0.00   Pr Pr Pr Py Ga Ch_Ga As Pr Ch_Ga Ga
+   1318     1724     100.00            0.00         27600.00   Pr Pr Pr Py Ga Ch_Ga As Pr Ch_Ga Ga Ze
+
+CombatSearchIntegral Results
+
+BuildOrder sorted by start times
+Pr Ga Pr Ga Pr Py As Ze Pr Ch_Ga Ga Pr As Ch_Ga Ze Pr
+  Start   Finish   ArmyEval  ArmyIntegral_N   ArmyIntegral_E   BuildOrder
+      0      272       0.00            0.00             0.00   Pr
+    363      635       0.00            0.00             0.00   Pr Pr
+    700      972       0.00            0.00             0.00   Pr Pr Pr
+    859     1259       0.00            0.00             0.00   Pr Pr Pr Py
+    278     1318       0.00            0.00             0.00   Pr Pr Pr Py Ga
+   1318     1318       0.00            0.00             0.00   Pr Pr Pr Py Ga Ch_Ga
+    978     1458       0.00            0.00             0.00   Pr Pr Pr Py Ga Ch_Ga As
+   1318     1590       0.00            0.00             0.00   Pr Pr Pr Py Ga Ch_Ga As Pr
+   1640     1640       0.00            0.00             0.00   Pr Pr Pr Py Ga Ch_Ga As Pr Ch_Ga
+    635     1675       0.00            0.00             0.00   Pr Pr Pr Py Ga Ch_Ga As Pr Ch_Ga Ga
+   1318     1724     100.00            0.00         27600.00   Pr Pr Pr Py Ga Ch_Ga As Pr Ch_Ga Ga Ze
+   1590     1862     100.00        13800.00         27600.00   Pr Pr Pr Py Ga Ch_Ga As Pr Ch_Ga Ga Ze Pr
+
+CombatSearchIntegral Results
+
+BuildOrder sorted by start times
+Pr Ga Pr Ga Pr Py As Ze Pr Ch_Ga Ga Pr As Ch_Ga Ze Pr
+  Start   Finish   ArmyEval  ArmyIntegral_N   ArmyIntegral_E   BuildOrder
+      0      272       0.00            0.00             0.00   Pr
+    363      635       0.00            0.00             0.00   Pr Pr
+    700      972       0.00            0.00             0.00   Pr Pr Pr
+    859     1259       0.00            0.00             0.00   Pr Pr Pr Py
+    278     1318       0.00            0.00             0.00   Pr Pr Pr Py Ga
+   1318     1318       0.00            0.00             0.00   Pr Pr Pr Py Ga Ch_Ga
+    978     1458       0.00            0.00             0.00   Pr Pr Pr Py Ga Ch_Ga As
+   1318     1590       0.00            0.00             0.00   Pr Pr Pr Py Ga Ch_Ga As Pr
+   1640     1640       0.00            0.00             0.00   Pr Pr Pr Py Ga Ch_Ga As Pr Ch_Ga
+    635     1675       0.00            0.00             0.00   Pr Pr Pr Py Ga Ch_Ga As Pr Ch_Ga Ga
+   1318     1724     100.00            0.00         27600.00   Pr Pr Pr Py Ga Ch_Ga As Pr Ch_Ga Ga Ze
+   1590     1862     100.00        13800.00         27600.00   Pr Pr Pr Py Ga Ch_Ga As Pr Ch_Ga Ga Ze Pr
+
+Searched 2336941 nodes in 24004.2ms @ 97355.7 nodes/sec
+
+    CombatSearch completed

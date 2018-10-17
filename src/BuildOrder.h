@@ -23,6 +23,7 @@ public:
     void                    add(const ActionType & type, const int & amount);
     void                    add(const BuildOrder & other);
     void                    clear();
+    const ActionType &      back() const;
     void                    pop_back();
     void                    sortByPrerequisites();
     

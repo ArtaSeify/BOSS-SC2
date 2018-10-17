@@ -25,10 +25,10 @@ namespace Eval
         double sum(0);
 
         auto & army_units = state.getFinishedArmyUnits();
-        for (const Unit & unit : army_units)
+        for (const size_t & unit_index : army_units)
         {
-            sum += unit.getType().mineralPrice();
-            sum += 2 * unit.getType().gasPrice();
+            sum += state.getUnit(unit_index).getType().mineralPrice();
+            sum += 2 * state.getUnit(unit_index).getType().gasPrice();
         }
 
         return sum;
@@ -48,6 +48,27 @@ namespace Eval
 	    }
 	    
 	    return sum;
+    }
+
+    double ArmyResourceSumToIndex(const GameState & state, size_t finishedUnitsIndex)
+    {
+        double sum(0);
+
+        auto & finishedUnits = state.getFinishedUnits();
+        auto & unitTimes = state.getUnitTimes();
+
+        for (size_t index(0); index < finishedUnitsIndex + 1; ++index)
+        {
+            const Unit & unit = state.getUnit(unitTimes[finishedUnits[index]].first);
+            auto & type = unit.getType();
+            if (!type.isBuilding() && !type.isWorker() && !type.isSupplyProvider())
+            {
+                sum += type.mineralPrice();
+                sum += 2 * type.gasPrice();
+            }
+        }
+
+        return sum;
     }
 
     bool BuildOrderBetter(const BuildOrder & buildOrder, const BuildOrder & compareTo)

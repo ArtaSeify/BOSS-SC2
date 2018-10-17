@@ -11,6 +11,7 @@ class GameState
 {
     std::vector<Unit>	m_units;
     std::vector<size_t>	m_unitsBeingBuilt;  // indices of m_units which are not completed, sorted descending by finish time
+    std::vector<size_t> m_chronoBoostTargets;
     int					m_race;
     double				m_minerals;
     double				m_gas;
@@ -23,10 +24,11 @@ class GameState
     int					m_buildingWorkers;
     int					m_numRefineries;
     int					m_numDepots;
-    ActionType			m_previousAction;
+    ActionType			m_lastAction;
 
-    std::vector< std::pair<Unit, size_t> >   m_unitsFinished;
-    std::vector<Unit>   m_armyUnits;
+    std::vector< std::pair<size_t, std::pair<size_t,size_t> > >   m_unitsStartAndEndFrames;           // <m_units_index, <start_frame, end_frame>>
+    std::vector<size_t>     m_unitsSortedEndFrame;      // holds indices of finished units. Indices point to m_unitsStartAndEndFrames, in the order they were finished in
+    std::vector<size_t>     m_armyUnits;                // holds indices of produced army units
 
     int			getBuilderID(const ActionType & type) const;
     bool		haveBuilder(const ActionType & type) const;
@@ -37,7 +39,7 @@ class GameState
     int			whenResourcesReady(const ActionType & action)       const;
     int			whenBuilderReady(const ActionType & action)         const;
 
-    void        addUnitToSpecialVector(const Unit & unit);
+    void        addUnitToSpecialVectors(const size_t & unitIndex);
 
     Unit &		getUnit(const size_t & id);
     void		completeUnit(Unit & Unit);
@@ -71,6 +73,8 @@ public:
     bool			isLegal(const ActionType & type) const;
     bool			haveType(const ActionType & action) const;
     int				getRace() const;
+    size_t          getChronoBoostsCast() const;
+    const ActionType & getLastAction() const;
 
     void			doAction(const ActionType & type, const size_t & targetID = -1);
     void			fastForward(const int & frames);
@@ -78,9 +82,14 @@ public:
     void			setMinerals(const double & minerals);
     void			setGas(const double & gas);
     
-    const std::vector<Unit> & getFinishedArmyUnits() const;
-    const std::vector< std::pair<Unit, size_t> > & getUnitsFinished() const;
+    const std::vector<size_t> &                                             getFinishedArmyUnits() const;
+    const std::vector< std::pair<size_t, std::pair<size_t, size_t> > > &    getUnitTimes() const;
+    const std::vector<size_t> &                                             getFinishedUnits() const;
+    const std::vector<size_t> &                                             getChronoBoostTargets() const;
 
     std::string		toString() const;
+
+
+    void printunitsbeingbuilt() const;
 };
 }

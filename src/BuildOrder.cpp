@@ -83,6 +83,11 @@ ActionType & BuildOrder::operator [] (const size_t & i)
     return m_buildOrder[i];
 }
 
+const ActionType & BuildOrder::back() const
+{
+    return m_buildOrder.back();
+}
+
 const size_t BuildOrder::size() const
 {
     return m_buildOrder.size();

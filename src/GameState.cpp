@@ -17,7 +17,7 @@ GameState::GameState()
     , m_buildingWorkers (0)
     , m_numRefineries   (0)
     , m_numDepots       (0)
-    , m_previousAction  (ActionTypes::None)
+    , m_lastAction  (ActionTypes::None)
 {
 
 }
@@ -78,6 +78,7 @@ bool GameState::isLegal(const ActionType & action) const
 void GameState::doAction(const ActionType & type, const size_t & targetID)
 {
     int previousFrame = m_currentFrame;
+    m_lastAction = type;
 
     // figure out when this action can be done and fast forward to it
     const int timeWhenReady = whenCanBuild(type);
@@ -89,7 +90,26 @@ void GameState::doAction(const ActionType & type, const size_t & targetID)
     if (type.isAbility())
     {
         BOSS_ASSERT(targetID != -1, "Target of ability %s is invalid. Target ID: %u", type.getName().c_str(), targetID);
-        getUnit(buildID).castAbility(type, getUnit(targetID));
+        // cast ability on building
+        getUnit(buildID).castAbility(type, getUnit(targetID), getUnit(getUnit(targetID).getBuildID()));
+        if (type.getName() == "ChronoBoost")
+        {
+            m_chronoBoostTargets.push_back(targetID);
+            // have to resort the list, because build time of a unit is changed
+            size_t index = find(m_unitsBeingBuilt.begin(), m_unitsBeingBuilt.end(), getUnit(targetID).getBuildID()) - m_unitsBeingBuilt.begin();
+            for (size_t i = index; i < m_unitsBeingBuilt.size() - 1; ++i)
+            {
+                if (getUnit(m_unitsBeingBuilt[i]).getTimeUntilBuilt() < getUnit(m_unitsBeingBuilt[i + 1]).getTimeUntilBuilt())
+                {
+                    std::swap(m_unitsBeingBuilt[i], m_unitsBeingBuilt[i + 1]);
+                }
+                else
+                {
+                    break;
+                }
+            }
+        }
+        
         return;
     }    
 
@@ -140,6 +160,7 @@ void GameState::fastForward(const int & toFrame)
         m_minerals              += timeElapsed * CONSTANTS::MPWPF * m_mineralWorkers;
         m_gas                   += timeElapsed * CONSTANTS::GPWPF * m_gasWorkers;
         lastActionFinishTime    = actionCompletionTime;
+        m_currentFrame += timeElapsed;
         
         // if it's a Terran building that's not an addon, the worker returns to minerals
         if (type.getRace() == Races::Terran && type.isBuilding() && !type.isAddon())
@@ -163,16 +184,15 @@ void GameState::fastForward(const int & toFrame)
         unit.fastForward(toFrame - previousFrame);
     }
 
-    m_currentFrame = toFrame;
+    m_currentFrame += timeElapsed;
 }
 
 void GameState::completeUnit(Unit & unit)
 {
-    addUnitToSpecialVector(unit);
-    m_unitsFinished.push_back(std::pair<Unit, size_t>(unit, m_currentFrame));
-
     unit.complete();
     m_maxSupply += unit.getType().supplyProvided();
+
+    addUnitToSpecialVectors(unit.getID());
 
     // if it's a worker, assign it to the correct job
     if (unit.getType().isWorker())
@@ -213,19 +233,24 @@ void GameState::addUnit(const ActionType & type, int builderID)
     // if we have a valid builder for this object, add it to the Units being built
     if (builderID != -1)
     {
+        m_unitsStartAndEndFrames.push_back(std::pair<size_t, std::pair<size_t, size_t>>(unit.getID(), std::pair<size_t, size_t>(m_currentFrame, 0)));
+
         getUnit(builderID).startBuilding(m_units.back());
 
         // add the Unit ID being built and sort the list
         m_unitsBeingBuilt.push_back(unit.getID());
 
         // we know the list is already sorted when we add this unit, so we just swap it from the end until it's in the right place
-        for (size_t i = m_unitsBeingBuilt.size() - 1; i > 0; i--) 
+        for (size_t i = m_unitsBeingBuilt.size() - 1; i > 0; i--)
         {
             if (getUnit(m_unitsBeingBuilt[i]).getTimeUntilBuilt() > getUnit(m_unitsBeingBuilt[i - 1]).getTimeUntilBuilt())
-            { 
-                std::swap(m_unitsBeingBuilt[i], m_unitsBeingBuilt[i - 1]); 
+            {
+                std::swap(m_unitsBeingBuilt[i], m_unitsBeingBuilt[i - 1]);
             }
-            else { break; }
+            else
+            {
+                break;
+            }
         }
     }
     // if there's no builder, complete the unit now and skip the unit in progress step
@@ -235,13 +260,36 @@ void GameState::addUnit(const ActionType & type, int builderID)
     }
 }
 
-void GameState::addUnitToSpecialVector(const Unit & unit)
+void GameState::addUnitToSpecialVectors(const size_t & unitIndex)
 {
-    const ActionType & type = unit.getType();
+    // we don't want to store units that we start with
+    if (m_units[unitIndex].getBuilderID() == -1)
+    {
+        return;
+    }
+
+    // if it's a combat unit add it to the armyUnits vector
+    const ActionType & type = m_units[unitIndex].getType();
     if (!type.isBuilding() && !type.isWorker() && !type.isSupplyProvider())
     {
-        m_armyUnits.push_back(unit);
+        m_armyUnits.push_back(unitIndex);
     }
+
+    size_t index = 0;
+    // add the end time to the vector
+    while (index < m_unitsStartAndEndFrames.size())
+    {
+        auto & value = m_unitsStartAndEndFrames[index];
+        if (value.first == unitIndex)
+        {
+            value.second.second = m_currentFrame;
+            break;
+        }
+        index++;
+    }
+  
+    // add to finished units vector
+    m_unitsSortedEndFrame.push_back(index);
 }
 
 int GameState::whenCanBuild(const ActionType & action) const
@@ -512,19 +560,24 @@ bool GameState::canChronoBoostTarget(const Unit & unit) const
     if (unit.getTimeUntilFree() == 0) { return false; }
 
     // can't chronoboost a building that is already chronoboosted
-    if (unit.getChronoBoostTime() > 0) { return false; }
+    if (unit.getChronoBoostAgainTime() > 0) { return false; }
 
     return true;
 }
 
-const std::vector<Unit> & GameState::getFinishedArmyUnits() const
+const std::vector<size_t> & GameState::getFinishedArmyUnits() const
 {
     return m_armyUnits;
 }
 
-const std::vector< std::pair<Unit, size_t> > & GameState::getUnitsFinished() const
+const std::vector< std::pair<size_t, std::pair<size_t, size_t> > > & GameState::getUnitTimes() const
 {
-    return m_unitsFinished;
+    return m_unitsStartAndEndFrames;
+}
+
+const std::vector<size_t> & GameState::getFinishedUnits() const
+{
+    return m_unitsSortedEndFrame;
 }
 
 const Unit & GameState::getUnit(const size_t & id) const
@@ -590,6 +643,21 @@ size_t GameState::getNumMineralWorkers() const
 size_t GameState::getNumGasWorkers() const
 {
     return m_gasWorkers;
+}
+
+size_t GameState::getChronoBoostsCast() const
+{
+    return m_chronoBoostTargets.size();
+}
+
+const std::vector<size_t> & GameState::getChronoBoostTargets() const
+{
+    return m_chronoBoostTargets;
+}
+
+const ActionType & GameState::getLastAction() const
+{
+    return m_lastAction;
 }
 
 int GameState::getLastActionFinishTime() const
@@ -664,4 +732,13 @@ std::string GameState::toString() const
     //printPath();
 
     return ss.str();
+}
+
+void GameState::printunitsbeingbuilt() const
+{
+    for (auto & index : m_unitsBeingBuilt)
+    {
+        std::cout << getUnit(index).getTimeUntilBuilt() << std::endl;
+    }
+    std::cout << std::endl;
 }
