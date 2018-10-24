@@ -11,27 +11,13 @@ CombatSearch_IntegralDataFinishedUnits::CombatSearch_IntegralDataFinishedUnits()
 
 void CombatSearch_IntegralDataFinishedUnits::update(const GameState & state, const BuildOrder & buildOrder, const CombatSearchParameters & params)
 {   
-    if (state.getLastAction() == ActionTypes::GetActionType("ChronoBoost") && state.getChronoBoostsCast() > m_chronoBoostEntries)
-    {
-        m_chronoBoostEntries++;
-        auto & previous_entry = m_integralStack.back();
-        IntegralDataFinishedUnits entry(previous_entry.eval, previous_entry.integral_ToThisPoint, previous_entry.integral_UntilFrameLimit, state.getCurrentFrame(), state.getCurrentFrame());
-        m_integralStack.push_back(entry);
-        //std::cout << "chronoboost added!" << std::endl;
-    }
-
     auto & finishedUnits = state.getFinishedUnits();
-    int new_units = finishedUnits.size() - (m_integralStack.size() - (state.getChronoBoostsCast() + 1));
-
-    if (new_units < 0)
-    {
-        std::cout << state.getChronoBoostsCast() << std::endl;
-    }
+    int new_units = finishedUnits.size() - (m_integralStack.size() - (m_chronoBoostEntries + 1));
 
     BOSS_ASSERT(new_units >= 0, "negative new units? %d", new_units);
 
-    // no new units
-    if (new_units == 0)
+    // no new units or chronoboosts
+    if (new_units == 0 && m_chronoBoostEntries == state.getChronoBoostsCast())
     {
         return;
     }
@@ -58,11 +44,22 @@ void CombatSearch_IntegralDataFinishedUnits::update(const GameState & state, con
         m_integralStack.push_back(entry);
     }
 
+    // Chrono Boost entry
+    if (state.getLastAction() == ActionTypes::GetActionType("ChronoBoost") && state.getChronoBoostsCast() > m_chronoBoostEntries)
+    {
+        m_chronoBoostEntries++;
+        auto & previous_entry = m_integralStack.back();
+        IntegralDataFinishedUnits entry(previous_entry.eval, previous_entry.integral_ToThisPoint, previous_entry.integral_UntilFrameLimit, state.getCurrentFrame(), state.getCurrentFrame());
+        m_integralStack.push_back(entry);
+
+        //std::cout << "chronoboost added!" << std::endl;
+    }
+
     // we have found a new best if:
         // 1. the new army integral is higher than the previous best
         // 2. the new army integral is the same as the old best but the build order is 'better'
     if ((m_integralStack.back().integral_UntilFrameLimit > m_bestIntegralValue)
-        || ((m_integralStack.back().integral_UntilFrameLimit == m_bestIntegralValue) && Eval::BuildOrderBetter(buildOrder, m_bestIntegralBuildOrder)))
+        || ((m_integralStack.back().integral_UntilFrameLimit == m_bestIntegralValue) && Eval::StateBetter(state, m_bestIntegralGameState)))
     {
         m_bestIntegralValue = m_integralStack.back().integral_UntilFrameLimit;
         m_bestIntegralStack = m_integralStack;
@@ -115,14 +112,8 @@ void CombatSearch_IntegralDataFinishedUnits::pop_back()
 void CombatSearch_IntegralDataFinishedUnits::popFinishedLastOrder(const GameState & prevState, const GameState & currState)
 {
     size_t chronoBoostsToRemove = currState.getChronoBoostsCast() - prevState.getChronoBoostsCast();
-    if (chronoBoostsToRemove > 0)
-    {
-        //std::cout << "Previous state's last action: " << prevState.getLastAction().getName() << std::endl;
-        //std::cout << "Current state's last action: " << currState.getLastAction().getName() << std::endl;
-        //std::cout << "Last entry in stack: " << m_integralStack.back().timeStarted << " " << m_integralStack.back().timeFinished << std::endl;
-        //std::cout << chronoBoostsToRemove << " " << (currState.getFinishedUnits().size() - prevState.getFinishedUnits().size()) + chronoBoostsToRemove << std::endl;
-    }
     m_chronoBoostEntries -= chronoBoostsToRemove;
+
     size_t numRemove = (currState.getFinishedUnits().size() - prevState.getFinishedUnits().size()) + chronoBoostsToRemove;
 
     BOSS_ASSERT(numRemove < m_integralStack.size(), "Removing %d elements from integral stack when it has %d elements", numRemove, m_integralStack.size());

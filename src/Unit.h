@@ -20,10 +20,10 @@ class Unit
     ActionType  m_buildType;        // type of the Unit currently being built by this Unit
     size_t      m_buildID;          // id of the Unit currently being built by this Unit
     int         m_job;              // current job this Unit has (UnitJobs::XXX)
-    int         m_timeUntilBuilt;   // time remaining until this Unit is completed
-    int         m_timeUntilFree;    // time remaining until this Unit can build again
+    double      m_timeUntilBuilt;   // time remaining until this Unit is completed
+    double      m_timeUntilFree;    // time remaining until this Unit can build again
 	double		m_timeChronoBoost;	// time remaining on Chrono Boost
-    int         m_timeChronoBoostAgain; // time until chronoboost can be used on this building again
+    double      m_timeChronoBoostAgain; // time until chronoboost can be used on this building again
 	int         m_numLarva;         // number of larva this building currently has (Hatch only)
 	double		m_energy;			// energy of the building
 
@@ -32,14 +32,14 @@ public:
     Unit(const ActionType & type, const size_t & id, int builderID);
 
     const int getTimeUntilFree() const;
-    const int & getTimeUntilBuilt() const;
-    void setTimeUntilBuilt(const int & time);
+    const int getTimeUntilBuilt() const;
+    void setTimeUntilBuilt(const double & time);
     const ActionType & getType() const;
     const ActionType & getAddon() const;
     const ActionType & getBuildType() const;
     const size_t & getID() const;
     const size_t & getBuilderID() const;
-    const double & getChronoBoostAgainTime() const;
+    const int getChronoBoostAgainTime() const;
     const size_t & getBuildID() const;
     void applyChronoBoost(const double & time, Unit & unitBeingProduced);
 

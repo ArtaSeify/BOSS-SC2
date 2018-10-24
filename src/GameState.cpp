@@ -34,15 +34,15 @@ void GameState::getLegalActions(std::vector<ActionType> & legalActions) const
 bool GameState::isLegal(const ActionType & action) const
 {
     // if the race can't do the action
-    if (action.getRace() != m_race) { return false; }
-    
-    // abilities are treated separately
-    if (action.isAbility()) { return false; }
+    if (action.getRace() != m_race) { return false; }    
     
     const size_t mineralWorkers			= m_mineralWorkers + m_buildingWorkers;
     const size_t refineriesInProgress	= getNumInProgress(ActionTypes::GetRefinery(m_race));
     const size_t numRefineries			= m_numRefineries + refineriesInProgress;
     const size_t numDepots				= m_numDepots + getNumInProgress(ActionTypes::GetResourceDepot(m_race));
+
+    // we can Chrono Boost as long as we have a Nexus
+    if (action.isAbility() && m_race == Races::GetRaceID("Protoss") && numDepots == 0) { return false; }
 
     // if we have no mineral workers, we can't make any unit
     if (mineralWorkers == 0) { return false; }
@@ -63,6 +63,13 @@ bool GameState::isLegal(const ActionType & action) const
     // don't build more refineries than resource depots
     if (action.isRefinery() && (numRefineries >= 2 * numDepots)) { return false; }
 
+    // don't build a refinery if we don't have enough mineral workers to transfer over
+    if (action.isRefinery() && (mineralWorkers <= (CONSTANTS::WorkersPerRefinery * (numRefineries + 1))))
+    {
+        //std::cout << "workers: " << mineralWorkers << ". Asking for " << CONSTANTS::WorkersPerRefinery << " workers for gas." << std::endl;
+        return false; 
+    }
+
     // we don't need to go over the maximum supply limit with supply providers
     if (action.isSupplyProvider() && (m_maxSupply + getSupplyInProgress() > 400)) { return false; }
 
@@ -75,8 +82,10 @@ bool GameState::isLegal(const ActionType & action) const
     return true;
 }
 
-void GameState::doAction(const ActionType & type, const size_t & targetID)
+void GameState::doAction(const ActionType & type)
 {
+    BOSS_ASSERT(!type.isAbility(), "doAction should not be called with an ability");
+
     int previousFrame = m_currentFrame;
     m_lastAction = type;
 
@@ -86,32 +95,6 @@ void GameState::doAction(const ActionType & type, const size_t & targetID)
 
     // the builder of action
     int buildID = getBuilderID(type);
-
-    if (type.isAbility())
-    {
-        BOSS_ASSERT(targetID != -1, "Target of ability %s is invalid. Target ID: %u", type.getName().c_str(), targetID);
-        // cast ability on building
-        getUnit(buildID).castAbility(type, getUnit(targetID), getUnit(getUnit(targetID).getBuildID()));
-        if (type.getName() == "ChronoBoost")
-        {
-            m_chronoBoostTargets.push_back(targetID);
-            // have to resort the list, because build time of a unit is changed
-            size_t index = find(m_unitsBeingBuilt.begin(), m_unitsBeingBuilt.end(), getUnit(targetID).getBuildID()) - m_unitsBeingBuilt.begin();
-            for (size_t i = index; i < m_unitsBeingBuilt.size() - 1; ++i)
-            {
-                if (getUnit(m_unitsBeingBuilt[i]).getTimeUntilBuilt() < getUnit(m_unitsBeingBuilt[i + 1]).getTimeUntilBuilt())
-                {
-                    std::swap(m_unitsBeingBuilt[i], m_unitsBeingBuilt[i + 1]);
-                }
-                else
-                {
-                    break;
-                }
-            }
-        }
-        
-        return;
-    }    
 
     // subtract the resource cost
     m_minerals  -= type.mineralPrice();
@@ -132,6 +115,58 @@ void GameState::doAction(const ActionType & type, const size_t & targetID)
 
     // get a builder for this type and start building it
     addUnit(type, buildID);
+
+    return;
+}
+
+bool GameState::doAbility(const ActionType & type, const size_t & targetID)
+{
+    BOSS_ASSERT(type.isAbility(), "doAbility should not be called with a non-ability action");
+    BOSS_ASSERT(targetID != -1, "Target of ability %s is invalid. Target ID: %u", type.getName().c_str(), targetID);
+
+    int previousFrame = m_currentFrame;
+    m_lastAction = type;
+
+    // figure out when this action can be done and fast forward to it
+    const int timeWhenReady = whenCanCast(type, targetID);
+    fastForward(timeWhenReady);
+
+    /*if (m_currentFrame == 1638 && getUnit(targetID).getType().getName() == "Gateway")
+    {
+        if (getUnit(getUnit(targetID).getBuildID()).getType().getName() == "Zealot" && m_chronoBoostTargets.size() > 0 && m_chronoBoostTargets[0] == targetID)
+        {
+            std::cout << "gateway will finish zealot in: " << getUnit(targetID).getTimeUntilFree() << std::endl;
+            std::cout << "can chronoboost again in: " << getUnit(targetID).getChronoBoostAgainTime() << std::endl;
+            std::cout << std::endl;
+        }
+    }*/
+
+    if (m_race == Races::GetRaceID("Protoss"))
+    {
+        // cast ability on building  
+        if (!canChronoBoostTarget(getUnit(targetID)))
+        {
+            return false;
+        }
+
+        getUnit(getBuilderID(type)).castAbility(type, getUnit(targetID), getUnit(getUnit(targetID).getBuildID()));
+        m_chronoBoostTargets.push_back(targetID);
+
+        // have to resort the list, because build time of a unit is changed
+        size_t index = find(m_unitsBeingBuilt.begin(), m_unitsBeingBuilt.end(), getUnit(targetID).getBuildID()) - m_unitsBeingBuilt.begin();
+        for (size_t i = index; i < m_unitsBeingBuilt.size() - 1; ++i)
+        {
+            if (getUnit(m_unitsBeingBuilt[i]).getTimeUntilBuilt() < getUnit(m_unitsBeingBuilt[i + 1]).getTimeUntilBuilt())
+            {
+                std::swap(m_unitsBeingBuilt[i], m_unitsBeingBuilt[i + 1]);
+            }
+            else
+            {
+                break;
+            }
+        }
+    }
+    return true;
 }
 
 void GameState::fastForward(const int & toFrame)
@@ -199,18 +234,23 @@ void GameState::completeUnit(Unit & unit)
     {
         m_mineralWorkers++;
         int needGasWorkers = std::max(0, (CONSTANTS::WorkersPerRefinery*m_numRefineries - m_gasWorkers));
-        BOSS_ASSERT(needGasWorkers < m_mineralWorkers, "Shouldn't need more gas workers than we have mineral workers");
+        BOSS_ASSERT(needGasWorkers < m_mineralWorkers, "Shouldn't need more gas workers than we have mineral workers. "
+                                        "%d required gas workers, %d mineral workers", needGasWorkers, m_mineralWorkers);
         m_mineralWorkers -= needGasWorkers;
         m_gasWorkers += needGasWorkers;
     }
     else if (unit.getType().isRefinery())
     {
+        //std::cout << "mineral workers before refinery build: " << m_mineralWorkers << std::endl;
         m_numRefineries++;
+        //std::cout << "we have " << m_numRefineries << " refineries, and " << (int)(m_numDepots + getNumInProgress(ActionTypes::GetResourceDepot(m_race))) << " bases." << std::endl;
         BOSS_ASSERT(m_numRefineries <= 2 * (int)(m_numDepots + getNumInProgress(ActionTypes::GetResourceDepot(m_race))), "Shouldn't have more refineries than 2*depots");
         int needGasWorkers = std::max(0, (CONSTANTS::WorkersPerRefinery*m_numRefineries - m_gasWorkers));
-        BOSS_ASSERT(needGasWorkers < m_mineralWorkers, "Shouldn't need more gas workers than we have mineral workers");
+        BOSS_ASSERT(needGasWorkers < m_mineralWorkers, "Shouldn't need more gas workers than we have mineral workers. "
+                                                       "%d required gas workers, %d mineral workers", needGasWorkers, m_mineralWorkers);
         m_mineralWorkers -= needGasWorkers;
         m_gasWorkers += needGasWorkers;
+        //std::cout << "mineral workers after refinery build: " << m_mineralWorkers << std::endl;
     }
     else if (unit.getType().isDepot())
     {
@@ -294,8 +334,13 @@ void GameState::addUnitToSpecialVectors(const size_t & unitIndex)
 
 int GameState::whenCanBuild(const ActionType & action) const
 {
+    if (action.isAbility())
+    {
+        return whenEnergyReady(action);
+    }
+
     // figure out when prerequisites will be ready
-    int maxTime         = m_currentFrame;
+    int maxTime = m_currentFrame;
     int prereqTime      = whenPrerequisitesReady(action);
     int resourceTime    = whenResourcesReady(action);
     int supplyTime      = whenSupplyReady(action);
@@ -308,6 +353,22 @@ int GameState::whenCanBuild(const ActionType & action) const
     maxTime = std::max(builderTime,     maxTime);
 
     // return the time
+    return maxTime;
+}
+
+int GameState::whenCanCast(const ActionType & action, const size_t & targetID) const
+{
+    BOSS_ASSERT(action.isAbility(), "whenCanCast should only be called with an ability");
+
+    int maxTime = m_currentFrame;
+    int energyReady = whenEnergyReady(action);
+    int buildingFinished = m_currentFrame + getUnit(targetID).getTimeUntilBuilt();
+    int canChronoBoostAgain = m_currentFrame + getUnit(targetID).getChronoBoostAgainTime();
+
+    maxTime = std::max(energyReady,         maxTime);
+    maxTime = std::max(buildingFinished,    maxTime);
+    maxTime = std::max(canChronoBoostAgain, maxTime);
+
     return maxTime;
 }
 
@@ -449,6 +510,30 @@ int GameState::whenPrerequisitesReady(const ActionType & action) const
     return m_currentFrame + whenPrereqReady;
 }
 
+int GameState::whenEnergyReady(const ActionType & action) const
+{
+    int minWhenReady = std::numeric_limits<int>::max();
+
+    for (auto & unit : m_units)
+    {
+        int whenReady = unit.whenCanBuild(action);
+
+        // shortcut return if we found something that can build now
+        if (whenReady == 0)
+        {
+            return m_currentFrame;
+        }
+
+        // if the Unit can build the unit, set the new min
+        if (whenReady != -1 && whenReady < minWhenReady)
+        {
+            minWhenReady = whenReady;
+        }
+    }
+
+    return m_currentFrame + minWhenReady;
+}
+
 int GameState::getBuilderID(const ActionType & action) const
 {
     int minWhenReady = std::numeric_limits<int>::max();
@@ -520,12 +605,16 @@ int GameState::getSupplyInProgress() const
            [this](size_t lhs, size_t rhs) { return lhs + this->getUnit(rhs).getType().supplyProvided(); });
 }
 
-// conditions for Chrono Boost:
-/*
-    1. Target must be a building6
-    2. The building must be fully built
-    3. The building must be producing something
-*/
+void GameState::getSpecialAbilityTargets(ActionSet & actionSet) const
+{
+    if (m_race == Races::GetRaceID("Protoss"))
+    {
+        actionSet.remove(ActionTypes::GetSpecialAction(m_race));
+        storeChronoBoostTargets(actionSet);
+    }
+}
+
+
 // checks whether any Nexus has 50 energy to cast Chrono Boost
 bool GameState::canChronoBoost() const
 {
@@ -540,12 +629,26 @@ void GameState::storeChronoBoostTargets(ActionSet & actionSet) const
 {
     for (const Unit & unit : m_units)
     {
-        if (canChronoBoostTarget(unit))
+        if (chronoBoostableTarget(unit))
         {
             //std::cout << "Chronoboost target: " << unit.getType().getName() << std::endl;
             actionSet.add(ActionTypes::GetSpecialAction(m_race), unit.getID());
         }
     }
+}
+
+bool GameState::chronoBoostableTarget(const Unit & unit) const
+{
+    // can only be used on buildings
+    if (!unit.getType().isBuilding()) { return false; }
+
+    // can't chrono boost refinery
+    if (unit.getType().isRefinery()) { return false; }
+
+    // can't chrono boost pylon
+    if (unit.getType().isSupplyProvider()) { return false; }
+
+    return true;
 }
 
 bool GameState::canChronoBoostTarget(const Unit & unit) const

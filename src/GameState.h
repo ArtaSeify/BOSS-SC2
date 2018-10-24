@@ -56,11 +56,16 @@ public:
     const Unit &	getUnit(const size_t & id) const;
 	bool			canBuildNow(const ActionType & action) const;
     int				whenCanBuild(const ActionType & action) const;
+    int             whenCanCast(const ActionType & action, const size_t & targetID) const;
+    int             whenEnergyReady(const ActionType & action)          const;
     int			    getSupplyInProgress() const;
     int             getLastActionFinishTime() const;
     int             getNextFinishTime(const ActionType & type) const;
+
     
+    void            getSpecialAbilityTargets(ActionSet & actionSet) const;
     void            storeChronoBoostTargets(ActionSet & actionSet) const;
+    bool            chronoBoostableTarget(const Unit & unit) const;
     bool            canChronoBoostTarget(const Unit & unit) const;
     
     bool            canChronoBoost()    const;
@@ -76,7 +81,8 @@ public:
     size_t          getChronoBoostsCast() const;
     const ActionType & getLastAction() const;
 
-    void			doAction(const ActionType & type, const size_t & targetID = -1);
+    bool            doAbility(const ActionType & type, const size_t & targetID);
+    void			doAction(const ActionType & type);
     void			fastForward(const int & frames);
     void			addUnit(const ActionType & Unit, int builderID = -1);
     void			setMinerals(const double & minerals);

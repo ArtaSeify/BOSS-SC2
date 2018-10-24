@@ -38,14 +38,6 @@ void CombatSearch::generateLegalActions(const GameState & state, ActionSet & leg
     for (ActionID a(0); a<allActions.size(); ++a)
     {
         const ActionType & action = allActions[a];
-        
-        // special actions
-        // store a chronoboost action for each eligible target
-        if (action.getName() == "ChronoBoost" && state.canChronoBoost())
-        {
-            state.storeChronoBoostTargets(legalActions);
-            continue;
-        }
 
         bool isLegal = state.isLegal(action);
         if (!isLegal)
@@ -83,10 +75,10 @@ void CombatSearch::generateLegalActions(const GameState & state, ActionSet & leg
         for (size_t a(0); a < legalActions.size(); ++a)
         {
             const ActionType & actionType = legalActions[a];
-            // abilities are instant and have no build time, so we won't consider them
             if (!actionType.isAbility())
             {
                 const int whenCanPerformAction = state.whenCanBuild(actionType);
+
                 if (whenCanPerformAction < workerReady)
                 {
                     actionLegalBeforeWorker = true;
@@ -105,6 +97,7 @@ void CombatSearch::generateLegalActions(const GameState & state, ActionSet & leg
         {
             legalActions.clear();
             legalActions.add(worker);
+            legalActions.add(ActionTypes::GetSpecialAction(state.getRace()));
         }
     }
 }

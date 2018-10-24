@@ -13,6 +13,7 @@ namespace Eval
     double ArmyResourceSumToIndex(const GameState & state, size_t finishedUnitsIndex);
 
     bool BuildOrderBetter(const BuildOrder & buildOrder, const BuildOrder & compareTo);
+    bool StateBetter(const GameState & state, const GameState & compareTo);
 
     bool StateDominates(const GameState & state, const GameState & other);
 }

@@ -102,6 +102,21 @@ namespace Eval
         }
     }
 
+    bool StateBetter(const GameState & state, const GameState & compareTo)
+    {
+        size_t numWorkers = state.getNumMineralWorkers() + state.getNumGasWorkers();
+        size_t numWorkersOther = compareTo.getNumMineralWorkers() + compareTo.getNumGasWorkers();
+
+        if (numWorkers == numWorkersOther)
+        {
+            return (state.getMinerals()) > (compareTo.getMinerals());
+        }
+        else
+        {
+            return numWorkers > numWorkersOther;
+        }
+    }
+
     bool StateDominates(const GameState & state, const GameState & other)
     {
         // we can't define domination for different races

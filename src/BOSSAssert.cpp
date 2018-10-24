@@ -85,6 +85,9 @@ namespace Assert
                 {
                     error_message += messages[i];
                 }
+                char temp[4096] = "";
+                memcpy(temp, msg + sub_msgs[sub_msgs.size()-1].second + 1, index);
+                error_message += temp;
             }            
         }	
 
