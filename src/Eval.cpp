@@ -53,14 +53,12 @@ namespace Eval
     double ArmyResourceSumToIndex(const GameState & state, size_t finishedUnitsIndex)
     {
         double sum(0);
-
         auto & finishedUnits = state.getFinishedUnits();
-        auto & unitTimes = state.getUnitTimes();
+        size_t index = (finishedUnitsIndex == 0) ? 0 : finishedUnitsIndex;
 
-        for (size_t index(0); index < finishedUnitsIndex + 1; ++index)
+        for (index; index < finishedUnitsIndex + 1; ++index)
         {
-            const Unit & unit = state.getUnit(unitTimes[finishedUnits[index]].first);
-            auto & type = unit.getType();
+            auto & type = state.getUnit(finishedUnits[index]).getType();
             if (!type.isBuilding() && !type.isWorker() && !type.isSupplyProvider())
             {
                 sum += type.mineralPrice();

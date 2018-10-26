@@ -14,45 +14,50 @@ namespace UnitJobs
 class Unit
 {
     size_t      m_id;               // index in GameState::m_Units
+    size_t      m_frameStarted;     // the frame the production of this unit started
+    size_t      m_frameFinished;    // the frame the production of this unit finished
     size_t      m_builderID;        // id of the unit that built this Unit
     ActionType  m_type;             // type of this Unit
     ActionType  m_addon;            // type of completed addon this Unit has
     ActionType  m_buildType;        // type of the Unit currently being built by this Unit
     size_t      m_buildID;          // id of the Unit currently being built by this Unit
     int         m_job;              // current job this Unit has (UnitJobs::XXX)
-    double      m_timeUntilBuilt;   // time remaining until this Unit is completed
-    double      m_timeUntilFree;    // time remaining until this Unit can build again
-	double		m_timeChronoBoost;	// time remaining on Chrono Boost
-    double      m_timeChronoBoostAgain; // time until chronoboost can be used on this building again
+    int         m_timeUntilBuilt;   // time remaining until this Unit is completed
+    int         m_timeUntilFree;    // time remaining until this Unit can build again
+	int		    m_timeChronoBoost;	// time remaining on Chrono Boost
+    int         m_timeChronoBoostAgain; // time until chronoboost can be used on this building again
 	int         m_numLarva;         // number of larva this building currently has (Hatch only)
+    double      m_maxEnergyAllowed; // maximum energy allowed for this building
 	double		m_energy;			// energy of the building
 
 public:
 
-    Unit(const ActionType & type, const size_t & id, int builderID);
+    Unit(ActionType type, size_t id, int builderID, size_t frameStarted);
 
     const int getTimeUntilFree() const;
     const int getTimeUntilBuilt() const;
-    void setTimeUntilBuilt(const double & time);
-    const ActionType & getType() const;
-    const ActionType & getAddon() const;
-    const ActionType & getBuildType() const;
-    const size_t & getID() const;
-    const size_t & getBuilderID() const;
-    const int getChronoBoostAgainTime() const;
-    const size_t & getBuildID() const;
-    void applyChronoBoost(const double & time, Unit & unitBeingProduced);
+    void setTimeUntilBuilt(int time);
+    ActionType getType() const;
+    ActionType getAddon() const;
+    ActionType getBuildType() const;
+    size_t getID() const;
+    size_t getBuilderID() const;
+    size_t getBuildID() const;
+    size_t getStartFrame() const;
+    size_t getFinishFrame() const;
 
-    void castAbility(const ActionType & type, Unit & abilityTarget, Unit & abilityTargetProduction);
+    int getChronoBoostAgainTime() const;
+    void applyChronoBoost(int time, Unit & unitBeingProduced);
+    void castAbility(ActionType type, Unit & abilityTarget, Unit & abilityTargetProduction);
 	const double & getEnergy() const;
-    void reduceEnergy(const double & energy);
+    void reduceEnergy(int energy);
 
-    int whenCanBuild(const ActionType & type) const;
+    int whenCanBuild(ActionType type) const;
 
-    void complete();
-    void setBuilderID(const int & id);
+    void complete(size_t frameFinished);
+    void setBuilderID(int id);
     void startBuilding(Unit & Unit);
-    void fastForward(const int & frames);
+    void fastForward(int frames);
 };
 
 }

@@ -1,10 +1,11 @@
 #include "ActionTypeData.h"
 #include "JSONTools.h"
+#include <unordered_map>
 
 using namespace BOSS;
 
 std::vector<ActionTypeData>     AllActionTypeData;
-std::map<std::string, size_t>   ActionTypeNameMap;
+std::unordered_map<std::string, size_t>   ActionTypeNameMap;
 
 const ActionTypeData & ActionTypeData::GetActionTypeData(const std::string & name)
 {

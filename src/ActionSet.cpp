@@ -5,7 +5,8 @@ using namespace BOSS;
 
 ActionSet::ActionSet()
 {
-
+    m_actions.reserve(30);
+    m_abilityTargets.reserve(30);
 }
 
 size_t ActionSet::size() const
@@ -42,7 +43,7 @@ void ActionSet::add(const ActionSet & set)
     }
 }
 
-void ActionSet::add(const ActionType & action, const size_t & abilityTargetID)
+void ActionSet::add(const ActionType & action, size_t abilityTargetID)
 { 
     add(action);
     m_abilityTargets.back() = abilityTargetID;
@@ -91,20 +92,19 @@ void ActionSet::clear()
 {
     m_actions.clear();
     m_abilityTargets.clear();
-    //m_abilityTargetIndex = 0;
 }
 
-ActionType & ActionSet::operator[] (const size_t & index)
+ActionType & ActionSet::operator[] (size_t index)
 {
     return m_actions[index];
 }
 
-const ActionType & ActionSet::operator[] (const size_t & index) const
+const ActionType & ActionSet::operator[] (size_t index) const
 {
     return m_actions[index];
 }
 
-const size_t & ActionSet::getAbilityTarget(const size_t & index) const
+const size_t & ActionSet::getAbilityTarget(size_t index) const
 {
     return m_abilityTargets[index];
 }

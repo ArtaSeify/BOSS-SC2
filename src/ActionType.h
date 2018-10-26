@@ -30,7 +30,7 @@ public:
     int  supplyProvided()   const;
     int  numProduced()      const;
 	int  startingEnergy()	const;
-	double  maxEnergy()		const;
+	int  maxEnergy()		const;
     bool isUnit()           const;
     bool isUpgrade()        const;
     bool isAbility()        const;
@@ -42,9 +42,9 @@ public:
     bool isAddon()          const;
     bool isMorphed()        const;
     
-    ActionType whatBuilds() const;
+    const ActionType & whatBuilds() const;
     const std::string & whatBuildsStatus() const;
-    ActionType whatBuildsAddon() const;
+    const ActionType & whatBuildsAddon() const;
     const std::vector<ActionType> & required() const;
     const std::vector<ActionType> & equivalent() const;
     const ActionSet & getPrerequisiteActionCount() const;
@@ -59,13 +59,13 @@ namespace ActionTypes
 {
     void Init();
     const std::vector<ActionType> & GetAllActionTypes();
-    const ActionType & GetWorker(const RaceID raceID);
-    const ActionType & GetSupplyProvider(const RaceID raceID);
-    const ActionType & GetRefinery(const RaceID raceID);
-    const ActionType & GetResourceDepot(const RaceID raceID);
-    const ActionType & GetSpecialAction(const RaceID raceID);
-    const ActionType & GetActionType(const std::string & name);
-    const bool         TypeExists(const std::string & name);
+    ActionType GetWorker(const RaceID raceID);
+    ActionType GetSupplyProvider(const RaceID raceID);
+    ActionType GetRefinery(const RaceID raceID);
+    ActionType GetResourceDepot(const RaceID raceID);
+    ActionType GetSpecialAction(const RaceID raceID);
+    ActionType GetActionType(const std::string & name);
+    const bool TypeExists(const std::string & name);
 
     ActionSet CalculatePrerequisites(const ActionType & action);
     void CalculateRecursivePrerequisites(ActionSet & count, const ActionType & action);

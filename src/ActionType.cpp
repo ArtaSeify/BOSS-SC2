@@ -47,7 +47,7 @@ int  ActionType::energyCost()        const { return ActionTypeData::GetActionTyp
 int  ActionType::supplyProvided()    const { return ActionTypeData::GetActionTypeData(m_id).supplyProvided; }
 int  ActionType::numProduced()       const { return ActionTypeData::GetActionTypeData(m_id).numProduced; }
 int  ActionType::startingEnergy()	 const { return ActionTypeData::GetActionTypeData(m_id).startingEnergy; }
-double ActionType::maxEnergy()		 const { return ActionTypeData::GetActionTypeData(m_id).maxEnergy; }
+int  ActionType::maxEnergy()		 const { return ActionTypeData::GetActionTypeData(m_id).maxEnergy; }
 bool ActionType::isAddon()           const { return ActionTypeData::GetActionTypeData(m_id).isAddon; }
 bool ActionType::isRefinery()        const { return ActionTypeData::GetActionTypeData(m_id).isRefinery; }
 bool ActionType::isWorker()          const { return ActionTypeData::GetActionTypeData(m_id).isWorker; }
@@ -59,7 +59,7 @@ bool ActionType::isUpgrade()         const { return ActionTypeData::GetActionTyp
 bool ActionType::isAbility()         const { return ActionTypeData::GetActionTypeData(m_id).isAbility; }
 bool ActionType::isMorphed()         const { return false; }
 
-ActionType ActionType::whatBuilds() const
+const ActionType & ActionType::whatBuilds() const
 {
     return ActionTypeData::GetActionTypeData(m_id).whatBuilds;
 }
@@ -69,7 +69,7 @@ const std::string & ActionType::whatBuildsStatus() const
     return ActionTypeData::GetActionTypeData(m_id).whatBuildsStatus;
 }
 
-ActionType ActionType::whatBuildsAddon() const
+const ActionType & ActionType::whatBuildsAddon() const
 {
     return ActionTypeData::GetActionTypeData(m_id).whatBuildsAddon;
 }
@@ -150,32 +150,32 @@ namespace ActionTypes
         }
     }
 
-    const ActionType & GetWorker(const RaceID raceID)
+    ActionType GetWorker(const RaceID raceID)
     {
         return workerActionTypes[raceID];
     }
 
-    const ActionType & GetSupplyProvider(const RaceID raceID)
+    ActionType GetSupplyProvider(const RaceID raceID)
     {
         return supplyProviderActionTypes[raceID];
     }
 
-    const ActionType & GetRefinery(const RaceID raceID)
+    ActionType GetRefinery(const RaceID raceID)
     {
         return refineryActionTypes[raceID];
     }
 
-    const ActionType & GetResourceDepot(const RaceID raceID)
+    ActionType GetResourceDepot(const RaceID raceID)
     {
         return resourceDepotActionTypes[raceID];
     }
 
-    const ActionType & GetSpecialAction(const RaceID raceID)
+    ActionType GetSpecialAction(const RaceID raceID)
     {
         return specialActionTypes[raceID];
     }
     
-    const ActionType & GetActionType(const std::string & name)
+    ActionType GetActionType(const std::string & name)
     {
         BOSS_ASSERT(TypeExists(name), "ActionType name not found: %s", name.c_str());
 

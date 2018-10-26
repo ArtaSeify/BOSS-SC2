@@ -90,6 +90,7 @@
     <ClCompile Include="..\src\CombatSearch_IntegralDataFinishedUnits.cpp">
       <Filter>search\CombatSearch</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\AbilityAction.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\ActionType.h" />
@@ -184,6 +185,7 @@
     <ClInclude Include="..\src\CombatSearch_IntegralDataFinishedUnits.h">
       <Filter>search\CombatSearch</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\AbilityAction.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="BuildOrder">

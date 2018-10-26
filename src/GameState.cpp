@@ -5,21 +5,54 @@
 using namespace BOSS;
 
 GameState::GameState()
-    : m_minerals        (0.0f)
-    , m_gas             (0.0f)
-    , m_race            (Races::None)
-    , m_currentSupply   (0)
-    , m_maxSupply       (0)
-    , m_currentFrame    (0)
-    , m_previousFrame   (0)
-    , m_mineralWorkers  (0)
-    , m_gasWorkers      (0)
-    , m_buildingWorkers (0)
-    , m_numRefineries   (0)
-    , m_numDepots       (0)
-    , m_lastAction  (ActionTypes::None)
+    : m_minerals(0.0f)
+    , m_gas(0.0f)
+    , m_race(Races::None)
+    , m_currentSupply(0)
+    , m_maxSupply(0)
+    , m_currentFrame(0)
+    , m_previousFrame(0)
+    , m_mineralWorkers(0)
+    , m_gasWorkers(0)
+    , m_buildingWorkers(0)
+    , m_numRefineries(0)
+    , m_numDepots(0)
+    , m_lastAction(ActionTypes::None)
 {
+    //m_units.reserve(20);
+    //m_unitsBeingBuilt.reserve(2);
+    //m_chronoBoosts.reserve(2);
+    //m_unitsSortedEndFrame.reserve(2);
+    //m_armyUnits.reserve(2);
+}
 
+GameState::GameState(const GameState & state)
+{
+    m_race = state.m_race;
+    m_minerals = state.m_minerals;
+    m_gas = state.m_gas;
+    m_currentSupply = state.m_currentSupply;
+    m_maxSupply = state.m_maxSupply;
+    m_currentFrame = state.m_currentFrame;
+    m_previousFrame = state.m_previousFrame;
+    m_mineralWorkers = state.m_mineralWorkers;
+    m_gasWorkers = state.m_gasWorkers;
+    m_buildingWorkers = state.m_buildingWorkers;
+    m_numRefineries = state.m_numRefineries;
+    m_numDepots = state.m_numDepots;
+    m_lastAction = state.m_lastAction;
+
+    m_units = state.m_units;
+    m_unitsBeingBuilt = state.m_unitsBeingBuilt;
+    m_chronoBoosts = state.m_chronoBoosts;
+    m_unitsSortedEndFrame = state.m_unitsSortedEndFrame;
+    m_armyUnits = state.m_armyUnits;
+
+    //m_units.reserve(m_units.size() + 1);
+    //m_unitsBeingBuilt.reserve(m_unitsBeingBuilt.size() + 1);
+    //m_chronoBoosts.reserve(m_chronoBoosts.size() + 1);
+    //m_unitsSortedEndFrame.reserve(m_unitsSortedEndFrame.size() + 3);
+    //m_armyUnits.reserve(m_armyUnits.size() + 3);
 }
 
 void GameState::getLegalActions(std::vector<ActionType> & legalActions) const
@@ -119,7 +152,7 @@ void GameState::doAction(const ActionType & type)
     return;
 }
 
-bool GameState::doAbility(const ActionType & type, const size_t & targetID)
+bool GameState::doAbility(const ActionType & type, size_t targetID)
 {
     BOSS_ASSERT(type.isAbility(), "doAbility should not be called with a non-ability action");
     BOSS_ASSERT(targetID != -1, "Target of ability %s is invalid. Target ID: %u", type.getName().c_str(), targetID);
@@ -150,7 +183,8 @@ bool GameState::doAbility(const ActionType & type, const size_t & targetID)
         }
 
         getUnit(getBuilderID(type)).castAbility(type, getUnit(targetID), getUnit(getUnit(targetID).getBuildID()));
-        m_chronoBoostTargets.push_back(targetID);
+        AbilityAction abilityAction(targetID, getUnit(targetID).getType());
+        m_chronoBoosts.push_back(abilityAction);
 
         // have to resort the list, because build time of a unit is changed
         size_t index = find(m_unitsBeingBuilt.begin(), m_unitsBeingBuilt.end(), getUnit(targetID).getBuildID()) - m_unitsBeingBuilt.begin();
@@ -169,7 +203,7 @@ bool GameState::doAbility(const ActionType & type, const size_t & targetID)
     return true;
 }
 
-void GameState::fastForward(const int & toFrame)
+void GameState::fastForward(int toFrame)
 {
     if (toFrame == m_currentFrame) { return; }
 
@@ -224,10 +258,16 @@ void GameState::fastForward(const int & toFrame)
 
 void GameState::completeUnit(Unit & unit)
 {
-    unit.complete();
+    unit.complete(m_currentFrame);
     m_maxSupply += unit.getType().supplyProvided();
 
-    addUnitToSpecialVectors(unit.getID());
+    //addUnitToSpecialVectors(unit.getID());
+
+    // we don't want to store units that we start with
+    if (m_units[unit.getID()].getBuilderID() != -1)
+    {
+        m_unitsSortedEndFrame.push_back(unit.getID());
+    }
 
     // if it's a worker, assign it to the correct job
     if (unit.getType().isWorker())
@@ -265,7 +305,7 @@ void GameState::addUnit(const ActionType & type, int builderID)
     BOSS_ASSERT(m_race == Races::None || type.getRace() == m_race, "Adding an Unit of a different race");
 
     m_race = type.getRace();
-    Unit unit(type, m_units.size(), builderID);
+    Unit unit(type, m_units.size(), builderID, m_currentFrame);
 
     m_units.push_back(unit);
     m_currentSupply += unit.getType().supplyCost();
@@ -273,8 +313,6 @@ void GameState::addUnit(const ActionType & type, int builderID)
     // if we have a valid builder for this object, add it to the Units being built
     if (builderID != -1)
     {
-        m_unitsStartAndEndFrames.push_back(std::pair<size_t, std::pair<size_t, size_t>>(unit.getID(), std::pair<size_t, size_t>(m_currentFrame, 0)));
-
         getUnit(builderID).startBuilding(m_units.back());
 
         // add the Unit ID being built and sort the list
@@ -300,7 +338,7 @@ void GameState::addUnit(const ActionType & type, int builderID)
     }
 }
 
-void GameState::addUnitToSpecialVectors(const size_t & unitIndex)
+void GameState::addUnitToSpecialVectors(size_t unitIndex)
 {
     // we don't want to store units that we start with
     if (m_units[unitIndex].getBuilderID() == -1)
@@ -309,27 +347,14 @@ void GameState::addUnitToSpecialVectors(const size_t & unitIndex)
     }
 
     // if it's a combat unit add it to the armyUnits vector
-    const ActionType & type = m_units[unitIndex].getType();
+    /*const ActionType & type = m_units[unitIndex].getType();
     if (!type.isBuilding() && !type.isWorker() && !type.isSupplyProvider())
     {
         m_armyUnits.push_back(unitIndex);
-    }
-
-    size_t index = 0;
-    // add the end time to the vector
-    while (index < m_unitsStartAndEndFrames.size())
-    {
-        auto & value = m_unitsStartAndEndFrames[index];
-        if (value.first == unitIndex)
-        {
-            value.second.second = m_currentFrame;
-            break;
-        }
-        index++;
-    }
+    }*/
   
     // add to finished units vector
-    m_unitsSortedEndFrame.push_back(index);
+    m_unitsSortedEndFrame.push_back(unitIndex);
 }
 
 int GameState::whenCanBuild(const ActionType & action) const
@@ -356,7 +381,7 @@ int GameState::whenCanBuild(const ActionType & action) const
     return maxTime;
 }
 
-int GameState::whenCanCast(const ActionType & action, const size_t & targetID) const
+int GameState::whenCanCast(const ActionType & action, size_t targetID) const
 {
     BOSS_ASSERT(action.isAbility(), "whenCanCast should only be called with an ability");
 
@@ -622,7 +647,8 @@ bool GameState::canChronoBoost() const
         return false;
 
     return std::any_of(m_units.begin(), m_units.end(),
-        [this](const Unit & u) { return (u.getType() == ActionTypes::GetResourceDepot(this->getRace()) && u.getEnergy() >= 50.0); });
+        [this](const Unit & u) { return (u.getType() == ActionTypes::GetResourceDepot(this->getRace()) && 
+                                                u.getTimeUntilBuilt() == 0 && u.getEnergy() >= 50.0); });
 }
 
 void GameState::storeChronoBoostTargets(ActionSet & actionSet) const
@@ -673,22 +699,22 @@ const std::vector<size_t> & GameState::getFinishedArmyUnits() const
     return m_armyUnits;
 }
 
-const std::vector< std::pair<size_t, std::pair<size_t, size_t> > > & GameState::getUnitTimes() const
-{
-    return m_unitsStartAndEndFrames;
-}
-
 const std::vector<size_t> & GameState::getFinishedUnits() const
 {
     return m_unitsSortedEndFrame;
 }
 
-const Unit & GameState::getUnit(const size_t & id) const
+const Unit & GameState::getUnit(size_t id) const
 {
     return m_units[id];
 }
 
-Unit & GameState::getUnit(const size_t & id)
+ActionType GameState::getUnitType(size_t id)
+{
+    return m_units[id].getType();
+}
+
+Unit & GameState::getUnit(size_t id)
 {
     return m_units[id];
 }
@@ -718,12 +744,12 @@ const int & GameState::getCurrentFrame() const
     return m_currentFrame;
 }
 
-void GameState::setMinerals(const double & minerals)
+void GameState::setMinerals(double minerals)
 {
     m_minerals = minerals;
 }
 
-void GameState::setGas(const double & gas)
+void GameState::setGas(double gas)
 {
     m_gas = gas;
 }
@@ -748,14 +774,14 @@ size_t GameState::getNumGasWorkers() const
     return m_gasWorkers;
 }
 
-size_t GameState::getChronoBoostsCast() const
+size_t GameState::getNumberChronoBoostsCast() const
 {
-    return m_chronoBoostTargets.size();
+    return m_chronoBoosts.size();
 }
 
-const std::vector<size_t> & GameState::getChronoBoostTargets() const
+const std::vector<AbilityAction> & GameState::getChronoBoostTargets() const
 {
-    return m_chronoBoostTargets;
+    return m_chronoBoosts;
 }
 
 const ActionType & GameState::getLastAction() const

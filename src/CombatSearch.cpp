@@ -37,7 +37,7 @@ void CombatSearch::generateLegalActions(const GameState & state, ActionSet & leg
     const ActionSet & allActions = params.getRelevantActions();
     for (ActionID a(0); a<allActions.size(); ++a)
     {
-        const ActionType & action = allActions[a];
+        ActionType action = allActions[a];
 
         bool isLegal = state.isLegal(action);
         if (!isLegal)
@@ -74,10 +74,11 @@ void CombatSearch::generateLegalActions(const GameState & state, ActionSet & leg
         // figure out if anything can be made before a worker
         for (size_t a(0); a < legalActions.size(); ++a)
         {
-            const ActionType & actionType = legalActions[a];
+            ActionType actionType = legalActions[a];
+            // considering abilities will break this heuristic
             if (!actionType.isAbility())
             {
-                const int whenCanPerformAction = state.whenCanBuild(actionType);
+                int whenCanPerformAction = state.whenCanBuild(actionType);
 
                 if (whenCanPerformAction < workerReady)
                 {
@@ -97,7 +98,7 @@ void CombatSearch::generateLegalActions(const GameState & state, ActionSet & leg
         {
             legalActions.clear();
             legalActions.add(worker);
-            legalActions.add(ActionTypes::GetSpecialAction(state.getRace()));
+            //legalActions.add(ActionTypes::GetSpecialAction(state.getRace()));
         }
     }
 }

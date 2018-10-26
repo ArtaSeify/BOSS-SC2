@@ -71,7 +71,7 @@ void CombatSearch_Integral::recurse(const GameState & state, size_t depth)
             //std::cout << "action added: " << action.getName() << std::endl;
             //std::cout << "target of action added: " << actionTarget << std::endl;
             //std::cout << "frame of action added: " << child.getCurrentFrame() << std::endl;
-            m_buildOrder.add(action, actionTarget);
+            m_buildOrder.add(action, actionTarget, child.getUnitType(actionTarget));
             m_integral.update(child, m_buildOrder, m_params);
 
             recurse(child, depth + 1);

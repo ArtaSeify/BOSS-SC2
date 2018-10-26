@@ -2,9 +2,11 @@
 
 using namespace BOSS;
 
-Unit::Unit(const ActionType & type, const size_t & id, int builderID)
+Unit::Unit(ActionType type, size_t id, int builderID, size_t frameStarted)
     : m_job                     (UnitJobs::None)
     , m_id                      (id)
+    , m_frameStarted            (frameStarted)
+    , m_frameFinished           (-1)
     , m_type                    (type)
     , m_addon                   (ActionTypes::None)
     , m_buildType               (ActionTypes::None)
@@ -15,6 +17,7 @@ Unit::Unit(const ActionType & type, const size_t & id, int builderID)
     , m_builderID               (builderID)
 	, m_timeChronoBoost         (0)
     , m_timeChronoBoostAgain    (0)
+    , m_maxEnergyAllowed        (type.maxEnergy())
 	, m_energy			        (type.startingEnergy())
 {
     
@@ -46,13 +49,14 @@ void Unit::startBuilding(Unit & Unit)
     }
 }
 
-void Unit::complete()
+void Unit::complete(size_t frameFinished)
 {
     m_timeUntilFree = 0;
     m_timeUntilBuilt = 0;
+    m_frameFinished = frameFinished;
 }
 
-void Unit::fastForward(const int & frames)
+void Unit::fastForward(int frames)
 {
     // if we are completing the thing that this Unit is building
     if ((m_buildType != ActionTypes::None) && frames >= m_timeUntilFree)
@@ -66,18 +70,21 @@ void Unit::fastForward(const int & frames)
         m_buildID = 0;
         m_job = m_type.isWorker() ? UnitJobs::Minerals : UnitJobs::None;
     }
-
-	m_energy = std::min(m_energy + std::max(0.0, frames - m_timeUntilBuilt) * CONSTANTS::ERPF, 
-						double(m_type.maxEnergy()));
-
-    m_timeUntilFree = std::max(0.0, m_timeUntilFree - frames);
-    m_timeUntilBuilt = std::max(0.0, m_timeUntilBuilt - frames);
-    m_timeChronoBoostAgain = std::max(0.0, m_timeChronoBoostAgain - frames);
-    m_timeChronoBoost = std::max(0.0, std::min(m_timeChronoBoost, m_timeChronoBoostAgain));
+    // calculate energy. a building starts getting energy the moment it is built
+    m_timeUntilBuilt -= frames;
+    if (m_maxEnergyAllowed > 0 && m_timeUntilBuilt < 0)
+    {
+        m_energy += std::abs(m_timeUntilBuilt) * CONSTANTS::ERPF;
+        m_energy = std::min(m_energy, m_maxEnergyAllowed);
+    }
+    m_timeUntilFree = std::max(0, m_timeUntilFree - frames);
+    m_timeUntilBuilt = std::max(0, m_timeUntilBuilt);
+    m_timeChronoBoostAgain = std::max(0, m_timeChronoBoostAgain - frames); 
+    m_timeChronoBoost = std::min(m_timeChronoBoost, m_timeChronoBoostAgain);
 }
 
 // returns when this Unit can build a given type, -1 if it can't
-int Unit::whenCanBuild(const ActionType & type) const
+int Unit::whenCanBuild(ActionType type) const
 {
     // check to see if this type can build the given type
     // TODO: check equivalent types (hatchery gspire etc)
@@ -101,10 +108,10 @@ int Unit::whenCanBuild(const ActionType & type) const
         return -1;
     }
 
-    return (int)(std::ceil(m_timeUntilFree));
+    return m_timeUntilFree;
 }
 
-void Unit::castAbility(const ActionType & type, Unit & abilityTarget, Unit & abilityTargetProduction)
+void Unit::castAbility(ActionType type, Unit & abilityTarget, Unit & abilityTargetProduction)
 {
     BOSS_ASSERT(type.whatBuilds() == m_type, "Ability %s can't be cast by unit %s on unit %s", type.getName().c_str(), m_type.getName().c_str(), abilityTarget.getType().getName().c_str());
 
@@ -118,11 +125,8 @@ void Unit::castAbility(const ActionType & type, Unit & abilityTarget, Unit & abi
     }
 }
 
-void Unit::applyChronoBoost(const double & time, Unit & unitBeingProduced)
+void Unit::applyChronoBoost(int time, Unit & unitBeingProduced)
 {
-    //std::cout << "Chronoboost on: " << m_type.getName() << std::endl;
-    //std::cout << "Current target has chronoboost timer: " << m_timeChronoBoost << std::endl;
-    //std::cout << "Current target will have chronoboost timer: " << time << std::endl;
     if (m_timeChronoBoostAgain > 0)
     {
         BOSS_ASSERT(time < ActionTypes::GetActionType("ChronoBoost").buildTime(), "Can't Chrono Boost %s yet", m_type.getName().c_str());
@@ -136,72 +140,60 @@ void Unit::applyChronoBoost(const double & time, Unit & unitBeingProduced)
 
     BOSS_ASSERT(m_timeUntilFree > 0, "Chrono Boost used on %s, but it is not producing anything, %f", m_type.getName().c_str(), m_timeUntilFree);
     BOSS_ASSERT(unitBeingProduced.getTimeUntilBuilt() > 0, "Chrono Boost used on target that is not producing anything");
-    //std::cout << "Previous build time: " << m_timeUntilFree << std::endl;;
-    //std::cout << "Previous chrono boost time: " << m_timeChronoBoost << std::endl;
+
     // Chrono Boost speeds up production by 50%
-    double newTimeUntilFree;
+    int newTimeUntilFree = (int)std::ceil(m_timeUntilFree / 1.5);
     // make changes to remaining production time and chronoboost time
-    if (m_timeChronoBoost >= m_timeUntilFree / 1.5)
+    if (m_timeChronoBoost >= newTimeUntilFree)
     {
-        newTimeUntilFree = m_timeUntilFree / 1.5;
         m_timeChronoBoost -= newTimeUntilFree;
     }
     else
     {
-        newTimeUntilFree = m_timeUntilFree - (m_timeChronoBoost / 2.0);
-        m_timeChronoBoost = 0.0;
+        newTimeUntilFree = (int)std::ceil(m_timeUntilFree - (m_timeChronoBoost / 2.0));
+        m_timeChronoBoost = 0;
     }
-
-    /*if (m_buildType == ActionTypes::GetActionType("Zealot"))
-    {
-        std::cout << "before chronoboost" << m_timeUntilFree << std::endl;
-    }*/
 
     m_timeUntilFree = newTimeUntilFree;
     unitBeingProduced.setTimeUntilBuilt(m_timeUntilFree);
-
-    /*if (m_buildType == ActionTypes::GetActionType("Zealot"))
-    {
-        std::cout << "after chronoboost" << m_timeUntilFree << std::endl;
-    }*/
 }
 
 const int Unit::getTimeUntilBuilt() const
 {
-    return (int)(std::ceil(m_timeUntilBuilt));
+    return m_timeUntilBuilt;
 }
 
-void Unit::setTimeUntilBuilt(const double & time)
+void Unit::setTimeUntilBuilt(int time)
 {
     m_timeUntilBuilt = time;
 }
 
 const int Unit::getTimeUntilFree() const
 {
-    return (int)(std::ceil(m_timeUntilFree));
+    return m_timeUntilFree;
 }
 
-const ActionType & Unit::getType() const
+ActionType Unit::getType() const
 {
     return m_type;
 }
 
-const ActionType & Unit::getAddon() const
+ActionType Unit::getAddon() const
 {
     return m_addon;
 }
 
-const ActionType & Unit::getBuildType() const
+ActionType Unit::getBuildType() const
 {
     return m_buildType;
 }
 
-const size_t & Unit::getID() const
+size_t Unit::getID() const
 {
     return m_id;
 }
 
-const size_t & Unit::getBuilderID() const
+size_t Unit::getBuilderID() const
 {
     return m_builderID;
 }
@@ -211,22 +203,32 @@ const double & Unit::getEnergy() const
 	return m_energy;
 }
 
-const int Unit::getChronoBoostAgainTime() const
+int Unit::getChronoBoostAgainTime() const
 {
-    return ((int)std::ceil(m_timeChronoBoostAgain));
+    return m_timeChronoBoostAgain;
 }
 
-const size_t & Unit::getBuildID() const
+size_t Unit::getBuildID() const
 {
     return m_buildID;
 }
 
-void Unit::reduceEnergy(const double & energy)
+void Unit::reduceEnergy(int energy)
 {
     m_energy -= energy;
 }
 
-void Unit::setBuilderID(const int & id)
+void Unit::setBuilderID(int id)
 {
     m_builderID = id;
+}
+
+size_t Unit::getStartFrame() const
+{
+    return m_frameStarted;
+}
+
+size_t Unit::getFinishFrame() const
+{
+    return m_frameFinished;
 }

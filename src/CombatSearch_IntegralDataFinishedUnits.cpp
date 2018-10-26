@@ -17,12 +17,11 @@ void CombatSearch_IntegralDataFinishedUnits::update(const GameState & state, con
     BOSS_ASSERT(new_units >= 0, "negative new units? %d", new_units);
 
     // no new units or chronoboosts
-    if (new_units == 0 && m_chronoBoostEntries == state.getChronoBoostsCast())
+    if (new_units == 0 && m_chronoBoostEntries == state.getNumberChronoBoostsCast())
     {
         return;
     }
 
-    auto & unitTimes = state.getUnitTimes();
     // go through all new units
     for (size_t index = finishedUnits.size() - new_units; index < finishedUnits.size(); ++index)
     {
@@ -31,11 +30,12 @@ void CombatSearch_IntegralDataFinishedUnits::update(const GameState & state, con
         std::cout << "unit name: " << state.getUnit(unitTimes[finishedUnits[index]].first).getType().getName() << std::endl;
         std::cout << "start time of unit: " << unitTimes[finishedUnits[index]].second.first << std::endl;
         std::cout << "end time of unit: " << unitTimes[finishedUnits[index]].second.second << std::endl;*/
+        size_t unitIndex = finishedUnits[index];
+
+        size_t startFrame = state.getUnit(unitIndex).getStartFrame();
+        size_t finishFrame = state.getUnit(unitIndex).getFinishFrame();
         
-        size_t startFrame = unitTimes[finishedUnits[index]].second.first;
-        size_t finishFrame = unitTimes[finishedUnits[index]].second.second;
-        
-        double value = Eval::ArmyResourceSumToIndex(state, index);
+        double value = Eval::ArmyResourceSumToIndex(state, index) + m_integralStack.back().eval;
         double timeElapsed = finishFrame - m_integralStack.back().timeFinished;
         double valueToAdd = m_integralStack.back().eval * timeElapsed;
         double integralToThisPoint = m_integralStack.back().integral_ToThisPoint + valueToAdd;
@@ -45,7 +45,7 @@ void CombatSearch_IntegralDataFinishedUnits::update(const GameState & state, con
     }
 
     // Chrono Boost entry
-    if (state.getLastAction() == ActionTypes::GetActionType("ChronoBoost") && state.getChronoBoostsCast() > m_chronoBoostEntries)
+    if (state.getLastAction() == ActionTypes::GetActionType("ChronoBoost") && state.getNumberChronoBoostsCast() > m_chronoBoostEntries)
     {
         m_chronoBoostEntries++;
         auto & previous_entry = m_integralStack.back();
@@ -68,7 +68,7 @@ void CombatSearch_IntegralDataFinishedUnits::update(const GameState & state, con
 
         // print the newly found best to console
         //printIntegralData(m_integralStack.size() - 1);
-        print();
+        //print();
     }
 }
 
@@ -80,7 +80,7 @@ void CombatSearch_IntegralDataFinishedUnits::print() const
 void CombatSearch_IntegralDataFinishedUnits::printIntegralData(const size_t index, const std::vector<IntegralDataFinishedUnits> & integral_stack, const GameState & state, const BuildOrder & buildOrder) const
 {
     printf("%7d %8d %10.2lf %15.2lf %16.2lf   ", integral_stack[index].timeStarted, integral_stack[index].timeFinished, integral_stack[index].eval, integral_stack[index].integral_ToThisPoint, integral_stack[index].integral_UntilFrameLimit);
-    std::cout << buildOrder.getNameString(state, 2, index) << std::endl;
+    std::cout << buildOrder.getNameString(2, index) << std::endl;
 }
 
 void CombatSearch_IntegralDataFinishedUnits::print(const std::vector<IntegralDataFinishedUnits> & integral_stack, const GameState & state, const BuildOrder & buildOrder) const
@@ -90,7 +90,7 @@ void CombatSearch_IntegralDataFinishedUnits::print(const std::vector<IntegralDat
     std::cout << "\nCombatSearchIntegral Results\n\n";
 
     std::cout << "BuildOrder sorted by start times" << std::endl;
-    std::cout << buildOrder.getNameString(state, 2) << std::endl;
+    std::cout << buildOrder.getNameString(2) << std::endl;
 
     std::cout << "  Start   Finish   ArmyEval  ArmyIntegral_N   ArmyIntegral_E   BuildOrder\n";
     for (size_t i(1); i < integral_stack.size(); ++i)
@@ -111,7 +111,7 @@ void CombatSearch_IntegralDataFinishedUnits::pop_back()
 
 void CombatSearch_IntegralDataFinishedUnits::popFinishedLastOrder(const GameState & prevState, const GameState & currState)
 {
-    size_t chronoBoostsToRemove = currState.getChronoBoostsCast() - prevState.getChronoBoostsCast();
+    size_t chronoBoostsToRemove = currState.getNumberChronoBoostsCast() - prevState.getNumberChronoBoostsCast();
     m_chronoBoostEntries -= chronoBoostsToRemove;
 
     size_t numRemove = (currState.getFinishedUnits().size() - prevState.getFinishedUnits().size()) + chronoBoostsToRemove;
@@ -129,18 +129,20 @@ BuildOrder CombatSearch_IntegralDataFinishedUnits::createBuildOrderEndTimes(cons
 {
     BuildOrder buildOrder;
     auto & finishedUnits = state.getFinishedUnits();
-    auto & unitTimes = state.getUnitTimes();
     auto & chronoBoostTargets = state.getChronoBoostTargets();
     size_t chronoboosts = 0;
     for (size_t index = 0; index < integral_stack.size() - 1; ++index)
     {
         if (integral_stack[index + 1].timeStarted == integral_stack[index + 1].timeFinished)
         {
-            buildOrder.add(ActionTypes::GetActionType("ChronoBoost"), chronoBoostTargets[chronoboosts++]);
+            const AbilityAction & ability = chronoBoostTargets[chronoboosts++];
+            if (state.getRace() == Races::GetRaceID("Protoss"))
+            {
+                buildOrder.add(ActionTypes::GetActionType("ChronoBoost"), ability.targetID, ability.type);
+            }
             continue;
         }
-
-        buildOrder.add(state.getUnit(unitTimes[finishedUnits[index - chronoboosts]].first).getType());
+        buildOrder.add(state.getUnit(finishedUnits[index - chronoboosts]).getType());
     }
 
     return buildOrder;

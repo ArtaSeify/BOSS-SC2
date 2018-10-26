@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\AbilityAction.cpp" />
     <ClCompile Include="..\src\ActionType.cpp" />
     <ClCompile Include="..\src\ActionTypeData.cpp" />
     <ClCompile Include="..\src\BOSS.cpp" />
@@ -46,6 +47,7 @@
     <ClCompile Include="..\src\Unit.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\src\AbilityAction.h" />
     <ClInclude Include="..\src\ActionType.h" />
     <ClInclude Include="..\src\ActionTypeData.h" />
     <ClInclude Include="..\src\BOSS.h" />
