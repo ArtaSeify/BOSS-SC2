@@ -81,11 +81,21 @@ BuildOrder JSONTools::GetBuildOrder(const json & j)
     
     BuildOrder buildOrder;
 
-    for (auto & type : j)
+    for (auto & entry : j)
     {
-        BOSS_ASSERT(type.is_string(), "Build order item is not a string");
+        if (entry.is_array())
+        {
+            BOSS_ASSERT(entry[0].is_string(), "Build order item is not a string");
+            BOSS_ASSERT(entry[1].is_number_integer(), "Target of ability is not an integer");
+            BOSS_ASSERT(entry[2].is_string(), "Target of ability type is not a string");
+            
+            buildOrder.add(ActionTypes::GetActionType(entry[0]), entry[1], ActionTypes::GetActionType(entry[2]));
+        }
 
-        buildOrder.add(ActionTypes::GetActionType(type));
+        else
+        {
+            buildOrder.add(ActionTypes::GetActionType(entry));
+        }
     }
     
     return buildOrder;

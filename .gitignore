@@ -20,3 +20,4 @@ bin/results
 *.js
 emscripten/BOSS.data
 *.o
+/bin/WTF.txt

@@ -25,11 +25,11 @@
             "State"             : "Protoss Start State",
             "PrintNewBest"      : true,
             "OutputDir"         : "../bin/results",
-            "SearchTimeLimitMS" : 1200000,
+            "SearchTimeLimitMS" : 20000000,
             "FrameTimeLimit"    : 2000,
             "RelevantActions"   : [ "Probe", "Pylon", "Nexus", "Assimilator", "Gateway", "CyberneticsCore", "Stalker", "Zealot", "ChronoBoost"],
             "MaxActions"        : [ ["Nexus", 2], ["CyberneticsCore", 1]],
-            "AlwaysMakeWorkers" : true,
+            "AlwaysMakeWorkers" : false,
             "OpeningBuildOrder" : "Empty"
         },
         
@@ -53,6 +53,6 @@
     "Build Orders" :
     {
         "Empty"                 : [ ],     
-        "CyberCore"             : [ "Gateway", "Assimilator", "CyberneticsCore" ]
+        "Test1"                 : [ "Pylon", "Probe", "Gateway", "ChronoBoost" ]
     }
 }

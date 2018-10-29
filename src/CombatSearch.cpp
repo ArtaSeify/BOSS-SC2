@@ -55,7 +55,7 @@ void CombatSearch::generateLegalActions(const GameState & state, ActionSet & leg
     }
 
     // if we enabled the always make workers flag, and workers are legal
-    const ActionType & worker = ActionTypes::GetWorker(state.getRace());
+    ActionType worker = ActionTypes::GetWorker(state.getRace());
     if (m_params.getAlwaysMakeWorkers() && legalActions.contains(worker))
     {
         bool actionLegalBeforeWorker = false;

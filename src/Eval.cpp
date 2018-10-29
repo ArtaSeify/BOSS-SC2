@@ -102,8 +102,8 @@ namespace Eval
 
     bool StateBetter(const GameState & state, const GameState & compareTo)
     {
-        size_t numWorkers = state.getNumMineralWorkers() + state.getNumGasWorkers();
-        size_t numWorkersOther = compareTo.getNumMineralWorkers() + compareTo.getNumGasWorkers();
+        size_t numWorkers = state.getNumTotalCompleted(ActionTypes::GetWorker(state.getRace()));
+        size_t numWorkersOther = compareTo.getNumTotalCompleted(ActionTypes::GetWorker(compareTo.getRace()));
 
         if (numWorkers == numWorkersOther)
         {

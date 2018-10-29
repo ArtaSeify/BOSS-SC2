@@ -12,9 +12,9 @@ class GameState
 {
     std::vector<Unit>	m_units;
     std::vector<size_t>	m_unitsBeingBuilt;  // indices of m_units which are not completed, sorted descending by finish time
-    std::vector<AbilityAction> m_chronoBoosts;
     std::vector<size_t>     m_unitsSortedEndFrame;      // indices of m_units which are completed, in order
     std::vector<size_t>     m_armyUnits;                // holds indices of produced army units
+    std::vector<AbilityAction> m_chronoBoosts;
     int					m_race;
     double				m_minerals;
     double				m_gas;
@@ -76,6 +76,7 @@ public:
     size_t			                        getNumInProgress(const ActionType & action) const;
     size_t			                        getNumCompleted(const ActionType & action) const;
     size_t			                        getNumTotal(const ActionType & action) const;
+    size_t                                  getNumTotalCompleted(const ActionType & action) const;
     void			                        getLegalActions(std::vector<ActionType> & legalActions) const;
     bool			                        isLegal(const ActionType & type) const;
     bool			                        haveType(const ActionType & action) const;

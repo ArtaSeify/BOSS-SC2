@@ -263,7 +263,7 @@ void GameState::completeUnit(Unit & unit)
 
     //addUnitToSpecialVectors(unit.getID());
 
-    // we don't want to store units that we start with
+    // stores units in the order they were finished, except the units we start with
     if (m_units[unit.getID()].getBuilderID() != -1)
     {
         m_unitsSortedEndFrame.push_back(unit.getID());
@@ -616,6 +616,12 @@ size_t GameState::getNumTotal(const ActionType & action) const
 {
     return std::count_if(m_units.begin(), m_units.end(), 
            [&action](const Unit & unit) { return action == unit.getType(); } );
+}
+
+size_t GameState::getNumTotalCompleted(const ActionType & action) const
+{
+    return std::count_if(m_units.begin(), m_units.end(),
+        [&action](const Unit & unit) { return (action == unit.getType() && unit.getTimeUntilBuilt() == 0); });
 }
 
 bool GameState::haveType(const ActionType & action) const
