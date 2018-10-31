@@ -7,14 +7,27 @@ namespace BOSS
 {
     struct AbilityAction
     {
-        size_t targetID;        // index inside m_units of GameState class
-        ActionType type;        // type of unit it was used on
+        ActionType  type;                // type of the ability
+        size_t      frameCast;           // the frame the ability was cast
+        size_t      targetID;            // index inside m_units of GameState class
+        size_t      targetProductionID;  // index inside m_units of the unit being produced by the target of this ability
+        ActionType  targetType;          // type of unit it was used on
+
 
         AbilityAction(): targetID(0), type(0) {}
-        AbilityAction(size_t target, const ActionType & action)
+        /*AbilityAction(size_t id, size_t target, const ActionType & action)
         {
             targetID = target;
             type = action;
+        }*/
+
+        AbilityAction(ActionType newType, size_t newFrameCast, size_t newTargetID, size_t newTargetProductionID, ActionType newTargetType)
+        {
+            type = newType;
+            frameCast = newFrameCast;
+            targetID = newTargetID;
+            targetProductionID = newTargetProductionID;
+            targetType = newTargetType;
         }
     };
 }

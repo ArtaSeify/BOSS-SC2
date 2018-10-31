@@ -28,7 +28,7 @@ void CombatSearch_Integral::recurse(const GameState & state, size_t depth)
 
     for (size_t a(0); a < legalActions.size(); ++a)
     {
-        const size_t index = legalActions.size()-1-a;
+        const size_t index = legalActions.size() - 1 - a;
 
         GameState child(state);
 
@@ -42,7 +42,7 @@ void CombatSearch_Integral::recurse(const GameState & state, size_t depth)
 
             state.getSpecialAbilityTargets(legalActions);
 
-            // the action is no longer valid, skip
+            // the ability is no longer valid, skip
             if (sizeBefore > legalActions.size())
             {
                 continue;
@@ -50,6 +50,9 @@ void CombatSearch_Integral::recurse(const GameState & state, size_t depth)
 
             // the new target is at the end of the vector 
             actionTarget = legalActions.getAbilityTarget(index + (legalActions.size() - sizeBefore));
+
+            // target is at the same index
+            //actionTarget = legalActions.getAbilityTarget(index);
         }
 
         if (action.isAbility())
@@ -59,10 +62,12 @@ void CombatSearch_Integral::recurse(const GameState & state, size_t depth)
             {
                 continue;
             }
+            m_buildOrder.add(action, child.getLastAbility());
         } 
         else
         {
             child.doAction(action);
+            m_buildOrder.add(action);
         }
 
         // can't go over the time limit
@@ -71,7 +76,7 @@ void CombatSearch_Integral::recurse(const GameState & state, size_t depth)
             //std::cout << "action added: " << action.getName() << std::endl;
             //std::cout << "target of action added: " << actionTarget << std::endl;
             //std::cout << "frame of action added: " << child.getCurrentFrame() << std::endl;
-            m_buildOrder.add(action, actionTarget, child.getUnitType(actionTarget));
+            
             m_integral.update(child, m_buildOrder, m_params);
 
             recurse(child, depth + 1);
@@ -83,6 +88,8 @@ void CombatSearch_Integral::recurse(const GameState & state, size_t depth)
         // go upto the time limit and update the integral stack
         else
         {
+            m_buildOrder.pop_back();
+
             GameState child_framelimit(state);
             child_framelimit.fastForward(m_params.getFrameTimeLimit());
 

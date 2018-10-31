@@ -16,13 +16,12 @@ void BuildOrder::add(const ActionType & type)
     m_typeCount[type.getID()]++;
 }
 
-void BuildOrder::add(const ActionType & type, const size_t & targetID, const ActionType & targetType)
+void BuildOrder::add(const ActionType & type, const AbilityAction & ability)
 {
     add(type);
     if (type.isAbility())
     {
-        AbilityAction action(targetID, targetType);
-        m_abilityTargets[m_buildOrder.size() - 1] = action;
+        m_abilityTargets[m_buildOrder.size() - 1] = ability;
     }
 }
 
@@ -55,12 +54,17 @@ const bool BuildOrder::empty() const
 
 const ActionType & BuildOrder::getAbilityTargetType(const size_t & index) const
 {
-    return m_abilityTargets.at(index).type;
+    return m_abilityTargets.at(index).targetType;
 }
 
 const size_t & BuildOrder::getAbilityTarget(const size_t & index) const
 {
     return m_abilityTargets.at(index).targetID;
+}
+
+const AbilityAction & BuildOrder::getAbilityAction(const size_t & index) const
+{
+    return m_abilityTargets.at(index);
 }
 
 const size_t BuildOrder::getTypeCount(const ActionType & type) const
@@ -182,7 +186,14 @@ std::string BuildOrder::getNameString(const size_t charactersPerName, size_t pri
         std::string name = charactersPerName == 0 ? m_buildOrder[i].getName() : m_buildOrder[i].getName().substr(0, charactersPerName);;
         if (m_buildOrder[i].getName() == "ChronoBoost")
         {
-            name += "_" +  m_abilityTargets.at(i).type.getName().substr(0, charactersPerName);
+            if (charactersPerName == 0)
+            {
+                name += "_" + m_abilityTargets.at(i).targetType.getName();
+            }
+            else
+            {
+                name += "_" + m_abilityTargets.at(i).targetType.getName().substr(0, charactersPerName);
+            }
         }
 
         ss << name << " ";

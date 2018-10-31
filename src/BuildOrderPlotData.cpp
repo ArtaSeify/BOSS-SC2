@@ -35,7 +35,7 @@ void BuildOrderPlotData::calculateStartEndTimes()
 
         m_startTimes.push_back(state.getCurrentFrame());
 
-        int finish = state.getCurrentFrame() + type.buildTime();
+        /*int finish = state.getCurrentFrame() + type.buildTime();
         if (type.isBuilding() && !type.isAddon() && !type.isMorphed())
         {
             finish += 0; // TODO: building constant walk time
@@ -43,7 +43,7 @@ void BuildOrderPlotData::calculateStartEndTimes()
 
         m_finishTimes.push_back(finish);
 
-        m_maxFinishTime = std::max(m_maxFinishTime, finish);
+        m_maxFinishTime = std::max(m_maxFinishTime, finish);*/
 
         m_armyValues.push_back(Eval::ArmyTotalResourceSum(state));
 
@@ -58,6 +58,31 @@ void BuildOrderPlotData::calculateStartEndTimes()
         m_gas.push_back(gasBefore);
         m_gas.push_back(gasAfter);
     }
+
+    // get the finish times
+    size_t numInitialUnits = m_initialState.getNumUnits();
+    state.fastForward(5000); // ff far enough so everything is done
+    const GameState constState = std::as_const(state);
+    size_t abilities = 0;
+    for (size_t i(0); i < m_buildOrder.size(); ++i)
+    {
+        const ActionType & type = m_buildOrder[i];
+        int finish;
+        if (type.isAbility())
+        {
+            finish = m_buildOrder.getAbilityAction(i).frameCast + type.buildTime();
+            abilities++;
+        }
+
+        else
+        {
+            finish = constState.getUnit(numInitialUnits + i - abilities).getFinishFrame();
+        }
+        
+
+        m_finishTimes.push_back(finish);
+        m_maxFinishTime = std::max(m_maxFinishTime, finish);
+    }
 }
 
 void BuildOrderPlotData::calculatePlot()
@@ -67,15 +92,31 @@ void BuildOrderPlotData::calculatePlot()
     // determine the layers for each action
     for (size_t i(0); i < m_startTimes.size(); ++i)
     {
-        int start    = m_startTimes[i];
-        int finish   = m_finishTimes[i];
+        int start           = m_startTimes[i];
+        int finish          = m_finishTimes[i];
+        ActionType action   = m_buildOrder[i];
+
+        //std::cout << "action: " << action.getName() << std::endl;
+        //std::cout << "start: " << start << " . end: " << finish << std::endl;
+        
+        if (action.isAbility())
+        {
+            // Overlap chronoboost with the unit it was cast on
+            if (action.getName() == "ChronoBoost")
+            {
+                size_t numInitialUnits = m_initialState.getNumUnits();
+                AbilityAction action = m_buildOrder.getAbilityAction(i);
+                m_layers[i] = m_layers[action.targetProductionID - numInitialUnits];
+                continue;
+            }
+        }
 
         std::vector<int> layerOverlap;
 
         // loop through everything up to this action and see which layers it can't be in
         for (size_t j(0); j < i; ++j)
         {
-            if (start < m_finishTimes[j])
+            if (start < m_finishTimes[j] && !m_buildOrder[j].isAbility())
             {
                 layerOverlap.push_back(m_layers[j]);
             }
@@ -103,7 +144,6 @@ void BuildOrderPlotData::calculatePlot()
     {
         Position topLeft(m_startTimes[i], m_layers[i] * (m_boxHeight + m_boxHeightBuffer));
         Position bottomRight(m_finishTimes[i], topLeft.y() + m_boxHeight);
-
         m_rectangles.push_back(Rectangle(m_buildOrder[i].getName(), topLeft, bottomRight));
     }
 }

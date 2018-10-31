@@ -57,24 +57,6 @@
     <ClCompile Include="..\src\CombatSearch.cpp">
       <Filter>search\CombatSearch</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\CombatSearch_BestResponse.cpp">
-      <Filter>search\CombatSearch</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\CombatSearch_BestResponseData.cpp">
-      <Filter>search\CombatSearch</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\CombatSearch_Bucket.cpp">
-      <Filter>search\CombatSearch</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\CombatSearch_BucketData.cpp">
-      <Filter>search\CombatSearch</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\CombatSearch_Integral.cpp">
-      <Filter>search\CombatSearch</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\CombatSearch_IntegralData.cpp">
-      <Filter>search\CombatSearch</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\CombatSearchParameters.cpp">
       <Filter>search\CombatSearch</Filter>
     </ClCompile>
@@ -87,10 +69,28 @@
     <ClCompile Include="..\src\FileTools.cpp">
       <Filter>util</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\CombatSearch_IntegralDataFinishedUnits.cpp">
-      <Filter>search\CombatSearch</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\AbilityAction.cpp" />
+    <ClCompile Include="..\src\CombatSearch_BestResponse.cpp">
+      <Filter>search\CombatSearch\Best Response</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\CombatSearch_BestResponseData.cpp">
+      <Filter>search\CombatSearch\Best Response</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\CombatSearch_Bucket.cpp">
+      <Filter>search\CombatSearch\Bucket</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\CombatSearch_BucketData.cpp">
+      <Filter>search\CombatSearch\Bucket</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\CombatSearch_Integral.cpp">
+      <Filter>search\CombatSearch\Integral</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\CombatSearch_IntegralData.cpp">
+      <Filter>search\CombatSearch\Integral</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\CombatSearch_IntegralDataFinishedUnits.cpp">
+      <Filter>search\CombatSearch\Integral</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\ActionType.h" />
@@ -152,24 +152,6 @@
     <ClInclude Include="..\src\CombatSearch.h">
       <Filter>search\CombatSearch</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\CombatSearch_BestResponse.h">
-      <Filter>search\CombatSearch</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\CombatSearch_BestResponseData.h">
-      <Filter>search\CombatSearch</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\CombatSearch_Bucket.h">
-      <Filter>search\CombatSearch</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\CombatSearch_BucketData.h">
-      <Filter>search\CombatSearch</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\CombatSearch_Integral.h">
-      <Filter>search\CombatSearch</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\CombatSearch_IntegralData.h">
-      <Filter>search\CombatSearch</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\CombatSearchParameters.h">
       <Filter>search\CombatSearch</Filter>
     </ClInclude>
@@ -182,10 +164,28 @@
     <ClInclude Include="..\src\FileTools.h">
       <Filter>util</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\CombatSearch_IntegralDataFinishedUnits.h">
-      <Filter>search\CombatSearch</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\AbilityAction.h" />
+    <ClInclude Include="..\src\CombatSearch_BestResponse.h">
+      <Filter>search\CombatSearch\Best Response</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\CombatSearch_BestResponseData.h">
+      <Filter>search\CombatSearch\Best Response</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\CombatSearch_Bucket.h">
+      <Filter>search\CombatSearch\Bucket</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\CombatSearch_BucketData.h">
+      <Filter>search\CombatSearch\Bucket</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\CombatSearch_Integral.h">
+      <Filter>search\CombatSearch\Integral</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\CombatSearch_IntegralData.h">
+      <Filter>search\CombatSearch\Integral</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\CombatSearch_IntegralDataFinishedUnits.h">
+      <Filter>search\CombatSearch\Integral</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="BuildOrder">
@@ -211,6 +211,15 @@
     </Filter>
     <Filter Include="search\NaiveSearch">
       <UniqueIdentifier>{46760ebb-f942-4939-b674-67be8c427428}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="search\CombatSearch\Best Response">
+      <UniqueIdentifier>{aa17de5e-81df-451a-807d-bbd48b29fa06}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="search\CombatSearch\Bucket">
+      <UniqueIdentifier>{a14eb6f6-1850-4720-ad1e-58481aac8c14}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="search\CombatSearch\Integral">
+      <UniqueIdentifier>{841059ad-587a-41f4-9642-a83478d31d49}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

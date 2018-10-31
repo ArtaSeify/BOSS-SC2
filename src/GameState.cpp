@@ -162,28 +162,22 @@ bool GameState::doAbility(const ActionType & type, size_t targetID)
 
     // figure out when this action can be done and fast forward to it
     const int timeWhenReady = whenCanCast(type, targetID);
-    fastForward(timeWhenReady);
-
-    /*if (m_currentFrame == 1638 && getUnit(targetID).getType().getName() == "Gateway")
+    // can't cast ability
+    if (timeWhenReady == -1)
     {
-        if (getUnit(getUnit(targetID).getBuildID()).getType().getName() == "Zealot" && m_chronoBoostTargets.size() > 0 && m_chronoBoostTargets[0] == targetID)
-        {
-            std::cout << "gateway will finish zealot in: " << getUnit(targetID).getTimeUntilFree() << std::endl;
-            std::cout << "can chronoboost again in: " << getUnit(targetID).getChronoBoostAgainTime() << std::endl;
-            std::cout << std::endl;
-        }
-    }*/
+        return false;
+    }
+
+    fastForward(timeWhenReady);
 
     if (m_race == Races::GetRaceID("Protoss"))
     {
-        // cast ability on building  
-        if (!canChronoBoostTarget(getUnit(targetID)))
-        {
-            return false;
-        }
+        AbilityAction abilityAction(type, m_currentFrame, targetID, getUnit(targetID).getBuildID(), getUnit(targetID).getType());
+        m_lastAbility = abilityAction;
 
+        // cast chronoboost
         getUnit(getBuilderID(type)).castAbility(type, getUnit(targetID), getUnit(getUnit(targetID).getBuildID()));
-        AbilityAction abilityAction(targetID, getUnit(targetID).getType());
+        
         m_chronoBoosts.push_back(abilityAction);
 
         // have to resort the list, because build time of a unit is changed
@@ -393,6 +387,12 @@ int GameState::whenCanCast(const ActionType & action, size_t targetID) const
     maxTime = std::max(energyReady,         maxTime);
     maxTime = std::max(buildingFinished,    maxTime);
     maxTime = std::max(canChronoBoostAgain, maxTime);
+
+    // the building will finish its production by the time we can chrono boost it
+    if (maxTime >= m_currentFrame + getUnit(targetID).getTimeUntilFree() && m_race == Races::Protoss)
+    {
+        return -1;
+    }
 
     return maxTime;
 }
@@ -680,6 +680,9 @@ bool GameState::chronoBoostableTarget(const Unit & unit) const
     // can't chrono boost pylon
     if (unit.getType().isSupplyProvider()) { return false; }
 
+    // the unit must be producing something
+    if (unit.getTimeUntilFree() == 0) { return false; }
+
     return true;
 }
 
@@ -795,9 +798,19 @@ const ActionType & GameState::getLastAction() const
     return m_lastAction;
 }
 
+const AbilityAction & GameState::getLastAbility() const
+{
+    return m_lastAbility;
+}
+
 int GameState::getLastActionFinishTime() const
 {
     return m_unitsBeingBuilt.empty() ? getCurrentFrame() : m_units[m_unitsBeingBuilt.front()].getTimeUntilBuilt();
+}
+
+size_t GameState::getNumUnits() const
+{
+    return m_units.size();
 }
 
 int GameState::getNextFinishTime(const ActionType & type) const

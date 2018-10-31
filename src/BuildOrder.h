@@ -2,7 +2,6 @@
 
 #include "Common.h"
 #include "ActionType.h"
-#include "GameState.h"
 #include "AbilityAction.h"
 
 namespace BOSS
@@ -19,7 +18,7 @@ public:
     BuildOrder();
 
     void                    add(const ActionType & type);
-    void                    add(const ActionType & type, const size_t & targetID, const ActionType & targetType);
+    void                    add(const ActionType & type, const AbilityAction & ability);
     void                    add(const ActionType & type, const int & amount);
     void                    add(const BuildOrder & other);
     void                    clear();
@@ -35,6 +34,7 @@ public:
     const bool              empty() const;
     const ActionType &      getAbilityTargetType(const size_t & index) const;
     const size_t &          getAbilityTarget(const size_t & index) const;
+    const AbilityAction &   getAbilityAction(const size_t & index) const;
 
     std::string             getJSONString() const;
     std::string             getNumberedString() const;

@@ -17,6 +17,7 @@ namespace BOSS
         double  integral_UntilFrameLimit;
         size_t     timeStarted;
         size_t     timeFinished;
+        char id;
 
         IntegralDataFinishedUnits(double e, double i_c, double i_l, size_t t_a, size_t t_f)
             : eval(e)
@@ -24,6 +25,18 @@ namespace BOSS
             , integral_UntilFrameLimit(i_l)
             , timeStarted(t_a)
             , timeFinished(t_f)
+            , id(0)
+        {
+
+        }
+
+        IntegralDataFinishedUnits(double e, double i_c, double i_l, size_t t_a, size_t t_f, char newID)
+            : eval(e)
+            , integral_ToThisPoint(i_c)
+            , integral_UntilFrameLimit(i_l)
+            , timeStarted(t_a)
+            , timeFinished(t_f)
+            , id(newID)
         {
 
         }
@@ -34,6 +47,7 @@ namespace BOSS
             , integral_UntilFrameLimit(0)
             , timeStarted(0)
             , timeFinished(0)
+            , id(0)
         {
 
         }

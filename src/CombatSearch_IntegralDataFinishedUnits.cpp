@@ -45,12 +45,16 @@ void CombatSearch_IntegralDataFinishedUnits::update(const GameState & state, con
     }
 
     // Chrono Boost entry
-    if (state.getLastAction() == ActionTypes::GetActionType("ChronoBoost") && state.getNumberChronoBoostsCast() > m_chronoBoostEntries)
+    //if (state.getLastAction() == ActionTypes::GetActionType("ChronoBoost") && state.getNumberChronoBoostsCast() > m_chronoBoostEntries)
+    if (state.getNumberChronoBoostsCast() > m_chronoBoostEntries)
     {
-        m_chronoBoostEntries++;
+        auto & chronoboosts = state.getChronoBoostTargets();
         auto & previous_entry = m_integralStack.back();
-        IntegralDataFinishedUnits entry(previous_entry.eval, previous_entry.integral_ToThisPoint, previous_entry.integral_UntilFrameLimit, state.getCurrentFrame(), state.getCurrentFrame());
+        IntegralDataFinishedUnits entry(previous_entry.eval, previous_entry.integral_ToThisPoint, previous_entry.integral_UntilFrameLimit, 
+                            chronoboosts[m_chronoBoostEntries].frameCast, chronoboosts[m_chronoBoostEntries].frameCast, 'c');
         m_integralStack.push_back(entry);
+
+        m_chronoBoostEntries++;
 
         //std::cout << "chronoboost added!" << std::endl;
     }
@@ -124,7 +128,7 @@ void CombatSearch_IntegralDataFinishedUnits::popFinishedLastOrder(const GameStat
     }
 }
 
-// needs finishing
+// creates a build order based on the unit finished times
 BuildOrder CombatSearch_IntegralDataFinishedUnits::createBuildOrderEndTimes(const std::vector<IntegralDataFinishedUnits> & integral_stack, const GameState & state) const
 {
     BuildOrder buildOrder;
@@ -133,12 +137,14 @@ BuildOrder CombatSearch_IntegralDataFinishedUnits::createBuildOrderEndTimes(cons
     size_t chronoboosts = 0;
     for (size_t index = 0; index < integral_stack.size() - 1; ++index)
     {
-        if (integral_stack[index + 1].timeStarted == integral_stack[index + 1].timeFinished)
+        const AbilityAction & current_ability = chronoBoostTargets[chronoboosts];
+        // chronoboost
+        if (integral_stack[index + 1].id == 'c')
         {
-            const AbilityAction & ability = chronoBoostTargets[chronoboosts++];
+            chronoboosts++;
             if (state.getRace() == Races::GetRaceID("Protoss"))
             {
-                buildOrder.add(ActionTypes::GetActionType("ChronoBoost"), ability.targetID, ability.type);
+                buildOrder.add(ActionTypes::GetActionType("ChronoBoost"), current_ability);
             }
             continue;
         }

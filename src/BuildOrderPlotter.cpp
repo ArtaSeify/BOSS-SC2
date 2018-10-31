@@ -83,6 +83,7 @@ void BuildOrderPlotter::writeBuildOrderPlot(const std::vector<BuildOrderPlotData
     //ss << "set title \"Title Goes Here\"" << std::endl;
     //ss << "set xlabel \"Time (frames)\"" << std::endl;
     ss << "set style rect fc lt -1 fs transparent solid 0.15" << std::endl;
+    //ss << "set style rect fc lt -1 fs solid" << std::endl;
     ss << "set xrange [" << -(plots[0].m_maxFinishTime*.03) << ":" << 1.03*plots[0].m_maxFinishTime << "]" << std::endl;
     ss << "set yrange [-15:" << maxY << "]" << std::endl;
     ss << "unset ytics" << std::endl;
@@ -109,9 +110,10 @@ void BuildOrderPlotter::writeBuildOrderPlot(const std::vector<BuildOrderPlotData
             const int rectCenterX = rect.bottomRight.x() - (rectWidth / 2);
         
             std::stringstream pos;
+
             pos << "(boxWidthScale * " << rectCenterX << "),";
             pos << "((boxHeight + boxHeightBuffer) * " << (plots[p].m_layers[i] + currentLayer) << " + boxHeight/2)";
-
+            
             ss << "set object " << (currentObject+i+1) << " rect at ";
             ss << pos.str();
             ss << " size ";
@@ -141,10 +143,30 @@ void BuildOrderPlotter::writeBuildOrderPlot(const std::vector<BuildOrderPlotData
             {
                 ss << " fc rgb \"purple\"";
             }
+            else if (buildOrder[i].isAbility())
+            {
+                if (buildOrder[i].getName() == "ChronoBoost")
+                {
+                    ss << " fs empty border lc rgb \"red\" front";
+                }
+            }
 
             ss << std::endl;
 
-            ss << "set label " << (currentObject+i+1) << " at " << pos.str() << " \"" << buildOrder[i].getName() << "\" front center";
+            if (buildOrder[i].isAbility())
+            {
+                if (buildOrder[i].getName() == "ChronoBoost")
+                {
+                    //ss << "set label " << (currentObject + i + 1) << " noenhanced at " << pos.str() << " \"" <<
+                    //    "CB_" << buildOrder.getAbilityTargetType(i).getName() << "\" front center";
+                    //ss << "set label " << (currentObject + i + 1) << " at " << pos.str() << " \"" << buildOrder[i].getName() << "\" front left";
+                }
+            }
+            else
+            {
+                ss << "set label " << (currentObject + i + 1) << " at " << pos.str() << " \"" << buildOrder[i].getName() << "\" front center";
+            }
+
             ss << std::endl;
         }
 

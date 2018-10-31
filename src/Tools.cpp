@@ -455,6 +455,17 @@ void Tools::DoBuildOrder(GameState & state, const BuildOrder & buildOrder)
 {
     for (size_t i(0); i < buildOrder.size(); ++i)
     {
-        state.doAction(buildOrder[i]);
+        if (buildOrder[i].isAbility())
+        {
+            if (!state.doAbility(buildOrder[i], buildOrder.getAbilityTarget(i)))
+            {
+                std::cout << "invalid chronoboost!" << std::endl;
+            }  
+        }
+        
+        else
+        {
+            state.doAction(buildOrder[i]);
+        }
     }
 }

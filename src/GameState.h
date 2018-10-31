@@ -28,6 +28,7 @@ class GameState
     int					m_numRefineries;
     int					m_numDepots;
     ActionType			m_lastAction;
+    AbilityAction       m_lastAbility;
 
     int			getBuilderID(const ActionType & type) const;
     bool		haveBuilder(const ActionType & type) const;
@@ -82,6 +83,8 @@ public:
     bool			                        haveType(const ActionType & action) const;
     int				                        getRace() const;
     const ActionType &                      getLastAction() const;
+    const AbilityAction &                   getLastAbility() const;
+    size_t                                  getNumUnits() const;
 
     bool                                    doAbility(const ActionType & type, size_t targetID);
     void			                        doAction(const ActionType & type);

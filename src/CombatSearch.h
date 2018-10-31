@@ -38,6 +38,7 @@ protected:
 public:
 
     virtual void                search();
+    virtual void                continueSearch();
     virtual void                printResults();
     virtual void                writeResultsFile(const std::string & dir, const std::string & prefix);
 

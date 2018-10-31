@@ -7,12 +7,10 @@
         {
             "Run"           : false,
             "Type"          : "BuildOrderPlot",
-            "OutputDir"     : "results",
+            "OutputDir"     : "../bin/results",
             "Scenarios"     :   
             [ 
-                { "State" : "Protoss Start State", "BuildOrder" : "UAB DT Rush" },
-                { "State" : "Protoss Start State", "BuildOrder" : "UAB Zealot Rush" },
-                { "State" : "Protoss Start State", "BuildOrder" : "UAB Dragoon Rush" }
+                { "State" : "Protoss Start State", "BuildOrder" : "UAB Zealot Rush" }
             ] 
         },
     
@@ -25,11 +23,11 @@
             "State"             : "Protoss Start State",
             "PrintNewBest"      : true,
             "OutputDir"         : "../bin/results",
-            "SearchTimeLimitMS" : 20000000,
+            "SearchTimeLimitMS" : 100000000,
             "FrameTimeLimit"    : 2000,
             "RelevantActions"   : [ "Probe", "Pylon", "Nexus", "Assimilator", "Gateway", "CyberneticsCore", "Stalker", "Zealot", "ChronoBoost"],
-            "MaxActions"        : [ ["Nexus", 2], ["CyberneticsCore", 1]],
-            "AlwaysMakeWorkers" : false,
+            "MaxActions"        : [ ["Nexus", 1], ["CyberneticsCore", 1]],
+            "AlwaysMakeWorkers" : true,
             "OpeningBuildOrder" : "Empty"
         },
         
@@ -53,6 +51,7 @@
     "Build Orders" :
     {
         "Empty"                 : [ ],     
-        "Test1"                 : [ "Pylon", "Probe", "Gateway", "ChronoBoost" ]
+        "Test1"                 : [ "Probe", "Gateway", "Probe", "Pylon", "Probe", "Pylon", "Pylon", "Probe", "Zealot", "Probe", ["ChronoBoost", "Gateway", 14], ["ChronoBoost", "Gateway", 14], "Probe", "Zealot" ], 
+        "UAB Zealot Rush"       : [ "Probe", "Probe", "Pylon", "Gateway", "Gateway", "Zealot", "Zealot", "Zealot", "Pylon", "Zealot", "Probe", "Zealot", "Zealot", "Zealot" ]
     }
 }
