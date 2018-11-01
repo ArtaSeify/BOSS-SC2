@@ -26,7 +26,9 @@ Unit::Unit(ActionType type, size_t id, int builderID, size_t frameStarted)
 void Unit::startBuilding(Unit & Unit)
 {
     // if it's not a probe, this Unit won't be free until the build time is done
-    if (!m_type.isWorker() || !m_type.getRace() == Races::Protoss)
+    // !! Double check. Think it was a mistake
+    //if (!m_type.isWorker() || !m_type.getRace() == Races::Protoss)
+    if (!m_type.isWorker() || m_type.getRace() != Races::Protoss)
     {
         if (Unit.getType().whatBuildsStatus() != "None")
         {

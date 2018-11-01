@@ -1,30 +1,30 @@
-#include "ActionSet.h"
+#include "ActionClass.h"
 #include "ActionType.h"
 
 using namespace BOSS;
 
-ActionSet::ActionSet()
+ActionClass::ActionClass()
 {
     m_actions.reserve(30);
     m_abilityTargets.reserve(30);
 }
 
-size_t ActionSet::size() const
+size_t ActionClass::size() const
 {
     return m_actions.size();
 }
 
-bool ActionSet::isEmpty() const
+bool ActionClass::isEmpty() const
 {
     return m_actions.empty();
 }
 
-bool ActionSet::contains(const ActionType & action) const
+bool ActionClass::contains(const ActionType & action) const
 {
     return std::find(m_actions.begin(), m_actions.end(), action) != m_actions.end();
 }
 
-void ActionSet::add(const ActionType & action)
+void ActionClass::add(const ActionType & action)
 {
     // can add multiple ability actions because the ability can potentially be used
     // on multiple targets
@@ -35,7 +35,7 @@ void ActionSet::add(const ActionType & action)
     }
 }
 
-void ActionSet::add(const ActionSet & set)
+void ActionClass::add(const ActionClass & set)
 {
     for (const auto & val : set.m_actions)
     {
@@ -43,13 +43,13 @@ void ActionSet::add(const ActionSet & set)
     }
 }
 
-void ActionSet::add(const ActionType & action, size_t abilityTargetID)
-{ 
+void ActionClass::add(const ActionType & action, size_t abilityTargetID)
+{
     add(action);
     m_abilityTargets.back() = abilityTargetID;
 }
 
-void ActionSet::remove(const ActionType & action)
+void ActionClass::remove(const ActionType & action)
 {
     //m_actions.erase(std::remove(m_actions.begin(), m_actions.end(), action), m_actions.end());
     for (size_t index(0); index < m_actions.size(); index++)
@@ -58,25 +58,24 @@ void ActionSet::remove(const ActionType & action)
         {
             m_actions.erase(m_actions.begin() + index);
             m_abilityTargets.erase(m_abilityTargets.begin() + index);
-            index--;
         }
     }
 }
 
 //  incorrect implementation
-/*void ActionSet::remove(const ActionSet & set)
+/*void ActionClass::remove(const ActionClass & set)
 {
-    for (const auto & val : set.m_actions)
-    {
-        add(val);
-    }
+for (const auto & val : set.m_actions)
+{
+add(val);
+}
 }
 */
 
-const std::string ActionSet::toString() const
+const std::string ActionClass::toString() const
 {
     std::stringstream ss;
-    
+
     for (const auto & val : m_actions)
     {
         ss << "Action: " << val.getName() << std::endl;
@@ -89,28 +88,28 @@ const std::string ActionSet::toString() const
     return ss.str();
 }
 
-void ActionSet::clear()
+void ActionClass::clear()
 {
     m_actions.clear();
     m_abilityTargets.clear();
 }
 
-ActionType & ActionSet::operator[] (size_t index)
+ActionType & ActionClass::operator[] (size_t index)
 {
     return m_actions[index];
 }
 
-const ActionType & ActionSet::operator[] (size_t index) const
+const ActionType & ActionClass::operator[] (size_t index) const
 {
     return m_actions[index];
 }
 
-const size_t & ActionSet::getAbilityTarget(size_t index) const
+const size_t & ActionClass::getAbilityTarget(size_t index) const
 {
     return m_abilityTargets[index];
 }
 
-const std::vector<size_t> & ActionSet::getAbilityTargets() const
+const std::vector<size_t> & ActionClass::getAbilityTargets() const
 {
     return m_abilityTargets;
 }

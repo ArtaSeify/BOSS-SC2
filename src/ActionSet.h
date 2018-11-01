@@ -9,6 +9,8 @@ namespace BOSS
 class ActionType;
 class ActionSet
 {
+    // turn this into a pair
+    std::vector< std::pair <ActionType, size_t>> m_actionsAndTargets;
 	std::vector<ActionType> m_actions;
     std::vector<size_t>     m_abilityTargets;
 

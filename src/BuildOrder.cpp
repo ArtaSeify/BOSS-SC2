@@ -25,7 +25,7 @@ void BuildOrder::add(const ActionType & type, const AbilityAction & ability)
     }
 }
 
-void BuildOrder::add(const ActionType & type, const int & amount)
+void BuildOrder::add(const ActionType & type, int amount)
 {
     for (int i(0); i < amount; ++i)
     {
@@ -52,17 +52,17 @@ const bool BuildOrder::empty() const
     return size() == 0;
 }
 
-const ActionType & BuildOrder::getAbilityTargetType(const size_t & index) const
+const ActionType & BuildOrder::getAbilityTargetType(size_t index) const
 {
     return m_abilityTargets.at(index).targetType;
 }
 
-const size_t & BuildOrder::getAbilityTarget(const size_t & index) const
+const size_t & BuildOrder::getAbilityTarget(size_t index) const
 {
     return m_abilityTargets.at(index).targetID;
 }
 
-const AbilityAction & BuildOrder::getAbilityAction(const size_t & index) const
+const AbilityAction & BuildOrder::getAbilityAction(size_t index) const
 {
     return m_abilityTargets.at(index);
 }
@@ -89,12 +89,12 @@ void BuildOrder::pop_back()
     
 }
 
-const ActionType & BuildOrder::operator [] (const size_t & i) const
+const ActionType & BuildOrder::operator [] (size_t i) const
 {
     return m_buildOrder[i];
 }
 
-ActionType & BuildOrder::operator [] (const size_t & i) 
+ActionType & BuildOrder::operator [] (size_t i) 
 {
     return m_buildOrder[i];
 }
@@ -172,7 +172,7 @@ std::string BuildOrder::getIDString() const
     return ss.str();
 }
 
-std::string BuildOrder::getNameString(const size_t charactersPerName, size_t printUpToIndex) const
+std::string BuildOrder::getNameString(size_t charactersPerName, size_t printUpToIndex) const
 {
     std::stringstream ss;
 

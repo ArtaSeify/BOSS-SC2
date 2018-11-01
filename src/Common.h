@@ -19,8 +19,11 @@ using json = nlohmann::json;
 
 namespace BOSS
 {
+    // ~~~~~!!! CAN CHANGE THIS
     typedef size_t  ActionID;
     typedef size_t  RaceID;
+
+    typedef unsigned char uint1;
 
 	// constants declared in data file
 	class CONSTANTS

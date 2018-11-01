@@ -20,7 +20,7 @@ void FileTools::MakeDirectory(const std::string & dir)
     nError = _mkdir(dir.c_str()); // can be used on Windows
 #else 
     mode_t nMode = 0733; // UNIX style permissions
-    nError = mkdir(sPath.c_str(), nMode); // can be used on non-Windows
+    nError = mkdir(dir.c_str(), nMode); // can be used on non-Windows
 #endif
     if (nError != 0) {
         std::cerr << "Could not make directory: " << dir << "\n";

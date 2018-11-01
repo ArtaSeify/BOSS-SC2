@@ -69,7 +69,6 @@
     <ClCompile Include="..\src\FileTools.cpp">
       <Filter>util</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\AbilityAction.cpp" />
     <ClCompile Include="..\src\CombatSearch_BestResponse.cpp">
       <Filter>search\CombatSearch\Best Response</Filter>
     </ClCompile>
@@ -90,6 +89,9 @@
     </ClCompile>
     <ClCompile Include="..\src\CombatSearch_IntegralDataFinishedUnits.cpp">
       <Filter>search\CombatSearch\Integral</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\AbilityAction.cpp">
+      <Filter>util</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -164,7 +166,6 @@
     <ClInclude Include="..\src\FileTools.h">
       <Filter>util</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\AbilityAction.h" />
     <ClInclude Include="..\src\CombatSearch_BestResponse.h">
       <Filter>search\CombatSearch\Best Response</Filter>
     </ClInclude>
@@ -185,6 +186,9 @@
     </ClInclude>
     <ClInclude Include="..\src\CombatSearch_IntegralDataFinishedUnits.h">
       <Filter>search\CombatSearch\Integral</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\AbilityAction.h">
+      <Filter>util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

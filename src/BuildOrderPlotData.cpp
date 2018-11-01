@@ -64,6 +64,7 @@ void BuildOrderPlotData::calculateStartEndTimes()
     state.fastForward(5000); // ff far enough so everything is done
     const GameState constState = std::as_const(state);
     size_t abilities = 0;
+    m_maxFinishTime = 0;
     for (size_t i(0); i < m_buildOrder.size(); ++i)
     {
         const ActionType & type = m_buildOrder[i];
