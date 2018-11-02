@@ -98,7 +98,7 @@ class CombatSearchParameters
     GameState               m_enemyInitialState;
     BuildOrder              m_enemyBuildOrder;
 
-    ActionSet               m_relevantActions;
+    ActionSetAbilities      m_relevantActions;
     int                     m_frameTimeLimit;
     bool                    m_printNewBest;
 
@@ -109,35 +109,35 @@ public:
 	// alternate constructor
 	CombatSearchParameters();
 	
-	void 	            setRepetitions(const ActionType & a, int repetitions);
-	int 	            getRepetitions(const ActionType & a) const;
+	void 	                    setRepetitions(const ActionType & a, int repetitions);
+	int 	                    getRepetitions(const ActionType & a) const;
 
-    void                setMaxActions(const ActionType & a, int max);
-    int 	            getMaxActions(const ActionType & a) const;
+    void                        setMaxActions(const ActionType & a, int max);
+    int 	                    getMaxActions(const ActionType & a) const;
 
-    void                setRelevantActions(const ActionSet & set);
-    const ActionSet &   getRelevantActions() const;
+    void                        setRelevantActions(const ActionSetAbilities & set);
+    const ActionSetAbilities &  getRelevantActions() const;
 
-    void                setInitialState(const GameState & s);
-    const GameState &   getInitialState() const;
+    void                        setInitialState(const GameState & s);
+    const GameState &           getInitialState() const;
 
-    void                setEnemyInitialState(const GameState & s);
-    const GameState &   getEnemyInitialState() const;
+    void                        setEnemyInitialState(const GameState & s);
+    const GameState &           getEnemyInitialState() const;
 
-    void                setOpeningBuildOrder(const BuildOrder & buildOrder);
-    const BuildOrder &  getOpeningBuildOrder() const;
+    void                        setOpeningBuildOrder(const BuildOrder & buildOrder);
+    const BuildOrder &          getOpeningBuildOrder() const;
 
-    void                setEnemyBuildOrder(const BuildOrder & buildOrder);
-    const BuildOrder &  getEnemyBuildOrder() const;
+    void                        setEnemyBuildOrder(const BuildOrder & buildOrder);
+    const BuildOrder &          getEnemyBuildOrder() const;
 
-    void                setSearchTimeLimit(const double timeLimitMS);
-    double              getSearchTimeLimit() const;
+    void                        setSearchTimeLimit(const double timeLimitMS);
+    double                      getSearchTimeLimit() const;
 
-    void                setFrameTimeLimit(const int limit);
-    int                 getFrameTimeLimit() const;
+    void                        setFrameTimeLimit(const int limit);
+    int                         getFrameTimeLimit() const;
 
-    void                setAlwaysMakeWorkers(const bool flag);
-    const bool          getAlwaysMakeWorkers() const;
+    void                        setAlwaysMakeWorkers(const bool flag);
+    const bool                  getAlwaysMakeWorkers() const;
 	
 	void print();
 };

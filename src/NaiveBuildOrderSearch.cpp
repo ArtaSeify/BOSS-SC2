@@ -47,7 +47,7 @@ const BuildOrder & NaiveBuildOrderSearch::solve()
         return m_buildOrder;
     }
 
-    ActionSet wanted;
+    ActionSetAbilities wanted;
     int minWorkers = 0;
 
     const ActionType & worker = ActionTypes::GetWorker(m_state.getRace());
@@ -69,7 +69,7 @@ const BuildOrder & NaiveBuildOrderSearch::solve()
     }
 
     // Calculate which prerequisite units we need to build to achieve the units we want from the goal
-    ActionSet requiredToBuild;
+    ActionSetAbilities requiredToBuild;
     Tools::CalculatePrerequisitesRequiredToBuild(m_state, wanted, requiredToBuild);
 
     // Add the required units to a preliminary build order

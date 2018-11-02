@@ -32,6 +32,7 @@ public:
     iterator begin() { return m_buildOrder.begin(); }
     iterator end() { return m_buildOrder.end(); }
     
+    // index
     const ActionType &      operator [] (size_t i) const;
     ActionType &            operator [] (size_t i);
 

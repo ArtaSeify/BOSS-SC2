@@ -64,14 +64,15 @@ CombatSearchExperiment::CombatSearchExperiment(const std::string & name, const j
         const json & relevantActions = val["RelevantActions"];
         BOSS_ASSERT(relevantActions.is_array(), "RelevantActions is not an array");
 
-        ActionSet relevantActionSet;
+        ActionSetAbilities relevantActionSet;
 
         for (size_t i(0); i < relevantActions.size(); ++i)
         {
             BOSS_ASSERT(relevantActions[i].is_string(), "RelvantActions element must be action type string");
-            BOSS_ASSERT(ActionTypes::TypeExists(relevantActions[i]), "Action Type doesn't exist: %s", std::string(relevantActions[i]).c_str());
+            std::string element = relevantActions[i];
+            BOSS_ASSERT(ActionTypes::TypeExists(relevantActions[i]), "Action Type doesn't exist: %s", element.c_str());
             
-            relevantActionSet.add(ActionTypes::GetActionType(relevantActions[i]));
+            relevantActionSet.add(ActionTypes::GetActionType(element));
         }
 
         m_params.setRelevantActions(relevantActionSet);

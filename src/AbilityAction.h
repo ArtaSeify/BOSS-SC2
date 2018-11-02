@@ -14,7 +14,7 @@ namespace BOSS
         ActionType  targetType;          // type of unit it was used on
 
 
-        AbilityAction(): targetID(0), type(0) {}
+        AbilityAction(): type(0), frameCast(0), targetID(0), targetProductionID(0), targetType(0) {}
         /*AbilityAction(size_t id, size_t target, const ActionType & action)
         {
             targetID = target;

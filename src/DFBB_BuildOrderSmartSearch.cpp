@@ -194,11 +194,11 @@ void DFBB_BuildOrderSmartSearch::recurseOverStrictDependencies(const ActionType 
         return;
     }
 
-    ActionSet recursivePrerequisites = actionType.getRecursivePrerequisiteActionCount();
+    ActionSetAbilities recursivePrerequisites = actionType.getRecursivePrerequisiteActionCount();
 
-    for (size_t a(0); a < recursivePrerequisites.size(); ++a)
+    for (const auto & actionTargetPair : recursivePrerequisites)
     {
-        const ActionType & actionType = recursivePrerequisites[a];
+        const ActionType & actionType = actionTargetPair.first;
 
         if (actionType.isDepot() ||actionType.isWorker() || actionType.isSupplyProvider() || actionType.isRefinery())
         {

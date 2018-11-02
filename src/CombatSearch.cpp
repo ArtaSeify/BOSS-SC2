@@ -36,13 +36,13 @@ void CombatSearch::continueSearch()
 }
 
 // This function generates the legal actions from a GameState based on the input search parameters
-void CombatSearch::generateLegalActions(const GameState & state, ActionSet & legalActions, const CombatSearchParameters & params)
+void CombatSearch::generateLegalActions(const GameState & state, ActionSetAbilities & legalActions, const CombatSearchParameters & params)
 {
     // prune actions we have too many of already
-    const ActionSet & allActions = params.getRelevantActions();
-    for (ActionID a(0); a<allActions.size(); ++a)
+    const ActionSetAbilities & allActions = params.getRelevantActions();
+    for (const auto & actionAndTarget : allActions)
     {
-        ActionType action = allActions[a];
+        ActionType action = actionAndTarget.first;
 
         bool isLegal = state.isLegal(action);
         if (!isLegal)
@@ -77,9 +77,9 @@ void CombatSearch::generateLegalActions(const GameState & state, ActionSet & leg
         }
 
         // figure out if anything can be made before a worker
-        for (size_t a(0); a < legalActions.size(); ++a)
+        for (const auto & actionAndTarget : legalActions)
         {
-            ActionType actionType = legalActions[a];
+            ActionType actionType = actionAndTarget.first;
             // considering abilities will break this heuristic
             if (!actionType.isAbility())
             {

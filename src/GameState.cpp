@@ -636,7 +636,7 @@ int GameState::getSupplyInProgress() const
            [this](size_t lhs, size_t rhs) { return lhs + this->getUnit(rhs).getType().supplyProvided(); });
 }
 
-void GameState::getSpecialAbilityTargets(ActionSet & actionSet) const
+void GameState::getSpecialAbilityTargets(ActionSetAbilities & actionSet) const
 {
     if (m_race == Races::GetRaceID("Protoss"))
     {
@@ -657,7 +657,7 @@ bool GameState::canChronoBoost() const
                                                 u.getTimeUntilBuilt() == 0 && u.getEnergy() >= 50.0); });
 }
 
-void GameState::storeChronoBoostTargets(ActionSet & actionSet) const
+void GameState::storeChronoBoostTargets(ActionSetAbilities & actionSet) const
 {
     for (const Unit & unit : m_units)
     {

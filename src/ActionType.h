@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Common.h"
-#include "ActionSet.h"
+#include "ActionSetAbilities.h"
 
 namespace BOSS
 {
@@ -47,12 +47,12 @@ public:
     const ActionType & whatBuildsAddon() const;
     const std::vector<ActionType> & required() const;
     const std::vector<ActionType> & equivalent() const;
-    const ActionSet & getPrerequisiteActionCount() const;
-    const ActionSet & getRecursivePrerequisiteActionCount() const;
+    const ActionSetAbilities & getPrerequisiteActionCount() const;
+    const ActionSetAbilities & getRecursivePrerequisiteActionCount() const;
 
-    const bool operator == (const ActionType & rhs)     const;
-    const bool operator != (const ActionType & rhs)     const;
-    const bool operator <  (const ActionType & rhs)     const;
+    bool operator == (const ActionType & rhs)     const { return m_id == rhs.m_id; }
+    bool operator != (const ActionType & rhs)     const { return m_id != rhs.m_id; }
+    bool operator <  (const ActionType & rhs)     const { return m_id < rhs.m_id; }
 };
 
 namespace ActionTypes
@@ -67,8 +67,8 @@ namespace ActionTypes
     ActionType GetActionType(const std::string & name);
     const bool TypeExists(const std::string & name);
 
-    ActionSet CalculatePrerequisites(const ActionType & action);
-    void CalculateRecursivePrerequisites(ActionSet & count, const ActionType & action);
+    ActionSetAbilities CalculatePrerequisites(const ActionType & action);
+    void CalculateRecursivePrerequisites(ActionSetAbilities & count, const ActionType & action);
 
     extern ActionType None;
 }

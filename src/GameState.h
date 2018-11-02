@@ -64,8 +64,8 @@ public:
     int                                     getLastActionFinishTime() const;
     int                                     getNextFinishTime(const ActionType & type) const;
 
-    void                                    getSpecialAbilityTargets(ActionSet & actionSet) const;
-    void                                    storeChronoBoostTargets(ActionSet & actionSet) const;
+    void                                    getSpecialAbilityTargets(ActionSetAbilities & actionSet) const;
+    void                                    storeChronoBoostTargets(ActionSetAbilities & actionSet) const;
     bool                                    chronoBoostableTarget(const Unit & unit) const;
     bool                                    canChronoBoostTarget(const Unit & unit) const;
     bool                                    canChronoBoost()    const;

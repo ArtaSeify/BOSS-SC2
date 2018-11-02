@@ -33,25 +33,7 @@
       <Filter>util</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Unit.cpp" />
-    <ClCompile Include="..\src\DFBB_BuildOrderSearchParameters.cpp">
-      <Filter>search\BuildOrderSearch</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\DFBB_BuildOrderSearchResults.cpp">
-      <Filter>search\BuildOrderSearch</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\DFBB_BuildOrderSmartSearch.cpp">
-      <Filter>search\BuildOrderSearch</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\DFBB_BuildOrderStackSearch.cpp">
-      <Filter>search\BuildOrderSearch</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\BuildOrderSearchGoal.cpp">
-      <Filter>search\BuildOrderSearch</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Tools.cpp">
-      <Filter>util</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\ActionSet.cpp">
       <Filter>util</Filter>
     </ClCompile>
     <ClCompile Include="..\src\CombatSearch.cpp">
@@ -63,23 +45,8 @@
     <ClCompile Include="..\src\CombatSearchResults.cpp">
       <Filter>search\CombatSearch</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\NaiveBuildOrderSearch.cpp">
-      <Filter>search\NaiveSearch</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\FileTools.cpp">
       <Filter>util</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\CombatSearch_BestResponse.cpp">
-      <Filter>search\CombatSearch\Best Response</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\CombatSearch_BestResponseData.cpp">
-      <Filter>search\CombatSearch\Best Response</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\CombatSearch_Bucket.cpp">
-      <Filter>search\CombatSearch\Bucket</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\CombatSearch_BucketData.cpp">
-      <Filter>search\CombatSearch\Bucket</Filter>
     </ClCompile>
     <ClCompile Include="..\src\CombatSearch_Integral.cpp">
       <Filter>search\CombatSearch\Integral</Filter>
@@ -93,6 +60,46 @@
     <ClCompile Include="..\src\AbilityAction.cpp">
       <Filter>util</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\ActionSetAbilities.cpp">
+      <Filter>util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\CombatSearch_BucketData.cpp">
+      <Filter>search\CombatSearch\Bucket</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\CombatSearch_Bucket.cpp">
+      <Filter>search\CombatSearch\Bucket</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\CombatSearch_BestResponseData.cpp">
+      <Filter>search\CombatSearch\Best Response</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\CombatSearch_BestResponse.cpp">
+      <Filter>search\CombatSearch\Best Response</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\DFBB_BuildOrderSearchSaveState.cpp">
+      <Filter>search\BuildOrderSearch</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\DFBB_BuildOrderSmartSearch.cpp">
+      <Filter>search\BuildOrderSearch</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\DFBB_BuildOrderStackSearch.cpp">
+      <Filter>search\BuildOrderSearch</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\DFBB_BuildOrderSearchParameters.cpp">
+      <Filter>search\BuildOrderSearch</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\DFBB_BuildOrderSearchResults.cpp">
+      <Filter>search\BuildOrderSearch</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\NaiveBuildOrderSearch.cpp">
+      <Filter>search\NaiveSearch</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ActionSet.cpp">
+      <Filter>util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\BuildOrderSearchGoal.cpp">
+      <Filter>search\BuildOrderSearch</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\BuildOrderAbilities.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\ActionType.h" />
@@ -130,25 +137,7 @@
       <Filter>plot</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Unit.h" />
-    <ClInclude Include="..\src\DFBB_BuildOrderSearchParameters.h">
-      <Filter>search\BuildOrderSearch</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\DFBB_BuildOrderSearchResults.h">
-      <Filter>search\BuildOrderSearch</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\DFBB_BuildOrderSmartSearch.h">
-      <Filter>search\BuildOrderSearch</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\DFBB_BuildOrderStackSearch.h">
-      <Filter>search\BuildOrderSearch</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\BuildOrderSearchGoal.h">
-      <Filter>search\BuildOrderSearch</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Tools.h">
-      <Filter>util</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\ActionSet.h">
       <Filter>util</Filter>
     </ClInclude>
     <ClInclude Include="..\src\CombatSearch.h">
@@ -160,23 +149,8 @@
     <ClInclude Include="..\src\CombatSearchResults.h">
       <Filter>search\CombatSearch</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\NaiveBuildOrderSearch.h">
-      <Filter>search\NaiveSearch</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\FileTools.h">
       <Filter>util</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\CombatSearch_BestResponse.h">
-      <Filter>search\CombatSearch\Best Response</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\CombatSearch_BestResponseData.h">
-      <Filter>search\CombatSearch\Best Response</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\CombatSearch_Bucket.h">
-      <Filter>search\CombatSearch\Bucket</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\CombatSearch_BucketData.h">
-      <Filter>search\CombatSearch\Bucket</Filter>
     </ClInclude>
     <ClInclude Include="..\src\CombatSearch_Integral.h">
       <Filter>search\CombatSearch\Integral</Filter>
@@ -190,6 +164,46 @@
     <ClInclude Include="..\src\AbilityAction.h">
       <Filter>util</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\ActionSetAbilities.h">
+      <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\CombatSearch_BucketData.h">
+      <Filter>search\CombatSearch\Bucket</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\CombatSearch_Bucket.h">
+      <Filter>search\CombatSearch\Bucket</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\CombatSearch_BestResponse.h">
+      <Filter>search\CombatSearch\Best Response</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\CombatSearch_BestResponseData.h">
+      <Filter>search\CombatSearch\Best Response</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\DFBB_BuildOrderSearchResults.h">
+      <Filter>search\BuildOrderSearch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\DFBB_BuildOrderSearchSaveState.h">
+      <Filter>search\BuildOrderSearch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\DFBB_BuildOrderSmartSearch.h">
+      <Filter>search\BuildOrderSearch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\DFBB_BuildOrderStackSearch.h">
+      <Filter>search\BuildOrderSearch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\DFBB_BuildOrderSearchParameters.h">
+      <Filter>search\BuildOrderSearch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\NaiveBuildOrderSearch.h">
+      <Filter>search\NaiveSearch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ActionSet.h">
+      <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\BuildOrderSearchGoal.h">
+      <Filter>search\BuildOrderSearch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\BuildOrderAbilities.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="BuildOrder">

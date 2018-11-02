@@ -56,7 +56,7 @@ BuildOrder Tools::GetOptimizedNaiveBuildOrderOld(const GameState & state, const 
 
 BuildOrder Tools::GetNaiveBuildOrderAddWorkersOld(const GameState & state, const BuildOrderSearchGoal & goal, size_t maxWorkers)
 {
-    ActionSet wanted;
+    ActionSetAbilities wanted;
     int minWorkers = 8;
 
     const ActionType & worker = ActionTypes::GetWorker(state.getRace());
@@ -80,14 +80,14 @@ BuildOrder Tools::GetNaiveBuildOrderAddWorkersOld(const GameState & state, const
     }
 
     // Calculate which prerequisite units we need to build to achieve the units we want from the goal
-    ActionSet requiredToBuild;
+    ActionSetAbilities requiredToBuild;
     CalculatePrerequisitesRequiredToBuild(state, wanted, requiredToBuild);
 
     // Add the required units to a preliminary build order
     BuildOrder buildOrder;
-    for (size_t a(0); a < requiredToBuild.size(); ++a)
+    for (const auto & actionTargetPair : requiredToBuild)
     {
-        const ActionType & type = requiredToBuild[a];
+        const ActionType & type = actionTargetPair.first;
         buildOrder.add(type);
         buildOrderActionTypeCount[type.getID()]++;
     }
@@ -207,7 +207,7 @@ BuildOrder Tools::GetNaiveBuildOrderAddWorkersOld(const GameState & state, const
     {
         for (size_t j(i+1); j < buildOrder.size(); ++j)
         {
-            const ActionSet & recursivePre = buildOrder[i].getRecursivePrerequisiteActionCount();
+            const ActionSetAbilities & recursivePre = buildOrder[i].getRecursivePrerequisiteActionCount();
 
             if (recursivePre.contains(buildOrder[j]))
             {
@@ -344,7 +344,7 @@ int Tools::GetUpperBound(const GameState & state, const BuildOrderSearchGoal & g
 
 int Tools::GetLowerBound(const GameState & state, const BuildOrderSearchGoal & goal)
 {
-    ActionSet wanted;
+    ActionSetAbilities wanted;
 
     // add everything from the goal to the needed set
     for (size_t a(0); a < ActionTypes::GetAllActionTypes().size(); ++a)
@@ -363,16 +363,17 @@ int Tools::GetLowerBound(const GameState & state, const BuildOrderSearchGoal & g
     return lowerBound;
 }
 
-void Tools::CalculatePrerequisitesRequiredToBuild(const GameState & state, const ActionSet & needed, ActionSet & added)
+void Tools::CalculatePrerequisitesRequiredToBuild(const GameState & state, const ActionSetAbilities & needed, ActionSetAbilities & added)
 {
     // if anything needed gas and we don't have a refinery, we need to add one
-    ActionSet allNeeded(needed);
+    ActionSetAbilities allNeeded(needed);
     const ActionType & refinery = ActionTypes::GetRefinery(state.getRace());
     if (!needed.contains(refinery) && (state.getNumCompleted(refinery) == 0) && !added.contains(refinery))
     {
-        for (size_t n(0); n<needed.size(); ++n)
+        for (const auto & actionTargetPair : needed)
         {
-            const ActionType & actionType = needed[n];
+            const ActionType & actionType = actionTargetPair.first;
+
             if (actionType.gasPrice() > 0)
             {
                 allNeeded.add(refinery);
@@ -381,9 +382,9 @@ void Tools::CalculatePrerequisitesRequiredToBuild(const GameState & state, const
         }
     }
 
-    for (size_t n(0); n<allNeeded.size(); ++n)
+    for (const auto & actionTargetPair : allNeeded)
     {
-        const ActionType & neededType = allNeeded[n];
+        const ActionType & neededType = actionTargetPair.first;
 
         // if we already have the needed type completed we can skip it
         if (added.contains(neededType) || state.getNumCompleted(neededType) > 0)
@@ -405,12 +406,12 @@ void Tools::CalculatePrerequisitesRequiredToBuild(const GameState & state, const
 }
 
 // returns the amount of time necessary to complete the longest chain of sequential prerequisites
-int Tools::CalculatePrerequisitesLowerBound(const GameState & state, const ActionSet & needed, int timeSoFar, int depth)
+int Tools::CalculatePrerequisitesLowerBound(const GameState & state, const ActionSetAbilities & needed, int timeSoFar, int depth)
 {
     int max = 0;
-    for (size_t n(0); n<needed.size(); ++n)
+    for (const auto & actionTargetPair : needed)
     {
-        const ActionType & neededType = needed[n];
+        const ActionType & neededType = actionTargetPair.first;
 
         int thisActionTime = 0;
 

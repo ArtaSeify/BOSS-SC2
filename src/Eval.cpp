@@ -25,7 +25,7 @@ namespace Eval
         double sum(0);
 
         auto & army_units = state.getFinishedArmyUnits();
-        for (const size_t & unit_index : army_units)
+        for (size_t unit_index : army_units)
         {
             sum += state.getUnit(unit_index).getType().mineralPrice();
             sum += 2 * state.getUnit(unit_index).getType().gasPrice();
@@ -58,7 +58,7 @@ namespace Eval
 
         for (index; index < finishedUnitsIndex + 1; ++index)
         {
-            auto & type = state.getUnit(finishedUnits[index]).getType();
+            ActionType type = state.getUnit(finishedUnits[index]).getType();
             if (!type.isBuilding() && !type.isWorker() && !type.isSupplyProvider())
             {
                 sum += type.mineralPrice();

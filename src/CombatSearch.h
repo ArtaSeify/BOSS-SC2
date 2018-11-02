@@ -27,7 +27,7 @@ protected:
     BuildOrder                  m_buildOrder;
 
     virtual void                recurse(const GameState & s, size_t depth);
-    virtual void                generateLegalActions(const GameState & state, ActionSet & legalActions, const CombatSearchParameters & params);
+    virtual void                generateLegalActions(const GameState & state, ActionSetAbilities & legalActions, const CombatSearchParameters & params);
 
     //virtual double              eval(const GameState & state) const;
     virtual bool                isTerminalNode(const GameState & s,int depth);

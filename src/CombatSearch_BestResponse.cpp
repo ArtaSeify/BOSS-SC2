@@ -26,7 +26,7 @@ void CombatSearch_BestResponse::recurse(const GameState & state, size_t depth)
         return;
     }
 
-    ActionSet legalActions;
+    ActionSetAbilities legalActions;
     generateLegalActions(state, legalActions, m_params);
     
     for (size_t a(0); a < legalActions.size(); ++a)
@@ -34,8 +34,8 @@ void CombatSearch_BestResponse::recurse(const GameState & state, size_t depth)
         size_t ri = legalActions.size() - 1 - a;
 
         GameState child(state);
-        child.doAction(legalActions[ri]);
-        m_buildOrder.add(legalActions[ri]);
+        child.doAction(legalActions[ri].first);
+        m_buildOrder.add(legalActions[ri].first);
         
         recurse(child,depth+1);
 

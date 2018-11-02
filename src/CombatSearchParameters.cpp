@@ -35,12 +35,12 @@ double CombatSearchParameters::getSearchTimeLimit() const
     return m_searchTimeLimit;
 }
 
-void CombatSearchParameters::setRelevantActions(const ActionSet & set)
+void CombatSearchParameters::setRelevantActions(const ActionSetAbilities & set)
 {
     m_relevantActions = set;
 }
 
-const ActionSet & CombatSearchParameters::getRelevantActions() const
+const ActionSetAbilities & CombatSearchParameters::getRelevantActions() const
 {
     return m_relevantActions;
 }

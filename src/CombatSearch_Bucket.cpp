@@ -29,14 +29,14 @@ void CombatSearch_Bucket::recurse(const GameState & state, size_t depth)
         //return;
     }
 
-    ActionSet legalActions;
+    ActionSetAbilities legalActions;
     generateLegalActions(state, legalActions, m_params);
     
     for (size_t a(0); a < legalActions.size(); ++a)
     {
         GameState child(state);
-        child.doAction(legalActions[a]);
-        m_buildOrder.add(legalActions[a]);
+        child.doAction(legalActions[a].first);
+        m_buildOrder.add(legalActions[a].first);
         
         recurse(child,depth+1);
 

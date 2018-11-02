@@ -1,11 +1,11 @@
 #include "ActionType.h"
 #include "ActionTypeData.h"
-#include "ActionSet.h"
+#include "ActionSetAbilities.h"
 
 using namespace BOSS;
 
-std::vector<ActionSet> allActionPrerequisites;
-std::vector<ActionSet> allActionRecursivePrerequisites;
+std::vector<ActionSetAbilities> allActionPrerequisites;
+std::vector<ActionSetAbilities> allActionRecursivePrerequisites;
 
 ActionType::ActionType()
     : m_id(0)
@@ -85,19 +85,15 @@ const std::vector<ActionType> & ActionType::equivalent() const
 }
 
 
-const ActionSet & ActionType::getPrerequisiteActionCount() const
+const ActionSetAbilities & ActionType::getPrerequisiteActionCount() const
 {
     return allActionPrerequisites[m_id];
 }
 
-const ActionSet & ActionType::getRecursivePrerequisiteActionCount() const
+const ActionSetAbilities & ActionType::getRecursivePrerequisiteActionCount() const
 {
     return allActionRecursivePrerequisites[m_id];
 }
-
-const bool ActionType::operator == (const ActionType & rhs)     const { return m_id == rhs.m_id; }
-const bool ActionType::operator != (const ActionType & rhs)     const { return m_id != rhs.m_id; }
-const bool ActionType::operator <  (const ActionType & rhs)     const { return m_id < rhs.m_id; }
 
 namespace BOSS
 {
@@ -144,7 +140,7 @@ namespace ActionTypes
         // calculate all action recursive prerequisites
         for (size_t i(0); i < allActionTypes.size(); ++i)
         {
-            ActionSet recursivePrerequisites;
+            ActionSetAbilities recursivePrerequisites;
             CalculateRecursivePrerequisites(recursivePrerequisites, allActionTypes[i]);
             allActionRecursivePrerequisites.push_back(recursivePrerequisites);
         }
@@ -194,9 +190,9 @@ namespace ActionTypes
 
     ActionType None(0);
 
-    ActionSet CalculatePrerequisites(const ActionType & action)
+    ActionSetAbilities CalculatePrerequisites(const ActionType & action)
     {
-        ActionSet count;
+        ActionSetAbilities count;
 
         // add everything from whatBuilds and required
 
@@ -204,9 +200,9 @@ namespace ActionTypes
         return count;
     }
 
-    void CalculateRecursivePrerequisites(ActionSet & allActions, const ActionType & action)
+    void CalculateRecursivePrerequisites(ActionSetAbilities & allActions, const ActionType & action)
     {
-        ActionSet pre = action.getPrerequisiteActionCount();
+        ActionSetAbilities pre = action.getPrerequisiteActionCount();
 
         if (action.gasPrice() > 0)
         {

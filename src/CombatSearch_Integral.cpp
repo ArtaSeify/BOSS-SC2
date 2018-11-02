@@ -23,7 +23,7 @@ void CombatSearch_Integral::recurse(const GameState & state, size_t depth)
         return;
     }
 
-    ActionSet legalActions;
+    ActionSetAbilities legalActions;
     generateLegalActions(state, legalActions, m_params);
 
     for (size_t a(0); a < legalActions.size(); ++a)
@@ -32,8 +32,10 @@ void CombatSearch_Integral::recurse(const GameState & state, size_t depth)
 
         GameState child(state);
 
-        ActionType action = legalActions[index];
-        size_t actionTarget = legalActions.getAbilityTarget(index);
+        const auto & actionTargetPair = legalActions[index];
+
+        ActionType action = actionTargetPair.first;
+        size_t actionTarget = actionTargetPair.second;
 
         // get the targets for the ability
         if (action == ActionTypes::GetSpecialAction(state.getRace()) && actionTarget == -1)
