@@ -46,6 +46,7 @@
     <ClCompile Include="..\src\GameState.cpp" />
     <ClCompile Include="..\src\JSONTools.cpp" />
     <ClCompile Include="..\src\NaiveBuildOrderSearch.cpp" />
+    <ClCompile Include="..\src\StaticVector.cpp" />
     <ClCompile Include="..\src\Tools.cpp" />
     <ClCompile Include="..\src\Unit.cpp" />
   </ItemGroup>
@@ -85,6 +86,7 @@
     <ClInclude Include="..\src\JSONTools.h" />
     <ClInclude Include="..\src\json\json.hpp" />
     <ClInclude Include="..\src\NaiveBuildOrderSearch.h" />
+    <ClInclude Include="..\src\StaticVector.h" />
     <ClInclude Include="..\src\Timer.hpp" />
     <ClInclude Include="..\src\Tools.h" />
     <ClInclude Include="..\src\Unit.h" />

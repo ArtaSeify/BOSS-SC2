@@ -2,7 +2,7 @@
 
 #include "Common.h"
 #include "GameState.h"
-#include "BuildOrder.h"
+#include "BuildOrderAbilities.h"
 
 namespace BOSS
 {
@@ -93,10 +93,10 @@ class CombatSearchParameters
 			
 	//      Initial GameState used for the search. See GameState.h for details
 	GameState				m_initialState;
-    BuildOrder              m_openingBuildOrder;
+    BuildOrderAbilities     m_openingBuildOrder;
 
     GameState               m_enemyInitialState;
-    BuildOrder              m_enemyBuildOrder;
+    BuildOrderAbilities     m_enemyBuildOrder;
 
     ActionSetAbilities      m_relevantActions;
     int                     m_frameTimeLimit;
@@ -109,11 +109,11 @@ public:
 	// alternate constructor
 	CombatSearchParameters();
 	
-	void 	                    setRepetitions(const ActionType & a, int repetitions);
-	int 	                    getRepetitions(const ActionType & a) const;
+	void 	                    setRepetitions(ActionType a, int repetitions);
+	int 	                    getRepetitions(ActionType a) const;
 
-    void                        setMaxActions(const ActionType & a, int max);
-    int 	                    getMaxActions(const ActionType & a) const;
+    void                        setMaxActions(ActionType a, int max);
+    int 	                    getMaxActions(ActionType a) const;
 
     void                        setRelevantActions(const ActionSetAbilities & set);
     const ActionSetAbilities &  getRelevantActions() const;
@@ -124,11 +124,11 @@ public:
     void                        setEnemyInitialState(const GameState & s);
     const GameState &           getEnemyInitialState() const;
 
-    void                        setOpeningBuildOrder(const BuildOrder & buildOrder);
-    const BuildOrder &          getOpeningBuildOrder() const;
+    void                        setOpeningBuildOrder(const BuildOrderAbilities & buildOrder);
+    const BuildOrderAbilities & getOpeningBuildOrder() const;
 
-    void                        setEnemyBuildOrder(const BuildOrder & buildOrder);
-    const BuildOrder &          getEnemyBuildOrder() const;
+    void                        setEnemyBuildOrder(const BuildOrderAbilities & buildOrder);
+    const BuildOrderAbilities & getEnemyBuildOrder() const;
 
     void                        setSearchTimeLimit(const double timeLimitMS);
     double                      getSearchTimeLimit() const;

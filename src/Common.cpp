@@ -5,12 +5,12 @@
 using namespace BOSS;
 
 // defining static variables
-double CONSTANTS::MPWPF;
-double CONSTANTS::GPWPF;
-double CONSTANTS::ERPF;
-double CONSTANTS::HRPF;
-double CONSTANTS::SRPF;
-int CONSTANTS::WorkersPerRefinery;
+float   CONSTANTS::MPWPF;
+float   CONSTANTS::GPWPF;
+float   CONSTANTS::ERPF;
+float   CONSTANTS::HRPF;
+float   CONSTANTS::SRPF;
+short   CONSTANTS::WorkersPerRefinery;
 
 RaceID Races::GetRaceID(const std::string & race)
 {

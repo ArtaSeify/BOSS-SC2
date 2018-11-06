@@ -8,7 +8,7 @@ ActionSetAbilities::ActionSetAbilities()
     m_actionsAndTargets.reserve(10);
 }
 
-bool ActionSetAbilities::contains(const ActionType & action) const
+bool ActionSetAbilities::contains(ActionType action) const
 {
     for (const auto & actionTargetPair : m_actionsAndTargets)
     {
@@ -21,7 +21,7 @@ bool ActionSetAbilities::contains(const ActionType & action) const
     //return std::find(m_actionsAndTargets.begin()->first, m_actionsAndTargets.end()->first, action) != m_actionsAndTargets.end()->first;
 }
 
-void ActionSetAbilities::add(const ActionType & action)
+void ActionSetAbilities::add(ActionType action)
 {
     // can add multiple ability actions because the ability can potentially be used
     // on multiple targets
@@ -39,13 +39,13 @@ void ActionSetAbilities::add(const ActionSetAbilities & set)
     }
 }
 
-void ActionSetAbilities::add(const ActionType & action, size_t abilityTargetID)
+void ActionSetAbilities::add(ActionType action, uint4 abilityTargetID)
 {
     add(action);
     m_actionsAndTargets.back().second = abilityTargetID;
 }
 
-void ActionSetAbilities::remove(const ActionType & action)
+void ActionSetAbilities::remove(ActionType action)
 {
     //m_actions.erase(std::remove(m_actions.begin(), m_actions.end(), action), m_actions.end());
     for (size_t index(0); index < m_actionsAndTargets.size(); index++)
@@ -58,7 +58,7 @@ void ActionSetAbilities::remove(const ActionType & action)
     }
 }
 
-size_t ActionSetAbilities::getAbilityTarget(size_t index) const
+uint4 ActionSetAbilities::getAbilityTarget(uint4 index) const
 { 
     return m_actionsAndTargets[index].second; 
 }

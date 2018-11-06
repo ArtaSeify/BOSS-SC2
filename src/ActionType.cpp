@@ -25,7 +25,7 @@ ActionType::ActionType(const ActionID & actionID)
 
 }
 
-ActionType & ActionType::operator = (const ActionType & rhs)
+ActionType & ActionType::operator = (ActionType rhs)
 {
     if (this != &rhs)
     {
@@ -59,7 +59,7 @@ bool ActionType::isUpgrade()         const { return ActionTypeData::GetActionTyp
 bool ActionType::isAbility()         const { return ActionTypeData::GetActionTypeData(m_id).isAbility; }
 bool ActionType::isMorphed()         const { return false; }
 
-const ActionType & ActionType::whatBuilds() const
+ActionType ActionType::whatBuilds() const
 {
     return ActionTypeData::GetActionTypeData(m_id).whatBuilds;
 }
@@ -69,7 +69,7 @@ const std::string & ActionType::whatBuildsStatus() const
     return ActionTypeData::GetActionTypeData(m_id).whatBuildsStatus;
 }
 
-const ActionType & ActionType::whatBuildsAddon() const
+ActionType ActionType::whatBuildsAddon() const
 {
     return ActionTypeData::GetActionTypeData(m_id).whatBuildsAddon;
 }
@@ -83,7 +83,6 @@ const std::vector<ActionType> & ActionType::equivalent() const
 {
     return ActionTypeData::GetActionTypeData(m_id).equivalent;
 }
-
 
 const ActionSetAbilities & ActionType::getPrerequisiteActionCount() const
 {
@@ -109,7 +108,7 @@ namespace ActionTypes
 
     void Init()
     {
-        for (size_t i(0); i < ActionTypeData::GetAllActionTypeData().size(); ++i)
+        for (ActionID i(0); i < ActionTypeData::GetAllActionTypeData().size(); ++i)
         {
             allActionTypes.push_back(ActionType(i));
             nameMap[allActionTypes[i].getName()] = allActionTypes[i];
@@ -178,7 +177,7 @@ namespace ActionTypes
         return nameMap[name];
     }
 
-    const bool TypeExists(const std::string & name) 
+    bool TypeExists(const std::string & name) 
     {
         return nameMap.find(name) != nameMap.end();
     }
@@ -190,7 +189,7 @@ namespace ActionTypes
 
     ActionType None(0);
 
-    ActionSetAbilities CalculatePrerequisites(const ActionType & action)
+    ActionSetAbilities CalculatePrerequisites(ActionType action)
     {
         ActionSetAbilities count;
 
@@ -200,7 +199,7 @@ namespace ActionTypes
         return count;
     }
 
-    void CalculateRecursivePrerequisites(ActionSetAbilities & allActions, const ActionType & action)
+    void CalculateRecursivePrerequisites(ActionSetAbilities & allActions, ActionType action)
     {
         ActionSetAbilities pre = action.getPrerequisiteActionCount();
 
@@ -209,9 +208,9 @@ namespace ActionTypes
             pre.add(ActionTypes::GetRefinery(action.getRace()));
         }
 
-        for (size_t a(0); a < pre.size(); ++a)
+        for (ActionID a(0); a < pre.size(); ++a)
         {
-            const ActionType & actionType(a);
+            ActionType actionType(a);
             
             if (pre.contains(actionType) && !allActions.contains(actionType))
             {

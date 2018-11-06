@@ -18,12 +18,12 @@ bool ActionSet::isEmpty() const
     return m_actions.empty();
 }
 
-bool ActionSet::contains(const ActionType & action) const
+bool ActionSet::contains(ActionType action) const
 {
     return std::find(m_actions.begin(), m_actions.end(), action) != m_actions.end();
 }
 
-void ActionSet::add(const ActionType & action)
+void ActionSet::add(ActionType action)
 {
     if (!contains(action))
     {
@@ -39,7 +39,7 @@ void ActionSet::add(const ActionSet & set)
     }
 }
 
-void ActionSet::remove(const ActionType & action)
+void ActionSet::remove(ActionType action)
 {
     m_actions.erase(std::remove(m_actions.begin(), m_actions.end(), action), m_actions.end());
 }
@@ -74,7 +74,7 @@ ActionType & ActionSet::operator[] (const size_t & index)
     return m_actions[index];
 }
 
-const ActionType & ActionSet::operator[] (const size_t & index) const
+ActionType ActionSet::operator[] (const size_t & index) const
 {
     return m_actions[index];
 }

@@ -15,7 +15,7 @@ namespace BOSS
 
 
         AbilityAction(): type(0), frameCast(0), targetID(0), targetProductionID(0), targetType(0) {}
-        /*AbilityAction(size_t id, size_t target, const ActionType & action)
+        /*AbilityAction(size_t id, size_t target, ActionType action)
         {
             targetID = target;
             type = action;

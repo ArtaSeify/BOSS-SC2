@@ -75,11 +75,11 @@ BuildOrderSearchGoal JSONTools::GetBuildOrderSearchGoal(const json & j)
     return goal;
 }
 
-BuildOrder JSONTools::GetBuildOrder(const json & j)
+BuildOrderAbilities JSONTools::GetBuildOrder(const json & j)
 {
     BOSS_ASSERT(j.is_array(), "Build order isn't an array");
     
-    BuildOrder buildOrder;
+    BuildOrderAbilities buildOrder;
 
     for (auto & entry : j)
     {

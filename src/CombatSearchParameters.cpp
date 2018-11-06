@@ -65,42 +65,42 @@ const GameState & CombatSearchParameters::getEnemyInitialState() const
     return m_enemyInitialState;
 }
 
-void CombatSearchParameters::setMaxActions(const ActionType & a, int max)
+void CombatSearchParameters::setMaxActions(ActionType a, int max)
 {
     m_maxActions[a.getID()] = max;
 }
 
-void CombatSearchParameters::setOpeningBuildOrder(const BuildOrder & buildOrder)
+void CombatSearchParameters::setOpeningBuildOrder(const BuildOrderAbilities & buildOrder)
 {
     m_openingBuildOrder = buildOrder;
 }
 
-const BuildOrder & CombatSearchParameters::getOpeningBuildOrder() const
+const BuildOrderAbilities & CombatSearchParameters::getOpeningBuildOrder() const
 {
     return m_openingBuildOrder;
 }
 
-void CombatSearchParameters::setEnemyBuildOrder(const BuildOrder & buildOrder)
+void CombatSearchParameters::setEnemyBuildOrder(const BuildOrderAbilities & buildOrder)
 {
     m_enemyBuildOrder = buildOrder;
 }
 
-const BuildOrder & CombatSearchParameters::getEnemyBuildOrder() const
+const BuildOrderAbilities & CombatSearchParameters::getEnemyBuildOrder() const
 {
     return m_enemyBuildOrder;
 }
 
-void CombatSearchParameters::setRepetitions(const ActionType & a,int repetitions)
+void CombatSearchParameters::setRepetitions(ActionType a,int repetitions)
 { 
     m_repetitionValues[a.getID()] = repetitions; 
 }
 
-int CombatSearchParameters::getMaxActions(const ActionType & a) const
+int CombatSearchParameters::getMaxActions(ActionType a) const
 { 
     return m_maxActions[a.getID()]; 
 }
 
-int CombatSearchParameters::getRepetitions(const ActionType & a) const
+int CombatSearchParameters::getRepetitions(ActionType a) const
 { 
     return m_repetitionValues[a.getID()]; 
 }

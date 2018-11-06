@@ -13,7 +13,7 @@ void BuildOrderPlotter::setOutputDir(const std::string & dir)
     m_outputDir = dir;
 }
 
-void BuildOrderPlotter::addPlot(const std::string & name, const GameState & state, const BuildOrder & buildOrder)
+void BuildOrderPlotter::addPlot(const std::string & name, const GameState & state, const BuildOrderAbilities & buildOrder)
 {
     m_buildOrderNames.push_back(name);
     m_allPlots.push_back(BuildOrderPlotData(state, buildOrder));
@@ -101,7 +101,7 @@ void BuildOrderPlotter::writeBuildOrderPlot(const std::vector<BuildOrderPlotData
 
     for (size_t p(0); p < plots.size(); ++p)
     {
-        const BuildOrder & buildOrder = plots[p].m_buildOrder;
+        const BuildOrderAbilities & buildOrder = plots[p].m_buildOrder;
 
         for (size_t i(0); i < buildOrder.size(); ++i)
         {
@@ -123,29 +123,30 @@ void BuildOrderPlotter::writeBuildOrderPlot(const std::vector<BuildOrderPlotData
             //ss << "((boxHeight + boxHeightBuffer) * " << m_layers[i] << " + boxHeight) ";
             ss << "lw 1";
 
-            if (buildOrder[i].isWorker())
+            ActionType type = buildOrder[i].first;
+            if (type.isWorker())
             {
                 ss << " fc rgb \"cyan\"";
             }
-            else if (buildOrder[i].isSupplyProvider())
+            else if (type.isSupplyProvider())
             {
                 ss << " fc rgb \"gold\"";
             }
-            else if (buildOrder[i].isRefinery())
+            else if (type.isRefinery())
             {
                 ss << " fc rgb \"green\"";
             }
-            else if (buildOrder[i].isBuilding())
+            else if (type.isBuilding())
             {
                 ss << " fc rgb \"brown\"";
             }
-            else if (buildOrder[i].isUpgrade())
+            else if (type.isUpgrade())
             {
                 ss << " fc rgb \"purple\"";
             }
-            else if (buildOrder[i].isAbility())
+            else if (type.isAbility())
             {
-                if (buildOrder[i].getName() == "ChronoBoost")
+                if (type.getName() == "ChronoBoost")
                 {
                     ss << " fs empty border lc rgb \"red\" front";
                 }
@@ -153,9 +154,9 @@ void BuildOrderPlotter::writeBuildOrderPlot(const std::vector<BuildOrderPlotData
 
             ss << std::endl;
 
-            if (buildOrder[i].isAbility())
+            if (type.isAbility())
             {
-                if (buildOrder[i].getName() == "ChronoBoost")
+                if (type.getName() == "ChronoBoost")
                 {
                     //ss << "set label " << (currentObject + i + 1) << " noenhanced at " << pos.str() << " \"" <<
                     //    "CB_" << buildOrder.getAbilityTargetType(i).getName() << "\" front center";
@@ -164,7 +165,7 @@ void BuildOrderPlotter::writeBuildOrderPlot(const std::vector<BuildOrderPlotData
             }
             else
             {
-                ss << "set label " << (currentObject + i + 1) << " at " << pos.str() << " \"" << buildOrder[i].getName() << "\" front center";
+                ss << "set label " << (currentObject + i + 1) << " at " << pos.str() << " \"" << type.getName() << "\" front center";
             }
 
             ss << std::endl;
@@ -188,35 +189,38 @@ std::string BuildOrderPlotter::getPlotJSON(const std::vector<BuildOrderPlotData>
 
     for (size_t p(0); p < plots.size(); ++p)
     {
-        const BuildOrder & buildOrder = plots[p].m_buildOrder;
+        const BuildOrderAbilities & buildOrder = plots[p].m_buildOrder;
+        
         ss << "{ name : \"" << m_buildOrderNames[p] << "\", buildOrder : [";
 
         for (size_t i(0); i < buildOrder.size(); ++i)
         {
-            ss << "[\"" << buildOrder[i].getName() << "\", ";
+            ActionType type = buildOrder[i].first;
+
+            ss << "[\"" << type.getName() << "\", ";
             ss << plots[p].m_startTimes[i] << ", "; 
             ss << plots[p].m_finishTimes[i] << ", ";
             ss << plots[p].m_minerals[i].first << ", ";
             ss << plots[p].m_gas[i].first << ", ";
             ss << plots[p].m_layers[i] << ", ";
             
-            if (buildOrder[i].isWorker())
+            if (type.isWorker())
             {
                 ss << "\"rgb(217, 255, 255)\"";
             }
-            else if (buildOrder[i].isSupplyProvider())
+            else if (type.isSupplyProvider())
             {
                 ss << "\"rgb(255, 249, 217)\"";
             }
-            else if (buildOrder[i].isRefinery())
+            else if (type.isRefinery())
             {
                 ss << "\"rgb(217, 255, 217)\"";
             }
-            else if (buildOrder[i].isBuilding())
+            else if (type.isBuilding())
             {
                 ss << "\"rgb(241, 223, 223)\"";
             }
-            else if (buildOrder[i].isUpgrade())
+            else if (type.isUpgrade())
             {
                 ss << "\"rgb(255, 217, 255)\"";
             }

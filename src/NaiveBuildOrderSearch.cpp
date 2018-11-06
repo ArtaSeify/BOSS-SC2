@@ -13,9 +13,9 @@ NaiveBuildOrderSearch::NaiveBuildOrderSearch(const GameState & state, const Buil
 
 bool NaiveBuildOrderSearch::checkUnsolvable()
 {
-    const ActionType & worker = ActionTypes::GetWorker(m_state.getRace());
-    const ActionType & supply = ActionTypes::GetSupplyProvider(m_state.getRace());
-    const ActionType & depot = ActionTypes::GetResourceDepot(m_state.getRace());
+    ActionType worker = ActionTypes::GetWorker(m_state.getRace());
+    ActionType supply = ActionTypes::GetSupplyProvider(m_state.getRace());
+    ActionType depot = ActionTypes::GetResourceDepot(m_state.getRace());
 
     size_t mineralWorkers = m_state.getNumMineralWorkers();
     size_t numDepot = m_state.getNumTotal(depot);
@@ -50,10 +50,10 @@ const BuildOrder & NaiveBuildOrderSearch::solve()
     ActionSetAbilities wanted;
     int minWorkers = 0;
 
-    const ActionType & worker = ActionTypes::GetWorker(m_state.getRace());
+    ActionType worker = ActionTypes::GetWorker(m_state.getRace());
 
     // add everything from the goal to the needed set
-    for (const ActionType & actionType : ActionTypes::GetAllActionTypes())
+    for (ActionType actionType : ActionTypes::GetAllActionTypes())
     {
         size_t numCompleted = m_state.getNumTotal(actionType);
             
@@ -74,7 +74,7 @@ const BuildOrder & NaiveBuildOrderSearch::solve()
 
     // Add the required units to a preliminary build order
     BuildOrder buildOrder;
-    for (size_t a(0); a < requiredToBuild.size(); ++a)
+    for (ActionID a(0); a < requiredToBuild.size(); ++a)
     {
         if (requiredToBuild.contains(a))
         {
@@ -87,7 +87,7 @@ const BuildOrder & NaiveBuildOrderSearch::solve()
     buildOrder.add(worker, requiredWorkers);
 
     // Add the goal units to the end of the build order 
-    for (const ActionType & actionType : ActionTypes::GetAllActionTypes())
+    for (ActionType actionType : ActionTypes::GetAllActionTypes())
     {
         int need = (int)m_goal.getGoal(actionType);
         int have = (int)m_state.getNumTotal(actionType);
@@ -103,13 +103,13 @@ const BuildOrder & NaiveBuildOrderSearch::solve()
         for (size_t t=0; t<2; ++t)
         {
             std::vector<size_t> neededMorphers(ActionTypes::GetAllActionTypes().size(), 0);
-            for (size_t i(0); i < ActionTypes::GetAllActionTypes().size(); ++i)
+            for (ActionID i(0); i < ActionTypes::GetAllActionTypes().size(); ++i)
             {
-                const ActionType & type(i);
+                ActionType type(i);
 
                 if (type.isMorphed())
                 {
-                    const ActionType & morpher = type.whatBuilds();
+                    ActionType morpher = type.whatBuilds();
 
                     int willMorph = buildOrder.getTypeCount(type);
                     int haveMorpher = m_state.getNumTotal(morpher);
@@ -125,7 +125,7 @@ const BuildOrder & NaiveBuildOrderSearch::solve()
             }
             
             // add the morphers to the build order
-            for (size_t i(0); i<neededMorphers.size(); ++i)
+            for (ActionID i(0); i<neededMorphers.size(); ++i)
             {
                 buildOrder.add(ActionType(i), neededMorphers[i]);
             }
@@ -133,14 +133,14 @@ const BuildOrder & NaiveBuildOrderSearch::solve()
 
         // special case: hydra/lurker both in goal, need to add hydras, same with creep/sunken and muta/guardian
         // ignore other spire / hatchery since they recursively serve all purposes
-        static const ActionType & Hydralisk     = ActionTypes::GetActionType("Hydralisk");
-        static const ActionType & Lurker        = ActionTypes::GetActionType("Lurker");
-        static const ActionType & Creep         = ActionTypes::GetActionType("CreepColony");
-        static const ActionType & Sunken        = ActionTypes::GetActionType("SunkenColony");
-        static const ActionType & Spore         = ActionTypes::GetActionType("SporeColony");
-        static const ActionType & Mutalisk      = ActionTypes::GetActionType("Mutalisk");
-        static const ActionType & Guardian      = ActionTypes::GetActionType("Guardian");
-        static const ActionType & Devourer      = ActionTypes::GetActionType("Devourer");
+        static ActionType Hydralisk     = ActionTypes::GetActionType("Hydralisk");
+        static ActionType Lurker        = ActionTypes::GetActionType("Lurker");
+        static ActionType Creep         = ActionTypes::GetActionType("CreepColony");
+        static ActionType Sunken        = ActionTypes::GetActionType("SunkenColony");
+        static ActionType Spore         = ActionTypes::GetActionType("SporeColony");
+        static ActionType Mutalisk      = ActionTypes::GetActionType("Mutalisk");
+        static ActionType Guardian      = ActionTypes::GetActionType("Guardian");
+        static ActionType Devourer      = ActionTypes::GetActionType("Devourer");
 
         if (m_goal.getGoal(Hydralisk) > 0)
         {
@@ -189,7 +189,7 @@ const BuildOrder & NaiveBuildOrderSearch::solve()
     // special case for zerg: buildings consume drones
     if (m_state.getRace() == Races::Zerg)
     {
-        for (const ActionType & type : ActionTypes::GetAllActionTypes())
+        for (ActionType type : ActionTypes::GetAllActionTypes())
         {
             if (type.whatBuilds().isWorker() && !type.isMorphed())
             {
@@ -245,12 +245,12 @@ const BuildOrder & NaiveBuildOrderSearch::solve()
     int maxSupply = m_state.getMaxSupply() + m_state.getSupplyInProgress();
     int currentSupply = m_state.getCurrentSupply();
 
-    const ActionType & supplyProvider = ActionTypes::GetSupplyProvider(m_state.getRace());
+    ActionType supplyProvider = ActionTypes::GetSupplyProvider(m_state.getRace());
 
     BuildOrder finalBuildOrder;
     for (size_t a(0); a < buildOrder.size(); ++a)
     {
-        const ActionType & nextAction = buildOrder[a];
+        ActionType nextAction = buildOrder[a];
         int maxSupply = m_state.getMaxSupply();
         int currentSupply = m_state.getCurrentSupply();
         int supplyInProgress = m_state.getSupplyInProgress();

@@ -2,17 +2,17 @@
 
 #include "Common.h"
 #include "GameState.h"
-#include "BuildOrder.h"
+#include "BuildOrderAbilities.h"
 
 namespace BOSS
 {
 namespace Eval
 {
-    double ArmyCompletedResourceSum(const GameState & state);
+    //double ArmyCompletedResourceSum(const GameState & state);
     double ArmyTotalResourceSum(const GameState & state);
     double ArmyResourceSumToIndex(const GameState & state, size_t finishedUnitsIndex);
 
-    bool BuildOrderBetter(const BuildOrder & buildOrder, const BuildOrder & compareTo);
+    bool BuildOrderBetter(const BuildOrderAbilities & buildOrder, const BuildOrderAbilities & compareTo);
     bool StateBetter(const GameState & state, const GameState & compareTo);
 
     bool StateDominates(const GameState & state, const GameState & other);

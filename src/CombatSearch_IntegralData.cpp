@@ -8,9 +8,9 @@ CombatSearch_IntegralData::CombatSearch_IntegralData()
     m_integralStack.push_back(IntegralData(0,0,0));
 }
 
-void CombatSearch_IntegralData::update(const GameState & state, const BuildOrder & buildOrder)
+void CombatSearch_IntegralData::update(const GameState & state, const BuildOrderAbilities & buildOrder)
 {
-    double value = Eval::ArmyCompletedResourceSum(state);
+    double value = Eval::ArmyResourceSumToIndex(state, state.getFinishedUnits().size() - 1);
     double timeElapsed = state.getCurrentFrame() - m_integralStack.back().timeAdded; 
     double valueToAdd = m_integralStack.back().eval * timeElapsed;
     IntegralData entry(value, m_integralStack.back().integral + valueToAdd, state.getCurrentFrame());
@@ -54,7 +54,7 @@ void CombatSearch_IntegralData::print() const
     }
 }
 
-const BuildOrder & CombatSearch_IntegralData::getBestBuildOrder() const
+const BuildOrderAbilities & CombatSearch_IntegralData::getBestBuildOrder() const
 {
     return m_bestIntegralBuildOrder;
 }

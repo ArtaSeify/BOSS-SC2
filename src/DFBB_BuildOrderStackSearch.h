@@ -52,7 +52,7 @@ class DFBB_BuildOrderStackSearch
     bool                                isTimeOut();
     void                                generateLegalActions(const GameState & state, ActionSet & legalActions);
 	std::vector<ActionType>             getBuildOrder(GameState & state);
-    size_t                              getRepetitions(const GameState & state, const ActionType & a);
+    size_t                              getRepetitions(const GameState & state, ActionType a);
     std::vector<ActionType>             calculateRelevantActions();
 
 public:

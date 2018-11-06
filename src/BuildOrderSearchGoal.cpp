@@ -32,7 +32,7 @@ bool BuildOrderSearchGoal::operator == (const BuildOrderSearchGoal & g)
     return true;
 }
 
-void BuildOrderSearchGoal::setGoal(const ActionType & a, const size_t num)
+void BuildOrderSearchGoal::setGoal(ActionType a, const size_t num)
 {
     BOSS_ASSERT(a.getID() >= 0 && a.getID() < m_goalUnits.size(), "Action type not valid");
 
@@ -54,21 +54,21 @@ bool BuildOrderSearchGoal::hasGoal() const
     return false;
 }
 
-void BuildOrderSearchGoal::setGoalMax(const ActionType & a, const size_t num)
+void BuildOrderSearchGoal::setGoalMax(ActionType a, const size_t num)
 {
     BOSS_ASSERT(a.getID() >= 0 && a.getID() < m_goalUnitsMax.size(), "Action type not valid");
 
     m_goalUnitsMax[a.getID()] = num;
 }
 
-size_t BuildOrderSearchGoal::getGoal(const ActionType & a) const
+size_t BuildOrderSearchGoal::getGoal(ActionType a) const
 {
     BOSS_ASSERT(a.getID() >= 0 && a.getID() < m_goalUnits.size(), "Action type not valid");
 
     return m_goalUnits[a.getID()];
 }
 
-size_t BuildOrderSearchGoal::getGoalMax(const ActionType & a) const
+size_t BuildOrderSearchGoal::getGoalMax(ActionType a) const
 {
     BOSS_ASSERT(a.getID() >= 0 && a.getID() < m_goalUnitsMax.size(), "Action type not valid");
 
@@ -106,11 +106,11 @@ std::string BuildOrderSearchGoal::toString() const
 
 bool BuildOrderSearchGoal::isAchievedBy(const GameState & state)
 {
-    static const ActionType & Hatchery      = ActionTypes::GetActionType("Zerg_Hatchery");
-    static const ActionType & Lair          = ActionTypes::GetActionType("Zerg_Lair");
-    static const ActionType & Hive          = ActionTypes::GetActionType("Zerg_Hive");
-    static const ActionType & Spire         = ActionTypes::GetActionType("Zerg_Spire");
-    static const ActionType & GreaterSpire  = ActionTypes::GetActionType("Zerg_Greater_Spire");
+    static ActionType Hatchery      = ActionTypes::GetActionType("Zerg_Hatchery");
+    static ActionType Lair          = ActionTypes::GetActionType("Zerg_Lair");
+    static ActionType Hive          = ActionTypes::GetActionType("Zerg_Hive");
+    static ActionType Spire         = ActionTypes::GetActionType("Zerg_Spire");
+    static ActionType GreaterSpire  = ActionTypes::GetActionType("Zerg_Greater_Spire");
 
     for (auto & actionType : ActionTypes::GetAllActionTypes())
     {

@@ -100,6 +100,9 @@
       <Filter>search\BuildOrderSearch</Filter>
     </ClCompile>
     <ClCompile Include="..\src\BuildOrderAbilities.cpp" />
+    <ClCompile Include="..\src\StaticVector.cpp">
+      <Filter>util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\ActionType.h" />
@@ -204,6 +207,9 @@
       <Filter>search\BuildOrderSearch</Filter>
     </ClInclude>
     <ClInclude Include="..\src\BuildOrderAbilities.h" />
+    <ClInclude Include="..\src\StaticVector.h">
+      <Filter>util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="BuildOrder">

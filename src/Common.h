@@ -19,22 +19,24 @@ using json = nlohmann::json;
 
 namespace BOSS
 {
-    // ~~~~~!!! CAN CHANGE THIS
-    typedef size_t  ActionID;
-    typedef size_t  RaceID;
+    typedef unsigned char   uint1;
+    typedef unsigned short  uint2;
+    typedef unsigned int    uint4;
 
-    typedef unsigned char uint1;
+    // ~~~~~!!! CAN CHANGE THIS
+    typedef uint2  ActionID;
+    typedef uint1  RaceID;
 
 	// constants declared in data file
 	class CONSTANTS
 	{
 	public:
-		static double MPWPF;				// minerals per worker per frame
-		static double GPWPF;				// gas per worker per frame
-		static double ERPF;				// energy regen per frame
-		static double HRPF;				// health regen per frame
-		static double SRPF;				// shield regen per frame
-		static int WorkersPerRefinery;
+		static float MPWPF;			        // minerals per worker per frame
+		static float GPWPF;		            // gas per worker per frame
+		static float ERPF;				    // energy regen per frame
+		static float HRPF;				    // health regen per frame
+		static float SRPF;				    // shield regen per frame
+		static short WorkersPerRefinery;    // number of workers per refinery
 	};
 
     namespace Races

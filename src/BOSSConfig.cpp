@@ -54,7 +54,7 @@ const GameState & BOSSConfig::GetState(const std::string & key)
     return m_stateMap[key];
 }
 
-const BuildOrder & BOSSConfig::GetBuildOrder(const std::string & key)
+const BuildOrderAbilities & BOSSConfig::GetBuildOrder(const std::string & key)
 {
     BOSS_ASSERT(m_buildOrderMap.find(key) != m_buildOrderMap.end(), "Couldn't find build order: %s", key.c_str());
 

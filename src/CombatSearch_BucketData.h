@@ -1,6 +1,6 @@
 #pragma once
 
-#include "BuildOrder.h"
+#include "BuildOrderAbilities.h"
 #include "Common.h"
 #include "GameState.h"
 #include "Eval.h"
@@ -12,7 +12,7 @@ class BucketData
 {
 public:
     double                      eval;
-    BuildOrder                  buildOrder;
+    BuildOrderAbilities         buildOrder;
     GameState                   state;
 
     BucketData()
@@ -36,7 +36,7 @@ public:
     const size_t numBuckets() const;
     const size_t getBucketIndex(const GameState & state) const;
         
-    void update(const GameState & state, const BuildOrder & buildOrder);
+    void update(const GameState & state, const BuildOrderAbilities & buildOrder);
 
     bool isDominated(const GameState & state);
 

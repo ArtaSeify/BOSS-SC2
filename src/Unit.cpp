@@ -2,7 +2,28 @@
 
 using namespace BOSS;
 
-Unit::Unit(ActionType type, size_t id, int builderID, size_t frameStarted)
+Unit::Unit()
+    : m_job                     (UnitJobs::None)
+    , m_id                      (-1)
+    , m_frameStarted            (-1)
+    , m_frameFinished           (-1)
+    , m_type                    (-1)
+    , m_addon                   (ActionTypes::None)
+    , m_buildType               (ActionTypes::None)
+    , m_buildID                 (0)
+    , m_timeUntilBuilt          (0)
+    , m_timeUntilFree           (0)
+    , m_numLarva                (0)
+    , m_builderID               (-1)
+    , m_timeChronoBoost         (0)
+    , m_timeChronoBoostAgain    (0)
+    , m_maxEnergyAllowed        (0)
+    , m_energy                  (0)
+{
+
+}
+
+/*Unit::Unit(ActionType type, uint4 id, int builderID, uint4 frameStarted)
     : m_job                     (UnitJobs::None)
     , m_id                      (id)
     , m_frameStarted            (frameStarted)
@@ -17,10 +38,22 @@ Unit::Unit(ActionType type, size_t id, int builderID, size_t frameStarted)
     , m_builderID               (builderID)
 	, m_timeChronoBoost         (0)
     , m_timeChronoBoostAgain    (0)
-    , m_maxEnergyAllowed        (type.maxEnergy())
-	, m_energy			        (type.startingEnergy())
+    , m_maxEnergyAllowed        (float(type.maxEnergy()))
+	, m_energy			        (float(type.startingEnergy()))
 {
     
+}*/
+
+void Unit::initializeUnit(ActionType type, short id, short builderID, uint2 frameStarted)
+{
+    m_id = id;
+    m_frameStarted = frameStarted;
+    m_type = type;
+    m_timeUntilBuilt = builderID != -1 ? type.buildTime() : 0;
+    m_timeUntilFree = builderID != -1 ? type.buildTime() : 0;
+    m_builderID = builderID;
+    m_maxEnergyAllowed = float(type.maxEnergy());
+    m_energy = float(type.startingEnergy());
 }
 
 void Unit::startBuilding(Unit & Unit)
@@ -51,14 +84,14 @@ void Unit::startBuilding(Unit & Unit)
     }
 }
 
-void Unit::complete(size_t frameFinished)
+void Unit::complete(uint2 frameFinished)
 {
     m_timeUntilFree = 0;
     m_timeUntilBuilt = 0;
     m_frameFinished = frameFinished;
 }
 
-void Unit::fastForward(int frames)
+void Unit::fastForward(uint2 frames)
 {
     // if we are completing the thing that this Unit is building
     if ((m_buildType != ActionTypes::None) && frames >= m_timeUntilFree)
@@ -79,14 +112,14 @@ void Unit::fastForward(int frames)
         m_energy += std::abs(m_timeUntilBuilt) * CONSTANTS::ERPF;
         m_energy = std::min(m_energy, m_maxEnergyAllowed);
     }
-    m_timeUntilFree = std::max(0, m_timeUntilFree - frames);
-    m_timeUntilBuilt = std::max(0, m_timeUntilBuilt);
-    m_timeChronoBoostAgain = std::max(0, m_timeChronoBoostAgain - frames); 
-    m_timeChronoBoost = std::min(m_timeChronoBoost, m_timeChronoBoostAgain);
+    m_timeUntilFree = (short)std::max(0, m_timeUntilFree - frames);
+    m_timeUntilBuilt = (short)std::max(short(0), m_timeUntilBuilt);
+    m_timeChronoBoostAgain = (uint2)std::max(0, m_timeChronoBoostAgain - frames); 
+    m_timeChronoBoost = (uint2)std::min(m_timeChronoBoost, m_timeChronoBoostAgain);
 }
 
 // returns when this Unit can build a given type, -1 if it can't
-int Unit::whenCanBuild(ActionType type) const
+short Unit::whenCanBuild(ActionType type) const
 {
     // check to see if this type can build the given type
     // TODO: check equivalent types (hatchery gspire etc)
@@ -95,7 +128,7 @@ int Unit::whenCanBuild(ActionType type) const
     // we can always use an ability if we have enough energy
     if (type.isAbility())
     {
-        return ((int)std::ceil(std::max(0.0, m_timeUntilBuilt + ((type.energyCost() - m_energy) / CONSTANTS::ERPF))));
+        return ((short)std::ceil(std::max(0.0f, m_timeUntilBuilt + ((type.energyCost() - m_energy) / CONSTANTS::ERPF))));
     }
 
     // if it requires an addon and we won't ever have one, we can't build it
@@ -127,7 +160,7 @@ void Unit::castAbility(ActionType type, Unit & abilityTarget, Unit & abilityTarg
     }
 }
 
-void Unit::applyChronoBoost(int time, Unit & unitBeingProduced)
+void Unit::applyChronoBoost(uint2 time, Unit & unitBeingProduced)
 {
     if (m_timeChronoBoostAgain > 0)
     {
@@ -144,7 +177,7 @@ void Unit::applyChronoBoost(int time, Unit & unitBeingProduced)
     BOSS_ASSERT(unitBeingProduced.getTimeUntilBuilt() > 0, "Chrono Boost used on target that is not producing anything");
 
     // Chrono Boost speeds up production by 50%
-    int newTimeUntilFree = (int)std::ceil(m_timeUntilFree / 1.5);
+    uint2 newTimeUntilFree = (uint2)std::ceil(m_timeUntilFree / 1.5);
     // make changes to remaining production time and chronoboost time
     if (m_timeChronoBoost >= newTimeUntilFree)
     {
@@ -152,85 +185,10 @@ void Unit::applyChronoBoost(int time, Unit & unitBeingProduced)
     }
     else
     {
-        newTimeUntilFree = (int)std::ceil(m_timeUntilFree - (m_timeChronoBoost / 2.0));
+        newTimeUntilFree = (uint2)std::ceil(m_timeUntilFree - (m_timeChronoBoost / 2.0));
         m_timeChronoBoost = 0;
     }
 
     m_timeUntilFree = newTimeUntilFree;
     unitBeingProduced.setTimeUntilBuilt(m_timeUntilFree);
-}
-
-const int Unit::getTimeUntilBuilt() const
-{
-    return m_timeUntilBuilt;
-}
-
-void Unit::setTimeUntilBuilt(int time)
-{
-    m_timeUntilBuilt = time;
-}
-
-const int Unit::getTimeUntilFree() const
-{
-    return m_timeUntilFree;
-}
-
-ActionType Unit::getType() const
-{
-    return m_type;
-}
-
-ActionType Unit::getAddon() const
-{
-    return m_addon;
-}
-
-ActionType Unit::getBuildType() const
-{
-    return m_buildType;
-}
-
-size_t Unit::getID() const
-{
-    return m_id;
-}
-
-size_t Unit::getBuilderID() const
-{
-    return m_builderID;
-}
-
-const double & Unit::getEnergy() const
-{
-	return m_energy;
-}
-
-int Unit::getChronoBoostAgainTime() const
-{
-    return m_timeChronoBoostAgain;
-}
-
-size_t Unit::getBuildID() const
-{
-    return m_buildID;
-}
-
-void Unit::reduceEnergy(int energy)
-{
-    m_energy -= energy;
-}
-
-void Unit::setBuilderID(int id)
-{
-    m_builderID = id;
-}
-
-size_t Unit::getStartFrame() const
-{
-    return m_frameStarted;
-}
-
-size_t Unit::getFinishFrame() const
-{
-    return m_frameFinished;
 }

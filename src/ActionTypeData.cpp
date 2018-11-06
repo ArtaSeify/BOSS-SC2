@@ -5,7 +5,7 @@
 using namespace BOSS;
 
 std::vector<ActionTypeData>     AllActionTypeData;
-std::unordered_map<std::string, size_t>   ActionTypeNameMap;
+std::unordered_map<std::string, ActionID>   ActionTypeNameMap;
 
 const ActionTypeData & ActionTypeData::GetActionTypeData(const std::string & name)
 {
@@ -32,7 +32,7 @@ void ActionTypeData::Init(const json & j)
     if (j.count("Types") && j["Types"].is_array())
     {
         const json & actions = j["Types"];
-        for (size_t a(0); a < actions.size(); ++a)
+        for (ActionID a(0); a < actions.size(); ++a)
         {
             ActionTypeData data;
 
@@ -79,7 +79,7 @@ void ActionTypeData::Init(const json & j)
             }
 
             // the name map stores the index that will hold this data, which is the current size
-            ActionTypeNameMap[data.name] = AllActionTypeData.size();
+            ActionTypeNameMap[data.name] = ActionID(AllActionTypeData.size());
 
             // then we add the data to the vector
             AllActionTypeData.push_back(data);
@@ -91,7 +91,7 @@ void ActionTypeData::Init(const json & j)
     // Special actions: Chrono Boost, MULE, and Spawn Larvae
     ActionTypeData data;
 
-    data.id = AllActionTypeData.size();
+    data.id = ActionID(AllActionTypeData.size());
     data.name = "ChronoBoost";
     data.raceName = "Protoss";
     data.race = Races::GetRaceID(data.raceName);
@@ -103,7 +103,7 @@ void ActionTypeData::Init(const json & j)
     data.whatBuildsStatus = "None";
 
     // the name map stores the index that will hold this data, which is the current size
-    ActionTypeNameMap[data.name] = AllActionTypeData.size();
+    ActionTypeNameMap[data.name] = ActionID(AllActionTypeData.size());
 
     // then we add the data to the vector
     AllActionTypeData.push_back(data);

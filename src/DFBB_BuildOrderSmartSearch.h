@@ -28,7 +28,7 @@ class DFBB_BuildOrderSmartSearch
     void doSearch();
     void calculateSearchSettings();
     void setPrerequisiteGoalMax();
-    void recurseOverStrictDependencies(const ActionType & action);
+    void recurseOverStrictDependencies(ActionType action);
     void setRelevantActions();
     void setRepetitions();
 
@@ -41,7 +41,7 @@ public:
 
     DFBB_BuildOrderSmartSearch();
 
-    void addGoal(const ActionType & a, const size_t & count);
+    void addGoal(ActionType a, const size_t & count);
     void setGoal(const BuildOrderSearchGoal & goal);
     void setState(const GameState & state);
     void print();

@@ -3,6 +3,7 @@
 #include "BOSS.h"
 #include "JSONTools.h"
 #include "CombatSearchParameters.h"
+#include "BuildOrderAbilities.h"
 
 namespace BOSS
 {
@@ -16,7 +17,7 @@ class CombatSearchExperiment
     std::vector<std::string>    m_searchTypes;
 
     RaceID                      m_enemyRace;
-    BuildOrder                  m_enemyBuildOrder;
+    BuildOrderAbilities         m_enemyBuildOrder;
 
 public:
 

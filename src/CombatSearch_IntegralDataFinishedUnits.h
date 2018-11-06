@@ -4,7 +4,7 @@
 #include "GameState.h"
 #include "CombatSearchParameters.h"
 #include "Eval.h"
-#include "BuildOrder.h"
+#include "BuildOrderAbilities.h"
 
 namespace BOSS
 {
@@ -60,24 +60,24 @@ namespace BOSS
 
         std::vector<IntegralDataFinishedUnits>       m_bestIntegralStack;
         double                                       m_bestIntegralValue;
-        BuildOrder                                   m_bestIntegralBuildOrder;
+        BuildOrderAbilities                          m_bestIntegralBuildOrder;
         GameState                                    m_bestIntegralGameState;
 
-        BuildOrder createBuildOrderEndTimes(const std::vector<IntegralDataFinishedUnits> & integral_stack, const GameState & state) const;
+        BuildOrderAbilities createBuildOrderEndTimes(const std::vector<IntegralDataFinishedUnits> & integral_stack, const GameState & state) const;
 
     public:
 
         CombatSearch_IntegralDataFinishedUnits();
 
-        void update(const GameState & state, const BuildOrder & buildOrder, const CombatSearchParameters & params);
+        void update(const GameState & state, const BuildOrderAbilities & buildOrder, const CombatSearchParameters & params);
         void pop_back();
         void popFinishedLastOrder(const GameState & prevState, const GameState & currState);
 
         void print() const;
-        void printIntegralData(const size_t index, const std::vector<IntegralDataFinishedUnits> & integral_stack, const GameState & state, const BuildOrder & buildOrder) const;
-        void print(const std::vector<IntegralDataFinishedUnits> & integral_stack, const GameState & state, const BuildOrder & buildOrder) const;
+        void printIntegralData(const size_t index, const std::vector<IntegralDataFinishedUnits> & integral_stack, const GameState & state, const BuildOrderAbilities & buildOrder) const;
+        void print(const std::vector<IntegralDataFinishedUnits> & integral_stack, const GameState & state, const BuildOrderAbilities & buildOrder) const;
 
-        const BuildOrder & getBestBuildOrder() const;
+        const BuildOrderAbilities & getBestBuildOrder() const;
     };
 
 }

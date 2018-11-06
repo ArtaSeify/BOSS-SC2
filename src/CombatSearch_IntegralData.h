@@ -38,20 +38,20 @@ class CombatSearch_IntegralData
 
     std::vector<IntegralData>       m_bestIntegralStack;
     double                          m_bestIntegralValue;
-    BuildOrder                      m_bestIntegralBuildOrder;
+    BuildOrderAbilities             m_bestIntegralBuildOrder;
     GameState                       m_bestIntegralGameState;
 
 public:
 
     CombatSearch_IntegralData();
 
-    void update(const GameState & state, const BuildOrder & buildOrder);
+    void update(const GameState & state, const BuildOrderAbilities & buildOrder);
     void pop_back();
 
     void printIntegralData(const size_t index) const;
     void print() const;
 
-    const BuildOrder & getBestBuildOrder() const;
+    const BuildOrderAbilities & getBestBuildOrder() const;
 };
 
 }

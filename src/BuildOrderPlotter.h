@@ -9,8 +9,8 @@ namespace BOSS
 
 class BuildOrderPlotter
 {
-    std::vector<std::string>    m_buildOrderNames;
-    std::string                 m_outputDir;
+    std::vector<std::string>        m_buildOrderNames;
+    std::string                     m_outputDir;
     std::vector<BuildOrderPlotData> m_allPlots;
 
 public:
@@ -18,7 +18,7 @@ public:
     BuildOrderPlotter();
     //BuildOrderPlotter(const std::string & name, const json & j);
     
-    void addPlot(const std::string & name, const GameState & state, const BuildOrder & buildOrder);
+    void addPlot(const std::string & name, const GameState & state, const BuildOrderAbilities & buildOrder);
     void doPlots();
 
     const std::vector<BuildOrderPlotData> & getPlots() const;

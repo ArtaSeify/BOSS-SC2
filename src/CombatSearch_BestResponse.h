@@ -3,7 +3,7 @@
 #include "Common.h"
 #include "Timer.hpp"
 #include "Eval.h"
-#include "BuildOrder.h"
+#include "BuildOrderAbilities.h"
 #include "CombatSearch.h"
 #include "CombatSearchParameters.h"
 #include "CombatSearchResults.h"
@@ -18,7 +18,7 @@ class CombatSearch_BestResponse : public CombatSearch
 
     CombatSearch_BestResponseData   m_bestResponseData;
 
-    BuildOrder                      m_bestBuildOrder;
+    BuildOrderAbilities             m_bestBuildOrder;
 
 public:
 	

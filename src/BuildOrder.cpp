@@ -8,7 +8,7 @@ BuildOrder::BuildOrder()
 
 }
 
-void BuildOrder::add(const ActionType & type)
+void BuildOrder::add(ActionType type)
 {
     BOSS_ASSERT((m_buildOrder.size() == 0) || (type.getRace() == m_buildOrder.back().getRace()), "Cannot have a build order with multiple races");
 
@@ -16,7 +16,7 @@ void BuildOrder::add(const ActionType & type)
     m_typeCount[type.getID()]++;
 }
 
-void BuildOrder::add(const ActionType & type, const AbilityAction & ability)
+void BuildOrder::add(ActionType type, const AbilityAction & ability)
 {
     add(type);
     if (type.isAbility())
@@ -25,7 +25,7 @@ void BuildOrder::add(const ActionType & type, const AbilityAction & ability)
     }
 }
 
-void BuildOrder::add(const ActionType & type, int amount)
+void BuildOrder::add(ActionType type, int amount)
 {
     for (int i(0); i < amount; ++i)
     {
@@ -52,7 +52,7 @@ const bool BuildOrder::empty() const
     return size() == 0;
 }
 
-const ActionType & BuildOrder::getAbilityTargetType(size_t index) const
+/*ActionType BuildOrder::getAbilityTargetType(size_t index) const
 {
     return m_abilityTargets.at(index).targetType;
 }
@@ -65,9 +65,9 @@ const size_t & BuildOrder::getAbilityTarget(size_t index) const
 const AbilityAction & BuildOrder::getAbilityAction(size_t index) const
 {
     return m_abilityTargets.at(index);
-}
+}*/
 
-const size_t BuildOrder::getTypeCount(const ActionType & type) const
+const size_t BuildOrder::getTypeCount(ActionType type) const
 {
     if (empty())
     {
@@ -89,7 +89,7 @@ void BuildOrder::pop_back()
     
 }
 
-const ActionType & BuildOrder::operator [] (size_t i) const
+ActionType BuildOrder::operator [] (size_t i) const
 {
     return m_buildOrder[i];
 }
@@ -99,7 +99,7 @@ ActionType & BuildOrder::operator [] (size_t i)
     return m_buildOrder[i];
 }
 
-const ActionType & BuildOrder::back() const
+ActionType BuildOrder::back() const
 {
     return m_buildOrder.back();
 }

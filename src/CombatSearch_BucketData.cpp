@@ -26,7 +26,7 @@ const size_t CombatSearch_BucketData::getBucketIndex(const GameState & state) co
     return (size_t)(((double)state.getCurrentFrame() / (double)m_frameLimit) * m_buckets.size());
 }
 
-void CombatSearch_BucketData::update(const GameState & state, const BuildOrder & buildOrder)
+void CombatSearch_BucketData::update(const GameState & state, const BuildOrderAbilities & buildOrder)
 {
     if (state.getCurrentFrame() >= m_frameLimit)
     {

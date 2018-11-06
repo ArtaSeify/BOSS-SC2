@@ -20,19 +20,20 @@ namespace Eval
 	    return sum;
     }*/
 
-    double ArmyCompletedResourceSum(const GameState & state)
+    /*double ArmyCompletedResourceSum(const GameState & state)
     {
         double sum(0);
 
         auto & army_units = state.getFinishedArmyUnits();
-        for (size_t unit_index : army_units)
+        for (size_t i(0); i < army_units.size(); ++i)
         {
+            size_t unit_index = army_units[i];
             sum += state.getUnit(unit_index).getType().mineralPrice();
             sum += 2 * state.getUnit(unit_index).getType().gasPrice();
         }
 
         return sum;
-    }
+    }*/
 
     double ArmyTotalResourceSum(const GameState & state)
     {
@@ -54,7 +55,7 @@ namespace Eval
     {
         double sum(0);
         auto & finishedUnits = state.getFinishedUnits();
-        size_t index = (finishedUnitsIndex == 0) ? 0 : finishedUnitsIndex;
+        size_t index = finishedUnitsIndex;
 
         for (index; index < finishedUnitsIndex + 1; ++index)
         {
@@ -69,14 +70,14 @@ namespace Eval
         return sum;
     }
 
-    bool BuildOrderBetter(const BuildOrder & buildOrder, const BuildOrder & compareTo)
+    bool BuildOrderBetter(const BuildOrderAbilities & buildOrder, const BuildOrderAbilities & compareTo)
     {
         size_t numWorkers = 0;
         size_t numWorkersOther = 0;
 
         for (size_t a(0); a<buildOrder.size(); ++a)
         {
-            if (buildOrder[a].isWorker())
+            if (buildOrder[a].first.isWorker())
             {
                 numWorkers++;
             }
@@ -84,7 +85,7 @@ namespace Eval
 
         for (size_t a(0); a<compareTo.size(); ++a)
         {
-            if (compareTo[a].isWorker())
+            if (compareTo[a].first.isWorker())
             {
                 numWorkersOther++;
             }
@@ -102,8 +103,8 @@ namespace Eval
 
     bool StateBetter(const GameState & state, const GameState & compareTo)
     {
-        size_t numWorkers = state.getNumTotalCompleted(ActionTypes::GetWorker(state.getRace()));
-        size_t numWorkersOther = compareTo.getNumTotalCompleted(ActionTypes::GetWorker(compareTo.getRace()));
+        size_t numWorkers = state.getNumCompleted(ActionTypes::GetWorker(state.getRace()));
+        size_t numWorkersOther = compareTo.getNumCompleted(ActionTypes::GetWorker(compareTo.getRace()));
 
         if (numWorkers == numWorkersOther)
         {

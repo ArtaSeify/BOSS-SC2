@@ -4,102 +4,110 @@
 #include "ActionType.h"
 #include "Unit.h"
 #include "AbilityAction.h"
+#include "StaticVector.h"
 
 namespace BOSS
 {
 
 class GameState 
 {
-    std::vector<Unit>	m_units;
-    std::vector<size_t>	m_unitsBeingBuilt;  // indices of m_units which are not completed, sorted descending by finish time
-    std::vector<size_t>     m_unitsSortedEndFrame;      // indices of m_units which are completed, in order
-    std::vector<size_t>     m_armyUnits;                // holds indices of produced army units
-    std::vector<AbilityAction> m_chronoBoosts;
-    int					m_race;
-    double				m_minerals;
-    double				m_gas;
-    int					m_currentSupply;
-    int					m_maxSupply;
-    int					m_currentFrame;
-    int					m_previousFrame;
-    int					m_mineralWorkers;
-    int					m_gasWorkers;
-    int					m_buildingWorkers;
-    int					m_numRefineries;
-    int					m_numDepots;
-    ActionType			m_lastAction;
-    AbilityAction       m_lastAbility;
+    typedef StaticVector<Unit, VectorLimit>         Vector_unit;
+    typedef StaticVector<uint2, VectorLimit / 2>    Vector_sizet;
+    typedef StaticVector<AbilityAction, 5>          Vector_abilityaction;
 
-    int			getBuilderID(const ActionType & type) const;
-    bool		haveBuilder(const ActionType & type) const;
-    bool		havePrerequisites(const ActionType & type) const;
+    Vector_unit                 m_units;
+    Vector_sizet	            m_unitsBeingBuilt;      // indices of m_units which are not completed, sorted descending by finish time
+    Vector_sizet                m_unitsSortedEndFrame;  // indices of m_units which are completed, in order
+    Vector_abilityaction        m_chronoBoosts;
+    uint4                       m_numUnits;
+    RaceID					    m_race;
+    float				        m_minerals;
+    float				        m_gas;
+    short					    m_currentSupply;
+    short					    m_maxSupply;
+    short					    m_currentFrame;
+    short					    m_previousFrame;
+    short					    m_mineralWorkers;
+    short					    m_gasWorkers;
+    short					    m_buildingWorkers;
+    short					    m_numRefineries;
+    short					    m_numDepots;
+    ActionType			        m_lastAction;
+    AbilityAction               m_lastAbility;
 
-    int			whenSupplyReady(const ActionType & action)          const;
-    int			whenPrerequisitesReady(const ActionType & action)   const;
-    int			whenResourcesReady(const ActionType & action)       const;
-    int			whenBuilderReady(const ActionType & action)         const;
+    short		getBuilderID(ActionType type)               const;
+    bool		haveBuilder(ActionType type)                const;
+    bool		havePrerequisites(ActionType type)          const;
 
-    void        addUnitToSpecialVectors(size_t unitIndex);
+    short		whenSupplyReady(ActionType action)          const;
+    short		whenPrerequisitesReady(ActionType action)   const;
+    short		whenResourcesReady(ActionType action)       const;
+    short		whenBuilderReady(ActionType action)         const;
 
-    Unit &		getUnit(size_t id);
+    void        addUnitToSpecialVectors(uint4 unitIndex);
+
+    Unit &		getUnit(uint4 id)
+                { 
+                    //BOSS_ASSERT(id < m_numUnits, "getUnit() called with invalid id");
+                    return m_units[id]; 
+                }
     void		completeUnit(Unit & Unit);
 
 public: 
 
     GameState();
-    GameState(const GameState & state);
 
-    const double &	                        getMinerals() const;
-    const double &	                        getGas() const;
-    const int &		                        getCurrentSupply() const;
-    const int &		                        getMaxSupply() const;
-    const int &		                        getCurrentFrame() const;
-    const Unit &	                        getUnit(size_t id) const;
-    ActionType                              getUnitType(size_t id);
-	bool			                        canBuildNow(const ActionType & action) const;
-    int				                        whenCanBuild(const ActionType & action) const;
-    int                                     whenCanCast(const ActionType & action, size_t targetID) const;
-    int                                     whenEnergyReady(const ActionType & action)          const;
-    int			                            getSupplyInProgress() const;
-    int                                     getLastActionFinishTime() const;
-    int                                     getNextFinishTime(const ActionType & type) const;
+    short				                    whenCanBuild(ActionType action)                     const;
+    short                                   whenCanCast(ActionType action, uint4 targetID)     const;
+    short                                   whenEnergyReady(ActionType action)                  const;
+    short			                        getSupplyInProgress()                                       const;
+    short                                   getNextFinishTime(ActionType type)                  const;
 
-    void                                    getSpecialAbilityTargets(ActionSetAbilities & actionSet) const;
-    void                                    storeChronoBoostTargets(ActionSetAbilities & actionSet) const;
-    bool                                    chronoBoostableTarget(const Unit & unit) const;
-    bool                                    canChronoBoostTarget(const Unit & unit) const;
-    bool                                    canChronoBoost()    const;
-    size_t                                  getNumberChronoBoostsCast() const;
-    const std::vector<AbilityAction> &      getChronoBoostTargets() const;
+    void                                    getSpecialAbilityTargets(ActionSetAbilities & actionSet)    const;
+    void                                    storeChronoBoostTargets(ActionSetAbilities & actionSet)     const;
+    bool                                    chronoBoostableTarget(const Unit & unit)                    const;
+    bool                                    canChronoBoostTarget(const Unit & unit)                     const;
+    bool                                    canChronoBoost()                                            const;
 
-    size_t			                        getNumMineralWorkers() const;
-    size_t			                        getNumGasWorkers() const;
-    size_t			                        getNumInProgress(const ActionType & action) const;
-    size_t			                        getNumCompleted(const ActionType & action) const;
-    size_t			                        getNumTotal(const ActionType & action) const;
-    size_t                                  getNumTotalCompleted(const ActionType & action) const;
-    void			                        getLegalActions(std::vector<ActionType> & legalActions) const;
-    bool			                        isLegal(const ActionType & type) const;
-    bool			                        haveType(const ActionType & action) const;
-    int				                        getRace() const;
-    const ActionType &                      getLastAction() const;
-    const AbilityAction &                   getLastAbility() const;
-    size_t                                  getNumUnits() const;
+    uint4			                        getNumInProgress(ActionType action)                 const;
+    uint4			                        getNumCompleted(ActionType action)                  const;
+    uint4			                        getNumTotal(ActionType action)                      const;
+    void			                        getLegalActions(std::vector<ActionType> & legalActions)     const;
+    bool			                        isLegal(ActionType type)                            const;
+    bool			                        haveType(ActionType action)                         const;
 
-    bool                                    doAbility(const ActionType & type, size_t targetID);
-    void			                        doAction(const ActionType & type);
-    void			                        fastForward(int frames);
-    void			                        addUnit(const ActionType & Unit, int builderID = -1);
-    void			                        setMinerals(double minerals);
-    void			                        setGas(double gas);
+    bool                                    doAbility(ActionType type, uint4 targetID);
+    void			                        doAction(ActionType type);
+    void			                        fastForward(short frames);
+    void			                        addUnit(ActionType Unit, short builderID = -1);
+  
+    void			                        setMinerals(float minerals) { m_minerals = minerals; }
+    void			                        setGas(float gas) { m_gas = gas; }
+
+    bool			                        canBuildNow(ActionType action) const { return whenCanBuild(action) == getCurrentFrame(); }
+    uint4			                        getNumMineralWorkers() const { return m_mineralWorkers; }
+    uint4			                        getNumGasWorkers() const { return m_gasWorkers; }
+    uint4                                   getNumberChronoBoostsCast() const { return m_chronoBoosts.size(); }
+    uint4                                   getNumUnits() const { return m_numUnits; }
+    short                                   getLastActionFinishTime() const { return m_unitsBeingBuilt.empty() ? getCurrentFrame() : m_units[m_unitsBeingBuilt.front()].getTimeUntilBuilt(); }
+    short		                            getCurrentSupply() const { return m_currentSupply; }
+    short		                            getMaxSupply() const { return m_maxSupply; }
+    short 	                                getCurrentFrame() const { return m_currentFrame; }
+    short				                    getRace() const { return m_race; }
+    float	                                getMinerals() const { return m_minerals; }
+    float	                                getGas() const { return m_gas; }
+    const Vector_abilityaction &            getChronoBoostTargets() const { return m_chronoBoosts; }
+    const Vector_sizet &                    getFinishedUnits() const { return m_unitsSortedEndFrame; }
+    ActionType                              getUnitType(uint4 id) const { return m_units[id].getType(); }
+    ActionType                              getLastAction() const { return m_lastAction; }
+    const AbilityAction &                   getLastAbility() const { return m_lastAbility; }
+    const Unit &	                        getUnit(uint4 id) const
+                                            { 
+                                                //BOSS_ASSERT(id < m_numUnits, "getUnit() called with invalid id");
+                                                return m_units[id]; 
+                                            }
     
-    const std::vector<size_t> &             getFinishedArmyUnits() const;
-    const std::vector<size_t> &             getFinishedUnits() const;
-    
-
-    std::string		toString() const;
-
-
-    void printunitsbeingbuilt() const;
+    std::string		                        toString() const;
+    void                                    printunitsbeingbuilt() const;
 };
 }

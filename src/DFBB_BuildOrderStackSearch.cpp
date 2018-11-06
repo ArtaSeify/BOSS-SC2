@@ -70,12 +70,12 @@ void DFBB_BuildOrderStackSearch::generateLegalActions(const GameState & state, A
 {
     legalActions.clear();
     BuildOrderSearchGoal & goal = m_params.m_goal;
-    const ActionType & worker = ActionTypes::GetWorker(state.getRace());
+    ActionType worker = ActionTypes::GetWorker(state.getRace());
     
     // add all legal relevant actions that are in the goal
     for (size_t a(0); a < m_params.m_relevantActions.size(); ++a)
     {
-        const ActionType & actionType = m_params.m_relevantActions[a];
+        ActionType actionType = m_params.m_relevantActions[a];
         const std::string & actionName = actionType.getName();
         const size_t numTotal = state.getNumTotal(actionType);
 
@@ -124,7 +124,7 @@ void DFBB_BuildOrderStackSearch::generateLegalActions(const GameState & state, A
 
         for (size_t a(0); a < legalActions.size(); ++a)
         {
-            const ActionType & actionType = legalActions[a];
+            ActionType actionType = legalActions[a];
             const int whenCanPerformAction = state.whenCanBuild(actionType);
             if (whenCanPerformAction < workerReady)
             {
@@ -149,7 +149,7 @@ void DFBB_BuildOrderStackSearch::generateLegalActions(const GameState & state, A
     }
 }
 
-size_t DFBB_BuildOrderStackSearch::getRepetitions(const GameState & state, const ActionType & a)
+size_t DFBB_BuildOrderStackSearch::getRepetitions(const GameState & state, ActionType a)
 {
     // set the repetitions if we are using repetitions, otherwise set to 1
     int repeat = m_params.m_useRepetitions ? m_params.getRepetitions(a) : 1;

@@ -94,13 +94,13 @@ public:
     // alternate constructor
     DFBB_BuildOrderSearchParameters();
 
-    void setMaxActions(const ActionType & a, const size_t & max);
-    void setRepetitions(const ActionType & a, const size_t & repetitions);
-    void setRepetitionThreshold(const ActionType & a, const size_t & thresh);
+    void setMaxActions(ActionType a, const size_t & max);
+    void setRepetitions(ActionType a, const size_t & repetitions);
+    void setRepetitionThreshold(ActionType a, const size_t & thresh);
 
-    const size_t & getRepetitions(const ActionType & a);
-    const size_t & getMaxActions(const ActionType & a);
-    const size_t & getRepetitionThreshold(const ActionType & a);
+    const size_t & getRepetitions(ActionType a);
+    const size_t & getMaxActions(ActionType a);
+    const size_t & getRepetitionThreshold(ActionType a);
 
     std::string toString() const;
 };

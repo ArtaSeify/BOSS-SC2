@@ -19,28 +19,28 @@ DFBB_BuildOrderSearchParameters::DFBB_BuildOrderSearchParameters()
     
 }
 
-void DFBB_BuildOrderSearchParameters::setRepetitions(const ActionType & a, const size_t & repetitions)
+void DFBB_BuildOrderSearchParameters::setRepetitions(ActionType a, const size_t & repetitions)
 { 
     BOSS_ASSERT(a.getID() >= 0 && a.getID() < m_repetitionValues.size(), "Action type not valid");
 
     m_repetitionValues[a.getID()] = repetitions; 
 }
 
-void DFBB_BuildOrderSearchParameters::setRepetitionThreshold(const ActionType & a, const size_t & thresh)	
+void DFBB_BuildOrderSearchParameters::setRepetitionThreshold(ActionType a, const size_t & thresh)	
 { 
     BOSS_ASSERT(a.getID() >= 0 && a.getID() < m_repetitionThresholds.size(), "Action type not valid");
 
     m_repetitionThresholds[a.getID()] = thresh; 
 }
 
-const size_t & DFBB_BuildOrderSearchParameters::getRepetitions(const ActionType & a)
+const size_t & DFBB_BuildOrderSearchParameters::getRepetitions(ActionType a)
 { 
     BOSS_ASSERT(a.getID() >= 0 && a.getID() < m_repetitionValues.size(), "Action type not valid");
 
     return m_repetitionValues[a.getID()]; 
 }
 
-const size_t & DFBB_BuildOrderSearchParameters::getRepetitionThreshold(const ActionType & a)				
+const size_t & DFBB_BuildOrderSearchParameters::getRepetitionThreshold(ActionType a)				
 { 
     BOSS_ASSERT(a.getID() >= 0 && a.getID() < m_repetitionThresholds.size(), "Action type not valid");
 

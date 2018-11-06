@@ -3,7 +3,7 @@
 #include "Common.h"
 #include "ActionType.h"
 #include "GameState.h"
-#include "BuildOrder.h"
+#include "BuildOrderAbilities.h"
 #include "Position.hpp"
 
 namespace BOSS
@@ -23,21 +23,21 @@ class BuildOrderPlotData
 {
     friend class BuildOrderPlotter;
 
-    const GameState         m_initialState;
-    const BuildOrder        m_buildOrder;
+    const GameState                     m_initialState;
+    const BuildOrderAbilities           m_buildOrder;
         
-    std::vector<int>        m_startTimes;
-    std::vector<int>        m_finishTimes;
-    std::vector<int>        m_layers;
-    std::vector<double>     m_armyValues;
-    std::vector< std::pair<int,int> > m_minerals;
-    std::vector< std::pair<int,int> > m_gas;
-    std::vector<Rectangle>  m_rectangles;
+    std::vector<int>                    m_startTimes;
+    std::vector<int>                    m_finishTimes;
+    std::vector<int>                    m_layers;
+    std::vector<double>                 m_armyValues;
+    std::vector< std::pair<int,int> >   m_minerals;
+    std::vector< std::pair<int,int> >   m_gas;
+    std::vector<Rectangle>              m_rectangles;
 
-    int                     m_maxLayer;
-    int                     m_maxFinishTime;
-    int                     m_boxHeight;
-    int                     m_boxHeightBuffer;
+    int                                 m_maxLayer;
+    int                                 m_maxFinishTime;
+    int                                 m_boxHeight;
+    int                                 m_boxHeightBuffer;
 
     void calculateStartEndTimes();
     void calculatePlot();
@@ -45,7 +45,7 @@ class BuildOrderPlotData
 
 public:
 
-    BuildOrderPlotData(const GameState & initialState, const BuildOrder & buildOrder);
+    BuildOrderPlotData(const GameState & initialState, const BuildOrderAbilities & buildOrder);
 
 };
 

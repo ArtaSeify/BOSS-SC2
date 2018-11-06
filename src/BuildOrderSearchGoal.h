@@ -23,11 +23,11 @@ public:
     bool                isAchievedBy(const GameState & state);
 
     size_t              supplyRequired() const;
-    size_t              getGoal(const ActionType & a) const;
-    size_t              getGoalMax(const ActionType & a) const;
+    size_t              getGoal(ActionType a) const;
+    size_t              getGoalMax(ActionType a) const;
 
-    void                setGoal(const ActionType & a, const size_t num);
-    void                setGoalMax(const ActionType & a, const size_t num);
+    void                setGoal(ActionType a, const size_t num);
+    void                setGoalMax(ActionType a, const size_t num);
     std::string         toString() const;
 };
 }

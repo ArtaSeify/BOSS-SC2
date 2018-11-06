@@ -10,7 +10,7 @@ struct ActionTypeData
 {
     std::string                 name            = "None";
     std::string                 raceName        = "None";
-    size_t                      id              = 0;
+    ActionID                    id              = 0;
     int                         race            = Races::None;            
     int                         mineralCost     = 0;      
     int                         gasCost         = 0;       
@@ -31,7 +31,7 @@ struct ActionTypeData
     bool                        isDepot         = false;
     bool                        isAddon         = false;
     ActionType                  whatBuilds      = 0;
-    size_t                      whatBuildsCount = 1;
+    uint4                       whatBuildsCount = 1;
     ActionType                  whatBuildsAddon = 0;
     std::string                 whatBuildsStr;
     std::string                 whatBuildsStatus;

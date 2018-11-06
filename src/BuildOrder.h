@@ -17,12 +17,12 @@ public:
 
     BuildOrder();
 
-    void                    add(const ActionType & type);
-    void                    add(const ActionType & type, const AbilityAction & ability);
-    void                    add(const ActionType & type, int amount);
+    void                    add(ActionType type);
+    void                    add(ActionType type, const AbilityAction & ability);
+    void                    add(ActionType type, int amount);
     void                    add(const BuildOrder & other);
     void                    clear();
-    const ActionType &      back() const;
+    ActionType      back() const;
     void                    pop_back();
     void                    sortByPrerequisites();
 
@@ -33,15 +33,15 @@ public:
     iterator end() { return m_buildOrder.end(); }
     
     // index
-    const ActionType &      operator [] (size_t i) const;
+    ActionType      operator [] (size_t i) const;
     ActionType &            operator [] (size_t i);
 
     const size_t            size() const;
-    const size_t            getTypeCount(const ActionType & type) const;
+    const size_t            getTypeCount(ActionType type) const;
     const bool              empty() const;
-    const ActionType &      getAbilityTargetType(size_t index) const;
-    const size_t &          getAbilityTarget(size_t index) const;
-    const AbilityAction &   getAbilityAction(size_t index) const;
+    //ActionType      getAbilityTargetType(size_t index) const;
+    //const size_t &          getAbilityTarget(size_t index) const;
+    //const AbilityAction &   getAbilityAction(size_t index) const;
 
     std::string             getJSONString() const;
     std::string             getNumberedString() const;

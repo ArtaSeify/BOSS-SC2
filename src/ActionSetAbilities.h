@@ -8,7 +8,7 @@ namespace BOSS
 class ActionType;
 class ActionSetAbilities
 {
-    typedef std::pair<ActionType, size_t> ActionTargetPair;
+    typedef std::pair<ActionType, uint4> ActionTargetPair;
     typedef std::vector<ActionTargetPair> Actions;
     Actions m_actionsAndTargets;
 
@@ -19,16 +19,16 @@ public:
     bool isEmpty() const { return m_actionsAndTargets.empty(); }
     void clear() { m_actionsAndTargets.clear(); }
 
-    bool contains(const ActionType & action) const;
+    bool contains(ActionType action) const;
 
-    void add(const ActionType & action);
+    void add(ActionType action);
     void add(const ActionSetAbilities & set);
-    void add(const ActionType & action, size_t abilityTargetID);
+    void add(ActionType action, uint4 abilityTargetID);
 
-    void remove(const ActionType & action);
+    void remove(ActionType action);
     void remove(const ActionSetAbilities & set);
 
-    size_t getAbilityTarget(size_t index) const;
+    uint4 getAbilityTarget(uint4 index) const;
 
     const std::string toString() const;
 
@@ -41,8 +41,8 @@ public:
     const_iterator end() const { return m_actionsAndTargets.end(); }
 
     // index
-    ActionTargetPair & operator[] (size_t index) { return m_actionsAndTargets[index]; }
-    const ActionTargetPair & operator[] (size_t index) const { return m_actionsAndTargets[index]; }
+    ActionTargetPair & operator[] (uint4 index) { return m_actionsAndTargets[index]; }
+    const ActionTargetPair & operator[] (uint4 index) const { return m_actionsAndTargets[index]; }
 };
 
 }

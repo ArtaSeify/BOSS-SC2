@@ -16,7 +16,7 @@ public:
     ActionType(const ActionType & type);
     ActionType(const ActionID & actionID);
 
-    ActionType & operator = (const ActionType & rhs);
+    ActionType & operator = (ActionType rhs);
     const std::string & getName()       const;
 
     ActionID getID()             const;
@@ -42,33 +42,33 @@ public:
     bool isAddon()          const;
     bool isMorphed()        const;
     
-    const ActionType & whatBuilds() const;
+    ActionType whatBuilds() const;
     const std::string & whatBuildsStatus() const;
-    const ActionType & whatBuildsAddon() const;
+    ActionType whatBuildsAddon() const;
     const std::vector<ActionType> & required() const;
     const std::vector<ActionType> & equivalent() const;
     const ActionSetAbilities & getPrerequisiteActionCount() const;
     const ActionSetAbilities & getRecursivePrerequisiteActionCount() const;
 
-    bool operator == (const ActionType & rhs)     const { return m_id == rhs.m_id; }
-    bool operator != (const ActionType & rhs)     const { return m_id != rhs.m_id; }
-    bool operator <  (const ActionType & rhs)     const { return m_id < rhs.m_id; }
+    bool operator == (ActionType rhs)     const { return m_id == rhs.m_id; }
+    bool operator != (ActionType rhs)     const { return m_id != rhs.m_id; }
+    bool operator <  (ActionType rhs)     const { return m_id < rhs.m_id; }
 };
 
 namespace ActionTypes
 {
     void Init();
     const std::vector<ActionType> & GetAllActionTypes();
-    ActionType GetWorker(const RaceID raceID);
-    ActionType GetSupplyProvider(const RaceID raceID);
-    ActionType GetRefinery(const RaceID raceID);
-    ActionType GetResourceDepot(const RaceID raceID);
-    ActionType GetSpecialAction(const RaceID raceID);
+    ActionType GetWorker(RaceID raceID);
+    ActionType GetSupplyProvider(RaceID raceID);
+    ActionType GetRefinery(RaceID raceID);
+    ActionType GetResourceDepot(RaceID raceID);
+    ActionType GetSpecialAction(RaceID raceID);
     ActionType GetActionType(const std::string & name);
-    const bool TypeExists(const std::string & name);
+    bool TypeExists(const std::string & name);
 
-    ActionSetAbilities CalculatePrerequisites(const ActionType & action);
-    void CalculateRecursivePrerequisites(ActionSetAbilities & count, const ActionType & action);
+    ActionSetAbilities CalculatePrerequisites(ActionType action);
+    void CalculateRecursivePrerequisites(ActionSetAbilities & count, ActionType action);
 
     extern ActionType None;
 }

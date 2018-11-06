@@ -59,13 +59,13 @@ BuildOrder Tools::GetNaiveBuildOrderAddWorkersOld(const GameState & state, const
     ActionSetAbilities wanted;
     int minWorkers = 8;
 
-    const ActionType & worker = ActionTypes::GetWorker(state.getRace());
+    ActionType worker = ActionTypes::GetWorker(state.getRace());
     std::vector<size_t> buildOrderActionTypeCount(ActionTypes::GetAllActionTypes().size(), 0);
 
     // add everything from the goal to the needed set
-    for (size_t a(0); a < ActionTypes::GetAllActionTypes().size(); ++a)
+    for (ActionID a(0); a < ActionTypes::GetAllActionTypes().size(); ++a)
     {
-        const ActionType & actionType(a);
+        ActionType actionType(a);
         size_t numCompleted = state.getNumTotal(actionType);
             
         if (goal.getGoal(actionType) > numCompleted)
@@ -87,7 +87,7 @@ BuildOrder Tools::GetNaiveBuildOrderAddWorkersOld(const GameState & state, const
     BuildOrder buildOrder;
     for (const auto & actionTargetPair : requiredToBuild)
     {
-        const ActionType & type = actionTargetPair.first;
+        ActionType type = actionTargetPair.first;
         buildOrder.add(type);
         buildOrderActionTypeCount[type.getID()]++;
     }
@@ -101,9 +101,9 @@ BuildOrder Tools::GetNaiveBuildOrderAddWorkersOld(const GameState & state, const
     }
 
     // Add the goal units to the end of the build order 
-    for (size_t a(0); a < ActionTypes::GetAllActionTypes().size(); ++a)
+    for (ActionID a(0); a < ActionTypes::GetAllActionTypes().size(); ++a)
     {
-        const ActionType & actionType(a);
+        ActionType actionType(a);
         int need = (int)goal.getGoal(actionType);
         int have = (int)state.getNumTotal(actionType);
         int numNeeded = need - have - buildOrderActionTypeCount[actionType.getID()]; 
@@ -136,7 +136,7 @@ BuildOrder Tools::GetNaiveBuildOrderAddWorkersOld(const GameState & state, const
         
         for (size_t a(0); a < buildOrder.size(); ++a)
         {
-            const ActionType & actionType = buildOrder[a];
+            ActionType actionType = buildOrder[a];
 
             if (actionType.isAddon())
             {
@@ -222,9 +222,9 @@ BuildOrder Tools::GetNaiveBuildOrderAddWorkersOld(const GameState & state, const
     size_t i = 0;
     while (i < buildOrder.size())
     {
-        const ActionType & worker           = ActionTypes::GetWorker(currentState.getRace());
-        const ActionType & supplyProvider   = ActionTypes::GetSupplyProvider(currentState.getRace());
-        const ActionType & nextAction       = buildOrder[i];
+        ActionType worker           = ActionTypes::GetWorker(currentState.getRace());
+        ActionType supplyProvider   = ActionTypes::GetSupplyProvider(currentState.getRace());
+        ActionType nextAction       = buildOrder[i];
         size_t maxSupply             = currentState.getMaxSupply() + currentState.getSupplyInProgress();
         size_t numWorkers            = currentState.getNumTotal(worker);
         size_t currentSupply         = currentState.getCurrentSupply();
@@ -285,7 +285,7 @@ BuildOrder Tools::GetNaiveBuildOrderAddWorkersOld(const GameState & state, const
     return finalBuildOrder;
 }
 
-void Tools::InsertActionIntoBuildOrder(BuildOrder & result, const BuildOrder & buildOrder, const GameState & initialState, const ActionType & action)
+void Tools::InsertActionIntoBuildOrder(BuildOrder & result, const BuildOrder & buildOrder, const GameState & initialState, ActionType action)
 {
     int bestInsertIndex = -1;
     BuildOrder runningBuildOrder;
@@ -347,9 +347,9 @@ int Tools::GetLowerBound(const GameState & state, const BuildOrderSearchGoal & g
     ActionSetAbilities wanted;
 
     // add everything from the goal to the needed set
-    for (size_t a(0); a < ActionTypes::GetAllActionTypes().size(); ++a)
+    for (ActionID a(0); a < ActionTypes::GetAllActionTypes().size(); ++a)
     {
-        const ActionType & actionType(a);
+        ActionType actionType(a);
         size_t numCompleted = state.getNumTotal(actionType);
             
         if (goal.getGoal(actionType) > numCompleted)
@@ -367,12 +367,12 @@ void Tools::CalculatePrerequisitesRequiredToBuild(const GameState & state, const
 {
     // if anything needed gas and we don't have a refinery, we need to add one
     ActionSetAbilities allNeeded(needed);
-    const ActionType & refinery = ActionTypes::GetRefinery(state.getRace());
+    ActionType refinery = ActionTypes::GetRefinery(state.getRace());
     if (!needed.contains(refinery) && (state.getNumCompleted(refinery) == 0) && !added.contains(refinery))
     {
         for (const auto & actionTargetPair : needed)
         {
-            const ActionType & actionType = actionTargetPair.first;
+            ActionType actionType = actionTargetPair.first;
 
             if (actionType.gasPrice() > 0)
             {
@@ -384,7 +384,7 @@ void Tools::CalculatePrerequisitesRequiredToBuild(const GameState & state, const
 
     for (const auto & actionTargetPair : allNeeded)
     {
-        const ActionType & neededType = actionTargetPair.first;
+        ActionType neededType = actionTargetPair.first;
 
         // if we already have the needed type completed we can skip it
         if (added.contains(neededType) || state.getNumCompleted(neededType) > 0)
@@ -411,7 +411,7 @@ int Tools::CalculatePrerequisitesLowerBound(const GameState & state, const Actio
     int max = 0;
     for (const auto & actionTargetPair : needed)
     {
-        const ActionType & neededType = actionTargetPair.first;
+        ActionType neededType = actionTargetPair.first;
 
         int thisActionTime = 0;
 
@@ -456,17 +456,27 @@ void Tools::DoBuildOrder(GameState & state, const BuildOrder & buildOrder)
 {
     for (size_t i(0); i < buildOrder.size(); ++i)
     {
-        if (buildOrder[i].isAbility())
+        state.doAction(buildOrder[i]);
+    }
+}
+
+void Tools::DoBuildOrder(GameState & state, const BuildOrderAbilities & buildOrder)
+{
+    for (size_t i(0); i < buildOrder.size(); ++i)
+    {
+        auto & actionTargetPair = buildOrder[i];
+        ActionType type = actionTargetPair.first;
+        if (type.isAbility())
         {
-            if (!state.doAbility(buildOrder[i], buildOrder.getAbilityTarget(i)))
+            if (!state.doAbility(type, actionTargetPair.second.targetID))
             {
                 std::cout << "invalid chronoboost!" << std::endl;
-            }  
+            }
         }
-        
+
         else
         {
-            state.doAction(buildOrder[i]);
+            state.doAction(type);
         }
     }
 }

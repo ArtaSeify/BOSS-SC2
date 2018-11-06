@@ -3,7 +3,7 @@
 #include "Common.h"
 #include "Timer.hpp"
 #include "Eval.h"
-#include "BuildOrder.h"
+#include "BuildOrderAbilities.h"
 #include "CombatSearchParameters.h"
 #include "CombatSearchResults.h"
 
@@ -24,7 +24,7 @@ protected:
     int                         m_upperBound; 		// the current upper bound for search
     Timer                       m_searchTimer;
 
-    BuildOrder                  m_buildOrder;
+    BuildOrderAbilities         m_buildOrder;
 
     virtual void                recurse(const GameState & s, size_t depth);
     virtual void                generateLegalActions(const GameState & state, ActionSetAbilities & legalActions, const CombatSearchParameters & params);
