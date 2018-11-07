@@ -28,7 +28,7 @@ void CombatSearch_Integral::recurse(const GameState & state, size_t depth)
 
     for (size_t a(0); a < legalActions.size(); ++a)
     {
-        const size_t index = legalActions.size() - 1 - a;
+        const size_t index = legalActions.size() - (a + 1);
 
         GameState child(state);
 
@@ -42,7 +42,7 @@ void CombatSearch_Integral::recurse(const GameState & state, size_t depth)
         {
             size_t sizeBefore = legalActions.size();
 
-            state.getSpecialAbilityTargets(legalActions);
+            state.getSpecialAbilityTargets(legalActions, index);
 
             // the ability is no longer valid, skip
             if (sizeBefore > legalActions.size())
@@ -50,7 +50,7 @@ void CombatSearch_Integral::recurse(const GameState & state, size_t depth)
                 continue;
             }
 
-            // the new target is at the end of the vector 
+            // the new target 
             actionTarget = legalActions.getAbilityTarget(index + (legalActions.size() - sizeBefore));
 
             // target is at the same index
@@ -79,7 +79,7 @@ void CombatSearch_Integral::recurse(const GameState & state, size_t depth)
             //std::cout << "target of action added: " << actionTarget << std::endl;
             //std::cout << "frame of action added: " << child.getCurrentFrame() << std::endl;
             
-            m_integral.update(child, m_buildOrder, m_params);
+            m_integral.update(child, m_buildOrder, m_params, m_searchTimer);
 
             recurse(child, depth + 1);
 
@@ -95,7 +95,7 @@ void CombatSearch_Integral::recurse(const GameState & state, size_t depth)
             GameState child_framelimit(state);
             child_framelimit.fastForward(m_params.getFrameTimeLimit());
 
-            m_integral.update(child_framelimit, m_buildOrder, m_params);
+            m_integral.update(child_framelimit, m_buildOrder, m_params, m_searchTimer);
             m_integral.popFinishedLastOrder(state, child_framelimit);
         }
     }

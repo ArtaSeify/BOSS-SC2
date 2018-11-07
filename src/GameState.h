@@ -11,9 +11,9 @@ namespace BOSS
 
 class GameState 
 {
-    typedef StaticVector<Unit, VectorLimit>         Vector_unit;
-    typedef StaticVector<uint2, VectorLimit / 2>    Vector_sizet;
-    typedef StaticVector<AbilityAction, 10>         Vector_abilityaction;
+    typedef StaticVector<Unit, 70>              Vector_unit;
+    typedef StaticVector<uint2, 35>             Vector_sizet;
+    typedef StaticVector<AbilityAction, 10>     Vector_abilityaction;
 
     Vector_unit                 m_units;
     Vector_sizet	            m_unitsBeingBuilt;      // indices of m_units which are not completed, sorted descending by finish time
@@ -63,8 +63,8 @@ public:
     short			                        getSupplyInProgress()                                       const;
     short                                   getNextFinishTime(ActionType type)                  const;
 
-    void                                    getSpecialAbilityTargets(ActionSetAbilities & actionSet)    const;
-    void                                    storeChronoBoostTargets(ActionSetAbilities & actionSet)     const;
+    void                                    getSpecialAbilityTargets(ActionSetAbilities & actionSet, size_t index)    const;
+    void                                    storeChronoBoostTargets(ActionSetAbilities & actionSet, size_t index)     const;
     bool                                    chronoBoostableTarget(const Unit & unit)                    const;
     bool                                    canChronoBoostTarget(const Unit & unit)                     const;
     bool                                    canChronoBoost()                                            const;
@@ -93,7 +93,7 @@ public:
     short		                            getCurrentSupply() const { return m_currentSupply; }
     short		                            getMaxSupply() const { return m_maxSupply; }
     short 	                                getCurrentFrame() const { return m_currentFrame; }
-    short				                    getRace() const { return m_race; }
+    RaceID				                    getRace() const { return m_race; }
     float	                                getMinerals() const { return m_minerals; }
     float	                                getGas() const { return m_gas; }
     const Vector_abilityaction &            getChronoBoostTargets() const { return m_chronoBoosts; }

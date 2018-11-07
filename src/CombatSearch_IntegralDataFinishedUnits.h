@@ -5,6 +5,7 @@
 #include "CombatSearchParameters.h"
 #include "Eval.h"
 #include "BuildOrderAbilities.h"
+#include "Timer.hpp"
 
 namespace BOSS
 {
@@ -69,7 +70,7 @@ namespace BOSS
 
         CombatSearch_IntegralDataFinishedUnits();
 
-        void update(const GameState & state, const BuildOrderAbilities & buildOrder, const CombatSearchParameters & params);
+        void update(const GameState & state, const BuildOrderAbilities & buildOrder, const CombatSearchParameters & params, Timer & timer);
         void pop_back();
         void popFinishedLastOrder(const GameState & prevState, const GameState & currState);
 
