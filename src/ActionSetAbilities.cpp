@@ -8,6 +8,11 @@ ActionSetAbilities::ActionSetAbilities()
     m_actionsAndTargets.reserve(10);
 }
 
+void ActionSetAbilities::setNewSet(const ActionSetAbilities & newSet)
+{
+    *this = newSet;
+}
+
 bool ActionSetAbilities::contains(ActionType action) const
 {
     for (const auto & actionTargetPair : m_actionsAndTargets)
@@ -43,6 +48,66 @@ void ActionSetAbilities::add(ActionType action, uint4 abilityTargetID)
 {
     add(action);
     m_actionsAndTargets.back().second = abilityTargetID;
+}
+
+void ActionSetAbilities::sort(const GameState & state, const CombatSearchParameters & params)
+{
+    std::cout << toString() << std::endl;
+    const short SupplyHeuristic = 4;
+
+    ActionSetAbilities sortedSet;
+
+    const short totalSupply = state.getCurrentSupply() + state.getSupplyInProgress();
+    
+    // if we have little supply free, give priority to supply providing units
+    // ie. pylon/supply depot/overlord and nexus/command center/hatchery
+    if (state.getMaxSupply() - totalSupply <= SupplyHeuristic)
+    {
+        for (size_t i(0); i < m_actionsAndTargets.size(); ++i)
+        {
+            auto & actionTargetPair = m_actionsAndTargets[i];
+            auto & type = actionTargetPair.first;
+            if (type.isSupplyProvider() || type.isDepot())
+            {
+                sortedSet.add(type, actionTargetPair.second);
+                m_actionsAndTargets.erase(m_actionsAndTargets.begin() + i);
+                i--;
+            }
+        }
+    }
+
+    // add combat units
+    for (size_t i(0); i < m_actionsAndTargets.size(); ++i)
+    {
+        auto & actionTargetPair = m_actionsAndTargets[i];
+        auto & type = actionTargetPair.first;
+        if (!type.isBuilding() && !type.isWorker() && !type.isSupplyProvider())
+        {
+            sortedSet.add(type, actionTargetPair.second);
+            m_actionsAndTargets.erase(m_actionsAndTargets.begin() + i);
+            i--;
+        }
+    }
+
+    // add worker
+    for (size_t i(0); i < m_actionsAndTargets.size(); ++i)
+    {
+        auto & actionTargetPair = m_actionsAndTargets[i];
+        auto & type = actionTargetPair.first;
+        if (type.isWorker())
+        {
+            sortedSet.add(type, actionTargetPair.second);
+            m_actionsAndTargets.erase(m_actionsAndTargets.begin() + i);
+            break;
+        }
+    }
+
+    // add the rest
+    sortedSet.add(*this);
+
+    setNewSet(sortedSet);
+
+    std::cout << sortedSet.toString() << std::endl;
 }
 
 void ActionSetAbilities::remove(ActionType action)

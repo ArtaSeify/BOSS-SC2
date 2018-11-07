@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Common.h"
-#include <vector>
+#include "CombatSearchParameters.h"
 
 namespace BOSS
 {
@@ -14,6 +14,7 @@ class ActionSetAbilities
 
 public:
     ActionSetAbilities();
+    void setNewSet(const ActionSetAbilities & newSet);
 
     size_t size() const { return m_actionsAndTargets.size(); }
     bool isEmpty() const { return m_actionsAndTargets.empty(); }
@@ -25,11 +26,12 @@ public:
     void add(const ActionSetAbilities & set);
     void add(ActionType action, uint4 abilityTargetID);
 
+    void sort(const GameState & state, const CombatSearchParameters & params);
+
     void remove(ActionType action);
     void remove(const ActionSetAbilities & set);
 
     uint4 getAbilityTarget(uint4 index) const;
-
     const std::string toString() const;
 
     // iterator

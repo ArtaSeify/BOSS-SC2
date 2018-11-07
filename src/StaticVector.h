@@ -5,7 +5,7 @@
 
 using namespace std;
 
-constexpr int VectorLimit = 40;
+constexpr int VectorLimit = 70;
 
 template <typename T, size_t VectorLimit>
 class StaticVector

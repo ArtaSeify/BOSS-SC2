@@ -1,0 +1,7 @@
+without static vector: Searched 3051048 nodes in 25741.5ms @ 118527 nodes/sec
+with static vector:
+	n = 50: Searched 3051048 nodes in 21347.8ms @ 142921 nodes/sec
+	n = 40: Searched 3051048 nodes in 20386.6ms @ 149660 nodes/sec
+	n = 40: everything is Vector: Searched 3051048 nodes in 15641.9ms @ 195056 nodes/sec
+
+	Fastest: Searched 3051048 nodes in 14499.6ms @ 210422 nodes/sec

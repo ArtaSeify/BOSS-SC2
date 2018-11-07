@@ -106,6 +106,9 @@ void CombatSearch::generateLegalActions(const GameState & state, ActionSetAbilit
             //legalActions.add(ActionTypes::GetSpecialAction(state.getRace()));
         }
     }
+
+    // sort the actions
+    legalActions.sort(state, m_params);
 }
 
 const CombatSearchResults & CombatSearch::getResults() const

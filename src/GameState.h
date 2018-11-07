@@ -13,7 +13,7 @@ class GameState
 {
     typedef StaticVector<Unit, VectorLimit>         Vector_unit;
     typedef StaticVector<uint2, VectorLimit / 2>    Vector_sizet;
-    typedef StaticVector<AbilityAction, 5>          Vector_abilityaction;
+    typedef StaticVector<AbilityAction, 10>         Vector_abilityaction;
 
     Vector_unit                 m_units;
     Vector_sizet	            m_unitsBeingBuilt;      // indices of m_units which are not completed, sorted descending by finish time
