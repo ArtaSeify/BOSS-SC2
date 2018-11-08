@@ -1,5 +1,6 @@
 #include "ActionSetAbilities.h"
 #include "ActionType.h"
+#include "CombatSearchParameters.h"
 
 using namespace BOSS;
 
@@ -46,13 +47,25 @@ void ActionSetAbilities::add(const ActionSetAbilities & set)
 
 void ActionSetAbilities::add(ActionType action, uint4 abilityTargetID)
 {
-    add(action);
-    m_actionsAndTargets.back().second = abilityTargetID;
+    if (action.isAbility() || !contains(action))
+    {
+        m_actionsAndTargets.emplace_back(action, abilityTargetID);
+    }
+}
+
+// add action and target at a specific index
+void ActionSetAbilities::add(ActionType action, uint4 abilityTargetID, size_t index)
+{
+    if (action.isAbility() || !contains(action))
+    {
+        m_actionsAndTargets.emplace(m_actionsAndTargets.begin() + index, action, abilityTargetID);
+    }
 }
 
 void ActionSetAbilities::sort(const GameState & state, const CombatSearchParameters & params)
 {
-    std::cout << toString() << std::endl;
+    //std::cout << "Before sorting:" << std::endl;
+    //std::cout << toString() << std::endl;
     const short SupplyHeuristic = 4;
 
     ActionSetAbilities sortedSet;
@@ -107,7 +120,8 @@ void ActionSetAbilities::sort(const GameState & state, const CombatSearchParamet
 
     setNewSet(sortedSet);
 
-    std::cout << sortedSet.toString() << std::endl;
+    //std::cout << "After sorting:" << std::endl;
+    //std::cout << sortedSet.toString() << std::endl;
 }
 
 void ActionSetAbilities::remove(ActionType action)
@@ -121,6 +135,14 @@ void ActionSetAbilities::remove(ActionType action)
             index--;
         }
     }
+}
+
+// remove the index, given that the action at that index is equal to the action parameter
+void ActionSetAbilities::remove(ActionType action, size_t index)
+{
+    BOSS_ASSERT(action == m_actionsAndTargets[index].first, "argument does not match action in vector");
+
+    m_actionsAndTargets.erase(m_actionsAndTargets.begin() + index);
 }
 
 uint4 ActionSetAbilities::getAbilityTarget(uint4 index) const

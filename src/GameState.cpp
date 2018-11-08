@@ -20,9 +20,9 @@ GameState::GameState()
     , m_numUnits(0)
     , m_lastAction(ActionTypes::None)
 {
-    for (int i = 0; i < VectorLimit; ++i) {
+    /*for (int i = 0; i < 70; ++i) {
         m_units.push_back(BOSS::Unit());
-    }
+    }*/
     //m_units.reserve(20);
     //m_unitsBeingBuilt.reserve(2);
     //m_chronoBoosts.reserve(2);
@@ -689,12 +689,12 @@ short GameState::getSupplyInProgress() const
     return supplyInProgress;
 }
 
-void GameState::getSpecialAbilityTargets(ActionSetAbilities & actionSet) const
+void GameState::getSpecialAbilityTargets(ActionSetAbilities & actionSet, size_t index) const
 {
     if (m_race == Races::Protoss)
     {
-        actionSet.remove(ActionTypes::GetSpecialAction(m_race));
-        storeChronoBoostTargets(actionSet);
+        actionSet.remove(ActionTypes::GetSpecialAction(m_race), index);
+        storeChronoBoostTargets(actionSet, index);
     }
 }
 
@@ -720,7 +720,7 @@ bool GameState::canChronoBoost() const
     return false;
 }
 
-void GameState::storeChronoBoostTargets(ActionSetAbilities & actionSet) const
+void GameState::storeChronoBoostTargets(ActionSetAbilities & actionSet, size_t index) const
 {
     for (uint4 i(0); i < m_numUnits; ++i)
     {
@@ -729,7 +729,7 @@ void GameState::storeChronoBoostTargets(ActionSetAbilities & actionSet) const
         if (chronoBoostableTarget(unit))
         {
             //std::cout << "Chronoboost target: " << unit.getType().getName() << std::endl;
-            actionSet.add(ActionTypes::GetSpecialAction(m_race), unit.getID());
+            actionSet.add(ActionTypes::GetSpecialAction(m_race), unit.getID(), index);
         }
     }
 }
