@@ -22,7 +22,7 @@ namespace Assert
     {
         std::cerr << "Assertion thrown!\n";
         // get the extra parameters
-        /*char messageBuffer[4096] = "";
+        char messageBuffer[4096] = "";
         std::string error_message;
         if (msg != NULL)
         {
@@ -89,16 +89,8 @@ namespace Assert
                 memcpy(temp, msg + sub_msgs[sub_msgs.size()-1].second + 1, index);
                 error_message += temp;
             }            
-        }	*/
+        }	
 
-        // put extra arguments into a buffer big enough to hold any error message (hopefully)
-        char error_message[1024*128];
-        va_list argptr;
-        va_start(argptr, msg);
-        vsprintf(error_message, msg, argptr);
-        va_end(argptr);
-
-        // print error message
         std::stringstream ss;
         ss                                      << std::endl;
         ss << "!Assert:   " << condition        << std::endl;
@@ -106,7 +98,6 @@ namespace Assert
         ss << "Message:   " << error_message    << std::endl;
         ss << "Line:      " << line             << std::endl;
         
-        // throw exception
         #if !defined(EMSCRIPTEN)
             std::cerr << ss.str();  
             throw BOSSException(ss.str());

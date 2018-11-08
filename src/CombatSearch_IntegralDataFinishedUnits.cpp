@@ -9,7 +9,7 @@ CombatSearch_IntegralDataFinishedUnits::CombatSearch_IntegralDataFinishedUnits()
     m_integralStack.push_back(IntegralDataFinishedUnits());
 }
 
-void CombatSearch_IntegralDataFinishedUnits::update(const GameState & state, const BuildOrderAbilities & buildOrder, const CombatSearchParameters & params, Timer & timer)
+void CombatSearch_IntegralDataFinishedUnits::update(const GameState & state, const BuildOrderAbilities & buildOrder, const CombatSearchParameters & params)
 {   
     auto & finishedUnits = state.getFinishedUnits();
     int new_units = finishedUnits.size() - (m_integralStack.size() - (m_chronoBoostEntries + 1));
@@ -72,8 +72,7 @@ void CombatSearch_IntegralDataFinishedUnits::update(const GameState & state, con
 
         // print the newly found best to console
         //printIntegralData(m_integralStack.size() - 1);
-        print();
-        std::cout << "time: " << timer.getElapsedTimeInMilliSec() << std::endl;
+        //print();
     }
 }
 

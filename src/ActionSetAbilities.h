@@ -1,13 +1,11 @@
 #pragma once
 
 #include "Common.h"
-//#include "ActionType.h"
-//#include "CombatSearchParameters.h"
+#include "CombatSearchParameters.h"
 
 namespace BOSS
 {
 class ActionType;
-class CombatSearchParameters;
 class ActionSetAbilities
 {
     typedef std::pair<ActionType, uint4> ActionTargetPair;
@@ -27,12 +25,10 @@ public:
     void add(ActionType action);
     void add(const ActionSetAbilities & set);
     void add(ActionType action, uint4 abilityTargetID);
-    void add(ActionType action, uint4 abilityTargetID, size_t index);
 
     void sort(const GameState & state, const CombatSearchParameters & params);
 
     void remove(ActionType action);
-    void remove(ActionType action, size_t index);
     void remove(const ActionSetAbilities & set);
 
     uint4 getAbilityTarget(uint4 index) const;
