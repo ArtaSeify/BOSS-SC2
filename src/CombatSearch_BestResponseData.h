@@ -16,8 +16,8 @@ namespace BOSS
         BuildOrderAbilities m_enemyBuildOrder;
 
         std::vector<GameState> m_enemyStates;
-        std::vector< std::pair<float,float>> m_enemyArmyValues;
-        std::vector< std::pair<float,float>> m_selfArmyValues;
+        std::vector< std::pair<TimeType, FracType>> m_enemyArmyValues;
+        std::vector< std::pair<TimeType, FracType>> m_selfArmyValues;
 
         float m_bestEval;
         BuildOrderAbilities m_bestBuildOrder;
@@ -29,7 +29,7 @@ namespace BOSS
 
         void calculateArmyValues(const GameState & state,
                                  const BuildOrderAbilities & buildOrder,
-                                 std::vector<std::pair<float,float>> & values);
+                                 std::vector<std::pair<TimeType, FracType>> & values);
 
     public:
 

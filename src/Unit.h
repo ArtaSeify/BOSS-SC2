@@ -26,11 +26,11 @@ class Unit
     NumUnits    m_job;              // current job this Unit has (UnitJobs::XXX)
     TimeType    m_timeUntilBuilt;   // time remaining until this Unit is completed
     TimeType    m_timeUntilFree;    // time remaining until this Unit can build again
-    TimeType    m_timeChronoBoost;	// time remaining on Chrono Boost
+    TimeType    m_timeChronoBoost;    // time remaining on Chrono Boost
     TimeType    m_timeChronoBoostAgain; // time until chronoboost can be used on this building again
     //int1        m_numLarva;         // number of larva this building currently has (Hatch only)
     FracType    m_maxEnergyAllowed; // maximum energy allowed for this building
-    FracType    m_energy;			// energy of the building
+    FracType    m_energy;            // energy of the building
 
 public:
     Unit();

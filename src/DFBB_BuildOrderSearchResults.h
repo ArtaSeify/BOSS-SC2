@@ -14,23 +14,23 @@ namespace BOSS
 
     public:
    
-	BuildOrder buildOrder;  // the build order
+        BuildOrder buildOrder;  // the build order
 
-	bool solved;            // whether ot not a solution was found
+        bool solved;            // whether ot not a solution was found
         bool timedOut;          // did the search time-out?
         bool solutionFound;     // did we find any solution
-	
-	int upperBound;		// upper bound of first node
-	
-	uint8 nodesExpanded;	// number of nodes expanded in the search
-	
-	float timeElapsed;	// time elapsed in milliseconds
+    
+        int upperBound;        // upper bound of first node
+    
+        uint8 nodesExpanded;    // number of nodes expanded in the search
+    
+        double timeElapsed;    // time elapsed in milliseconds
 
         GameState finalState;
-	
-	DFBB_BuildOrderSearchResults();
-		
-	void printResults(bool pbo = true) const;
-	void printBuildOrder() const;
+    
+        DFBB_BuildOrderSearchResults();
+        
+        void printResults(bool pbo = true) const;
+        void printBuildOrder() const;
     };
 }

@@ -91,7 +91,7 @@ namespace Assert
                 memcpy(temp, msg + sub_msgs[sub_msgs.size()-1].second + 1, index);
                 error_message += temp;
             }            
-        }	*/
+        }    */
 
         // put extra arguments into a buffer big enough to hold any error message (hopefully)
         char error_message[1024*128];

@@ -40,7 +40,7 @@ Unit::Unit(ActionType type, NumUnits id, NumUnits builderID, TimeType frameStart
     , m_timeChronoBoost         (0)
     , m_timeChronoBoostAgain    (0)
     , m_maxEnergyAllowed        (float(type.maxEnergy()))
-    , m_energy			        (float(type.startingEnergy()))
+    , m_energy                    (float(type.startingEnergy()))
 {
     
 }

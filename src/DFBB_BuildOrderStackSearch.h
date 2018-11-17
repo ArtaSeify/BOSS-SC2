@@ -37,9 +37,9 @@ namespace BOSS
 
     class DFBB_BuildOrderStackSearch
     {
-	DFBB_BuildOrderSearchParameters m_params; // parameters that will be used in this search
-	DFBB_BuildOrderSearchResults m_results;   // the results of the search so far
-					
+    DFBB_BuildOrderSearchParameters m_params; // parameters that will be used in this search
+    DFBB_BuildOrderSearchResults m_results;   // the results of the search so far
+                    
         Timer m_searchTimer;
         BuildOrder m_buildOrder;
 
@@ -53,17 +53,17 @@ namespace BOSS
         void updateResults(const GameState & state);
         bool isTimeOut();
         void generateLegalActions(const GameState & state, ActionSet & legalActions);
-	std::vector<ActionType> getBuildOrder(GameState & state);
+    std::vector<ActionType> getBuildOrder(GameState & state);
         int getRepetitions(const GameState & state, ActionType a);
         std::vector<ActionType> calculateRelevantActions();
 
     public:
-	
-	DFBB_BuildOrderStackSearch(const DFBB_BuildOrderSearchParameters & p);
+    
+    DFBB_BuildOrderStackSearch(const DFBB_BuildOrderSearchParameters & p);
         void setTimeLimit(float ms);
         void search();
         const DFBB_BuildOrderSearchResults & getResults() const;
-	
-	void DFBB();
+    
+    void DFBB();
     };
 }

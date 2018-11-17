@@ -41,7 +41,7 @@ ActionType & ActionType::operator = (ActionType & rhs)
 ActionID ActionType::getID()   const { return m_id; }
 RaceID   ActionType::getRace() const { return ActionTypeData::GetActionTypeData(m_id).race; }
 const std::string & ActionType::getName() const { return ActionTypeData::GetActionTypeData(m_id).name; }
-	
+    
 int  ActionType::buildTime()         const { return ActionTypeData::GetActionTypeData(m_id).buildTime; }
 int  ActionType::mineralPrice()      const { return ActionTypeData::GetActionTypeData(m_id).mineralCost; }
 int  ActionType::gasPrice()          const { return ActionTypeData::GetActionTypeData(m_id).gasCost; }
@@ -49,8 +49,8 @@ int  ActionType::supplyCost()        const { return ActionTypeData::GetActionTyp
 int  ActionType::energyCost()        const { return ActionTypeData::GetActionTypeData(m_id).energyCost; }
 int  ActionType::supplyProvided()    const { return ActionTypeData::GetActionTypeData(m_id).supplyProvided; }
 int  ActionType::numProduced()       const { return ActionTypeData::GetActionTypeData(m_id).numProduced; }
-int  ActionType::startingEnergy()	 const { return ActionTypeData::GetActionTypeData(m_id).startingEnergy; }
-int  ActionType::maxEnergy()		 const { return ActionTypeData::GetActionTypeData(m_id).maxEnergy; }
+int  ActionType::startingEnergy()     const { return ActionTypeData::GetActionTypeData(m_id).startingEnergy; }
+int  ActionType::maxEnergy()         const { return ActionTypeData::GetActionTypeData(m_id).maxEnergy; }
 bool ActionType::isAddon()           const { return ActionTypeData::GetActionTypeData(m_id).isAddon; }
 bool ActionType::isRefinery()        const { return ActionTypeData::GetActionTypeData(m_id).isRefinery; }
 bool ActionType::isWorker()          const { return ActionTypeData::GetActionTypeData(m_id).isWorker; }

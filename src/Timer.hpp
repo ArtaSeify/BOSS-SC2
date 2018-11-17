@@ -16,9 +16,9 @@
 #define TIMER_H_DEF
 
 #ifdef WIN32   // Windows system specific
-	#include <windows.h>
+    #include <windows.h>
 #else          // Unix based system specific
-	#include <sys/time.h>
+    #include <sys/time.h>
 #endif
 
 namespace BOSS
@@ -53,23 +53,23 @@ namespace BOSS
       stopped = 0;
       startTimeInMicroSec = 0;
       endTimeInMicroSec = 0;
-		
+        
       start();
     }
-	
+    
     ~Timer() {}                                 // default destructor
 
     void start()
     {
       stopped = 0; // reset stop flag
-		
+        
 #ifdef WIN32
       QueryPerformanceCounter(&startCount);
 #else
       gettimeofday(&startCount, NULL);
 #endif
     }
-	
+    
     void stop()
     {
       stopped = 1; // set timer stopped flag
@@ -80,7 +80,7 @@ namespace BOSS
       gettimeofday(&endCount, NULL);
 #endif
     }
-	
+    
     double getElapsedTimeInMicroSec()
     {
 #ifdef WIN32
@@ -100,7 +100,7 @@ namespace BOSS
 
       return endTimeInMicroSec - startTimeInMicroSec;
     }
-	 
+     
     double getElapsedTimeInMilliSec()
     {
       return this->getElapsedTimeInMicroSec() * 0.001;

@@ -28,9 +28,9 @@ namespace BOSS
 
     static_assert(sizeof(uint4) == 4 && sizeof(uint2) == 2, "unexpected sizes");
   
-    using int1  =  signed char;
+    using int1  = signed char;
     using int2  = signed short;
-    using in4   = signed int;
+    using int4  = signed int;
 
     using ActionID = uint2;
     using RaceID = uint1;

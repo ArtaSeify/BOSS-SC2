@@ -41,7 +41,7 @@ void CombatSearch_BucketData::update(const GameState & state, const BuildOrderAb
     size_t bucketIndex = getBucketIndex(state);
 
     // evaluate the state with whatever value we want
-    double eval = Eval::ArmyTotalResourceSum(state);
+    FracType eval = Eval::ArmyTotalResourceSum(state);
 
     // update the data if we have a new best value for this bucket
     BucketData & bucket = m_buckets[bucketIndex];

@@ -204,7 +204,7 @@ void GameState::fastForward(TimeType toFrame)
         if (actionCompletionTime > toFrame) { break; }
 
         // add the resources we gathered during this time period
-        const TimeType timeElapsed	= actionCompletionTime - lastActionFinishTime;
+        const TimeType timeElapsed    = actionCompletionTime - lastActionFinishTime;
         m_minerals              += timeElapsed * CONSTANTS::MPWPF * m_mineralWorkers;
         m_gas                   += timeElapsed * CONSTANTS::GPWPF * m_gasWorkers;
         lastActionFinishTime    = actionCompletionTime;

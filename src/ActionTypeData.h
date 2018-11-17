@@ -22,7 +22,7 @@ namespace BOSS
         int                         buildTime       = 0;
         int                         numProduced     = 1;
         int                         startingEnergy  = 0;
-        int						    maxEnergy       = 0;
+        int                            maxEnergy       = 0;
         bool                        isUnit          = false;
         bool                        isUpgrade       = false;
         bool                        isAbility       = false;

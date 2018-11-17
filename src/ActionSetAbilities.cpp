@@ -47,7 +47,7 @@ void ActionSetAbilities::add(const ActionSetAbilities & set)
     }
 }
 
-void ActionSetAbilities::add(ActionType action, NumUnits abilityTargetID)
+void ActionSetAbilities::add(ActionType action, int abilityTargetID)
 {
     if (action.isAbility() || !contains(action))
     {
@@ -56,7 +56,7 @@ void ActionSetAbilities::add(ActionType action, NumUnits abilityTargetID)
 }
 
 // add action and target at a specific index
-void ActionSetAbilities::add(ActionType action, NumUnits abilityTargetID, int index)
+void ActionSetAbilities::add(ActionType action, int abilityTargetID, int index)
 {
     if (action.isAbility() || !contains(action))
     {

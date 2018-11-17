@@ -18,7 +18,7 @@ void DFBB_BuildOrderSmartSearch::doSearch()
     // if we are resuming a search
     if (m_stackSearch.getResults().timedOut)
     {
-        m_stackSearch.setTimeLimit(m_searchTimeLimit);
+        m_stackSearch.setTimeLimit(float(m_searchTimeLimit));
         m_stackSearch.search();
     }
     else
@@ -32,7 +32,7 @@ void DFBB_BuildOrderSmartSearch::doSearch()
         m_params.m_useSupplyBounding        = true;
         m_params.m_supplyBoundingThreshold  = 1.5;
         m_params.m_relevantActions          = m_relevantActions;
-        m_params.m_searchTimeLimit          = m_searchTimeLimit;
+        m_params.m_searchTimeLimit          = float(m_searchTimeLimit);
 
         //BWAPI::Broodwar->printf("Constructing new search object time limit is %lf", _params.searchTimeLimit);
         m_stackSearch = DFBB_BuildOrderStackSearch(m_params);

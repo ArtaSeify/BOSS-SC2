@@ -14,14 +14,14 @@ CombatSearch_BestResponseData::CombatSearch_BestResponseData(const GameState & e
     calculateArmyValues(m_enemyInitialState, m_enemyBuildOrder, m_enemyArmyValues);
 }
 
-void CombatSearch_BestResponseData::calculateArmyValues(const GameState & initialState, const BuildOrderAbilities & buildOrder, std::vector< std::pair<float, float> > & values)
+void CombatSearch_BestResponseData::calculateArmyValues(const GameState & initialState, const BuildOrderAbilities & buildOrder, std::vector< std::pair<TimeType, FracType> > & values)
 {
     values.clear();
     GameState state(initialState);
     for (size_t i(0); i < buildOrder.size(); ++i)
     {
         state.doAction(buildOrder[i].first);
-        values.push_back(std::pair<float,float>(state.getCurrentFrame(), Eval::ArmyTotalResourceSum(state)));
+        values.push_back(std::pair<TimeType,FracType>(state.getCurrentFrame(), Eval::ArmyTotalResourceSum(state)));
     }
 }
 
@@ -51,8 +51,8 @@ float CombatSearch_BestResponseData::compareBuildOrder(const GameState & initial
 
     for (size_t ei(0); ei < m_enemyArmyValues.size(); ++ei)
     {
-        float enemyTime = m_enemyArmyValues[ei].first;
-        float enemyVal = m_enemyArmyValues[ei].second;    
+        TimeType enemyTime = m_enemyArmyValues[ei].first;
+        FracType enemyVal = m_enemyArmyValues[ei].second;    
     
         int selfIndex = 0;
 
@@ -67,8 +67,8 @@ float CombatSearch_BestResponseData::compareBuildOrder(const GameState & initial
             selfIndex = si;
         }
     
-        float selfVal = m_selfArmyValues[selfIndex].second;
-        float diff = enemyVal - selfVal;
+        FracType selfVal = m_selfArmyValues[selfIndex].second;
+        FracType diff = enemyVal - selfVal;
         maxDiff = std::max(maxDiff, diff);
     }
 

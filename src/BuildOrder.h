@@ -9,8 +9,8 @@ namespace BOSS
 
     class BuildOrder
     {
-        std::vector<ActionType>	m_buildOrder;
-        std::vector<size_t>		m_typeCount;
+        std::vector<ActionType>    m_buildOrder;
+        std::vector<size_t>        m_typeCount;
 
     public:
 
@@ -34,6 +34,14 @@ namespace BOSS
         std::string             getNumberedString() const;
         std::string             getIDString() const;
         std::string             getNameString(const size_t charactersPerName = 0) const;
+
+        // iterator
+        using iterator = std::vector<ActionType>::iterator;
+        using const_iterator = std::vector<ActionType>::const_iterator;
+        iterator begin() { return m_buildOrder.begin(); }
+        const_iterator begin() const { return m_buildOrder.begin(); }
+        iterator end() { return m_buildOrder.end(); }
+        const_iterator end() const { return m_buildOrder.end(); }
     };
 
 }

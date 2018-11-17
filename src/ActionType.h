@@ -30,8 +30,8 @@ namespace BOSS
         int  energyCost()       const;
         int  supplyProvided()   const;
         int  numProduced()      const;
-        int  startingEnergy()	const;
-        int  maxEnergy()		const;
+        int  startingEnergy()    const;
+        int  maxEnergy()        const;
         bool isUnit()           const;
         bool isUpgrade()        const;
         bool isAbility()        const;

@@ -23,7 +23,7 @@ namespace BOSS
 
         uint8  nodesExpanded;   // number of nodes expanded in the search
 
-        float timeElapsed;	// time elapsed in milliseconds
+        double timeElapsed;     // time elapsed in milliseconds
         float avgBranch;        // avg branching factor
 
         Timer searchTimer;         

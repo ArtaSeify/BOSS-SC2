@@ -42,8 +42,8 @@ namespace BOSS
         std::string getNameString(int charactersPerName = 0, int printUpToIndex = -1) const;
     
         // iterator
-        typedef BuildOrder::iterator iterator;
-        typedef BuildOrder::const_iterator const_iterator;
+        using iterator = BuildOrder::iterator;
+        using const_iterator = BuildOrder::const_iterator;
         iterator begin() { return m_buildOrder.begin(); }
         const_iterator begin() const { return m_buildOrder.begin(); }
         iterator end() { return m_buildOrder.end(); }

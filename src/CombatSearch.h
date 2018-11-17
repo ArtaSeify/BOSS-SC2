@@ -21,9 +21,9 @@ namespace BOSS
     protected:
 
         CombatSearchParameters      m_params;            // parameters that will be used in this search
-        CombatSearchResults         m_results;			// the results of the search so far
+        CombatSearchResults         m_results;            // the results of the search so far
 
-        int                         m_upperBound; 		// the current upper bound for search
+        int                         m_upperBound;         // the current upper bound for search
         Timer                       m_searchTimer;
 
         BuildOrderAbilities         m_buildOrder;
