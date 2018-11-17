@@ -13,7 +13,7 @@ CombatSearch_BestResponse::CombatSearch_BestResponse(const CombatSearchParameter
 }
 
 // Recursive DFS search through all possible build orders given the parameters
-void CombatSearch_BestResponse::recurse(const GameState & state, size_t depth)
+void CombatSearch_BestResponse::recurse(const GameState & state, int depth)
 {
     if (timeLimitReached())
     {
@@ -33,7 +33,7 @@ void CombatSearch_BestResponse::recurse(const GameState & state, size_t depth)
     
     for (size_t a(0); a < legalActions.size(); ++a)
     {
-        size_t ri = legalActions.size() - 1 - a;
+        int ri = (int)legalActions.size() - 1 - a;
 
         GameState child(state);
         child.doAction(legalActions[ri].first);

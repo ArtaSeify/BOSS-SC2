@@ -11,7 +11,7 @@ using namespace BOSS;
 // The number of buckets and the frame limit determine the size of the buckets
 
 
-CombatSearch_BucketData::CombatSearch_BucketData(const int frameLimit, const size_t numBuckets)
+CombatSearch_BucketData::CombatSearch_BucketData(int frameLimit, int numBuckets)
         : m_buckets(numBuckets, BucketData())
         , m_frameLimit(frameLimit)
 {

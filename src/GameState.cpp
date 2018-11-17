@@ -299,7 +299,7 @@ void GameState::addUnit(ActionType type, int builderID)
         m_unitsBeingBuilt.push_back(unit.getID());
 
         // we know the list is already sorted when we add this unit, so we just swap it from the end until it's in the right place
-        for (size_t i = m_unitsBeingBuilt.size() - 1; i > 0; i--)
+        for (int i = (int)m_unitsBeingBuilt.size() - 1; i > 0; i--)
         {
             if (getUnit(m_unitsBeingBuilt[i]).getTimeUntilBuilt() > getUnit(m_unitsBeingBuilt[i - 1]).getTimeUntilBuilt())
             {

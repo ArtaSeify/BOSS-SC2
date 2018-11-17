@@ -27,12 +27,12 @@ CombatSearchParameters::CombatSearchParameters()
     
 }
 
-void CombatSearchParameters::setSearchTimeLimit(const double timeLimitMS)
+void CombatSearchParameters::setSearchTimeLimit(float timeLimitMS)
 {
     m_searchTimeLimit = timeLimitMS;
 }
 
-double CombatSearchParameters::getSearchTimeLimit() const
+float CombatSearchParameters::getSearchTimeLimit() const
 {
     return m_searchTimeLimit;
 }

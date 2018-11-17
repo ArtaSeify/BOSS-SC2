@@ -32,10 +32,10 @@ void CombatSearch_IntegralDataFinishedUnits::update(const GameState & state, con
         std::cout << "unit name: " << state.getUnit(unitTimes[finishedUnits[index]].first).getType().getName() << std::endl;
         std::cout << "start time of unit: " << unitTimes[finishedUnits[index]].second.first << std::endl;
         std::cout << "end time of unit: " << unitTimes[finishedUnits[index]].second.second << std::endl;*/
-        size_t unitIndex = finishedUnits[index];
+        int unitIndex = finishedUnits[index];
 
-        size_t startFrame = state.getUnit(unitIndex).getStartFrame();
-        size_t finishFrame = state.getUnit(unitIndex).getFinishFrame();
+        int startFrame = state.getUnit(unitIndex).getStartFrame();
+        int finishFrame = state.getUnit(unitIndex).getFinishFrame();
         
         double value = Eval::ArmyResourceSumToIndex(state, index) + m_integralStack.back().eval;
         double timeElapsed = finishFrame - m_integralStack.back().timeFinished;
@@ -139,7 +139,7 @@ BuildOrderAbilities CombatSearch_IntegralDataFinishedUnits::createBuildOrderEndT
     auto & finishedUnits = state.getFinishedUnits();
     auto & chronoBoostTargets = state.getChronoBoostTargets();
     int chronoboosts = 0;
-    for (size_t index = 0; index < integral_stack.size() - 1; ++index)
+    for (int index = 0; index < (int)integral_stack.size() - 1; ++index)
     {
         const AbilityAction & current_ability = chronoBoostTargets[chronoboosts];
         // chronoboost

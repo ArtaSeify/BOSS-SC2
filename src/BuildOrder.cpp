@@ -64,7 +64,7 @@ const AbilityAction & BuildOrder::getAbilityAction(size_t index) const
     return m_abilityTargets.at(index);
 }*/
 
-size_t BuildOrder::getTypeCount(ActionType type) const
+int BuildOrder::getTypeCount(ActionType type) const
 {
     if (empty())
     {
@@ -149,7 +149,7 @@ std::string BuildOrder::getIDString() const
     return ss.str();
 }
 
-std::string BuildOrder::getNameString(size_t charactersPerName, size_t printUpToIndex) const
+std::string BuildOrder::getNameString(int charactersPerName, int printUpToIndex) const
 {
     std::stringstream ss;
 
@@ -161,7 +161,7 @@ std::string BuildOrder::getNameString(size_t charactersPerName, size_t printUpTo
     }
 #endif
     
-    for (size_t i(0); i < printUpToIndex; ++i)
+    for (int i(0); i < printUpToIndex; ++i)
     {
         std::string name = charactersPerName == 0 ? m_buildOrder[i].getName() : m_buildOrder[i].getName().substr(0, charactersPerName);;
         if (m_buildOrder[i].getName() == "ChronoBoost")

@@ -11,10 +11,9 @@ namespace BOSS
 {
     class DFBB_BuildOrderSearchSaveState
     {
-
-	int		depth;
-	int		upperBound;
-	int		currentActions[MAX_SAVE_ACTIONS];
+	int depth;
+	int upperBound;
+	int currentActions[MAX_SAVE_ACTIONS];
 
     public:
 
@@ -23,9 +22,9 @@ namespace BOSS
 	DFBB_BuildOrderSearchSaveState(const std::vector<ActionType> & buildOrder, int ub);
 	
 	int getUpperBound() const;
-	int operator [] (const int index) const;
+	int operator [] (size_t index) const;
 	int getDepth() const;
-	int getAction(const int d) const;
+	int getAction(int d) const;
 
 	void print() const;
     };

@@ -18,7 +18,7 @@ namespace BOSS
     {
         CombatSearch_BucketData     m_bucket;
 
-	virtual void                recurse(const GameState & s, size_t depth);
+	virtual void                recurse(const GameState & s, int depth);
 
     public:
 	

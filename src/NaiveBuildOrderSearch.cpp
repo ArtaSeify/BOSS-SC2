@@ -5,12 +5,12 @@
 
 using namespace BOSS;
 
-NaiveBuildOrderSearch::NaiveBuildOrderSearch(const GameState & state, const BuildOrderSearchGoal & goal)
+NaiveBuildOrderSearch::NaiveBuildOrderSearch(const GameState & state,
+                                             const BuildOrderSearchGoal & goal)
     : m_state(state)
     , m_goal(goal)
     , m_naiveSolved(false)
 {
-
 }
 
 bool NaiveBuildOrderSearch::checkUnsolvable()
@@ -19,8 +19,8 @@ bool NaiveBuildOrderSearch::checkUnsolvable()
     ActionType supply = ActionTypes::GetSupplyProvider(m_state.getRace());
     ActionType depot = ActionTypes::GetResourceDepot(m_state.getRace());
 
-    size_t mineralWorkers = m_state.getNumMineralWorkers();
-    size_t numDepot = m_state.getNumTotal(depot);
+    int mineralWorkers = m_state.getNumMineralWorkers();
+    int numDepot = m_state.getNumTotal(depot);
 
     if (mineralWorkers == 0 || numDepot == 0)
     {
@@ -70,7 +70,8 @@ const BuildOrder & NaiveBuildOrderSearch::solve()
     return m_buildOrder;
   }
 
-  // Calculate which prerequisite units we need to build to achieve the units we want from the goal
+  // Calculate which prerequisite units we need to build to achieve the units
+  // we want from the goal
   ActionSetAbilities requiredToBuild;
   Tools::CalculatePrerequisitesRequiredToBuild(m_state, wanted, requiredToBuild);
 
@@ -102,9 +103,9 @@ const BuildOrder & NaiveBuildOrderSearch::solve()
   if (m_state.getRace() == Races::Zerg)
   {
     // do this whole thing twice so that Hive->Lair->Hatchery is satisfied
-    for (size_t t=0; t<2; ++t)
+    for (int t=0; t<2; ++t)
     {
-      std::vector<size_t> neededMorphers(ActionTypes::GetAllActionTypes().size(), 0);
+      std::vector<int> neededMorphers(ActionTypes::GetAllActionTypes().size(), 0);
       for (ActionID i(0); i < ActionTypes::GetAllActionTypes().size(); ++i)
       {
         ActionType type(i);
@@ -135,14 +136,14 @@ const BuildOrder & NaiveBuildOrderSearch::solve()
 
     // special case: hydra/lurker both in goal, need to add hydras, same with creep/sunken and muta/guardian
     // ignore other spire / hatchery since they recursively serve all purposes
-    static ActionType Hydralisk     = ActionTypes::GetActionType("Hydralisk");
-    static ActionType Lurker        = ActionTypes::GetActionType("Lurker");
-    static ActionType Creep         = ActionTypes::GetActionType("CreepColony");
-    static ActionType Sunken        = ActionTypes::GetActionType("SunkenColony");
-    static ActionType Spore         = ActionTypes::GetActionType("SporeColony");
-    static ActionType Mutalisk      = ActionTypes::GetActionType("Mutalisk");
-    static ActionType Guardian      = ActionTypes::GetActionType("Guardian");
-    static ActionType Devourer      = ActionTypes::GetActionType("Devourer");
+    static ActionType Hydralisk = ActionTypes::GetActionType("Hydralisk");
+    static ActionType Lurker    = ActionTypes::GetActionType("Lurker");
+    static ActionType Creep     = ActionTypes::GetActionType("CreepColony");
+    static ActionType Sunken    = ActionTypes::GetActionType("SunkenColony");
+    static ActionType Spore     = ActionTypes::GetActionType("SporeColony");
+    static ActionType Mutalisk  = ActionTypes::GetActionType("Mutalisk");
+    static ActionType Guardian  = ActionTypes::GetActionType("Guardian");
+    static ActionType Devourer  = ActionTypes::GetActionType("Devourer");
 
     if (m_goal.getGoal(Hydralisk) > 0)
     {
@@ -181,10 +182,10 @@ const BuildOrder & NaiveBuildOrderSearch::solve()
   }
 
   // figure out how many workers are needed for the build order to be legal      
-  size_t workersNeeded = m_goal.getGoal(worker);
+  int workersNeeded = m_goal.getGoal(worker);
 
   // we need enough workers to fill all the refineries that will be built
-  size_t gasWorkersNeeded = 3*m_state.getNumTotal(ActionTypes::GetRefinery(m_state.getRace())) + 3*buildOrder.getTypeCount(ActionTypes::GetRefinery(m_state.getRace()));
+  int gasWorkersNeeded = 3*m_state.getNumTotal(ActionTypes::GetRefinery(m_state.getRace())) + 3*buildOrder.getTypeCount(ActionTypes::GetRefinery(m_state.getRace()));
 
   workersNeeded = std::max(workersNeeded, gasWorkersNeeded);
 

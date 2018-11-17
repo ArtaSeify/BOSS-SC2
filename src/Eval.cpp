@@ -37,28 +37,29 @@ namespace Eval
         return sum;
     }*/
 
-    double ArmyTotalResourceSum(const GameState & state)
+    float ArmyTotalResourceSum(const GameState & state)
     {
-        double sum(0);
+        float sum(0);
 	    
-	    for (auto & type : ActionTypes::GetAllActionTypes())
-	    {
-	        if (!type.isBuilding() && !type.isWorker() && !type.isSupplyProvider())
-	        {
+        for (auto & type : ActionTypes::GetAllActionTypes())
+        {
+            if (!type.isBuilding() && !type.isWorker() && !type.isSupplyProvider())
+            {
                 sum += state.getNumTotal(type)*type.mineralPrice();
-	            sum += 2*state.getNumTotal(type)*type.gasPrice();
-	        }
-	    }
+                sum += 2*state.getNumTotal(type)*type.gasPrice();
+            }
+        }
 	    
-	    return sum;
+        return sum;
     }
 
-    double ArmyResourceSumToIndex(const GameState & state, size_t finishedUnitsIndex)
+    float ArmyResourceSumToIndex(const GameState & state, int finishedUnitsIndex)
     {
-        double sum(0);
+        float sum(0);
         auto & finishedUnits = state.getFinishedUnits();
-        size_t index = finishedUnitsIndex;
+        int index = finishedUnitsIndex;
 
+        //!!! PROBLEM only runs exactly one time?!
         for (; index < finishedUnitsIndex + 1; ++index)
         {
             ActionType type = state.getUnit(finishedUnits[index]).getType();
@@ -74,23 +75,15 @@ namespace Eval
 
     bool BuildOrderBetter(const BuildOrderAbilities & buildOrder, const BuildOrderAbilities & compareTo)
     {
-        size_t numWorkers = 0;
-        size_t numWorkersOther = 0;
+        int numWorkers = 0;
+        int numWorkersOther = 0;
 
-        for (size_t a(0); a<buildOrder.size(); ++a)
-        {
-            if (buildOrder[a].first.isWorker())
-            {
-                numWorkers++;
-            }
+        for (const auto &x : buildOrder) {
+            numWorkers += x.first.isWorker();
         }
-
-        for (size_t a(0); a<compareTo.size(); ++a)
-        {
-            if (compareTo[a].first.isWorker())
-            {
-                numWorkersOther++;
-            }
+        
+        for (const auto &x : compareTo) {
+            numWorkersOther += x.first.isWorker();
         }
 
         if (numWorkers == numWorkersOther)
@@ -105,8 +98,8 @@ namespace Eval
 
     bool StateBetter(const GameState & state, const GameState & compareTo)
     {
-        size_t numWorkers = state.getNumCompleted(ActionTypes::GetWorker(state.getRace()));
-        size_t numWorkersOther = compareTo.getNumCompleted(ActionTypes::GetWorker(compareTo.getRace()));
+        int numWorkers = state.getNumCompleted(ActionTypes::GetWorker(state.getRace()));
+        int numWorkersOther = compareTo.getNumCompleted(ActionTypes::GetWorker(compareTo.getRace()));
 
         if (numWorkers == numWorkersOther)
         {

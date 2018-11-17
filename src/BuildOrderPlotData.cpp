@@ -63,11 +63,12 @@ void BuildOrderPlotData::calculateStartEndTimes()
     }
 
     // get the finish times
-    size_t numInitialUnits = m_initialState.getNumUnits();
+    int numInitialUnits = m_initialState.getNumUnits();
     state.fastForward(5000); // ff far enough so everything is done
     const GameState constState = std::as_const(state);
-    size_t abilities = 0;
+    int abilities = 0;
     m_maxFinishTime = 0;
+
     for (size_t i(0); i < m_buildOrder.size(); ++i)
     {
         auto & actionTargetPair = m_buildOrder[i];
@@ -113,7 +114,7 @@ void BuildOrderPlotData::calculatePlot()
             // Overlap chronoboost with the unit it was cast on
             if (type.getName() == "ChronoBoost")
             {
-                size_t numInitialUnits = m_initialState.getNumUnits();
+                int numInitialUnits = m_initialState.getNumUnits();
                 AbilityAction action = actionTargetPair.second;
                 m_layers[i] = m_layers[action.targetProductionID - numInitialUnits];
                 continue;

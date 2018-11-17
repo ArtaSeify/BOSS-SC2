@@ -10,15 +10,14 @@ namespace BOSS
 
     class ActionType
     {
-        const ActionID	    m_id;
+        ActionID m_id;
 
     public:
 	
         ActionType();
-        ActionType(const ActionType & type);
         ActionType(const ActionID & actionID);
-
-        ActionType & operator = (ActionType rhs);
+        // ActionType(const ActionType & type);
+        // ActionType & operator = (ActionType rhs);
         const std::string & getName() const;
 
         ActionID getID() const;

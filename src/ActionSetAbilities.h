@@ -28,28 +28,28 @@ namespace BOSS
 
         void add(ActionType action);
         void add(const ActionSetAbilities & set);
-        void add(ActionType action, uint4 abilityTargetID);
-        void add(ActionType action, uint4 abilityTargetID, size_t index);
+        void add(ActionType action, int abilityTargetID);
+        void add(ActionType action, int abilityTargetID, int index);
 
         void sort(const GameState & state, const CombatSearchParameters & params);
 
         void remove(ActionType action);
-        void remove(ActionType action, size_t index);
+        void remove(ActionType action, int index);
         void remove(const ActionSetAbilities & set);
 
-        uint4 getAbilityTarget(uint4 index) const;
+        int getAbilityTarget(int index) const;
         const std::string toString() const;
 
         // iterator
-        typedef Actions::iterator iterator;
-        typedef Actions::const_iterator const_iterator;
+        using iterator = Actions::iterator;
+        using const_iterator = Actions::const_iterator;
         iterator begin() { return m_actionsAndTargets.begin(); }
         const_iterator begin() const { return m_actionsAndTargets.begin(); }
         iterator end() { return m_actionsAndTargets.end(); }
         const_iterator end() const { return m_actionsAndTargets.end(); }
 
         // index
-        ActionTargetPair & operator[] (uint4 index) { return m_actionsAndTargets[index]; }
-        const ActionTargetPair & operator[] (uint4 index) const { return m_actionsAndTargets[index]; }
+        ActionTargetPair & operator[] (size_t index) { return m_actionsAndTargets[index]; }
+        const ActionTargetPair & operator[] (size_t index) const { return m_actionsAndTargets[index]; }
     };
 }

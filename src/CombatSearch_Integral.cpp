@@ -11,7 +11,7 @@ CombatSearch_Integral::CombatSearch_Integral(const CombatSearchParameters p)
     BOSS_ASSERT(m_params.getInitialState().getRace() != Races::None, "Combat search initial state is invalid");
 }
 
-void CombatSearch_Integral::recurse(const GameState & state, size_t depth)
+void CombatSearch_Integral::recurse(const GameState & state, int depth)
 {
     if (timeLimitReached())
     {
@@ -37,7 +37,7 @@ void CombatSearch_Integral::recurse(const GameState & state, size_t depth)
         const auto & actionTargetPair = legalActions[index];
 
         ActionType action = actionTargetPair.first;
-        size_t actionTarget = actionTargetPair.second;
+        int actionTarget = actionTargetPair.second;
 
         // get the targets for the ability
         //!!! PROBLEM actionTarget is >= 0, so below will always be false

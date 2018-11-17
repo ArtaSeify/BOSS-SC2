@@ -41,12 +41,12 @@ namespace BOSS
     bool haveBuilder(ActionType type) const;
     bool havePrerequisites(ActionType type) const;
 
-    int		whenSupplyReady(ActionType action)          const;
-    int		whenPrerequisitesReady(ActionType action)   const;
-    int		whenResourcesReady(ActionType action)       const;
-    int		whenBuilderReady(ActionType action)         const;
+    int whenSupplyReady(ActionType action) const;
+    int	whenPrerequisitesReady(ActionType action) const;
+    int	whenResourcesReady(ActionType action) const;
+    int	whenBuilderReady(ActionType action) const;
 
-    void        addUnitToSpecialVectors(int unitIndex);
+    void addUnitToSpecialVectors(int unitIndex);
 
     Unit &getUnit(int id)
     { 
@@ -59,25 +59,24 @@ namespace BOSS
 
     GameState();
 
-    int whenCanBuild(ActionType action)                     const;
-    int whenCanCast(ActionType action, int targetID)     const;
-    int whenEnergyReady(ActionType action)                  const;
-    int getSupplyInProgress()                                       const;
-    int getNextFinishTime(ActionType type)                  const;
+    int whenCanBuild(ActionType action) const;
+    int whenCanCast(ActionType action, int targetID) const;
+    int whenEnergyReady(ActionType action) const;
+    int getSupplyInProgress() const;
+    int getNextFinishTime(ActionType type) const;
 
-    void getSpecialAbilityTargets(ActionSetAbilities & actionSet, int index)    const;
-    void storeChronoBoostTargets(ActionSetAbilities & actionSet, int index)     const;
-    bool chronoBoostableTarget(const Unit & unit)                    const;
-    bool canChronoBoostTarget(const Unit & unit)                     const;
-    bool canChronoBoost()                                            const;
+    void getSpecialAbilityTargets(ActionSetAbilities & actionSet, int index) const;
+    void storeChronoBoostTargets(ActionSetAbilities & actionSet, int index) const;
+    bool chronoBoostableTarget(const Unit & unit) const;
+    bool canChronoBoostTarget(const Unit & unit) const;
+    bool canChronoBoost() const;
 
-    //!!! MIC: changed to int (was uint4)
-    int getNumInProgress(ActionType action)                 const;
-    int getNumCompleted(ActionType action)                  const;
-    int getNumTotal(ActionType action)                      const;
-    void getLegalActions(std::vector<ActionType> & legalActions)     const;
-    bool isLegal(ActionType type)                            const;
-    bool haveType(ActionType action)                         const;
+    int getNumInProgress(ActionType action) const;
+    int getNumCompleted(ActionType action) const;
+    int getNumTotal(ActionType action) const;
+    void getLegalActions(std::vector<ActionType> & legalActions) const;
+    bool isLegal(ActionType type) const;
+    bool haveType(ActionType action) const;
 
     bool doAbility(ActionType type, int targetID);
     void doAction(ActionType type);
@@ -110,7 +109,7 @@ namespace BOSS
       return m_units[id]; 
     }
     
-    std::string		                        toString() const;
-    void                                    printunitsbeingbuilt() const;
+    std::string	toString() const;
+    void printunitsbeingbuilt() const;
   };
 }

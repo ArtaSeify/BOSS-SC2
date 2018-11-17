@@ -37,18 +37,18 @@ public:
     //Unit(ActionType type, uint4 id, int builderID, uint4 frameStarted);
     void        initializeUnit(ActionType type, int id, int builderID, int frameStarted);
 
-    int         getID()                     const   { return m_id; }
-    int         getBuilderID()              const   { return m_builderID; }
-    int         getBuildID()                const   { return m_buildID; }
-    int         getStartFrame()             const   { return m_frameStarted; }
-    int         getFinishFrame()            const   { return m_frameFinished; }
-    int         getTimeUntilFree()          const   { return m_timeUntilFree; }
-    int         getTimeUntilBuilt()         const   { return m_timeUntilBuilt; }
-    int         getChronoBoostAgainTime()   const   { return m_timeChronoBoostAgain; }
-    float       getEnergy()                 const   { return m_energy; }
-    ActionType  getType()                   const   { return m_type; }
-    ActionType  getAddon()                  const   { return m_addon; }
-    ActionType  getBuildType()              const   { return m_buildType; }
+    int         getID()                   const   { return m_id; }
+    int         getBuilderID()            const   { return m_builderID; }
+    int         getBuildID()              const   { return m_buildID; }
+    int         getStartFrame()           const   { return m_frameStarted; }
+    int         getFinishFrame()          const   { return m_frameFinished; }
+    int         getTimeUntilFree()        const   { return m_timeUntilFree; }
+    int         getTimeUntilBuilt()       const   { return m_timeUntilBuilt; }
+    int         getChronoBoostAgainTime() const   { return m_timeChronoBoostAgain; }
+    float       getEnergy()               const   { return m_energy; }
+    ActionType  getType()                 const   { return m_type; }
+    ActionType  getAddon()                const   { return m_addon; }
+    ActionType  getBuildType()            const   { return m_buildType; }
 
     void        setTimeUntilBuilt(int time)       { m_timeUntilBuilt = time; }
     void        setBuilderID(int id)              { m_builderID = id; }
@@ -59,7 +59,7 @@ public:
     void        complete(int frameFinished);
     void        startBuilding(Unit & Unit);
     void        fastForward(int frames);
-    int       whenCanBuild(ActionType type) const;
+    int         whenCanBuild(ActionType type) const;
 };
 
 }

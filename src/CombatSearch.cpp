@@ -134,7 +134,7 @@ bool CombatSearch::isTerminalNode(const GameState & s, int /*!!! PROBLEM NOT USE
     return false;
 }
 
-void CombatSearch::recurse(const GameState & /*!!! PROBLEM NOT USED state*/, size_t /*!!! PROBLEM NOT USED depth*/)
+void CombatSearch::recurse(const GameState & /*!!! PROBLEM NOT USED state*/, int /*!!! PROBLEM NOT USED depth*/)
 {
     // This base class function should never be called, leaving the code
     // here as a basis to form child classes

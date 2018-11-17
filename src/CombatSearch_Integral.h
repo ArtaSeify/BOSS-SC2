@@ -20,7 +20,7 @@ namespace BOSS
         //CombatSearch_IntegralData   m_integral;
         CombatSearch_IntegralDataFinishedUnits  m_integral;
 
-        virtual void                recurse(const GameState & s, size_t depth);
+        virtual void recurse(const GameState & s, int depth);
 
     public:
 	

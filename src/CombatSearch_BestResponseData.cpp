@@ -7,27 +7,27 @@ using namespace BOSS;
 CombatSearch_BestResponseData::CombatSearch_BestResponseData(const GameState & enemyState, const BuildOrderAbilities & enemyBuildOrder)
     : m_enemyInitialState(enemyState)
     , m_enemyBuildOrder(enemyBuildOrder)
-    , m_bestEval(std::numeric_limits<double>::max())
+    , m_bestEval(std::numeric_limits<float>::max())
 {
     // compute enemy army values
 
     calculateArmyValues(m_enemyInitialState, m_enemyBuildOrder, m_enemyArmyValues);
 }
 
-void CombatSearch_BestResponseData::calculateArmyValues(const GameState & initialState, const BuildOrderAbilities & buildOrder, std::vector< std::pair<double, double> > & values)
+void CombatSearch_BestResponseData::calculateArmyValues(const GameState & initialState, const BuildOrderAbilities & buildOrder, std::vector< std::pair<float, float> > & values)
 {
     values.clear();
     GameState state(initialState);
     for (size_t i(0); i < buildOrder.size(); ++i)
     {
         state.doAction(buildOrder[i].first);
-        values.push_back(std::pair<double,double>(state.getCurrentFrame(), Eval::ArmyTotalResourceSum(state)));
+        values.push_back(std::pair<float,float>(state.getCurrentFrame(), Eval::ArmyTotalResourceSum(state)));
     }
 }
 
 void CombatSearch_BestResponseData::update(const GameState & initialState, const GameState & currentState, const BuildOrderAbilities & buildOrder)
 {
-    double eval = compareBuildOrder(initialState, buildOrder);
+    float eval = compareBuildOrder(initialState, buildOrder);
 
     if (eval < m_bestEval)
     {
@@ -39,22 +39,22 @@ void CombatSearch_BestResponseData::update(const GameState & initialState, const
     }
 }
 
-double CombatSearch_BestResponseData::compareBuildOrder(const GameState & initialState, const BuildOrderAbilities & buildOrder)
+float CombatSearch_BestResponseData::compareBuildOrder(const GameState & initialState, const BuildOrderAbilities & buildOrder)
 {
     calculateArmyValues(initialState, buildOrder, m_selfArmyValues);
 
     //!!! PROBLEM NOT USED size_t selfIndex = 0; 
     //!!! PROBLEM NOT USED size_t enemyIndex = 0;
-    double maxDiff = std::numeric_limits<double>::lowest();
+    float maxDiff = std::numeric_limits<float>::lowest();
     //!!! PROBLEM NOT USED double sumDiff = 0;
     //!!! PROBLEM NOT USED int n = 0;
 
     for (size_t ei(0); ei < m_enemyArmyValues.size(); ++ei)
     {
-        double enemyTime = m_enemyArmyValues[ei].first;
-        double enemyVal = m_enemyArmyValues[ei].second;    
+        float enemyTime = m_enemyArmyValues[ei].first;
+        float enemyVal = m_enemyArmyValues[ei].second;    
     
-        size_t selfIndex = 0;
+        int selfIndex = 0;
 
         // find the corresponding self army value for this time
         for (size_t si(0); si < m_selfArmyValues.size(); ++si)
@@ -67,8 +67,8 @@ double CombatSearch_BestResponseData::compareBuildOrder(const GameState & initia
             selfIndex = si;
         }
     
-        double selfVal = m_selfArmyValues[selfIndex].second;
-        double diff = enemyVal - selfVal;
+        float selfVal = m_selfArmyValues[selfIndex].second;
+        float diff = enemyVal - selfVal;
         maxDiff = std::max(maxDiff, diff);
     }
 

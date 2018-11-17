@@ -15,7 +15,7 @@ DFBB_BuildOrderStackSearch::DFBB_BuildOrderStackSearch(const DFBB_BuildOrderSear
 {
 }
 
-void DFBB_BuildOrderStackSearch::setTimeLimit(double ms)
+void DFBB_BuildOrderStackSearch::setTimeLimit(float ms)
 {
     m_params.m_searchTimeLimit = ms;
 }
@@ -150,7 +150,7 @@ void DFBB_BuildOrderStackSearch::generateLegalActions(const GameState & state, A
     }
 }
 
-size_t DFBB_BuildOrderStackSearch::getRepetitions(const GameState & state, ActionType a)
+int DFBB_BuildOrderStackSearch::getRepetitions(const GameState & state, ActionType a)
 {
     // set the repetitions if we are using repetitions, otherwise set to 1
     int repeat = m_params.m_useRepetitions ? m_params.getRepetitions(a) : 1;
@@ -225,7 +225,7 @@ SEARCH_BEGIN:
     }
 
     generateLegalActions(STATE, LEGAL_ACTIONS);
-    for (CHILD_NUM = 0; CHILD_NUM < LEGAL_ACTIONS.size(); ++CHILD_NUM)
+    for (CHILD_NUM = 0; CHILD_NUM < (int)LEGAL_ACTIONS.size(); ++CHILD_NUM)
     {
         ACTION_TYPE = LEGAL_ACTIONS[CHILD_NUM];
 
@@ -244,6 +244,7 @@ SEARCH_BEGIN:
         // do the action as many times as legal to to 'repeat'
         CHILD_STATE = STATE;
         COMPLETED_REPS = 0;
+
         for (; COMPLETED_REPS < REPETITIONS; ++COMPLETED_REPS)
         {
             if (CHILD_STATE.isLegal(ACTION_TYPE))
@@ -268,7 +269,7 @@ SEARCH_BEGIN:
 
 SEARCH_RETURN:
 
-        for (size_t r(0); r < COMPLETED_REPS; ++r)
+        for (int r(0); r < COMPLETED_REPS; ++r)
         {
             m_buildOrder.pop_back();
         }

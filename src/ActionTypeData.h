@@ -32,9 +32,9 @@ namespace BOSS
         bool                        isSupplyProvider= false;
         bool                        isDepot         = false;
         bool                        isAddon         = false;
-        ActionType                  whatBuilds      = 0;
+        ActionType                  whatBuilds;
         uint4                       whatBuildsCount = 1;
-        ActionType                  whatBuildsAddon = 0;
+        ActionType                  whatBuildsAddon;
         std::string                 whatBuildsStr;
         std::string                 whatBuildsStatus;
         std::string                 whatBuildsAddonStr;

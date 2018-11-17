@@ -25,21 +25,21 @@ namespace BOSS
     {
         friend class BuildOrderPlotter;
 
-        const GameState                     m_initialState;
-        const BuildOrderAbilities           m_buildOrder;
+        const GameState                   m_initialState;
+        const BuildOrderAbilities         m_buildOrder;
         
-        std::vector<int>                    m_startTimes;
-        std::vector<int>                    m_finishTimes;
-        std::vector<int>                    m_layers;
-        std::vector<double>                 m_armyValues;
-        std::vector< std::pair<int,int> >   m_minerals;
-        std::vector< std::pair<int,int> >   m_gas;
-        std::vector<Rectangle>              m_rectangles;
+        std::vector<int>                  m_startTimes;
+        std::vector<int>                  m_finishTimes;
+        std::vector<int>                  m_layers;
+        std::vector<float>                m_armyValues;
+        std::vector< std::pair<int,int> > m_minerals;
+        std::vector< std::pair<int,int> > m_gas;
+        std::vector<Rectangle>            m_rectangles;
 
-        int                                 m_maxLayer;
-        int                                 m_maxFinishTime;
-        int                                 m_boxHeight;
-        int                                 m_boxHeightBuffer;
+        int                               m_maxLayer;
+        int                               m_maxFinishTime;
+        int                               m_boxHeight;
+        int                               m_boxHeightBuffer;
 
         void calculateStartEndTimes();
         void calculatePlot();

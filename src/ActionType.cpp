@@ -12,22 +12,22 @@ std::vector<ActionSetAbilities> allActionRecursivePrerequisites;
 ActionType::ActionType()
     : m_id(0)
 {
-
-}
-
-ActionType::ActionType(const ActionType & type)
-    : m_id(type.m_id)
-{
-
 }
 
 ActionType::ActionType(const ActionID & actionID)
     : m_id(actionID)
 {
-
 }
 
-ActionType & ActionType::operator = (ActionType rhs)
+#if 0
+//!!! mic: not necessary
+
+ActionType::ActionType(const ActionType & type)
+    : m_id(type.m_id)
+{
+}
+
+ActionType & ActionType::operator = (ActionType & rhs)
 {
     if (this != &rhs)
     {
@@ -36,10 +36,11 @@ ActionType & ActionType::operator = (ActionType rhs)
 
     return *this;
 }   
+#endif
 
-ActionID    ActionType::getID()     const { return m_id; }
-RaceID      ActionType::getRace()   const { return ActionTypeData::GetActionTypeData(m_id).race; }
-const std::string & ActionType::getName()   const { return ActionTypeData::GetActionTypeData(m_id).name; }
+ActionID ActionType::getID()   const { return m_id; }
+RaceID   ActionType::getRace() const { return ActionTypeData::GetActionTypeData(m_id).race; }
+const std::string & ActionType::getName() const { return ActionTypeData::GetActionTypeData(m_id).name; }
 	
 int  ActionType::buildTime()         const { return ActionTypeData::GetActionTypeData(m_id).buildTime; }
 int  ActionType::mineralPrice()      const { return ActionTypeData::GetActionTypeData(m_id).mineralCost; }
