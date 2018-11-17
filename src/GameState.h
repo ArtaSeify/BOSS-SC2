@@ -84,8 +84,8 @@ class GameState
     bool                            canBuildNow(ActionType action)      const { return whenCanBuild(action) == getCurrentFrame(); }
     int                             getNumMineralWorkers()              const { return m_mineralWorkers; }
     int                             getNumGasWorkers()                  const { return m_gasWorkers; }
-    size_t                          getNumberChronoBoostsCast()         const { return m_chronoBoosts.size(); }
-    size_t                          getNumUnits()                       const { return m_units.size(); }
+    int                             getNumberChronoBoostsCast()         const { return m_chronoBoosts.size(); }
+    int                             getNumUnits()                       const { return m_units.size(); }
     TimeType                        getLastActionFinishTime()           const { return m_unitsBeingBuilt.empty() ? getCurrentFrame() : m_units[m_unitsBeingBuilt.front()].getTimeUntilBuilt(); }
     int                             getCurrentSupply()                  const { return m_currentSupply; }
     int                             getMaxSupply()                      const { return m_maxSupply; }

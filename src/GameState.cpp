@@ -49,7 +49,7 @@ bool GameState::isLegal(ActionType action) const
     // if we have no gas income we can't make a gas unit
     if ((m_gas < action.gasPrice()) && (m_gasWorkers == 0)) { return false; }
 
-    const uint4 mineralWorkers = m_mineralWorkers + m_buildingWorkers;
+    const int mineralWorkers = m_mineralWorkers + m_buildingWorkers;
     // if we have no mineral workers, we can't make any unit
     if (mineralWorkers == 0) { return false; }
 
@@ -60,12 +60,12 @@ bool GameState::isLegal(ActionType action) const
     // rules for buildings which are built by workers
     if (action.isBuilding() && !action.isMorphed() && !action.isAddon() && (mineralWorkers == 0)) { return false; }
 
-    const uint4 refineriesInProgress = getNumInProgress(ActionTypes::GetRefinery(m_race));
-    const uint4 numRefineries = m_numRefineries + refineriesInProgress;
+    const int refineriesInProgress = getNumInProgress(ActionTypes::GetRefinery(m_race));
+    const int numRefineries = m_numRefineries + refineriesInProgress;
     // don't build a refinery if we don't have enough mineral workers to transfer over
     if (action.isRefinery() && (mineralWorkers <= (CONSTANTS::WorkersPerRefinery * (numRefineries + 1)))) { return false; }
 
-    const uint4 numDepots = m_numDepots + getNumInProgress(ActionTypes::GetResourceDepot(m_race));
+    const int numDepots = m_numDepots + getNumInProgress(ActionTypes::GetResourceDepot(m_race));
     // don't build more refineries than resource depots
     if (action.isRefinery() && (numRefineries >= 2 * numDepots)) { return false; }
 
@@ -167,7 +167,7 @@ bool GameState::doAbility(ActionType type, NumUnits targetID)
         }
 
         // resort
-        for (uint4 i = index; i < m_unitsBeingBuilt.size() - 1; ++i)
+        for (int i = index; i < (int)m_unitsBeingBuilt.size() - 1; ++i)
         {
             if (getUnit(m_unitsBeingBuilt[i]).getTimeUntilBuilt() < getUnit(m_unitsBeingBuilt[i + 1]).getTimeUntilBuilt())
             {
@@ -478,7 +478,7 @@ TimeType GameState::whenSupplyReady(ActionType action) const
     if (supplyNeeded <= 0) { return m_currentFrame; }
 
     // search the actions in progress in reverse for the first supply provider
-    for (uint4 i(0); i < m_unitsBeingBuilt.size(); ++i)
+    for (size_t i(0); i < m_unitsBeingBuilt.size(); ++i)
     {
         const Unit & unit = getUnit(m_unitsBeingBuilt[m_unitsBeingBuilt.size() - 1 - i]);   
         if (unit.getType().supplyProvided() > supplyNeeded)
@@ -604,7 +604,7 @@ int GameState::getNumInProgress(ActionType action) const
     //       [this, &action](const size_t & id) { return action == this->getUnit(id).getType(); } );
 
     int numInProgress = 0;
-    for (uint4 i(0); i < m_unitsBeingBuilt.size(); ++i)
+    for (size_t i(0); i < m_unitsBeingBuilt.size(); ++i)
     {
         if (getUnit(m_unitsBeingBuilt[i]).getType() == action)
         {
@@ -683,7 +683,7 @@ int GameState::getSupplyInProgress() const
     //       [this](size_t lhs, size_t rhs) { return lhs + this->getUnit(rhs).getType().supplyProvided(); });
 
     int supplyInProgress = 0;
-    for (uint4 i(0); i < m_unitsBeingBuilt.size(); ++i)
+    for (size_t i(0); i < m_unitsBeingBuilt.size(); ++i)
     {
         supplyInProgress += getUnit(m_unitsBeingBuilt[i]).getType().supplyProvided();
     }
@@ -856,7 +856,7 @@ std::string GameState::toString() const
 
 void GameState::printunitsbeingbuilt() const
 {
-    for (uint4 i(0); i < m_unitsBeingBuilt.size(); ++i)
+    for (size_t i(0); i < m_unitsBeingBuilt.size(); ++i)
     {
         auto & index = m_unitsBeingBuilt[i];
         std::cout << getUnit(index).getTimeUntilBuilt() << std::endl;

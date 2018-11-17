@@ -1,3 +1,5 @@
+/* -*- c-basic-offset: 4 -*- */
+
 #include "BuildOrder.h"
 
 using namespace BOSS;
@@ -26,9 +28,8 @@ void BuildOrder::add(const ActionType & type, int amount)
 
 void BuildOrder::add(const BuildOrder & other)
 {
-    for (size_t i(0); i < other.size(); ++i)
-    {
-        add(other[i]);
+    for (const auto &x : other) {
+        add(x);
     }
 }
 
@@ -44,7 +45,7 @@ bool BuildOrder::empty() const
 }
 
 
-size_t BuildOrder::getTypeCount(ActionType type) const
+int BuildOrder::getTypeCount(ActionType type) const
 {
     if (empty())
     {
@@ -61,26 +62,26 @@ void BuildOrder::pop_back()
     m_buildOrder.pop_back();
 }
 
-const ActionType & BuildOrder::operator [] (size_t i) const
+const ActionType & BuildOrder::operator [] (int i) const
 {
     return m_buildOrder[i];
 }
 
-ActionType & BuildOrder::operator [] (size_t i)
+ActionType & BuildOrder::operator [] (int i)
 {
     return m_buildOrder[i];
 }
 
-size_t BuildOrder::size() const
+int BuildOrder::size() const
 {
-    return m_buildOrder.size();
+    return (int)m_buildOrder.size();
 }
 
 void BuildOrder::sortByPrerequisites()
 {
-    for (size_t i(0); i < m_buildOrder.size() - 1; ++i)
+    for (int i(0); i < (int) m_buildOrder.size() - 1; ++i)
     {
-        for (size_t j(i + 1); j < m_buildOrder.size(); ++j)
+        for (int j(i + 1); j < (int)m_buildOrder.size(); ++j)
         {
             const auto & recursivePre = m_buildOrder[i].getRecursivePrerequisiteActionCount();
 
@@ -98,9 +99,10 @@ std::string BuildOrder::getJSONString() const
 
     ss << "\"Build Order\" : [";
 
-    for (size_t i(0); i < m_buildOrder.size(); ++i)
+    for (int i(0); i < (int)m_buildOrder.size(); ++i)
     {
-        ss << "\"" << m_buildOrder[i].getName() << "\"" << (i < m_buildOrder.size() - 1 ? ", " : "");
+        ss << "\"" << m_buildOrder[i].getName()
+           << "\"" << (i < (int)m_buildOrder.size() - 1 ? ", " : "");
     }
 
     ss << "]";
@@ -112,7 +114,7 @@ std::string BuildOrder::getNumberedString() const
 {
     std::stringstream ss;
 
-    for (size_t i(0); i < m_buildOrder.size(); ++i)
+    for (int i(0); i < (int)m_buildOrder.size(); ++i)
     {
         std::stringstream num;
         num << i;
@@ -131,21 +133,22 @@ std::string BuildOrder::getIDString() const
 {
     std::stringstream ss;
 
-    for (size_t i(0); i < m_buildOrder.size(); ++i)
-    {
-        ss << (int)m_buildOrder[i].getID() << " ";
+    for (const auto &x : m_buildOrder) {
+        ss << (int)x.getID() << " ";
     }
 
     return ss.str();
 }
 
-std::string BuildOrder::getNameString(const size_t charactersPerName) const
+std::string BuildOrder::getNameString(int charactersPerName) const
 {
     std::stringstream ss;
 
-    for (size_t i(0); i < m_buildOrder.size(); ++i)
+    for (const auto &x : m_buildOrder)
     {
-        std::string name = charactersPerName == 0 ? m_buildOrder[i].getName() : m_buildOrder[i].getName().substr(0, charactersPerName);
+        std::string name = charactersPerName == 0 ?
+            x.getName() :
+            x.getName().substr(0, charactersPerName);
 
         ss << name << " ";
     }

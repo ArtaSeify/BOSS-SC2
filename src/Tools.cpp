@@ -15,7 +15,7 @@ BuildOrder Tools::GetOptimizedNaiveBuildOrderOld(const GameState & state, const 
     int minCompletionTime = Tools::GetBuildOrderCompletionTime(state, bestBuildOrder);
     size_t bestNumWorkers = bestBuildOrder.getTypeCount(ActionTypes::GetWorker(state.getRace()));
 
-    for (size_t numWorkers(8); numWorkers < 27; ++numWorkers)
+    for (int numWorkers(8); numWorkers < 27; ++numWorkers)
     {
         BuildOrder buildOrder = Tools::GetNaiveBuildOrderAddWorkersOld(state, goal, numWorkers);
         int completionTime = Tools::GetBuildOrderCompletionTime(state, buildOrder);
@@ -106,8 +106,8 @@ BuildOrder Tools::GetNaiveBuildOrderAddWorkersOld(const GameState & state, const
     for (ActionID a(0); a < ActionTypes::GetAllActionTypes().size(); ++a)
     {
         ActionType actionType(a);
-        int need = (int)goal.getGoal(actionType);
-        int have = (int)state.getNumTotal(actionType);
+        int need = goal.getGoal(actionType);
+        int have = state.getNumTotal(actionType);
         int numNeeded = need - have - buildOrderActionTypeCount[actionType.getID()]; 
             
         for (int i(0); i < numNeeded; ++i)
@@ -136,7 +136,7 @@ BuildOrder Tools::GetNaiveBuildOrderAddWorkersOld(const GameState & state, const
         int numStarports = state.getNumTotal(starport);
         int numSci = state.getNumTotal(scienceFacility);
         
-        for (size_t a(0); a < buildOrder.size(); ++a)
+        for (int a(0); a < buildOrder.size(); ++a)
         {
             ActionType actionType = buildOrder[a];
 
@@ -205,9 +205,9 @@ BuildOrder Tools::GetNaiveBuildOrderAddWorkersOld(const GameState & state, const
     }
 
     // Bubble sort the build order so that prerequites always come before what requires them
-    for (size_t i(0); i < buildOrder.size()-1; ++i)
+    for (int i(0); i < buildOrder.size()-1; ++i)
     {
-        for (size_t j(i+1); j < buildOrder.size(); ++j)
+        for (int j(i+1); j < buildOrder.size(); ++j)
         {
             const ActionSetAbilities & recursivePre = buildOrder[i].getRecursivePrerequisiteActionCount();
 
@@ -221,7 +221,7 @@ BuildOrder Tools::GetNaiveBuildOrderAddWorkersOld(const GameState & state, const
     // finish the build order with workers and supply
     BuildOrder finalBuildOrder;
     GameState currentState(state);
-    size_t i = 0;
+    int i = 0;
     while (i < buildOrder.size())
     {
         ActionType worker = ActionTypes::GetWorker(currentState.getRace());
@@ -296,7 +296,7 @@ void Tools::InsertActionIntoBuildOrder(BuildOrder & result, const BuildOrder & b
 
     BuildOrder testBuildOrder = buildOrder;
 
-    for (size_t insertIndex(0); insertIndex < buildOrder.size(); ++insertIndex)
+    for (int insertIndex(0); insertIndex < buildOrder.size(); ++insertIndex)
     {
         // if we can test the action here, do it
         if (runningState.isLegal(action))
@@ -304,7 +304,7 @@ void Tools::InsertActionIntoBuildOrder(BuildOrder & result, const BuildOrder & b
             // figure out the build time of build order with action inserted here
             GameState tempState(runningState);
             tempState.doAction(action);
-            for (size_t a(insertIndex); a < buildOrder.size(); ++a)
+            for (int a(insertIndex); a < buildOrder.size(); ++a)
             {
                 tempState.doAction(buildOrder[a]);
             }
@@ -324,10 +324,9 @@ void Tools::InsertActionIntoBuildOrder(BuildOrder & result, const BuildOrder & b
     }
 
     result.clear();
-    for (size_t a(0); a<buildOrder.size(); ++a)
+    for (int a(0); a < buildOrder.size(); ++a)
     {
-        //!!! mic: added (int) - hopefully OK
-        if (bestInsertIndex == (int)a)
+        if (bestInsertIndex == a)
         {
             result.add(action);
         }

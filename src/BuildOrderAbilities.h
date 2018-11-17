@@ -29,7 +29,7 @@ namespace BOSS
         void pop_back();
         void sortByPrerequisites();
 
-        size_t size() const;
+        int size() const;
         int getTypeCount(ActionType type) const;
         bool empty() const { return size() == 0; }
         //ActionType          getAbilityTargetType(size_t index) const;
@@ -50,8 +50,8 @@ namespace BOSS
         const_iterator end() const { return m_buildOrder.end(); }
 
         // index
-        const ActionTargetPair & operator [] (size_t i) const;
-        ActionTargetPair & operator [] (size_t i);
+        const ActionTargetPair & operator [] (int i) const;
+        ActionTargetPair & operator [] (int i);
     };
 
 }

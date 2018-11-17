@@ -13,11 +13,11 @@ namespace BOSS
     class IntegralData
     {
     public:
-        float  eval;
-        float  integral;
+        FracType eval;
+        FracType integral;
         int    timeAdded;
 
-        IntegralData(float e, float i, int t)
+        IntegralData(FracType e, FracType i, int t)
             : eval(e)
             , integral(i)
             , timeAdded(t)
@@ -38,7 +38,7 @@ namespace BOSS
     {
         std::vector<IntegralData> m_integralStack;
         std::vector<IntegralData> m_bestIntegralStack;
-        float                     m_bestIntegralValue;
+        FracType                  m_bestIntegralValue;
         BuildOrderAbilities       m_bestIntegralBuildOrder;
         GameState                 m_bestIntegralGameState;
 
@@ -49,7 +49,7 @@ namespace BOSS
         void update(const GameState & state, const BuildOrderAbilities & buildOrder);
         void pop_back();
 
-        void printIntegralData(size_t index) const;
+        void printIntegralData(int index) const;
         void print() const;
 
         const BuildOrderAbilities & getBestBuildOrder() const;

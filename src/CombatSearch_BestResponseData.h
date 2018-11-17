@@ -25,7 +25,7 @@ namespace BOSS
 
         float compareBuildOrder(const GameState & state,
                                 const BuildOrderAbilities & buildOrder);
-        size_t getStateIndex(const GameState & state);
+        int getStateIndex(const GameState & state);
 
         void calculateArmyValues(const GameState & state,
                                  const BuildOrderAbilities & buildOrder,

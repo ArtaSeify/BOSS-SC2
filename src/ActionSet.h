@@ -8,15 +8,16 @@
 namespace BOSS
 {
     class ActionType;
+
     class ActionSet
     {
-    std::vector<ActionType> m_actions;
+        std::vector<ActionType> m_actions;
 
     public:
 
         ActionSet();
 
-        size_t size() const;
+        int size() const;
 
         bool isEmpty() const;
         bool contains(ActionType action) const;
@@ -26,8 +27,8 @@ namespace BOSS
         void remove(const ActionSet & set);
         void clear();
 
-        ActionType & operator[] (size_t index);
-        ActionType operator[] (size_t index) const;
+        ActionType & operator[] (int index);
+        ActionType operator[] (int index) const;
 
         const std::string toString() const;
     };

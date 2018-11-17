@@ -28,7 +28,7 @@ void DFBB_BuildOrderSearchResults::printResults(bool pbo) const
 
 void DFBB_BuildOrderSearchResults::printBuildOrder() const
 {
-    for (size_t i(0); i<buildOrder.size(); ++i)
+    for (int i(0); i < buildOrder.size(); ++i)
     {
         printf("%d ",buildOrder[i].getID());
     }

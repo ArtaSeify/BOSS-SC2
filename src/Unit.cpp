@@ -45,7 +45,7 @@ Unit::Unit(ActionType type, NumUnits id, NumUnits builderID, TimeType frameStart
     
 }
 
-/*void Unit::initializeUnit(ActionType type, short id, short builderID, uint2 frameStarted)
+/*void Unit::initializeUnit(ActionType type, intt id, int builderID, int frameStarted)
 {
     m_id = id;
     m_frameStarted = frameStarted;

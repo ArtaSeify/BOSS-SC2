@@ -251,7 +251,7 @@ const BuildOrder & NaiveBuildOrderSearch::solve()
   ActionType supplyProvider = ActionTypes::GetSupplyProvider(m_state.getRace());
 
   BuildOrder finalBuildOrder;
-  for (size_t a(0); a < buildOrder.size(); ++a)
+  for (int a(0); a < buildOrder.size(); ++a)
   {
     ActionType nextAction = buildOrder[a];
     int maxSupply = m_state.getMaxSupply();

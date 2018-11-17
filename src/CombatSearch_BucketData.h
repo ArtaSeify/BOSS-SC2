@@ -13,7 +13,7 @@ namespace BOSS
     class BucketData
     {
     public:
-        float eval;
+        FracType eval;
         BuildOrderAbilities buildOrder;
         GameState state;
 
@@ -34,9 +34,9 @@ namespace BOSS
 
         CombatSearch_BucketData(int frameLimit, int numBuckets);
 
-        const BucketData & getBucket(size_t index) const;
-        size_t numBuckets() const;
-        size_t getBucketIndex(const GameState & state) const;
+        const BucketData & getBucket(int index) const;
+        int numBuckets() const;
+        int getBucketIndex(const GameState & state) const;
         
         void update(const GameState & state, const BuildOrderAbilities & buildOrder);
 

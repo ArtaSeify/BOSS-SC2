@@ -26,16 +26,26 @@ namespace BOSS
     using uint4 = unsigned int;
     using uint8 = unsigned long long int;
 
-    static_assert(sizeof(uint4) == 4 && sizeof(uint2) == 2, "unexpected sizes");
-  
-    using int1  = signed char;
-    using int2  = signed short;
-    using int4  = signed int;
+    using sint1 = signed char;
+    using sint2 = signed short;
+    using sint4 = signed int;
+    using sint8 = signed long long int;
 
+    static_assert(sizeof(uint1) == 1, "unexpected size");
+    static_assert(sizeof(uint2) == 2, "unexpected size");
+    static_assert(sizeof(uint4) == 4, "unexpected size");
+    static_assert(sizeof(uint8) == 8, "unexpected size");
+    static_assert(sizeof(sint1) == 1, "unexpected size");
+    static_assert(sizeof(sint2) == 2, "unexpected size");
+    static_assert(sizeof(sint4) == 4, "unexpected size");
+    static_assert(sizeof(sint8) == 8, "unexpected size");
+
+    static_assert(sizeof(int) >= 4, "unexpected size");
+    
     using ActionID = uint2;
-    using RaceID = uint1;
-    using TimeType = int4;
-    using NumUnits = int2;
+    using RaceID   = uint1;
+    using TimeType = sint4;
+    using NumUnits = sint2;
     using FracType = float;
 
     // constants declared in data file

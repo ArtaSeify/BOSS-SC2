@@ -14,14 +14,14 @@
 #include <cassert>
 #include <type_traits>
 
-template <typename T, size_t N>
+template <typename T, int N>
 class BoundedVector
 {
     static_assert(N > 0, "N=0");
     static_assert(is_trivially_copyable<T>::value, "not trivial");
 
     T data[N];
-    size_t n; // number of active elements
+    int n; // number of active elements
 
     // optimize arg/ret types when T is small (avoiding references)
     static constexpr bool small_type = sizeof(T) <= 8 && std::is_trivially_copyable<T>::value;
@@ -39,7 +39,7 @@ public:
         n = x.n;
 
         // T trivially copyable => memcpy
-        for (size_t i=0; i < n; ++i) {
+        for (int i=0; i < n; ++i) {
             new (&data[i]) T(x.data[i]);
         }
     }
@@ -55,15 +55,15 @@ public:
         return *this;
     }
   
-    T &operator[](size_t i)
+    T &operator[](int i)
     {
-        assert(i < N);
+        assert(0 <= i && i < N);
         return data[i];
     }
 
-    ConstRetTypeT operator[](size_t i) const
+    ConstRetTypeT operator[](int i) const
     {
-        assert(i < N);
+        assert(0 <= i && i < N);
         return data[i];
     }
 
@@ -93,7 +93,7 @@ public:
         return data[n-1];
     }
 
-    size_t size() const { return n; }
+    int size() const { return n; }
 
     // [r]begin/[r]end interface
 

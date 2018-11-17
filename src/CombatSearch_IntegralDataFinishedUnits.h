@@ -20,7 +20,7 @@ namespace BOSS
         FracType    integral_UntilFrameLimit;
         TimeType    timeStarted;
         TimeType    timeFinished;
-        int1        id;
+        sint1       id;
 
         IntegralDataFinishedUnits(FracType e, FracType i_c, FracType i_l, TimeType t_a, TimeType t_f)
             : eval(e)
@@ -33,7 +33,7 @@ namespace BOSS
 
         }
 
-        IntegralDataFinishedUnits(FracType e, FracType i_c, FracType i_l, TimeType t_a, TimeType t_f, int1 newID)
+        IntegralDataFinishedUnits(FracType e, FracType i_c, FracType i_l, TimeType t_a, TimeType t_f, sint1 newID)
             : eval(e)
             , integral_ToThisPoint(i_c)
             , integral_UntilFrameLimit(i_l)
@@ -59,7 +59,7 @@ namespace BOSS
     class CombatSearch_IntegralDataFinishedUnits
     {
         std::vector<IntegralDataFinishedUnits>      m_integralStack;
-        size_t                                      m_chronoBoostEntries;
+        int                                         m_chronoBoostEntries;
 
         std::vector<IntegralDataFinishedUnits>      m_bestIntegralStack;
         FracType                                    m_bestIntegralValue;

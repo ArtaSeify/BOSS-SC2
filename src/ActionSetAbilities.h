@@ -20,7 +20,7 @@ namespace BOSS
         ActionSetAbilities();
         void setNewSet(const ActionSetAbilities & newSet);
 
-        size_t size() const { return m_actionsAndTargets.size(); }
+        int size() const { return m_actionsAndTargets.size(); }
         bool isEmpty() const { return m_actionsAndTargets.empty(); }
         void clear() { m_actionsAndTargets.clear(); }
 
@@ -49,7 +49,7 @@ namespace BOSS
         const_iterator end() const { return m_actionsAndTargets.end(); }
 
         // index
-        ActionTargetPair & operator[] (size_t index) { return m_actionsAndTargets[index]; }
-        const ActionTargetPair & operator[] (size_t index) const { return m_actionsAndTargets[index]; }
+        ActionTargetPair & operator[] (int index) { return m_actionsAndTargets[index]; }
+        const ActionTargetPair & operator[] (int index) const { return m_actionsAndTargets[index]; }
     };
 }
