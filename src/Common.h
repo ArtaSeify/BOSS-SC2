@@ -1,3 +1,5 @@
+/* -*- c-basic-offset: 4 -*- */
+
 #pragma once
 
 #include <stdio.h>
@@ -23,21 +25,23 @@ namespace BOSS
     typedef unsigned short  uint2;
     typedef unsigned int    uint4;
 
+    using TimeType = int;
+  
     // ~~~~~!!! CAN CHANGE THIS
     typedef uint2  ActionID;
     typedef uint1  RaceID;
 
-	// constants declared in data file
-	class CONSTANTS
-	{
-	public:
-		static float MPWPF;			        // minerals per worker per frame
-		static float GPWPF;		            // gas per worker per frame
-		static float ERPF;				    // energy regen per frame
-		static float HRPF;				    // health regen per frame
-		static float SRPF;				    // shield regen per frame
-		static short WorkersPerRefinery;    // number of workers per refinery
-	};
+    // constants declared in data file
+    class CONSTANTS
+    {
+    public:
+        static float MPWPF;               // minerals per worker per frame
+        static float GPWPF;               // gas per worker per frame
+        static float ERPF;                // energy regen per frame
+        static float HRPF;                // health regen per frame
+        static float SRPF;                // shield regen per frame
+        static int   WorkersPerRefinery;  // number of workers per refinery
+    };
 
     namespace Races
     {

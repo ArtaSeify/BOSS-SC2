@@ -1,3 +1,5 @@
+/* -*- c-basic-offset: 4 -*- */
+
 #include "CombatSearchParameters.h"
 #include "ActionType.h"
 
@@ -5,8 +7,11 @@ using namespace BOSS;
 
 // alternate constructor
 CombatSearchParameters::CombatSearchParameters()
-    : m_useRepetitions                (true)
+    : m_maxActions                    (ActionTypes::GetAllActionTypes().size(), -1)
+    , m_useRepetitions                (true)
+    , m_repetitionValues              (ActionTypes::GetAllActionTypes().size(), 1)
     , m_useIncreasingRepetitions      (false)
+    , m_repetitionThresholds          (ActionTypes::GetAllActionTypes().size(), 0)
     , m_useWorkerCutoff               (false)
     , m_workerCutoff                  (1)
     , m_useAlwaysMakeWorkers          (false)
@@ -17,9 +22,6 @@ CombatSearchParameters::CombatSearchParameters()
     , m_searchTimeLimit               (0)
     , m_initialUpperBound             (0)
     , m_initialState                  ()
-    , m_maxActions                    (ActionTypes::GetAllActionTypes().size(), -1)
-    , m_repetitionValues              (ActionTypes::GetAllActionTypes().size(), 1)
-    , m_repetitionThresholds          (ActionTypes::GetAllActionTypes().size(), 0)
     , m_printNewBest                  (false)
 {
     
@@ -115,7 +117,7 @@ void CombatSearchParameters::setAlwaysMakeWorkers(const bool flag)
     m_useAlwaysMakeWorkers = flag;
 }
 
-const bool CombatSearchParameters::getAlwaysMakeWorkers() const
+bool CombatSearchParameters::getAlwaysMakeWorkers() const
 {
     return m_useAlwaysMakeWorkers;
 }   

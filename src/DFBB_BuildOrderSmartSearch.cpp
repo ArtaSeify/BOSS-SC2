@@ -1,11 +1,13 @@
+/* -*- c-basic-offset: 4 -*- */
+
 #include "DFBB_BuildOrderSmartSearch.h"
 #include "ActionSet.h"
 
 using namespace BOSS;
 
 DFBB_BuildOrderSmartSearch::DFBB_BuildOrderSmartSearch() 
-    : m_stackSearch(m_params)
-    , m_searchTimeLimit(30)
+    : m_searchTimeLimit(30)
+    , m_stackSearch(m_params)
 {
 }
 
@@ -57,7 +59,7 @@ void DFBB_BuildOrderSmartSearch::calculateSearchSettings()
     m_goal.setGoalMax(resourceDepot, m_initialState.getNumTotal(resourceDepot));
 
     // set the number of refineries
-    m_goal.setGoalMax(refinery, std::min(3u, calculateRefineriesRequired()));
+    m_goal.setGoalMax(refinery, std::min(3ul, calculateRefineriesRequired()));
 
     // set the maximum number of workers to an initial ridiculously high upper bound
     m_goal.setGoalMax(worker, std::min(m_initialState.getNumTotal(worker) + 20u, 100u));
@@ -74,7 +76,7 @@ void DFBB_BuildOrderSmartSearch::calculateSearchSettings()
     // set the repetitions
     setRepetitions();
 
-    size_t maxWorkers = 45;
+    int maxWorkers = 45;
     if (m_goal.getGoal(worker) > maxWorkers)
     {
         m_goal.setGoal(worker, maxWorkers);
@@ -205,7 +207,7 @@ void DFBB_BuildOrderSmartSearch::recurseOverStrictDependencies(ActionType action
             continue;
         }
 
-        m_goal.setGoalMax(actionType, std::max(1u, m_goal.getGoalMax(actionType)));
+        m_goal.setGoalMax(actionType, std::max(1, m_goal.getGoalMax(actionType)));
     }
 }
 
@@ -264,7 +266,7 @@ void DFBB_BuildOrderSmartSearch::setRepetitions()
         if (!actionType.isSupplyProvider() && m_goal.getGoal(actionType) >= 5)
         {
             // set the repetitions to half of the value
-            m_params.setRepetitions(actionType, std::min(4u, (m_goal.getGoal(actionType) / 2u)));
+            m_params.setRepetitions(actionType, std::min(4, (m_goal.getGoal(actionType) / 2)));
             m_params.setRepetitions(actionType.whatBuilds(), 2);
             m_params.setRepetitionThreshold(actionType.whatBuilds(), 1);
         }
@@ -322,7 +324,7 @@ void DFBB_BuildOrderSmartSearch::print()
     printf("\n\n");
 }
 
-const RaceID DFBB_BuildOrderSmartSearch::getRace() const
+RaceID DFBB_BuildOrderSmartSearch::getRace() const
 {
     return m_initialState.getRace();
 }

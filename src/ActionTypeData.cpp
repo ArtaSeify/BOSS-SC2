@@ -1,3 +1,5 @@
+/* -*- c-basic-offset: 4 -*- */
+
 #include "ActionTypeData.h"
 #include "JSONTools.h"
 #include <unordered_map>

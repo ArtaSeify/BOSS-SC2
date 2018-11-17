@@ -1,13 +1,14 @@
+/* -*- c-basic-offset: 4 -*- */
+
 #include "BuildOrderSearchGoal.h"
 
 using namespace BOSS;
 
 BuildOrderSearchGoal::BuildOrderSearchGoal()
-    : m_supplyRequiredVal(0)
-    , m_goalUnits(ActionTypes::GetAllActionTypes().size())
-    , m_goalUnitsMax(ActionTypes::GetAllActionTypes().size())
+  : m_goalUnits(ActionTypes::GetAllActionTypes().size()),
+    m_goalUnitsMax(ActionTypes::GetAllActionTypes().size()),
+    m_supplyRequiredVal(0)
 {
- 
 }
 
 void BuildOrderSearchGoal::calculateSupplyRequired()
@@ -61,21 +62,21 @@ void BuildOrderSearchGoal::setGoalMax(ActionType a, const size_t num)
     m_goalUnitsMax[a.getID()] = num;
 }
 
-size_t BuildOrderSearchGoal::getGoal(ActionType a) const
+int BuildOrderSearchGoal::getGoal(ActionType a) const
 {
     BOSS_ASSERT(a.getID() >= 0 && a.getID() < m_goalUnits.size(), "Action type not valid");
 
     return m_goalUnits[a.getID()];
 }
 
-size_t BuildOrderSearchGoal::getGoalMax(ActionType a) const
+int BuildOrderSearchGoal::getGoalMax(ActionType a) const
 {
     BOSS_ASSERT(a.getID() >= 0 && a.getID() < m_goalUnitsMax.size(), "Action type not valid");
 
     return m_goalUnitsMax[a.getID()];
 }
 
-size_t BuildOrderSearchGoal::supplyRequired() const
+int BuildOrderSearchGoal::supplyRequired() const
 {
     return m_supplyRequiredVal;
 }
@@ -106,38 +107,38 @@ std::string BuildOrderSearchGoal::toString() const
 
 bool BuildOrderSearchGoal::isAchievedBy(const GameState & state)
 {
-    static ActionType Hatchery      = ActionTypes::GetActionType("Zerg_Hatchery");
-    static ActionType Lair          = ActionTypes::GetActionType("Zerg_Lair");
-    static ActionType Hive          = ActionTypes::GetActionType("Zerg_Hive");
-    static ActionType Spire         = ActionTypes::GetActionType("Zerg_Spire");
-    static ActionType GreaterSpire  = ActionTypes::GetActionType("Zerg_Greater_Spire");
+  static ActionType Hatchery      = ActionTypes::GetActionType("Zerg_Hatchery");
+  static ActionType Lair          = ActionTypes::GetActionType("Zerg_Lair");
+  static ActionType Hive          = ActionTypes::GetActionType("Zerg_Hive");
+  static ActionType Spire         = ActionTypes::GetActionType("Zerg_Spire");
+  static ActionType GreaterSpire  = ActionTypes::GetActionType("Zerg_Greater_Spire");
 
-    for (auto & actionType : ActionTypes::GetAllActionTypes())
+  for (auto & actionType : ActionTypes::GetAllActionTypes())
+  {
+    int have = state.getNumTotal(actionType);
+
+    if (state.getRace() == Races::Zerg)
     {
-        size_t have = state.getNumTotal(actionType);
-
-        if (state.getRace() == Races::Zerg)
-        {
-            if (actionType == Hatchery)
-            {
-                have += state.getNumTotal(Lair);
-                have += state.getNumTotal(Hive);
-            }
-            else if (actionType == Lair)
-            {
-                have += state.getNumTotal(Hive);
-            }
-            else if (actionType == Spire)
-            {
-                have += state.getNumTotal(GreaterSpire);
-            }
-        }
-
-        if (have < getGoal(actionType))
-        {
-            return false;
-        }
+      if (actionType == Hatchery)
+      {
+        have += state.getNumTotal(Lair);
+        have += state.getNumTotal(Hive);
+      }
+      else if (actionType == Lair)
+      {
+        have += state.getNumTotal(Hive);
+      }
+      else if (actionType == Spire)
+      {
+        have += state.getNumTotal(GreaterSpire);
+      }
     }
 
-    return true;
+    if (have < getGoal(actionType))
+    {
+      return false;
+    }
+  }
+
+  return true;
 }

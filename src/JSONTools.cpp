@@ -1,3 +1,5 @@
+/* -*- c-basic-offset: 4 -*- */
+
 #include "JSONTools.h"
 #include "GameState.h"
 

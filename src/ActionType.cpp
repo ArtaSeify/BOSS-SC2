@@ -1,3 +1,5 @@
+/* -*- c-basic-offset: 4 -*- */
+
 #include "ActionType.h"
 #include "ActionTypeData.h"
 #include "ActionSetAbilities.h"
@@ -189,7 +191,7 @@ namespace ActionTypes
 
     ActionType None(0);
 
-    ActionSetAbilities CalculatePrerequisites(ActionType action)
+    ActionSetAbilities CalculatePrerequisites(ActionType /*action NOT USED? */)
     {
         ActionSetAbilities count;
 

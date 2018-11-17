@@ -10086,7 +10086,10 @@ namespace cimg_library_suffixed {
           if (cimg_sscanf(s,"%u%c",&val,&sep)>0) {
             if (sep=='%') siz[k] = val*(k==0?_width:k==1?_height:k==2?_depth:_spectrum)/100;
             else siz[k] = val;
-            while (*s>='0' && *s<='9') ++s; if (sep=='%') ++s;
+            //!!! PROBLEM MISLEADING while (*s>='0' && *s<='9') ++s; if (sep=='%') ++s;
+            //!!! IS THIS WHAT WAS MEANT???
+            while (*s>='0' && *s<='9') { ++s; }
+            if (sep=='%') { ++s; }
           } else switch (cimg::uncase(*s)) {
           case 'x' : case 'w' : siz[k] = img._width; ++s; break;
           case 'y' : case 'h' : siz[k] = img._height; ++s; break;
@@ -28641,10 +28644,16 @@ namespace cimg_library_suffixed {
           dy = y - yi;
         if (c==0) {
           CImg<floatT>& I = *pI;
-          if (xi<0) xi = 0; if (nxi<0) nxi = 0;
-          if (xi>=ref.width()) xi = ref.width() - 1; if (nxi>=ref.width()) nxi = ref.width() - 1;
-          if (yi<0) yi = 0; if (nyi<0) nyi = 0;
-          if (yi>=ref.height()) yi = ref.height() - 1; if (nyi>=ref.height()) nyi = ref.height() - 1;
+          //!!! PROBLEM MISLEADING if (xi<0) xi = 0; if (nxi<0) nxi = 0;
+          //!!! IS THIS WHAT WAS MEANT?
+          if (xi<0) xi = 0;
+          if (nxi<0) nxi = 0;
+          if (xi>=ref.width()) xi = ref.width() - 1;
+          if (nxi>=ref.width()) nxi = ref.width() - 1;
+          if (yi<0) yi = 0;
+          if (nyi<0) nyi = 0;
+          if (yi>=ref.height()) yi = ref.height() - 1;
+          if (nyi>=ref.height()) nyi = ref.height() - 1;
           I(0,0,0) = (float)ref(xi,yi,zi,0);   I(0,0,1) = (float)ref(xi,yi,zi,1);
           I(1,0,0) = (float)ref(nxi,yi,zi,0);  I(1,0,1) = (float)ref(nxi,yi,zi,1);
           I(1,1,0) = (float)ref(nxi,nyi,zi,0); I(1,1,1) = (float)ref(nxi,nyi,zi,1);
@@ -28673,12 +28682,21 @@ namespace cimg_library_suffixed {
           dz = z - zi;
         if (c==0) {
           CImg<floatT>& I = *pI;
-          if (xi<0) xi = 0; if (nxi<0) nxi = 0;
-          if (xi>=ref.width()) xi = ref.width() - 1; if (nxi>=ref.width()) nxi = ref.width() - 1;
-          if (yi<0) yi = 0; if (nyi<0) nyi = 0;
-          if (yi>=ref.height()) yi = ref.height() - 1; if (nyi>=ref.height()) nyi = ref.height() - 1;
-          if (zi<0) zi = 0; if (nzi<0) nzi = 0;
-          if (zi>=ref.depth()) zi = ref.depth() - 1; if (nzi>=ref.depth()) nzi = ref.depth() - 1;
+          //!!!PROBLEM MISLEADING
+          //!!! if (xi<0) xi = 0; if (nxi<0) nxi = 0;
+          //!!! IS THIS WHAT WAS MEANT?
+          if (xi<0) xi = 0;
+          if (nxi<0) nxi = 0;
+          if (xi>=ref.width()) xi = ref.width() - 1;
+          if (nxi>=ref.width()) nxi = ref.width() - 1;
+          if (yi<0) yi = 0;
+          if (nyi<0) nyi = 0;
+          if (yi>=ref.height()) yi = ref.height() - 1;
+          if (nyi>=ref.height()) nyi = ref.height() - 1;
+          if (zi<0) zi = 0;
+          if (nzi<0) nzi = 0;
+          if (zi>=ref.depth()) zi = ref.depth() - 1;
+          if (nzi>=ref.depth()) nzi = ref.depth() - 1;
           I(0,0,0,0) = (float)ref(xi,yi,zi,0); I(0,0,0,1) = (float)ref(xi,yi,zi,1);
           I(0,0,0,2) = (float)ref(xi,yi,zi,2); I(1,0,0,0) = (float)ref(nxi,yi,zi,0);
           I(1,0,0,1) = (float)ref(nxi,yi,zi,1); I(1,0,0,2) = (float)ref(nxi,yi,zi,2);
@@ -43328,12 +43346,19 @@ namespace cimg_library_suffixed {
           }
         }
 
-        if (X0<0) X0 = 0; if (X0>=width()) X0 = width() - 1;
-        if (Y0<0) Y0 = 0; if (Y0>=height()) Y0 = height() - 1;
-        if (Z0<0) Z0 = 0; if (Z0>=depth()) Z0 = depth() - 1;
-        if (X1<1) X1 = 0; if (X1>=width()) X1 = width() - 1;
-        if (Y1<0) Y1 = 0; if (Y1>=height()) Y1 = height() - 1;
-        if (Z1<0) Z1 = 0; if (Z1>=depth()) Z1 = depth() - 1;
+        //!!! PROBLEM AVOID TWO IFs IN THE SAME LINE
+        if (X0<0) X0 = 0;
+        if (X0>=width()) X0 = width() - 1;
+        if (Y0<0) Y0 = 0;
+        if (Y0>=height()) Y0 = height() - 1;
+        if (Z0<0) Z0 = 0;
+        if (Z0>=depth()) Z0 = depth() - 1;
+        if (X1<1) X1 = 0;
+        if (X1>=width()) X1 = width() - 1;
+        if (Y1<0) Y1 = 0;
+        if (Y1>=height()) Y1 = height() - 1;
+        if (Z1<0) Z1 = 0;
+        if (Z1>=depth()) Z1 = depth() - 1;
 
         // Draw visualization image on the display
         if (mx!=omx || my!=omy || !visu0 || (_depth>1 && !view3d)) {
@@ -52300,7 +52325,9 @@ namespace cimg_library_suffixed {
       }
       else {
         if (new_data) { // Insert with re-allocation.
+          //!!! PROBLEM UNSAFE memcpy
           if (npos) std::memcpy(new_data,_data,sizeof(CImg<T>)*npos);
+          //!!! PROBLEM UNSAFE memcpy
           if (npos!=_width - 1) std::memcpy(new_data + npos + 1,_data + npos,sizeof(CImg<T>)*(_width - 1 - npos));
           if (is_shared && img) {
             new_data[npos]._width = img._width;
@@ -52314,10 +52341,12 @@ namespace cimg_library_suffixed {
             new_data[npos]._data = 0;
             new_data[npos] = img;
           }
+          //!!! PROBLEM UNSAFE memset
           std::memset(_data,0,sizeof(CImg<T>)*(_width - 1));
           delete[] _data;
           _data = new_data;
         } else { // Insert without re-allocation.
+          //!!! PROBLEM UNSAFE memmove
           if (npos!=_width - 1) std::memmove(_data + npos + 1,_data + npos,sizeof(CImg<T>)*(_width - 1 - npos));
           if (is_shared && img) {
             _data[npos]._width = img._width;
@@ -55307,6 +55336,7 @@ namespace cimg_library_suffixed {
           ind = (unsigned int)i; break; // Found empty slot or cached font.
         }
       if (ind==~0U) { // No empty slots nor existing font in cache.
+        //!!! PROBLEM UNSAFE mem* calls
         std::memmove(fonts,fonts + 1,15*sizeof(CImgList<ucharT>));
         std::memmove(is_variable_widths,is_variable_widths + 1,15*sizeof(bool));
         std::memset(fonts + (ind=15),0,sizeof(CImgList<ucharT>));  // Free a slot in cache for new font.

@@ -1,3 +1,5 @@
+/* -*- c-basic-offset: 4 -*- */
+
 #include "Eval.h"
 
 namespace BOSS
@@ -57,7 +59,7 @@ namespace Eval
         auto & finishedUnits = state.getFinishedUnits();
         size_t index = finishedUnitsIndex;
 
-        for (index; index < finishedUnitsIndex + 1; ++index)
+        for (; index < finishedUnitsIndex + 1; ++index)
         {
             ActionType type = state.getUnit(finishedUnits[index]).getType();
             if (!type.isBuilding() && !type.isWorker() && !type.isSupplyProvider())

@@ -1,3 +1,5 @@
+/* -*- c-basic-offset: 4 -*- */
+
 #pragma once
 
 #include "Common.h"
@@ -7,5 +9,5 @@
 namespace BOSS
 {
     void Init(const std::string & filename);
-	void InitializeConstants(const json & j);
+    void InitializeConstants(const json & j);
 }

@@ -1,3 +1,5 @@
+/* -*- c-basic-offset: 4 -*- */
+
 #include "BuildOrder.h"
 
 using namespace BOSS;
@@ -47,11 +49,6 @@ void BuildOrder::clear()
     m_typeCount.clear();
 }
 
-const bool BuildOrder::empty() const
-{
-    return size() == 0;
-}
-
 /*ActionType BuildOrder::getAbilityTargetType(size_t index) const
 {
     return m_abilityTargets.at(index).targetType;
@@ -67,7 +64,7 @@ const AbilityAction & BuildOrder::getAbilityAction(size_t index) const
     return m_abilityTargets.at(index);
 }*/
 
-const size_t BuildOrder::getTypeCount(ActionType type) const
+size_t BuildOrder::getTypeCount(ActionType type) const
 {
     if (empty())
     {
@@ -87,26 +84,6 @@ void BuildOrder::pop_back()
     }
     m_buildOrder.pop_back();
     
-}
-
-ActionType BuildOrder::operator [] (size_t i) const
-{
-    return m_buildOrder[i];
-}
-
-ActionType & BuildOrder::operator [] (size_t i) 
-{
-    return m_buildOrder[i];
-}
-
-ActionType BuildOrder::back() const
-{
-    return m_buildOrder.back();
-}
-
-const size_t BuildOrder::size() const
-{
-    return m_buildOrder.size();
 }
 
 void BuildOrder::sortByPrerequisites()
@@ -176,11 +153,14 @@ std::string BuildOrder::getNameString(size_t charactersPerName, size_t printUpTo
 {
     std::stringstream ss;
 
+#if 0
+    //!!!PROBLEM never true
     if (printUpToIndex == -1)
     {
         printUpToIndex = m_buildOrder.size();
     }
-
+#endif
+    
     for (size_t i(0); i < printUpToIndex; ++i)
     {
         std::string name = charactersPerName == 0 ? m_buildOrder[i].getName() : m_buildOrder[i].getName().substr(0, charactersPerName);;

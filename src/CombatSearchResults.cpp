@@ -1,3 +1,5 @@
+/* -*- c-basic-offset: 4 -*- */
+
 #include "CombatSearchResults.h"
 
 using namespace BOSS;
@@ -11,10 +13,10 @@ CombatSearchResults::CombatSearchResults()
     , nodesExpanded(0)
     , timeElapsed(0)
     , avgBranch(0)
+    , highestEval(0)
     , minerals(0)
     , gas(0)
     , frameCompleted(0)
-    , highestEval(0)
 {
 }
 

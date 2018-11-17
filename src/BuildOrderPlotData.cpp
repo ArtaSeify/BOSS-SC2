@@ -1,3 +1,5 @@
+/* -*- c-basic-offset: 4 -*- */
+
 #include "BuildOrderPlotData.h"
 #include "Eval.h"
 
@@ -96,7 +98,10 @@ void BuildOrderPlotData::calculatePlot()
     for (size_t i(0); i < m_startTimes.size(); ++i)
     {
         int start               = m_startTimes[i];
+#if 0
+        //!!!PROBLEM NOT USED
         int finish              = m_finishTimes[i];
+#endif        
         auto & actionTargetPair = m_buildOrder[i];
         ActionType type = actionTargetPair.first;
 

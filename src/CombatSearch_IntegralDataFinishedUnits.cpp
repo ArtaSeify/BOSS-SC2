@@ -1,10 +1,12 @@
+/* -*- c-basic-offset: 4 -*- */
+
 #include "CombatSearch_IntegralDataFinishedUnits.h"
 
 using namespace BOSS;
 
 CombatSearch_IntegralDataFinishedUnits::CombatSearch_IntegralDataFinishedUnits()
-    : m_bestIntegralValue(0)
-    , m_chronoBoostEntries(0)
+    : m_chronoBoostEntries(0)
+    , m_bestIntegralValue(0)
 {
     m_integralStack.push_back(IntegralDataFinishedUnits());
 }
@@ -82,9 +84,9 @@ void CombatSearch_IntegralDataFinishedUnits::print() const
     print(m_bestIntegralStack, m_bestIntegralGameState, m_bestIntegralBuildOrder);
 }
 
-void CombatSearch_IntegralDataFinishedUnits::printIntegralData(const size_t index, const std::vector<IntegralDataFinishedUnits> & integral_stack, const GameState & state, const BuildOrderAbilities & buildOrder) const
+void CombatSearch_IntegralDataFinishedUnits::printIntegralData(const int index, const std::vector<IntegralDataFinishedUnits> & integral_stack, const GameState & /*!!! PROBLEM UNUSED state */, const BuildOrderAbilities & buildOrder) const
 {
-    printf("%7d %8d %10.2lf %15.2lf %16.2lf   ", integral_stack[index].timeStarted, integral_stack[index].timeFinished, integral_stack[index].eval, integral_stack[index].integral_ToThisPoint, integral_stack[index].integral_UntilFrameLimit);
+  printf("%7d %8d %10.2lf %15.2lf %16.2lf   ", (int)integral_stack[index].timeStarted, (int)integral_stack[index].timeFinished, integral_stack[index].eval, integral_stack[index].integral_ToThisPoint, integral_stack[index].integral_UntilFrameLimit);
     std::cout << buildOrder.getNameString(2, index) << std::endl;
 }
 
@@ -111,22 +113,23 @@ const BuildOrderAbilities & CombatSearch_IntegralDataFinishedUnits::getBestBuild
 
 void CombatSearch_IntegralDataFinishedUnits::pop_back()
 {
+    assert(!m_integralStack.empty());
     m_integralStack.pop_back();
 }
 
 void CombatSearch_IntegralDataFinishedUnits::popFinishedLastOrder(const GameState & prevState, const GameState & currState)
 {
-    size_t chronoBoostsToRemove = currState.getNumberChronoBoostsCast() - prevState.getNumberChronoBoostsCast();
-    m_chronoBoostEntries -= chronoBoostsToRemove;
+  int chronoBoostsToRemove = currState.getNumberChronoBoostsCast() - prevState.getNumberChronoBoostsCast();
+  m_chronoBoostEntries -= chronoBoostsToRemove;
 
-    size_t numRemove = (currState.getFinishedUnits().size() - prevState.getFinishedUnits().size()) + chronoBoostsToRemove;
+  int numRemove = (int)((currState.getFinishedUnits().size() - prevState.getFinishedUnits().size()) + chronoBoostsToRemove);
 
-    BOSS_ASSERT(numRemove < m_integralStack.size(), "Removing %d elements from integral stack when it has %d elements", numRemove, m_integralStack.size());
+  BOSS_ASSERT(numRemove < (int)m_integralStack.size(), "Removing %d elements from integral stack when it has %d elements", numRemove, m_integralStack.size());
 
-    for (size_t pop_times = 0; pop_times < numRemove; ++pop_times)
-    {
-        pop_back();
-    }
+  for (int pop_times = 0; pop_times < numRemove; ++pop_times)
+  {
+    pop_back();
+  }
 }
 
 // creates a build order based on the unit finished times
@@ -135,7 +138,7 @@ BuildOrderAbilities CombatSearch_IntegralDataFinishedUnits::createBuildOrderEndT
     BuildOrderAbilities buildOrder;
     auto & finishedUnits = state.getFinishedUnits();
     auto & chronoBoostTargets = state.getChronoBoostTargets();
-    size_t chronoboosts = 0;
+    int chronoboosts = 0;
     for (size_t index = 0; index < integral_stack.size() - 1; ++index)
     {
         const AbilityAction & current_ability = chronoBoostTargets[chronoboosts];

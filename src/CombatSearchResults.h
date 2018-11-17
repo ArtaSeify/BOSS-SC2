@@ -1,3 +1,5 @@
+/* -*- c-basic-offset: 4 -*- */
+
 #pragma once
 
 #include "Common.h"
@@ -7,40 +9,40 @@
 
 namespace BOSS
 {
-class CombatSearchResults
-{
+    class CombatSearchResults
+    {
 
-public:
+    public:
 
-    bool                solved;			// whether ot not a solution was found
-    bool                timedOut;		// did the search time-out?
+        bool                solved;			// whether ot not a solution was found
+        bool                timedOut;		// did the search time-out?
 
-    int                 solutionLength;	// the length of the solution
-    int                 upperBound;		// upper bound of first node
-    int                 lowerBound;		// lower bound of first node
+        int                 solutionLength;	// the length of the solution
+        int                 upperBound;		// upper bound of first node
+        int                 lowerBound;		// lower bound of first node
 
-    unsigned long long  nodesExpanded;	// number of nodes expanded in the search
+        unsigned long long  nodesExpanded;	// number of nodes expanded in the search
 
-    double              timeElapsed;	// time elapsed in milliseconds
-    double              avgBranch;		// avg branching factor
+        double              timeElapsed;	// time elapsed in milliseconds
+        double              avgBranch;		// avg branching factor
 
-    Timer               searchTimer;         
+        Timer               searchTimer;         
 
-    GameState           winner;
+        GameState           winner;
 
-    std::vector<ActionType> buildOrder;		// the build order
+        std::vector<ActionType> buildOrder;		// the build order
 
-    double              highestEval;
+        double              highestEval;
 
-    double              minerals;
-    double              gas;
+        double              minerals;
+        double              gas;
 
-    int                 frameCompleted;
+        int                 frameCompleted;
 
-    CombatSearchResults();
-    CombatSearchResults(bool s,int len,unsigned long long n,double t,std::vector<ActionType> solution);
+        CombatSearchResults();
+        CombatSearchResults(bool s,int len,unsigned long long n,double t,std::vector<ActionType> solution);
 
-    void printResults(bool pbo = true);
-    void printBuildOrder();
-};
+        void printResults(bool pbo = true);
+        void printBuildOrder();
+    };
 }

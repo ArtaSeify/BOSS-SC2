@@ -1,3 +1,5 @@
+/* -*- c-basic-offset: 4 -*- */
+
 #pragma once
 
 #include "Common.h"
@@ -6,15 +8,15 @@
 
 namespace BOSS
 {
-namespace Eval
-{
-    //double ArmyCompletedResourceSum(const GameState & state);
-    double ArmyTotalResourceSum(const GameState & state);
-    double ArmyResourceSumToIndex(const GameState & state, size_t finishedUnitsIndex);
+    namespace Eval
+    {
+        //double ArmyCompletedResourceSum(const GameState & state);
+        double ArmyTotalResourceSum(const GameState & state);
+        double ArmyResourceSumToIndex(const GameState & state, int finishedUnitsIndex);
 
-    bool BuildOrderBetter(const BuildOrderAbilities & buildOrder, const BuildOrderAbilities & compareTo);
-    bool StateBetter(const GameState & state, const GameState & compareTo);
+        bool BuildOrderBetter(const BuildOrderAbilities & buildOrder, const BuildOrderAbilities & compareTo);
+        bool StateBetter(const GameState & state, const GameState & compareTo);
 
-    bool StateDominates(const GameState & state, const GameState & other);
-}
+        bool StateDominates(const GameState & state, const GameState & other);
+    }
 }

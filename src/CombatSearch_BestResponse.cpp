@@ -1,3 +1,5 @@
+/* -*- c-basic-offset: 4 -*- */
+
 #include "CombatSearch_BestResponse.h"
 
 using namespace BOSS;
@@ -49,7 +51,7 @@ void CombatSearch_BestResponse::printResults()
 }
 
 #include "BuildOrderPlotter.h"
-void CombatSearch_BestResponse::writeResultsFile(const std::string & dir, const std::string & filename)
+void CombatSearch_BestResponse::writeResultsFile(const std::string & dir, const std::string & /*!!! PROBLEM NOT USED filename */)
 {
     BuildOrderPlotter plot;
     plot.setOutputDir(dir);

@@ -1,3 +1,5 @@
+/* -*- c-basic-offset: 4 -*- */
+
 #include "CombatSearch_BestResponseData.h"
 
 using namespace BOSS;
@@ -41,11 +43,11 @@ double CombatSearch_BestResponseData::compareBuildOrder(const GameState & initia
 {
     calculateArmyValues(initialState, buildOrder, m_selfArmyValues);
 
-    size_t selfIndex = 0;
-    size_t enemyIndex = 0;
+    //!!! PROBLEM NOT USED size_t selfIndex = 0; 
+    //!!! PROBLEM NOT USED size_t enemyIndex = 0;
     double maxDiff = std::numeric_limits<double>::lowest();
-    double sumDiff = 0;
-    int n = 0;
+    //!!! PROBLEM NOT USED double sumDiff = 0;
+    //!!! PROBLEM NOT USED int n = 0;
 
     for (size_t ei(0); ei < m_enemyArmyValues.size(); ++ei)
     {

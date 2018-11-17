@@ -1,3 +1,5 @@
+/* -*- c-basic-offset: 4 -*- */
+
 #pragma once
 
 #include "BOSS.h"
@@ -7,32 +9,32 @@
 namespace BOSS
 {
 
-class BuildOrderPlotter
-{
-    std::vector<std::string>        m_buildOrderNames;
-    std::string                     m_outputDir;
-    std::vector<BuildOrderPlotData> m_allPlots;
+    class BuildOrderPlotter
+    {
+        std::vector<std::string>        m_buildOrderNames;
+        std::string                     m_outputDir;
+        std::vector<BuildOrderPlotData> m_allPlots;
 
-public:
+    public:
 
-    BuildOrderPlotter();
-    //BuildOrderPlotter(const std::string & name, const json & j);
+        BuildOrderPlotter();
+        //BuildOrderPlotter(const std::string & name, const json & j);
     
-    void addPlot(const std::string & name, const GameState & state, const BuildOrderAbilities & buildOrder);
-    void doPlots();
+        void addPlot(const std::string & name, const GameState & state, const BuildOrderAbilities & buildOrder);
+        void doPlots();
 
-    const std::vector<BuildOrderPlotData> & getPlots() const;
+        const std::vector<BuildOrderPlotData> & getPlots() const;
 
-    void setOutputDir(const std::string & dir);
+        void setOutputDir(const std::string & dir);
 
-    void writeResourcePlot(const BuildOrderPlotData & plot, const std::string & filename);
-    void writeArmyValuePlot(const BuildOrderPlotData & plot, const std::string & filename);
-    void writeBuildOrderPlot(const std::vector<BuildOrderPlotData> & plots, const std::string & filename);
+        void writeResourcePlot(const BuildOrderPlotData & plot, const std::string & filename);
+        void writeArmyValuePlot(const BuildOrderPlotData & plot, const std::string & filename);
+        void writeBuildOrderPlot(const std::vector<BuildOrderPlotData> & plots, const std::string & filename);
 
-    std::string getPlotJSON(const std::vector<BuildOrderPlotData> & plots);
+        std::string getPlotJSON(const std::vector<BuildOrderPlotData> & plots);
     
-    static std::string GetFileNameFromPath(const std::string & path);
-    static std::string RemoveFileExtension(const std::string & path);
-    static void WriteGnuPlot(const std::string & filename, const std::string & data, const std::string & args);
-};
+        static std::string GetFileNameFromPath(const std::string & path);
+        static std::string RemoveFileExtension(const std::string & path);
+        static void WriteGnuPlot(const std::string & filename, const std::string & data, const std::string & args);
+    };
 }

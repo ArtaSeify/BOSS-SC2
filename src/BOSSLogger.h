@@ -1,3 +1,5 @@
+/* -*- c-basic-offset: 4 -*- */
+
 #pragma once
 
 #include <string>
@@ -6,9 +8,9 @@
 
 namespace BOSS
 {
-namespace Logger 
-{
-    void LogAppendToFile(const std::string & logFile, const std::string & msg);
-    void LogOverwriteToFile(const std::string & logFile, const std::string & msg);
-};
+    namespace Logger 
+    {
+        void LogAppendToFile(const std::string & logFile, const std::string & msg);
+        void LogOverwriteToFile(const std::string & logFile, const std::string & msg);
+    };
 }

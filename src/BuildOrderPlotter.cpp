@@ -1,3 +1,5 @@
+/* -*- c-basic-offset: 4 -*- */
+
 #include "BuildOrderPlotter.h"
 #include "BOSSConfig.h"
 

@@ -1,3 +1,5 @@
+/* -*- c-basic-offset: 4 -*- */
+
 #pragma once
 
 #include "BuildOrderAbilities.h"
@@ -8,40 +10,40 @@
 namespace BOSS
 {
 
-class BucketData
-{
-public:
-    double                      eval;
-    BuildOrderAbilities         buildOrder;
-    GameState                   state;
-
-    BucketData()
-        : eval(0)
+    class BucketData
     {
-    }
-};
+    public:
+        double                      eval;
+        BuildOrderAbilities         buildOrder;
+        GameState                   state;
 
-class CombatSearch_BucketData
-{
-    std::vector<BucketData>     m_buckets;
-    int                         m_frameLimit;
+        BucketData()
+            : eval(0)
+        {
+        }
+    };
 
-    BucketData & getBucketData(const GameState & state);
+    class CombatSearch_BucketData
+    {
+        std::vector<BucketData>     m_buckets;
+        int                         m_frameLimit;
 
-public:
+        BucketData & getBucketData(const GameState & state);
 
-    CombatSearch_BucketData(const int frameLimit, const size_t numBuckets);
+    public:
 
-    const BucketData & getBucket(const size_t index) const;
-    const size_t numBuckets() const;
-    const size_t getBucketIndex(const GameState & state) const;
+        CombatSearch_BucketData(const int frameLimit, const size_t numBuckets);
+
+        const BucketData & getBucket(const size_t index) const;
+        size_t numBuckets() const;
+        size_t getBucketIndex(const GameState & state) const;
         
-    void update(const GameState & state, const BuildOrderAbilities & buildOrder);
+        void update(const GameState & state, const BuildOrderAbilities & buildOrder);
 
-    bool isDominated(const GameState & state);
+        bool isDominated(const GameState & state);
 
-    void print() const;
-    std::string getBucketResultsString();
-};
+        void print() const;
+        std::string getBucketResultsString();
+    };
 
 }

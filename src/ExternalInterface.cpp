@@ -1,3 +1,5 @@
+/* -*- c-basic-offset: 4 -*- */
+
 #ifdef EMSCRIPTEN
 
 #include "BOSS.h"

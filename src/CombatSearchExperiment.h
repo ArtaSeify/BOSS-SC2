@@ -1,3 +1,5 @@
+/* -*- c-basic-offset: 4 -*- */
+
 #pragma once
 
 #include "BOSS.h"
@@ -8,22 +10,22 @@
 namespace BOSS
 {
 
-class CombatSearchExperiment
-{
-    std::string                 m_name;
-    std::string                 m_outputDir;
-    CombatSearchParameters      m_params;
-    RaceID                      m_race;
-    std::vector<std::string>    m_searchTypes;
+    class CombatSearchExperiment
+    {
+        std::string                 m_name;
+        std::string                 m_outputDir;
+        CombatSearchParameters      m_params;
+        RaceID                      m_race;
+        std::vector<std::string>    m_searchTypes;
 
-    RaceID                      m_enemyRace;
-    BuildOrderAbilities         m_enemyBuildOrder;
+        //!!! PROBLEM UNUSED RaceID                      m_enemyRace;
+        BuildOrderAbilities         m_enemyBuildOrder;
 
-public:
+    public:
 
-    CombatSearchExperiment();
-    CombatSearchExperiment(const std::string & name, const json & experimentVal);
+        CombatSearchExperiment();
+        CombatSearchExperiment(const std::string & name, const json & experimentVal);
 
-    void run();
-};
+        void run();
+    };
 }

@@ -1,3 +1,5 @@
+/* -*- c-basic-offset: 4 -*- */
+
 #include "CombatSearch_BucketData.h"
 
 using namespace BOSS;
@@ -16,12 +18,12 @@ CombatSearch_BucketData::CombatSearch_BucketData(const int frameLimit, const siz
     
 }
 
-const size_t CombatSearch_BucketData::numBuckets() const
+size_t CombatSearch_BucketData::numBuckets() const
 {
     return m_buckets.size();
 }
 
-const size_t CombatSearch_BucketData::getBucketIndex(const GameState & state) const
+size_t CombatSearch_BucketData::getBucketIndex(const GameState & state) const
 {
     return (size_t)(((double)state.getCurrentFrame() / (double)m_frameLimit) * m_buckets.size());
 }
@@ -112,7 +114,7 @@ std::string CombatSearch_BucketData::getBucketResultsString()
             maxEval = m_buckets[b].eval;
 
             double frame = ((double)b / m_buckets.size()) * m_frameLimit;
-            double sec   = frame / 24;
+            //!!! PROBLEM NOT USED double sec   = frame / 24;
 
             ss << frame << " " << m_buckets[b].eval << std::endl;
         }

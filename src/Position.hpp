@@ -28,37 +28,37 @@ public:
     }
 
 
-    const bool operator < (const Position & rhs) const
+    bool operator < (const Position & rhs) const
     {
         return (x() < rhs.x()) || ((x() == rhs.x()) && y() < rhs.y());
     }
 
-    const bool operator == (const Position & rhs) const
+    bool operator == (const Position & rhs) const
     {
         return x() == rhs.x() && y() == rhs.y();
     }
 
-    const Position operator + (const Position & rhs) const
+    Position operator + (const Position & rhs) const
     {
         return Position(x() + rhs.x(), y() + rhs.y());
     }
 
-    const Position operator - (const Position & rhs) const
+    Position operator - (const Position & rhs) const
     {
         return Position(x() - rhs.x(), y() - rhs.y());
     }
 
-    const Position operator / (const PositionType & d) const
+    Position operator / (const PositionType & d) const
     {
         return Position(_x / d, _y / d);
     }
 
-    const Position operator * (const PositionType & d) const
+    Position operator * (const PositionType & d) const
     {
         return Position(_x * d, _y * d);
     }
 
-    const Position scale(const float & f) const
+    Position scale(const float & f) const
     {
         return Position((PositionType)(f * x()), (PositionType)(f * y()));
     }
@@ -99,27 +99,27 @@ public:
         _y = y;
     }
 
-    const PositionType x() const
+    PositionType x() const
     {
         return _x;
     }
 
-    const PositionType y() const
+    PositionType y() const
     {
         return _y;
     }
 
-    const Position flipX() const
+    Position flipX() const
     {
         return Position(-_x,_y);
     }
 
-    const Position flipY() const
+    Position flipY() const
     {
         return Position(_y,_x);
     }
 
-    const float Q_rsqrt( float number ) const
+    float Q_rsqrt( float number ) const
     {
         long i;
         float x2, y;
@@ -136,12 +136,12 @@ public:
         return y;
     }
 
-    const Position flip() const
+    Position flip() const
     {
         return Position(-_x, -_y);
     }
 
-    inline const PositionType getDistance(const Position & p) const 
+    PositionType getDistance(const Position & p) const 
     {
         PositionType dX = x() - p.x();
         PositionType dY = y() - p.y();
@@ -160,7 +160,7 @@ public:
         }
      }
 
-    inline const PositionType getDistanceSq(const Position & p) const 
+    PositionType getDistanceSq(const Position & p) const 
     {
         return (x()-p.x())*(x()-p.x()) + (y()-p.y())*(y()-p.y());
     }
@@ -170,7 +170,7 @@ public:
         printf("Position = (%d, %d)\n", _x, _y);
     }
 
-    const std::string getString() const
+    std::string getString() const
     {
         std::stringstream ss;
         ss << "(" << x() << ", " << y() << ")";

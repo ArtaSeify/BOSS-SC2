@@ -1,3 +1,5 @@
+/* -*- c-basic-offset: 4 -*- */
+
 #include "DFBB_BuildOrderSearchParameters.h"
 
 using namespace BOSS;
@@ -5,7 +7,9 @@ using namespace BOSS;
 // alternate constructor
 DFBB_BuildOrderSearchParameters::DFBB_BuildOrderSearchParameters()
     : m_useRepetitions(true)
+    , m_repetitionValues(ActionTypes::GetAllActionTypes().size(), 1)
     , m_useIncreasingRepetitions(false)
+    , m_repetitionThresholds(ActionTypes::GetAllActionTypes().size(), 0)
     , m_useAlwaysMakeWorkers(false)
     , m_useSupplyBounding(false)
     , m_supplyBoundingThreshold(1)
@@ -13,34 +17,31 @@ DFBB_BuildOrderSearchParameters::DFBB_BuildOrderSearchParameters()
     , m_useResourceLowerBoundHeuristic(true)
     , m_searchTimeLimit(0)
     , m_initialUpperBound(0)
-    , m_repetitionValues(ActionTypes::GetAllActionTypes().size(), 1)
-    , m_repetitionThresholds(ActionTypes::GetAllActionTypes().size(), 0)
 {
-    
 }
 
-void DFBB_BuildOrderSearchParameters::setRepetitions(ActionType a, const size_t & repetitions)
+void DFBB_BuildOrderSearchParameters::setRepetitions(ActionType a, int repetitions)
 { 
     BOSS_ASSERT(a.getID() >= 0 && a.getID() < m_repetitionValues.size(), "Action type not valid");
 
     m_repetitionValues[a.getID()] = repetitions; 
 }
 
-void DFBB_BuildOrderSearchParameters::setRepetitionThreshold(ActionType a, const size_t & thresh)	
+void DFBB_BuildOrderSearchParameters::setRepetitionThreshold(ActionType a, int thresh)	
 { 
     BOSS_ASSERT(a.getID() >= 0 && a.getID() < m_repetitionThresholds.size(), "Action type not valid");
 
     m_repetitionThresholds[a.getID()] = thresh; 
 }
 
-const size_t & DFBB_BuildOrderSearchParameters::getRepetitions(ActionType a)
+int DFBB_BuildOrderSearchParameters::getRepetitions(ActionType a)
 { 
     BOSS_ASSERT(a.getID() >= 0 && a.getID() < m_repetitionValues.size(), "Action type not valid");
 
     return m_repetitionValues[a.getID()]; 
 }
 
-const size_t & DFBB_BuildOrderSearchParameters::getRepetitionThreshold(ActionType a)				
+int DFBB_BuildOrderSearchParameters::getRepetitionThreshold(ActionType a)				
 { 
     BOSS_ASSERT(a.getID() >= 0 && a.getID() < m_repetitionThresholds.size(), "Action type not valid");
 

@@ -1,3 +1,5 @@
+/* -*- c-basic-offset: 4 -*- */
+
 #include "BOSS.h"
 #include "ActionType.h"
 #include "ActionTypeData.h"

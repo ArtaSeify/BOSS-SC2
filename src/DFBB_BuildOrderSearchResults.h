@@ -1,3 +1,5 @@
+/* -*- c-basic-offset: 4 -*- */
+
 #pragma once
 
 #include "Common.h"
@@ -7,16 +9,16 @@
 
 namespace BOSS
 {
-class DFBB_BuildOrderSearchResults
-{
+    class DFBB_BuildOrderSearchResults
+    {
 
-public:
+    public:
    
 	BuildOrder                  buildOrder;		// the build order
 
 	bool 				        solved;			// whether ot not a solution was found
-    bool    			        timedOut;		// did the search time-out?
-    bool                        solutionFound;  // did we find any solution
+        bool    			        timedOut;		// did the search time-out?
+        bool                        solutionFound;  // did we find any solution
 	
 	int					        upperBound;		// upper bound of first node
 	
@@ -24,11 +26,11 @@ public:
 	
 	double 				        timeElapsed;	// time elapsed in milliseconds
 
-    GameState                   finalState;
+        GameState                   finalState;
 	
 	DFBB_BuildOrderSearchResults();
 		
 	void printResults(bool pbo = true) const;
 	void printBuildOrder() const;
-};
+    };
 }

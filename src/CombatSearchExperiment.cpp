@@ -1,3 +1,5 @@
+/* -*- c-basic-offset: 4 -*- */
+
 #include "CombatSearchExperiment.h"
 #include "CombatSearch.h"
 #include "CombatSearch_Bucket.h"
@@ -14,8 +16,8 @@ CombatSearchExperiment::CombatSearchExperiment()
 }
 
 CombatSearchExperiment::CombatSearchExperiment(const std::string & name, const json & val)
-    : m_race(Races::None)
-    , m_name(name)
+  : m_name(name)
+  , m_race(Races::None)
 {
     BOSS_ASSERT(val.count("SearchTypes") && val["SearchTypes"].is_array(), "CombatSearchExperiment must have a 'SearchTypes' array");
     for (size_t i(0); i < val["SearchTypes"].size(); ++i)
