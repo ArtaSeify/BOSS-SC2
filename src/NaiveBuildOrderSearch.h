@@ -13,13 +13,13 @@ namespace BOSS
 
 class NaiveBuildOrderSearch
 {
-    GameState                   m_state;
-    BuildOrderSearchGoal        m_goal;
-    BuildOrder                  m_buildOrder;
+    GameState m_state;
+    BuildOrderSearchGoal m_goal;
+    BuildOrder m_buildOrder;
 
-    bool                        m_naiveSolved;
+    bool m_naiveSolved;
 
-    bool                        checkUnsolvable();
+    bool checkUnsolvable();
 
 public:
 

@@ -13,11 +13,11 @@ namespace BOSS
     class IntegralData
     {
     public:
-        double  eval;
-        double  integral;
-        int     timeAdded;
+        float  eval;
+        float  integral;
+        int    timeAdded;
 
-        IntegralData(double e, double i, int t)
+        IntegralData(float e, float i, int t)
             : eval(e)
             , integral(i)
             , timeAdded(t)
@@ -36,12 +36,11 @@ namespace BOSS
 
     class CombatSearch_IntegralData
     {
-        std::vector<IntegralData>       m_integralStack;
-
-        std::vector<IntegralData>       m_bestIntegralStack;
-        double                          m_bestIntegralValue;
-        BuildOrderAbilities             m_bestIntegralBuildOrder;
-        GameState                       m_bestIntegralGameState;
+        std::vector<IntegralData> m_integralStack;
+        std::vector<IntegralData> m_bestIntegralStack;
+        float                     m_bestIntegralValue;
+        BuildOrderAbilities       m_bestIntegralBuildOrder;
+        GameState                 m_bestIntegralGameState;
 
     public:
 
@@ -50,7 +49,7 @@ namespace BOSS
         void update(const GameState & state, const BuildOrderAbilities & buildOrder);
         void pop_back();
 
-        void printIntegralData(const size_t index) const;
+        void printIntegralData(size_t index) const;
         void print() const;
 
         const BuildOrderAbilities & getBestBuildOrder() const;

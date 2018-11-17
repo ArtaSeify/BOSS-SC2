@@ -19,7 +19,7 @@ namespace Tools
     void        InsertActionIntoBuildOrder(BuildOrder & result, const BuildOrder & buildOrder, const GameState & initialState, ActionType action);
     void        CalculatePrerequisitesRequiredToBuild(const GameState & state, const ActionSetAbilities & wanted, ActionSetAbilities & requiredToBuild);
     BuildOrder  GetOptimizedNaiveBuildOrderOld(const GameState & state, const BuildOrderSearchGoal & goal);
-    BuildOrder  GetNaiveBuildOrderAddWorkersOld(const GameState & state, const BuildOrderSearchGoal & goal, size_t maxWorkers);
+    BuildOrder  GetNaiveBuildOrderAddWorkersOld(const GameState & state, const BuildOrderSearchGoal & goal, int maxWorkers);
     int         GetBuildOrderCompletionTime(const GameState & state, const BuildOrder & buildOrder);
     void        DoBuildOrder(GameState & state, const BuildOrder & buildOrder);
     void        DoBuildOrder(GameState & state, const BuildOrderAbilities & buildOrder);

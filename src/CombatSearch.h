@@ -28,7 +28,7 @@ namespace BOSS
 
         BuildOrderAbilities         m_buildOrder;
 
-        virtual void recurse(const GameState & s, size_t depth);
+        virtual void recurse(const GameState & s, int depth);
         virtual void generateLegalActions(const GameState & state, ActionSetAbilities & legalActions, const CombatSearchParameters & params);
 
         //virtual double              eval(const GameState & state) const;

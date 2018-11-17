@@ -33,7 +33,7 @@ bool BuildOrderSearchGoal::operator == (const BuildOrderSearchGoal & g)
     return true;
 }
 
-void BuildOrderSearchGoal::setGoal(ActionType a, const size_t num)
+void BuildOrderSearchGoal::setGoal(ActionType a, int num)
 {
     BOSS_ASSERT(a.getID() >= 0 && a.getID() < m_goalUnits.size(), "Action type not valid");
 
@@ -55,7 +55,7 @@ bool BuildOrderSearchGoal::hasGoal() const
     return false;
 }
 
-void BuildOrderSearchGoal::setGoalMax(ActionType a, const size_t num)
+void BuildOrderSearchGoal::setGoalMax(ActionType a, int num)
 {
     BOSS_ASSERT(a.getID() >= 0 && a.getID() < m_goalUnitsMax.size(), "Action type not valid");
 

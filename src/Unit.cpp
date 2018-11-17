@@ -178,7 +178,7 @@ void Unit::applyChronoBoost(TimeType time, Unit & unitBeingProduced)
     BOSS_ASSERT(unitBeingProduced.getTimeUntilBuilt() > 0, "Chrono Boost used on target that is not producing anything");
 
     // Chrono Boost speeds up production by 50%
-    uint2 newTimeUntilFree = (uint2)std::ceil(m_timeUntilFree / 1.5);
+    int newTimeUntilFree = (int)std::ceil(m_timeUntilFree / 1.5);
     // make changes to remaining production time and chronoboost time
     if (m_timeChronoBoost >= newTimeUntilFree)
     {
@@ -186,7 +186,7 @@ void Unit::applyChronoBoost(TimeType time, Unit & unitBeingProduced)
     }
     else
     {
-        newTimeUntilFree = (uint2)std::ceil(m_timeUntilFree - (m_timeChronoBoost / 2.0));
+        newTimeUntilFree = (int)std::ceil(m_timeUntilFree - (m_timeChronoBoost / 2.0));
         m_timeChronoBoost = 0;
     }
 

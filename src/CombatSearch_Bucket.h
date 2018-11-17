@@ -18,11 +18,11 @@ namespace BOSS
     {
         CombatSearch_BucketData     m_bucket;
 
-    virtual void                recurse(const GameState & s, size_t depth);
+	virtual void                recurse(const GameState & s, int depth);
 
     public:
-    
-    CombatSearch_Bucket(const CombatSearchParameters p = CombatSearchParameters());
+	
+	CombatSearch_Bucket(const CombatSearchParameters p = CombatSearchParameters());
 
         virtual void printResults();
         virtual void writeResultsFile(const std::string & dir, const std::string & filename);

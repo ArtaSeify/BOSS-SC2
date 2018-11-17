@@ -13,9 +13,9 @@ namespace BOSS
     class BucketData
     {
     public:
-        double                      eval;
-        BuildOrderAbilities         buildOrder;
-        GameState                   state;
+        float eval;
+        BuildOrderAbilities buildOrder;
+        GameState state;
 
         BucketData()
             : eval(0)
@@ -25,14 +25,14 @@ namespace BOSS
 
     class CombatSearch_BucketData
     {
-        std::vector<BucketData>     m_buckets;
-        int                         m_frameLimit;
+        std::vector<BucketData> m_buckets;
+        int m_frameLimit;
 
         BucketData & getBucketData(const GameState & state);
 
     public:
 
-        CombatSearch_BucketData(int frameLimit, size_t numBuckets);
+        CombatSearch_BucketData(int frameLimit, int numBuckets);
 
         const BucketData & getBucket(size_t index) const;
         size_t numBuckets() const;

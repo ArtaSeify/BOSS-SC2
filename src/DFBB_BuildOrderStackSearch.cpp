@@ -15,7 +15,7 @@ DFBB_BuildOrderStackSearch::DFBB_BuildOrderStackSearch(const DFBB_BuildOrderSear
 {
 }
 
-void DFBB_BuildOrderStackSearch::setTimeLimit(double ms)
+void DFBB_BuildOrderStackSearch::setTimeLimit(float ms)
 {
     m_params.m_searchTimeLimit = ms;
 }
@@ -126,7 +126,7 @@ void DFBB_BuildOrderStackSearch::generateLegalActions(const GameState & state, A
         for (size_t a(0); a < legalActions.size(); ++a)
         {
             ActionType actionType = legalActions[a];
-            int whenCanPerformAction = state.whenCanBuild(actionType);
+            const int whenCanPerformAction = state.whenCanBuild(actionType);
             if (whenCanPerformAction < workerReady)
             {
                 actionLegalBeforeWorker = true;
@@ -225,7 +225,7 @@ SEARCH_BEGIN:
     }
 
     generateLegalActions(STATE, LEGAL_ACTIONS);
-    for (CHILD_NUM = 0; CHILD_NUM < int(LEGAL_ACTIONS.size()); ++CHILD_NUM)
+    for (CHILD_NUM = 0; CHILD_NUM < (int)LEGAL_ACTIONS.size(); ++CHILD_NUM)
     {
         ACTION_TYPE = LEGAL_ACTIONS[CHILD_NUM];
 
@@ -244,6 +244,7 @@ SEARCH_BEGIN:
         // do the action as many times as legal to to 'repeat'
         CHILD_STATE = STATE;
         COMPLETED_REPS = 0;
+
         for (; COMPLETED_REPS < REPETITIONS; ++COMPLETED_REPS)
         {
             if (CHILD_STATE.isLegal(ACTION_TYPE))

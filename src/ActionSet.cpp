@@ -7,7 +7,6 @@ using namespace BOSS;
 
 ActionSet::ActionSet()
 {
-
 }
 
 size_t ActionSet::size() const

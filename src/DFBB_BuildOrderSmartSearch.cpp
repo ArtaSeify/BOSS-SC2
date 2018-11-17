@@ -26,10 +26,10 @@ void DFBB_BuildOrderSmartSearch::doSearch()
         calculateSearchSettings();
         m_params.m_goal                     = m_goal;
         m_params.m_initialState             = m_initialState;
-        m_params.m_useRepetitions 			= true;
+        m_params.m_useRepetitions           = true;
         m_params.m_useIncreasingRepetitions = true;
-        m_params.m_useAlwaysMakeWorkers 	= true;
-        m_params.m_useSupplyBounding 		= true;
+        m_params.m_useAlwaysMakeWorkers     = true;
+        m_params.m_useSupplyBounding        = true;
         m_params.m_supplyBoundingThreshold  = 1.5;
         m_params.m_relevantActions          = m_relevantActions;
         m_params.m_searchTimeLimit          = m_searchTimeLimit;
@@ -59,7 +59,7 @@ void DFBB_BuildOrderSmartSearch::calculateSearchSettings()
     m_goal.setGoalMax(resourceDepot, m_initialState.getNumTotal(resourceDepot));
 
     // set the number of refineries
-    m_goal.setGoalMax(refinery, std::min(size_t(3), calculateRefineriesRequired()));
+    m_goal.setGoalMax(refinery, std::min(3, calculateRefineriesRequired()));
 
     // set the maximum number of workers to an initial ridiculously high upper bound
     m_goal.setGoalMax(worker, std::min(m_initialState.getNumTotal(worker) + 20u, 100u));
@@ -89,7 +89,7 @@ void DFBB_BuildOrderSmartSearch::calculateSearchSettings()
 }
 
 // calculates maximum number of refineries we'll need
-size_t DFBB_BuildOrderSmartSearch::calculateRefineriesRequired()
+int DFBB_BuildOrderSmartSearch::calculateRefineriesRequired()
 {
     ActionType refinery      = ActionTypes::GetRefinery(getRace());
     ActionType resourceDepot = ActionTypes::GetResourceDepot(getRace());
@@ -130,7 +130,7 @@ void DFBB_BuildOrderSmartSearch::setPrerequisiteGoalMax()
         }
 
         // vector which stores the number of goal units which are built by [index]
-        std::vector<size_t> numGoalUnitsBuiltBy(ActionTypes::GetAllActionTypes().size(), 0);
+        std::vector<int> numGoalUnitsBuiltBy(ActionTypes::GetAllActionTypes().size(), 0);
 
         for (ActionID a(0); a < numGoalUnitsBuiltBy.size(); ++a)
         {
@@ -146,7 +146,7 @@ void DFBB_BuildOrderSmartSearch::setPrerequisiteGoalMax()
             }
         }
 
-        size_t additionalProductionBuildingLimit = 2;
+        int additionalProductionBuildingLimit = 2;
 
         for (ActionID a(0); a < numGoalUnitsBuiltBy.size(); ++a)
         {
@@ -223,7 +223,7 @@ void DFBB_BuildOrderSmartSearch::setRelevantActions()
     }
 }
 
-size_t DFBB_BuildOrderSmartSearch::calculateSupplyProvidersRequired()
+int DFBB_BuildOrderSmartSearch::calculateSupplyProvidersRequired()
 {
     ActionType resourceDepot    = ActionTypes::GetResourceDepot(getRace());
     ActionType worker           = ActionTypes::GetWorker(getRace());
@@ -240,13 +240,13 @@ size_t DFBB_BuildOrderSmartSearch::calculateSupplyProvidersRequired()
     }
 
     // set the upper bound on supply based on these values
-    size_t supplyFromResourceDepots = m_initialState.getNumTotal(resourceDepot) * resourceDepot.supplyProvided();
+    int supplyFromResourceDepots = m_initialState.getNumTotal(resourceDepot) * resourceDepot.supplyProvided();
 
     // take this away from the supply needed
     supplyNeeded -= supplyFromResourceDepots;
 
     // return the number of supply providers required
-    return supplyNeeded > 0 ? (size_t)std::ceil((double)supplyNeeded / (double)supplyProvider.supplyProvided()) : 0;
+    return supplyNeeded > 0 ? (int)std::ceil((double)supplyNeeded / (double)supplyProvider.supplyProvided()) : 0;
 }
 
 void DFBB_BuildOrderSmartSearch::setRepetitions()
@@ -273,7 +273,7 @@ void DFBB_BuildOrderSmartSearch::setRepetitions()
     }
 }
 
-void DFBB_BuildOrderSmartSearch::addGoal(ActionType a, size_t count)
+void DFBB_BuildOrderSmartSearch::addGoal(ActionType a, int count)
 {
     m_goal.setGoal(a,count);
 }
@@ -309,11 +309,11 @@ const DFBB_BuildOrderSearchParameters & DFBB_BuildOrderSmartSearch::getParameter
     calculateSearchSettings();
 
     m_params.m_goal = m_goal;
-    m_params.m_initialState                = m_initialState;
-    m_params.m_useRepetitions 				= true;
-    m_params.m_useIncreasingRepetitions 	= true;
-    m_params.m_useAlwaysMakeWorkers 		= true;
-    m_params.m_useSupplyBounding 			= true;
+    m_params.m_initialState = m_initialState;
+    m_params.m_useRepetitions = true;
+    m_params.m_useIncreasingRepetitions = true;
+    m_params.m_useAlwaysMakeWorkers = true;
+    m_params.m_useSupplyBounding = true;
 
     return m_params;
 }

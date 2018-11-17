@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include <stdio.h>
-#include <math.h>
+#include <cstdio>
+#include <cmath>
 #include <fstream>
 #include <fstream>
 #include <iostream>
@@ -21,18 +21,22 @@ using json = nlohmann::json;
 
 namespace BOSS
 {
-    typedef unsigned char   uint1;
-    typedef unsigned short  uint2;
-    typedef unsigned int    uint4;
-    typedef signed char     int1;
-    typedef signed short    int2;
-    typedef signed int      int4;
+    using uint1 = unsigned char;
+    using uint2 = unsigned short;
+    using uint4 = unsigned int;
+    using uint8 = unsigned long long int;
 
-    using ActionID  = uint2;
-    using RaceID    = uint1;
-    using TimeType  = int4;
-    using NumUnits  = int2;
-    using FracType  = float;
+    static_assert(sizeof(uint4) == 4 && sizeof(uint2) == 2, "unexpected sizes");
+  
+    using int1  =  signed char;
+    using int2  = signed short;
+    using in4   = signed int;
+
+    using ActionID = uint2;
+    using RaceID = uint1;
+    using TimeType = int4;
+    using NumUnits = int2;
+    using FracType = float;
 
     // constants declared in data file
     class CONSTANTS

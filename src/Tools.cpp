@@ -56,13 +56,13 @@ BuildOrder Tools::GetOptimizedNaiveBuildOrderOld(const GameState & state, const 
     return bestBuildOrder;
 }
 
-BuildOrder Tools::GetNaiveBuildOrderAddWorkersOld(const GameState & state, const BuildOrderSearchGoal & goal, size_t maxWorkers)
+BuildOrder Tools::GetNaiveBuildOrderAddWorkersOld(const GameState & state, const BuildOrderSearchGoal & goal, int maxWorkers)
 {
     ActionSetAbilities wanted;
     int minWorkers = 8;
 
     ActionType worker = ActionTypes::GetWorker(state.getRace());
-    std::vector<size_t> buildOrderActionTypeCount(ActionTypes::GetAllActionTypes().size(), 0);
+    std::vector<int> buildOrderActionTypeCount(ActionTypes::GetAllActionTypes().size(), 0);
 
     // add everything from the goal to the needed set
     for (ActionID a(0); a < ActionTypes::GetAllActionTypes().size(); ++a)
@@ -224,12 +224,12 @@ BuildOrder Tools::GetNaiveBuildOrderAddWorkersOld(const GameState & state, const
     size_t i = 0;
     while (i < buildOrder.size())
     {
-        ActionType worker           = ActionTypes::GetWorker(currentState.getRace());
-        ActionType supplyProvider   = ActionTypes::GetSupplyProvider(currentState.getRace());
-        ActionType nextAction       = buildOrder[i];
-        size_t maxSupply             = currentState.getMaxSupply() + currentState.getSupplyInProgress();
-        size_t numWorkers            = currentState.getNumTotal(worker);
-        size_t currentSupply         = currentState.getCurrentSupply();
+        ActionType worker = ActionTypes::GetWorker(currentState.getRace());
+        ActionType supplyProvider = ActionTypes::GetSupplyProvider(currentState.getRace());
+        ActionType nextAction = buildOrder[i];
+        int maxSupply = currentState.getMaxSupply() + currentState.getSupplyInProgress();
+        int numWorkers = currentState.getNumTotal(worker);
+        int currentSupply = currentState.getCurrentSupply();
 
         if (numWorkers < 8)
         {
@@ -240,6 +240,7 @@ BuildOrder Tools::GetNaiveBuildOrderAddWorkersOld(const GameState & state, const
 
         // insert a supply provider if we are behind
         int surplusSupply = maxSupply - currentSupply;
+
         if (surplusSupply < nextAction.supplyCost() + 2)
         {
             try
@@ -253,7 +254,6 @@ BuildOrder Tools::GetNaiveBuildOrderAddWorkersOld(const GameState & state, const
             {
                 break;
             }
-
         }
 
        
@@ -457,26 +457,24 @@ int Tools::GetBuildOrderCompletionTime(const GameState & state, const BuildOrder
 
 void Tools::DoBuildOrder(GameState & state, const BuildOrder & buildOrder)
 {
-    for (size_t i(0); i < buildOrder.size(); ++i)
+    for (const auto &x : buildOrder)
     {
-        state.doAction(buildOrder[i]);
+        state.doAction(x);
     }
 }
 
 void Tools::DoBuildOrder(GameState & state, const BuildOrderAbilities & buildOrder)
 {
-    for (size_t i(0); i < buildOrder.size(); ++i)
+    for (const auto &x : buildOrder)
     {
-        auto & actionTargetPair = buildOrder[i];
-        ActionType type = actionTargetPair.first;
+        ActionType type = x.first;
         if (type.isAbility())
         {
-            if (!state.doAbility(type, actionTargetPair.second.targetID))
+            if (!state.doAbility(type, x.second.targetID))
             {
                 std::cout << "invalid chronoboost!" << std::endl;
             }
         }
-
         else
         {
             state.doAction(type);

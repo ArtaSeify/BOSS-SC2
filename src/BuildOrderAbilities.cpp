@@ -34,9 +34,8 @@ void BuildOrderAbilities::add(ActionType type, int amount)
 
 void BuildOrderAbilities::add(const BuildOrderAbilities & other)
 {
-    for (size_t i(0); i < other.size(); ++i)
-    {
-        add(other[i].first);
+    for (const auto &x : other) {
+        add(x.first);
     }
 }
 
@@ -101,9 +100,9 @@ size_t BuildOrderAbilities::size() const
 
 void BuildOrderAbilities::sortByPrerequisites()
 {
-    for (size_t i(0); i < m_buildOrder.size() - 1; ++i)
+    for (int i(0); i < (int)m_buildOrder.size() - 1; ++i)
     {
-        for (size_t j(i + 1); j < m_buildOrder.size(); ++j)
+        for (int j(i + 1); j < (int)m_buildOrder.size(); ++j)
         {
             const auto & recursivePre = m_buildOrder[i].first.getRecursivePrerequisiteActionCount();
 
@@ -154,18 +153,18 @@ std::string BuildOrderAbilities::getIDString() const
 {
     std::stringstream ss;
 
-    for (size_t i(0); i < m_buildOrder.size(); ++i)
+    for (const auto &x : m_buildOrder)
     {
-        ss << (int)m_buildOrder[i].first.getID() << " ";
+        ss << (int)x.first.getID() << " ";
     }
 
     return ss.str();
 }
 
-std::string BuildOrderAbilities::getNameString(size_t charactersPerName, int printUpToIndex) const
+std::string BuildOrderAbilities::getNameString(int charactersPerName, int printUpToIndex) const
 {
     std::stringstream ss;
- 
+
     if (printUpToIndex == -1)
     {
         printUpToIndex = m_buildOrder.size();

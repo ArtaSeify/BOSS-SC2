@@ -10,9 +10,9 @@ namespace BOSS
 {
     class BuildOrderSearchGoal
     {
-        std::vector<size_t> m_goalUnits;                 // vector of goal number of units indexed by ActionType ID
-        std::vector<size_t> m_goalUnitsMax;              // vector of goal max number of units indexed by ActionType ID
-        size_t              m_supplyRequiredVal;         // amount of supply required for all goal units in _goalUnits
+        std::vector<int> m_goalUnits;                 // vector of goal number of units indexed by ActionType ID
+        std::vector<int> m_goalUnitsMax;              // vector of goal max number of units indexed by ActionType ID
+        int m_supplyRequiredVal;         // amount of supply required for all goal units in _goalUnits
 
         void calculateSupplyRequired();
 
@@ -28,8 +28,8 @@ namespace BOSS
         int                 getGoal(ActionType a) const;
         int                 getGoalMax(ActionType a) const;
 
-        void                setGoal(ActionType a, const size_t num);
-        void                setGoalMax(ActionType a, const size_t num);
+        void                setGoal(ActionType a, int num);
+        void                setGoalMax(ActionType a, int num);
         std::string         toString() const;
     };
 }

@@ -28,8 +28,8 @@ namespace BOSS
 
         void add(ActionType action);
         void add(const ActionSetAbilities & set);
-        void add(ActionType action, NumUnits abilityTargetID);
-        void add(ActionType action, NumUnits abilityTargetID, int index);
+        void add(ActionType action, int abilityTargetID);
+        void add(ActionType action, int abilityTargetID, int index);
 
         void sort(const GameState & state, const CombatSearchParameters & params);
 
@@ -41,8 +41,8 @@ namespace BOSS
         const std::string toString() const;
 
         // iterator
-        typedef Actions::iterator iterator;
-        typedef Actions::const_iterator const_iterator;
+        using iterator = Actions::iterator;
+        using const_iterator = Actions::const_iterator;
         iterator begin() { return m_actionsAndTargets.begin(); }
         const_iterator begin() const { return m_actionsAndTargets.begin(); }
         iterator end() { return m_actionsAndTargets.end(); }

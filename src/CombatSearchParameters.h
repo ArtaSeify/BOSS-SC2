@@ -22,9 +22,9 @@ namespace BOSS
         //
         //      true:  macro actions are used, stored in repetitionValues array
         //      false: macro actions not used, all actions will be carried out once
-        bool 	m_useRepetitions;
-        std::vector<size_t>	m_repetitionValues;
-    
+        bool m_useRepetitions;
+        std::vector<int> m_repetitionValues;
+	
         //      Flag which determines whether increasing repetitions will be used in search
         //      Increasing repetitions means the reptition value will be 1 until we have at least
         //      repetitionThresholds[a] count of action a. For example, setting:
@@ -34,8 +34,8 @@ namespace BOSS
         //
         //      true:  increasing repetitions are used
         //      false: increasing repetitions not used
-        bool	m_useIncreasingRepetitions;
-        std::vector<size_t> m_repetitionThresholds;
+        bool m_useIncreasingRepetitions;
+        std::vector<int> m_repetitionThresholds;
 
         //		Flag which determines whether or not we use worker cutoff pruning in search.
         //		Worker cutoff pruning stops workers from being constructed after a certain number
@@ -46,9 +46,9 @@ namespace BOSS
         //
         //      true:  worker cutoff is used
         //      false: worker cutoff not used
-        bool	m_useWorkerCutoff;					
-        double 	m_workerCutoff;
-    
+        bool m_useWorkerCutoff;					
+        float m_workerCutoff;
+	
         //      Flag which determines whether or not we always make workers during search
         //      This abstraction changes the search so that it always makes a worker if it is able to. It
         //          accomplished this by modifying the current legal actions to exclude anything that
@@ -58,8 +58,8 @@ namespace BOSS
         //
         //      true:  always make workers is used
         //      false: always make workers is not used
-        bool	m_useAlwaysMakeWorkers;
-    
+        bool m_useAlwaysMakeWorkers;
+	
         //      Flag which determines whether or not we use supply bounding in our search
         //      Supply bounding makes supply producing buildings illegal if we are currently ahead
         //          on supply by a certain amount. If we currently have more than
@@ -69,79 +69,76 @@ namespace BOSS
         //
         //      true:  supply bounding is used
         //      false: supply bounding is not used
-        bool	m_useSupplyBounding;
-        int		m_supplyBoundingThreshold;
-    
-    
+        bool m_useSupplyBounding;
+        int m_supplyBoundingThreshold;
+	
+	
         //      Flag which determines whether or not we use various heuristics in our search.
         //
         //      true:  the heuristic is used
         //      false: the heuristic is not used
-        bool	m_useLandmarkLowerBoundHeuristic;
-        bool	m_useResourceLowerBoundHeuristic;
-    
+        bool m_useLandmarkLowerBoundHeuristic;
+        bool m_useResourceLowerBoundHeuristic;
+	
         //      Search time limit measured in milliseconds
         //      If searchTimeLimit is set to a value greater than zero, the search will effectively
         //          time out and the best solution so far will be used in the results. This is
         //          accomplished by throwing an exception if the time limit is hit. Time is checked
         //          once every 1000 nodes expanded, as checking the time is slow.
-        double	m_searchTimeLimit;
-    
+        float m_searchTimeLimit;
+	
         //      Initial upper bound for the DFBB search
         //      If this value is set to zero, DFBB search will automatically determine an
         //          appropriate upper bound using an upper bound heuristic. If it is non-zero,
         //          it will use the value as an initial bound.
-        int		m_initialUpperBound;
-            
+        int m_initialUpperBound;
+			
         //      Initial GameState used for the search. See GameState.h for details
-        GameState				m_initialState;
-        BuildOrderAbilities     m_openingBuildOrder;
+        GameState m_initialState;
+        BuildOrderAbilities m_openingBuildOrder;
 
-        GameState               m_enemyInitialState;
-        BuildOrderAbilities     m_enemyBuildOrder;
+        GameState m_enemyInitialState;
+        BuildOrderAbilities m_enemyBuildOrder;
 
-        ActionSetAbilities      m_relevantActions;
-        int                     m_frameTimeLimit;
-        bool                    m_printNewBest;
-
-
+        ActionSetAbilities m_relevantActions;
+        int m_frameTimeLimit;
+        bool m_printNewBest;
 
     public:
 
         // alternate constructor
         CombatSearchParameters();
-    
-        void 	                    setRepetitions(ActionType a, int repetitions);
-        int 	                    getRepetitions(ActionType a) const;
+	
+        void setRepetitions(ActionType a, int repetitions);
+        int getRepetitions(ActionType a) const;
 
-        void                        setMaxActions(ActionType a, int max);
-        int 	                    getMaxActions(ActionType a) const;
+        void setMaxActions(ActionType a, int max);
+        int getMaxActions(ActionType a) const;
 
-        void                        setRelevantActions(const ActionSetAbilities & set);
-        const ActionSetAbilities &  getRelevantActions() const;
+        void setRelevantActions(const ActionSetAbilities & set);
+        const ActionSetAbilities & getRelevantActions() const;
 
-        void                        setInitialState(const GameState & s);
-        const GameState &           getInitialState() const;
+        void setInitialState(const GameState & s);
+        const GameState & getInitialState() const;
 
-        void                        setEnemyInitialState(const GameState & s);
-        const GameState &           getEnemyInitialState() const;
+        void setEnemyInitialState(const GameState & s);
+        const GameState & getEnemyInitialState() const;
 
-        void                        setOpeningBuildOrder(const BuildOrderAbilities & buildOrder);
+        void setOpeningBuildOrder(const BuildOrderAbilities & buildOrder);
         const BuildOrderAbilities & getOpeningBuildOrder() const;
 
-        void                        setEnemyBuildOrder(const BuildOrderAbilities & buildOrder);
+        void setEnemyBuildOrder(const BuildOrderAbilities & buildOrder);
         const BuildOrderAbilities & getEnemyBuildOrder() const;
 
-        void                        setSearchTimeLimit(double timeLimitMS);
-        double                      getSearchTimeLimit() const;
+        void setSearchTimeLimit(float timeLimitMS);
+        float getSearchTimeLimit() const;
 
-        void                        setFrameTimeLimit(int limit);
-        int                         getFrameTimeLimit() const;
+        void setFrameTimeLimit(int limit);
+        int getFrameTimeLimit() const;
 
-        void                        setAlwaysMakeWorkers(bool flag);
-        bool                        getAlwaysMakeWorkers() const;
-    
+        void setAlwaysMakeWorkers(bool flag);
+        bool getAlwaysMakeWorkers() const;
+	
         void print();
-};
-
+    };
 }

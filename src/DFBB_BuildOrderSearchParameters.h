@@ -61,7 +61,7 @@ namespace BOSS
         //      true:  supply bounding is used
         //      false: supply bounding is not used
         bool m_useSupplyBounding;
-        double m_supplyBoundingThreshold;
+        float m_supplyBoundingThreshold;
 
 
         //      Flag which determines whether or not we use various heuristics in our search.
@@ -76,7 +76,7 @@ namespace BOSS
         //          time out and the best solution so far will be used in the results. This is
         //          accomplished by throwing an exception if the time limit is hit. Time is checked
         //          once every 1000 nodes expanded, as checking the time is slow.
-        double m_searchTimeLimit;
+        float m_searchTimeLimit;
 
         //      Initial upper bound for the DFBB search
         //      If this value is set to zero, DFBB search will automatically determine an

@@ -139,7 +139,7 @@ BuildOrderAbilities CombatSearch_IntegralDataFinishedUnits::createBuildOrderEndT
     auto & finishedUnits = state.getFinishedUnits();
     auto & chronoBoostTargets = state.getChronoBoostTargets();
     int chronoboosts = 0;
-    for (size_t index = 0; index < integral_stack.size() - 1; ++index)
+    for (int index = 0; index < (int)integral_stack.size() - 1; ++index)
     {
         const AbilityAction & current_ability = chronoBoostTargets[chronoboosts];
         // chronoboost

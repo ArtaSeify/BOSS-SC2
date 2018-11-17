@@ -11,7 +11,7 @@ CombatSearch_Bucket::CombatSearch_Bucket(const CombatSearchParameters p)
    
     BOSS_ASSERT(m_params.getInitialState().getRace() != Races::None, "Combat search initial state is invalid");
 }
-void CombatSearch_Bucket::recurse(const GameState & state, size_t depth)
+void CombatSearch_Bucket::recurse(const GameState & state, int depth)
 {
     if (timeLimitReached())
     {

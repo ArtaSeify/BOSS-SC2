@@ -12,7 +12,7 @@ CombatSearch_IntegralData::CombatSearch_IntegralData()
 
 void CombatSearch_IntegralData::update(const GameState & state, const BuildOrderAbilities & buildOrder)
 {
-    double value = Eval::ArmyResourceSumToIndex(state, state.getFinishedUnits().size() - 1);
+    double value = Eval::ArmyResourceSumToIndex(state, (int)state.getFinishedUnits().size() - 1);
     double timeElapsed = state.getCurrentFrame() - m_integralStack.back().timeAdded; 
     double valueToAdd = m_integralStack.back().eval * timeElapsed;
     IntegralData entry(value, m_integralStack.back().integral + valueToAdd, state.getCurrentFrame());
