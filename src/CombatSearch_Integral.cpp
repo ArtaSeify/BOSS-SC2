@@ -1,3 +1,5 @@
+/* -*- c-basic-offset: 4 -*- */
+
 #include "CombatSearch_Integral.h"
 
 using namespace BOSS;
@@ -38,7 +40,8 @@ void CombatSearch_Integral::recurse(const GameState & state, size_t depth)
         uint4 actionTarget = actionTargetPair.second;
 
         // get the targets for the ability
-        if (action == ActionTypes::GetSpecialAction(state.getRace()) && actionTarget == -1)
+        //!!! PROBLEM actionTarget is >= 0, so below will always be false
+        if (action == ActionTypes::GetSpecialAction(state.getRace()) /*!!! PROBLEM && actionTarget == -1*/)
         {
             size_t sizeBefore = legalActions.size();
 
@@ -107,7 +110,7 @@ void CombatSearch_Integral::printResults()
 }
 
 #include "BuildOrderPlotter.h"
-void CombatSearch_Integral::writeResultsFile(const std::string & dir, const std::string & filename)
+void CombatSearch_Integral::writeResultsFile(const std::string & dir, const std::string & /*!!! PROBLEM UNUSED filename*/)
 {
     BuildOrderPlotter plot;
     plot.setOutputDir(dir);

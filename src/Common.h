@@ -1,3 +1,5 @@
+/* -*- c-basic-offset: 4 -*- */
+
 #pragma once
 
 #include <stdio.h>
@@ -36,12 +38,12 @@ namespace BOSS
     class CONSTANTS
     {
     public:
-        static float MPWPF;			        // minerals per worker per frame
-        static float GPWPF;		            // gas per worker per frame
-        static float ERPF;				    // energy regen per frame
-        static float HRPF;				    // health regen per frame
-        static float SRPF;				    // shield regen per frame
-        static short WorkersPerRefinery;    // number of workers per refinery
+        static float MPWPF;               // minerals per worker per frame
+        static float GPWPF;               // gas per worker per frame
+        static float ERPF;                // energy regen per frame
+        static float HRPF;                // health regen per frame
+        static float SRPF;                // shield regen per frame
+        static int   WorkersPerRefinery;  // number of workers per refinery
     };
 
     namespace Races

@@ -1,3 +1,5 @@
+/* -*- c-basic-offset: 4 -*- */
+
 #include "CombatSearch.h"
 #include "Tools.h"
 
@@ -121,8 +123,9 @@ bool CombatSearch::timeLimitReached()
     return (m_params.getSearchTimeLimit() && (m_results.nodesExpanded % 100 == 0) && (m_searchTimer.getElapsedTimeInMilliSec() > m_params.getSearchTimeLimit()));
 }
 
-bool CombatSearch::isTerminalNode(const GameState & s, int depth)
+bool CombatSearch::isTerminalNode(const GameState & s, int /*!!! PROBLEM NOT USED depth */)
 {
+  //!!! IMPROVEMENT: just say return s.getCurrent....
     if (s.getCurrentFrame() >= m_params.getFrameTimeLimit())
     {
         return true;
@@ -131,7 +134,7 @@ bool CombatSearch::isTerminalNode(const GameState & s, int depth)
     return false;
 }
 
-void CombatSearch::recurse(const GameState & state, size_t depth)
+void CombatSearch::recurse(const GameState & /*!!! PROBLEM NOT USED state*/, size_t /*!!! PROBLEM NOT USED depth*/)
 {
     // This base class function should never be called, leaving the code
     // here as a basis to form child classes
@@ -165,7 +168,7 @@ void CombatSearch::recurse(const GameState & state, size_t depth)
     //}
 }
 
-void CombatSearch::updateResults(const GameState & state)
+void CombatSearch::updateResults(const GameState & /*!!! PROBLEM NOT USED state */)
 {
     m_results.nodesExpanded++;
 }
@@ -175,7 +178,7 @@ void CombatSearch::printResults()
     std::cout << "Printing base class CombatSearch results!\n\n";
 }
 
-void CombatSearch::writeResultsFile(const std::string & dir, const std::string & prefix)
+void CombatSearch::writeResultsFile(const std::string & /*!!! PROBLEM NOT USED dir*/, const std::string & /*!!! PROBLEM NOT USED prefix*/)
 {
     std::cout << "Writing base class CombatSearch results!\n\n";
 }

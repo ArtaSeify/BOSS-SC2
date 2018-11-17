@@ -1,3 +1,5 @@
+/* -*- c-basic-offset: 4 -*- */
+
 #include "ActionType.h"
 #include "ActionTypeData.h"
 #include "ActionSetAbilities.h"
@@ -38,7 +40,7 @@ ActionType & ActionType::operator = (ActionType rhs)
 ActionID    ActionType::getID()     const { return m_id; }
 RaceID      ActionType::getRace()   const { return ActionTypeData::GetActionTypeData(m_id).race; }
 const std::string & ActionType::getName()   const { return ActionTypeData::GetActionTypeData(m_id).name; }
-    
+	
 int  ActionType::buildTime()         const { return ActionTypeData::GetActionTypeData(m_id).buildTime; }
 int  ActionType::mineralPrice()      const { return ActionTypeData::GetActionTypeData(m_id).mineralCost; }
 int  ActionType::gasPrice()          const { return ActionTypeData::GetActionTypeData(m_id).gasCost; }
@@ -189,7 +191,7 @@ namespace ActionTypes
 
     ActionType None(0);
 
-    ActionSetAbilities CalculatePrerequisites(ActionType /*action*/)
+    ActionSetAbilities CalculatePrerequisites(ActionType /*action NOT USED? */)
     {
         ActionSetAbilities count;
 
@@ -210,7 +212,7 @@ namespace ActionTypes
 
         for (ActionID a(0); a < pre.size(); ++a)
         {
-            ActionID actionType(a);
+            ActionType actionType(a);
             
             if (pre.contains(actionType) && !allActions.contains(actionType))
             {

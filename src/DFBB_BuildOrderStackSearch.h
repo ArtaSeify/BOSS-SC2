@@ -1,3 +1,5 @@
+/* -*- c-basic-offset: 4 -*- */
+
 #pragma once
 
 #include "Common.h"
@@ -13,56 +15,55 @@
 namespace BOSS
 {
 
-class StackData
-{
-public:
-
-    size_t              currentChildIndex;
-    GameState           state;
-    ActionSet           legalActions;
-    ActionType          currentActionType;
-    size_t              repetitionValue;
-    size_t              completedRepetitions;
-    
-    StackData()
-        : currentChildIndex(0)
-        , repetitionValue(1)
-        , completedRepetitions(0)
+    class StackData
     {
-    
-    }
-};
+    public:
 
-class DFBB_BuildOrderStackSearch
-{
-    DFBB_BuildOrderSearchParameters     m_params;                      //parameters that will be used in this search
-    DFBB_BuildOrderSearchResults        m_results;                     //the results of the search so far
-                    
-    Timer                               m_searchTimer;
-    BuildOrder                          m_buildOrder;
-
-    std::vector<StackData>              m_stack;
-    size_t                              m_depth;
-
-    bool                                m_firstSearch;
-
-    bool                                m_wasInterrupted;
+        int        currentChildIndex;
+        GameState  state;
+        ActionSet  legalActions;
+        ActionType currentActionType;
+        int        repetitionValue;
+        int        completedRepetitions;
     
-    void                                updateResults(const GameState & state);
-    bool                                isTimeOut();
-    void                                generateLegalActions(const GameState & state, ActionSet & legalActions);
-    std::vector<ActionType>             getBuildOrder(GameState & state);
-    size_t                              getRepetitions(const GameState & state, ActionType a);
-    std::vector<ActionType>             calculateRelevantActions();
+        StackData()
+            : currentChildIndex(0)
+            , repetitionValue(1)
+            , completedRepetitions(0)
+        {
+    
+        }
+    };
 
-public:
+    class DFBB_BuildOrderStackSearch
+    {
+	DFBB_BuildOrderSearchParameters     m_params;                      //parameters that will be used in this search
+	DFBB_BuildOrderSearchResults        m_results;                     //the results of the search so far
+					
+        Timer                               m_searchTimer;
+        BuildOrder                          m_buildOrder;
+
+        std::vector<StackData>              m_stack;
+        int                                 m_depth;
+
+        bool                                m_firstSearch;
+
+        bool                                m_wasInterrupted;
     
-    DFBB_BuildOrderStackSearch(const DFBB_BuildOrderSearchParameters & p);
-    
-    void setTimeLimit(double ms);
-    void search();
-    const DFBB_BuildOrderSearchResults & getResults() const;
-    
-    void DFBB();
-};
+        void                                updateResults(const GameState & state);
+        bool                                isTimeOut();
+        void                                generateLegalActions(const GameState & state, ActionSet & legalActions);
+	std::vector<ActionType>             getBuildOrder(GameState & state);
+        int                                 getRepetitions(const GameState & state, ActionType a);
+        std::vector<ActionType>             calculateRelevantActions();
+
+    public:
+	
+	DFBB_BuildOrderStackSearch(const DFBB_BuildOrderSearchParameters & p);
+        void setTimeLimit(double ms);
+        void search();
+        const DFBB_BuildOrderSearchResults & getResults() const;
+	
+	void DFBB();
+    };
 }

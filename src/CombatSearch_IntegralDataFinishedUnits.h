@@ -1,3 +1,5 @@
+/* -*- c-basic-offset: 4 -*- */
+
 #pragma once
 
 #include "Common.h"
@@ -80,5 +82,4 @@ namespace BOSS
 
         const BuildOrderAbilities & getBestBuildOrder() const;
     };
-
 }

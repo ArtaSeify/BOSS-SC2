@@ -1,3 +1,5 @@
+/* -*- c-basic-offset: 4 -*- */
+
 #include "CombatSearch_BucketData.h"
 
 using namespace BOSS;
@@ -112,7 +114,7 @@ std::string CombatSearch_BucketData::getBucketResultsString()
             maxEval = m_buckets[b].eval;
 
             double frame = ((double)b / m_buckets.size()) * m_frameLimit;
-            double sec   = frame / 24;
+            //!!! PROBLEM NOT USED double sec   = frame / 24;
 
             ss << frame << " " << m_buckets[b].eval << std::endl;
         }

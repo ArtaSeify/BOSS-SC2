@@ -1,3 +1,5 @@
+/* -*- c-basic-offset: 4 -*- */
+
 #include "Tools.h"
 #include "BuildOrderSearchGoal.h"
 #include "NaiveBuildOrderSearch.h"
@@ -66,7 +68,7 @@ BuildOrder Tools::GetNaiveBuildOrderAddWorkersOld(const GameState & state, const
     for (ActionID a(0); a < ActionTypes::GetAllActionTypes().size(); ++a)
     {
         ActionType actionType(a);
-        size_t numCompleted = state.getNumTotal(actionType);
+        int numCompleted = state.getNumTotal(actionType);
             
         if (goal.getGoal(actionType) > numCompleted)
         {
@@ -247,7 +249,7 @@ BuildOrder Tools::GetNaiveBuildOrderAddWorkersOld(const GameState & state, const
                 currentState.doAction(supplyProvider);
                 continue;
             }
-            catch (BOSSException e)
+            catch (BOSSException & e)
             {
                 break;
             }
@@ -267,14 +269,14 @@ BuildOrder Tools::GetNaiveBuildOrderAddWorkersOld(const GameState & state, const
                 finalBuildOrder.add(worker);
                 currentState.doAction(worker);
             }
-            catch (BOSSException)
+            catch (BOSSException &)
             {
             }
             continue;
         }
         else
         {
-            ActionType testNextAction = buildOrder[i];
+            //!!! PROBLEM UNUSED ActionType testNextAction = buildOrder[i];
             BOSS_ASSERT(currentState.isLegal(nextAction), "nextAction should be legal");
             finalBuildOrder.add(nextAction);
             currentState.doAction(nextAction);
@@ -324,7 +326,8 @@ void Tools::InsertActionIntoBuildOrder(BuildOrder & result, const BuildOrder & b
     result.clear();
     for (size_t a(0); a<buildOrder.size(); ++a)
     {
-        if (bestInsertIndex == a)
+        //!!! mic: added (int) - hopefully OK
+        if (bestInsertIndex == (int)a)
         {
             result.add(action);
         }
@@ -350,7 +353,7 @@ int Tools::GetLowerBound(const GameState & state, const BuildOrderSearchGoal & g
     for (ActionID a(0); a < ActionTypes::GetAllActionTypes().size(); ++a)
     {
         ActionType actionType(a);
-        size_t numCompleted = state.getNumTotal(actionType);
+        int numCompleted = state.getNumTotal(actionType);
             
         if (goal.getGoal(actionType) > numCompleted)
         {
@@ -429,10 +432,10 @@ int Tools::CalculatePrerequisitesLowerBound(const GameState & state, const Actio
         else
         {
             /*for (int i=0; i<depth; ++i)
-            {
-                std::cout << "    ";
-            }
-            std::cout << neededType.getName() << " " << neededType.buildTime() << " " << timeSoFar << std::endl;*/
+              {
+              std::cout << "    ";
+              }
+              std::cout << neededType.getName() << " " << neededType.buildTime() << " " << timeSoFar << std::endl;*/
             thisActionTime = CalculatePrerequisitesLowerBound(state, neededType.getPrerequisiteActionCount(), timeSoFar + neededType.buildTime(), depth + 1);
         }
 

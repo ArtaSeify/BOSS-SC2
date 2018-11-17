@@ -1,3 +1,5 @@
+/* -*- c-basic-offset: 4 -*- */
+
 #include "ActionSetAbilities.h"
 #include "ActionType.h"
 #include "CombatSearchParameters.h"
@@ -62,7 +64,7 @@ void ActionSetAbilities::add(ActionType action, NumUnits abilityTargetID, size_t
     }
 }
 
-void ActionSetAbilities::sort(const GameState & state, const CombatSearchParameters & params)
+void ActionSetAbilities::sort(const GameState & state, const CombatSearchParameters & /* params */)
 {
     //std::cout << "Before sorting:" << std::endl;
     //std::cout << toString() << std::endl;
@@ -70,7 +72,7 @@ void ActionSetAbilities::sort(const GameState & state, const CombatSearchParamet
 
     ActionSetAbilities sortedSet;
 
-    const short totalSupply = state.getCurrentSupply() + state.getSupplyInProgress();
+    const int totalSupply = state.getCurrentSupply() + state.getSupplyInProgress();
     
     // if we have little supply free, give priority to supply providing units
     // ie. pylon/supply depot/overlord and nexus/command center/hatchery

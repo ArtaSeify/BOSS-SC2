@@ -1,3 +1,5 @@
+/* -*- c-basic-offset: 4 -*- */
+
 //#include "DFBB_BuildOrderSearchSaveState.h"
 //
 //using namespace BOSS;

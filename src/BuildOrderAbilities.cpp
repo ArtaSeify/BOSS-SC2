@@ -1,3 +1,5 @@
+/* -*- c-basic-offset: 4 -*- */
+
 #include "BuildOrderAbilities.h"
 
 using namespace BOSS;
@@ -42,11 +44,6 @@ void BuildOrderAbilities::clear()
 {
     m_buildOrder.clear();
     m_typeCount.clear();
-}
-
-bool BuildOrderAbilities::empty() const
-{
-    return size() == 0;
 }
 
 /*ActionType BuildOrderAbilities::getAbilityTargetType(size_t index) const
@@ -169,11 +166,14 @@ std::string BuildOrderAbilities::getNameString(size_t charactersPerName, size_t 
 {
     std::stringstream ss;
 
+#if 0    
+    //!!!PROBLEM can't be -1
     if (printUpToIndex == -1)
     {
         printUpToIndex = m_buildOrder.size();
     }
-
+#endif
+    
     for (size_t i(0); i < printUpToIndex; ++i)
     {
         std::string name = charactersPerName == 0 ? m_buildOrder[i].first.getName() : m_buildOrder[i].first.getName().substr(0, charactersPerName);;

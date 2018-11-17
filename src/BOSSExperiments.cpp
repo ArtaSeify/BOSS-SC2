@@ -1,5 +1,6 @@
-#include "BOSSExperiments.h"
+/* -*- c-basic-offset: 4 -*- */
 
+#include "BOSSExperiments.h"
 #include "CombatSearchExperiment.h"
 #include "BuildOrderPlotter.h"
 #include "FileTools.h"

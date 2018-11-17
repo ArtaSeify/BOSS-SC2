@@ -1,3 +1,5 @@
+/* -*- c-basic-offset: 4 -*- */
+
 #pragma once
 
 #include "Common.h"
@@ -6,12 +8,12 @@
 namespace BOSS
 {
 
-namespace Experiments
-{
-    void RunExperiments(const std::string & experimentFilename);
+    namespace Experiments
+    {
+        void RunExperiments(const std::string & experimentFilename);
 
-    void RunCombatExperiment(const std::string & name, const json & val);
-    void RunBuildOrderPlot(const std::string & name, const json & j);
-}
+        void RunCombatExperiment(const std::string & name, const json & val);
+        void RunBuildOrderPlot(const std::string & name, const json & j);
+    }
 
 }

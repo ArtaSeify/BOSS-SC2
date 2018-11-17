@@ -1,3 +1,5 @@
+/* -*- c-basic-offset: 4 -*- */
+
 #pragma once
 
 #include "Common.h"
@@ -28,8 +30,8 @@ namespace BOSS
         void                        sortByPrerequisites();
 
         size_t                      size() const;
-        int                         getTypeCount(ActionType type) const;
-        bool                        empty() const;
+        size_t                      getTypeCount(ActionType type) const;
+        bool                        empty() const { return size() == 0; }
         //ActionType          getAbilityTargetType(size_t index) const;
         //size_t                      getAbilityTarget(size_t index) const;
         //const AbilityAction &       getAbilityAction(size_t index) const;

@@ -1,4 +1,4 @@
-#pragma once
+/* -*- c-basic-offset: 4 -*- */
 
 #include "Common.h"
 

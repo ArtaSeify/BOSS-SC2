@@ -1,3 +1,5 @@
+/* -*- c-basic-offset: 4 -*- */
+
 #pragma once
 
 #include "Common.h"
@@ -16,10 +18,10 @@ namespace BOSS
 
         AbilityAction(): type(0), frameCast(0), targetID(0), targetProductionID(0), targetType(0) {}
         /*AbilityAction(size_t id, size_t target, ActionType action)
-        {
-            targetID = target;
-            type = action;
-        }*/
+          {
+          targetID = target;
+          type = action;
+          }*/
 
         AbilityAction(ActionType newType, TimeType newFrameCast, NumUnits newTargetID, NumUnits newTargetProductionID, ActionType newTargetType)
         {

@@ -1,3 +1,5 @@
+/* -*- c-basic-offset: 4 -*- */
+
 #include "DFBB_BuildOrderStackSearch.h"
 #include "Tools.h"
 #include "ActionSet.h"
@@ -6,12 +8,11 @@ using namespace BOSS;
 
 DFBB_BuildOrderStackSearch::DFBB_BuildOrderStackSearch(const DFBB_BuildOrderSearchParameters & p)
     : m_params(p)
+    , m_stack(100, StackData())
     , m_depth(0)
     , m_firstSearch(true)
     , m_wasInterrupted(false)
-    , m_stack(100, StackData())
 {
-    
 }
 
 void DFBB_BuildOrderStackSearch::setTimeLimit(double ms)
@@ -76,8 +77,8 @@ void DFBB_BuildOrderStackSearch::generateLegalActions(const GameState & state, A
     for (size_t a(0); a < m_params.m_relevantActions.size(); ++a)
     {
         ActionType actionType = m_params.m_relevantActions[a];
-        const std::string & actionName = actionType.getName();
-        size_t numTotal = state.getNumTotal(actionType);
+        //!!! PROBLEM UNUSED const std::string & actionName = actionType.getName();
+        const int numTotal = state.getNumTotal(actionType);
 
         if (state.isLegal(actionType))
         {

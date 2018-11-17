@@ -1,3 +1,5 @@
+/* -*- c-basic-offset: 4 -*- */
+
 #pragma once
 
 #include "Common.h"
@@ -5,30 +7,28 @@
 
 namespace BOSS
 {
+    class ActionType;
+    class ActionSet
+    {
+	std::vector<ActionType> m_actions;
 
-class ActionType;
-class ActionSet
-{
-    std::vector<ActionType> m_actions;
+    public:
 
-public:
+        ActionSet();
 
-    ActionSet();
+        size_t size() const;
 
-    size_t size() const;
+        bool isEmpty() const;
+        bool contains(ActionType action) const;
+        void add(ActionType action);
+        void add(const ActionSet & set);
+        void remove(ActionType action);
+        void remove(const ActionSet & set);
+        void clear();
 
-    bool isEmpty() const;
-    bool contains(ActionType action) const;
-    void add(ActionType action);
-    void add(const ActionSet & set);
-    void remove(ActionType action);
-    void remove(const ActionSet & set);
-    void clear();
+        ActionType & operator[] (const size_t & index);
+        ActionType operator[] (const size_t & index) const;
 
-          ActionType & operator[] (size_t index);
-    ActionType operator[] (size_t index) const;
-
-    const std::string toString() const;
-};
-
+        const std::string toString() const;
+    };
 }

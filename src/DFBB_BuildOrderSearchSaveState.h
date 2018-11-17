@@ -1,3 +1,5 @@
+/* -*- c-basic-offset: 4 -*- */
+
 #pragma once
 
 #include "Common.h"
@@ -7,14 +9,14 @@
 
 namespace BOSS
 {
-class DFBB_BuildOrderSearchSaveState
-{
+    class DFBB_BuildOrderSearchSaveState
+    {
 
 	int		depth;
 	int		upperBound;
 	int		currentActions[MAX_SAVE_ACTIONS];
 
-public:
+    public:
 
 	DFBB_BuildOrderSearchSaveState();
 
@@ -26,5 +28,5 @@ public:
 	int getAction(int d) const;
 
 	void print() const;
-};
+    };
 }

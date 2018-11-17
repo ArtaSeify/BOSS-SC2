@@ -1,3 +1,5 @@
+/* -*- c-basic-offset: 4 -*- */
+
 #pragma once
 
 #include <string>
@@ -7,8 +9,8 @@
 
 namespace BOSS
 {
-namespace FileTools
-{
-    void MakeDirectory(const std::string & dir);
-}    
+    namespace FileTools
+    {
+        void MakeDirectory(const std::string & dir);
+    }    
 }

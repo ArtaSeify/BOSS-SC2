@@ -1,3 +1,4 @@
+/* -*- c-basic-offset: 4 -*- */
 
 #define _CRT_NO_VA_START_VALIDATION
 
@@ -143,7 +144,7 @@ void testjson()
 
 }
 
-int main(int argc, char *argv[])
+int main(int /*!!! PROBLEM UNUSED argc*/, char */*!!! PROBLEM UNUSED argv*/[])
 {
     // Initialize all the BOSS internal data
     //BOSS::Init("../bin/BWData.json");

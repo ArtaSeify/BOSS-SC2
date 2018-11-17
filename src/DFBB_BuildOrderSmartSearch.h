@@ -1,3 +1,5 @@
+/* -*- c-basic-offset: 4 -*- */
+
 #pragma once
 
 #include "Common.h"
@@ -7,50 +9,50 @@
 
 namespace BOSS
 {
-class DFBB_BuildOrderSmartSearch
-{
-    RaceID                              m_race;
+    class DFBB_BuildOrderSmartSearch
+    {
+        //!!! PROBLEM UNUSED RaceID                              m_race;
 
-    DFBB_BuildOrderSearchParameters		m_params;
-    BuildOrderSearchGoal 			    m_goal;
+        DFBB_BuildOrderSearchParameters		m_params;
+        BuildOrderSearchGoal 			    m_goal;
 
-    std::vector<ActionType>             m_relevantActions;
+        std::vector<ActionType>             m_relevantActions;
 
-    GameState					        m_initialState;
+        GameState					        m_initialState;
 
-    int 							    m_searchTimeLimit;
+        int 							    m_searchTimeLimit;
 
-    Timer							    m_searchTimer;
+        Timer							    m_searchTimer;
 
-    DFBB_BuildOrderStackSearch          m_stackSearch;
-    DFBB_BuildOrderSearchResults        m_results;
+        DFBB_BuildOrderStackSearch          m_stackSearch;
+        DFBB_BuildOrderSearchResults        m_results;
 
-    void doSearch();
-    void calculateSearchSettings();
-    void setPrerequisiteGoalMax();
-    void recurseOverStrictDependencies(ActionType action);
-    void setRelevantActions();
-    void setRepetitions();
+        void doSearch();
+        void calculateSearchSettings();
+        void setPrerequisiteGoalMax();
+        void recurseOverStrictDependencies(ActionType action);
+        void setRelevantActions();
+        void setRepetitions();
 
-    size_t calculateSupplyProvidersRequired();
-    size_t calculateRefineriesRequired();
+        size_t calculateSupplyProvidersRequired();
+        size_t calculateRefineriesRequired();
 
-    const RaceID getRace() const;
+        RaceID getRace() const;
 
-public:
+    public:
 
-    DFBB_BuildOrderSmartSearch();
+        DFBB_BuildOrderSmartSearch();
 
-    void addGoal(ActionType a, size_t count);
-    void setGoal(const BuildOrderSearchGoal & goal);
-    void setState(const GameState & state);
-    void print();
-    void setTimeLimit(int n);
+        void addGoal(ActionType a, size_t count);
+        void setGoal(const BuildOrderSearchGoal & goal);
+        void setState(const GameState & state);
+        void print();
+        void setTimeLimit(int n);
 
-    void search();
+        void search();
 
-    const DFBB_BuildOrderSearchResults & getResults() const;
-    const DFBB_BuildOrderSearchParameters & getParameters();
-};
+        const DFBB_BuildOrderSearchResults & getResults() const;
+        const DFBB_BuildOrderSearchParameters & getParameters();
+    };
 
 }

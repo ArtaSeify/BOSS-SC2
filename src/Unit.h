@@ -1,3 +1,5 @@
+/* -*- c-basic-offset: 4 -*- */
+
 #pragma once
 
 #include "Common.h"
@@ -26,7 +28,7 @@ class Unit
     TimeType    m_timeUntilFree;    // time remaining until this Unit can build again
     TimeType    m_timeChronoBoost;	// time remaining on Chrono Boost
     TimeType    m_timeChronoBoostAgain; // time until chronoboost can be used on this building again
-    int1        m_numLarva;         // number of larva this building currently has (Hatch only)
+    //int1        m_numLarva;         // number of larva this building currently has (Hatch only)
     FracType    m_maxEnergyAllowed; // maximum energy allowed for this building
     FracType    m_energy;			// energy of the building
 
@@ -38,12 +40,12 @@ public:
     int         getID()                     const   { return m_id; }
     int         getBuilderID()              const   { return m_builderID; }
     int         getBuildID()                const   { return m_buildID; }
-    TimeType    getStartFrame()             const   { return m_frameStarted; }
-    TimeType    getFinishFrame()            const   { return m_frameFinished; }
-    TimeType    getTimeUntilFree()          const   { return m_timeUntilFree; }
-    TimeType    getTimeUntilBuilt()         const   { return m_timeUntilBuilt; }
-    TimeType    getChronoBoostAgainTime()   const   { return m_timeChronoBoostAgain; }
-    FracType    getEnergy()                 const   { return m_energy; }
+    int         getStartFrame()             const   { return m_frameStarted; }
+    int         getFinishFrame()            const   { return m_frameFinished; }
+    int         getTimeUntilFree()          const   { return m_timeUntilFree; }
+    int         getTimeUntilBuilt()         const   { return m_timeUntilBuilt; }
+    int         getChronoBoostAgainTime()   const   { return m_timeChronoBoostAgain; }
+    float       getEnergy()                 const   { return m_energy; }
     ActionType  getType()                   const   { return m_type; }
     ActionType  getAddon()                  const   { return m_addon; }
     ActionType  getBuildType()              const   { return m_buildType; }
