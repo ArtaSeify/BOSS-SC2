@@ -38,12 +38,12 @@ namespace BOSS
     class CONSTANTS
     {
     public:
-        static float MPWPF;               // minerals per worker per frame
-        static float GPWPF;               // gas per worker per frame
-        static float ERPF;                // energy regen per frame
-        static float HRPF;                // health regen per frame
-        static float SRPF;                // shield regen per frame
-        static int   WorkersPerRefinery;  // number of workers per refinery
+        static FracType MPWPF;               // minerals per worker per frame
+        static FracType GPWPF;               // gas per worker per frame
+        static FracType ERPF;                // energy regen per frame
+        static FracType HRPF;                // health regen per frame
+        static FracType SRPF;                // shield regen per frame
+        static NumUnits WorkersPerRefinery;  // number of workers per refinery
     };
 
     namespace Races

@@ -30,18 +30,17 @@ void CombatSearch_Integral::recurse(const GameState & state, size_t depth)
 
     for (size_t a(0); a < legalActions.size(); ++a)
     {
-        int index = legalActions.size() - (a + 1);
+        const int index = legalActions.size() - (a + 1);
 
         GameState child(state);
 
         const auto & actionTargetPair = legalActions[index];
 
         ActionType action = actionTargetPair.first;
-        uint4 actionTarget = actionTargetPair.second;
+        NumUnits actionTarget = actionTargetPair.second;
 
-        // get the targets for the ability
-        //!!! PROBLEM actionTarget is >= 0, so below will always be false
-        if (action == ActionTypes::GetSpecialAction(state.getRace()) /*!!! PROBLEM && actionTarget == -1*/)
+        // if it's the plain CB without a target, we need to get the targets for the ability
+        if (action == ActionTypes::GetSpecialAction(state.getRace()) && actionTarget == -1)
         {
             size_t sizeBefore = legalActions.size();
 

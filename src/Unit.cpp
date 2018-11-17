@@ -35,7 +35,7 @@ Unit::Unit(ActionType type, NumUnits id, NumUnits builderID, TimeType frameStart
     , m_buildID                 (0)
     , m_timeUntilBuilt          (builderID != -1 ? type.buildTime() : 0)
     , m_timeUntilFree           (builderID != -1 ? type.buildTime() : 0)
-    , m_numLarva                (0)
+    //, m_numLarva                (0)
     , m_builderID               (builderID)
     , m_timeChronoBoost         (0)
     , m_timeChronoBoostAgain    (0)

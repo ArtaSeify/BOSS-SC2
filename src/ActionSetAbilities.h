@@ -12,7 +12,7 @@ namespace BOSS
     class CombatSearchParameters;
     class ActionSetAbilities
     {
-        typedef std::pair<ActionType, uint4> ActionTargetPair;
+        typedef std::pair<ActionType, NumUnits> ActionTargetPair;
         typedef std::vector<ActionTargetPair> Actions;
         Actions m_actionsAndTargets;
 
@@ -28,16 +28,16 @@ namespace BOSS
 
         void add(ActionType action);
         void add(const ActionSetAbilities & set);
-        void add(ActionType action, uint4 abilityTargetID);
-        void add(ActionType action, uint4 abilityTargetID, size_t index);
+        void add(ActionType action, NumUnits abilityTargetID);
+        void add(ActionType action, NumUnits abilityTargetID, int index);
 
         void sort(const GameState & state, const CombatSearchParameters & params);
 
         void remove(ActionType action);
-        void remove(ActionType action, size_t index);
+        void remove(ActionType action, int index);
         void remove(const ActionSetAbilities & set);
 
-        uint4 getAbilityTarget(uint4 index) const;
+        int getAbilityTarget(int index) const;
         const std::string toString() const;
 
         // iterator
@@ -49,7 +49,7 @@ namespace BOSS
         const_iterator end() const { return m_actionsAndTargets.end(); }
 
         // index
-        ActionTargetPair & operator[] (uint4 index) { return m_actionsAndTargets[index]; }
-        const ActionTargetPair & operator[] (uint4 index) const { return m_actionsAndTargets[index]; }
+        ActionTargetPair & operator[] (size_t index) { return m_actionsAndTargets[index]; }
+        const ActionTargetPair & operator[] (size_t index) const { return m_actionsAndTargets[index]; }
     };
 }

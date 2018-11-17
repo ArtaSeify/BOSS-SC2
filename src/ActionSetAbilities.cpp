@@ -56,7 +56,7 @@ void ActionSetAbilities::add(ActionType action, NumUnits abilityTargetID)
 }
 
 // add action and target at a specific index
-void ActionSetAbilities::add(ActionType action, NumUnits abilityTargetID, size_t index)
+void ActionSetAbilities::add(ActionType action, NumUnits abilityTargetID, int index)
 {
     if (action.isAbility() || !contains(action))
     {
@@ -140,14 +140,14 @@ void ActionSetAbilities::remove(ActionType action)
 }
 
 // remove the index, given that the action at that index is equal to the action parameter
-void ActionSetAbilities::remove(ActionType action, size_t index)
+void ActionSetAbilities::remove(ActionType action, int index)
 {
     BOSS_ASSERT(action == m_actionsAndTargets[index].first, "argument does not match action in vector");
 
     m_actionsAndTargets.erase(m_actionsAndTargets.begin() + index);
 }
 
-NumUnits ActionSetAbilities::getAbilityTarget(size_t index) const
+int ActionSetAbilities::getAbilityTarget(int index) const
 { 
     return m_actionsAndTargets[index].second; 
 }

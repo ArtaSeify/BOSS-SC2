@@ -30,7 +30,7 @@ namespace BOSS
         void                        sortByPrerequisites();
 
         size_t                      size() const;
-        size_t                      getTypeCount(ActionType type) const;
+        int                         getTypeCount(ActionType type) const;
         bool                        empty() const { return size() == 0; }
         //ActionType          getAbilityTargetType(size_t index) const;
         //size_t                      getAbilityTarget(size_t index) const;
@@ -39,7 +39,7 @@ namespace BOSS
         std::string                 getJSONString() const;
         std::string                 getNumberedString() const;
         std::string                 getIDString() const;
-        std::string                 getNameString(size_t charactersPerName = 0, size_t printUpToIndex = -1) const;
+        std::string                 getNameString(size_t charactersPerName = 0, int printUpToIndex = -1) const;
     
         // iterator
         typedef BuildOrder::iterator iterator;

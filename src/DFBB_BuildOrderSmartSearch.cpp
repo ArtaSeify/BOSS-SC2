@@ -59,7 +59,7 @@ void DFBB_BuildOrderSmartSearch::calculateSearchSettings()
     m_goal.setGoalMax(resourceDepot, m_initialState.getNumTotal(resourceDepot));
 
     // set the number of refineries
-    m_goal.setGoalMax(refinery, std::min(3ul, calculateRefineriesRequired()));
+    m_goal.setGoalMax(refinery, std::min(size_t(3), calculateRefineriesRequired()));
 
     // set the maximum number of workers to an initial ridiculously high upper bound
     m_goal.setGoalMax(worker, std::min(m_initialState.getNumTotal(worker) + 20u, 100u));
@@ -236,7 +236,7 @@ size_t DFBB_BuildOrderSmartSearch::calculateSupplyProvidersRequired()
     for (ActionType actionType : ActionTypes::GetAllActionTypes())
     {
         // add the supply required for this number of goal units and all units currently made
-        supplyNeeded += std::max(m_goal.getGoal(actionType), size_t(m_initialState.getNumTotal(actionType))) * actionType.supplyCost();
+        supplyNeeded += std::max(m_goal.getGoal(actionType), m_initialState.getNumTotal(actionType)) * actionType.supplyCost();
     }
 
     // set the upper bound on supply based on these values

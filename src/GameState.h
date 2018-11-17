@@ -57,18 +57,18 @@ class GameState
     TimeType				        whenCanBuild(ActionType action)                         const;
     TimeType                        whenCanCast(ActionType action, NumUnits targetID)       const;
     TimeType                        whenEnergyReady(ActionType action)                      const;
-    NumUnits			            getSupplyInProgress()                                   const;
+    int			                    getSupplyInProgress()                                   const;
     TimeType                        getNextFinishTime(ActionType type)                      const;
 
-    void                            getSpecialAbilityTargets(ActionSetAbilities & actionSet, NumUnits index)      const;
-    void                            storeChronoBoostTargets(ActionSetAbilities & actionSet, NumUnits index)       const;
+    void                            getSpecialAbilityTargets(ActionSetAbilities & actionSet, int index)         const;
+    void                            storeChronoBoostTargets(ActionSetAbilities & actionSet, int index)          const;
     bool                            chronoBoostableTarget(const Unit & unit)                                    const;
     bool                            canChronoBoostTarget(const Unit & unit)                                     const;
     bool                            canChronoBoost()                                                            const;
 
-    NumUnits			            getNumInProgress(ActionType action)                     const;
-    NumUnits			            getNumCompleted(ActionType action)                      const;
-    NumUnits			            getNumTotal(ActionType action)                          const;
+    int			                    getNumInProgress(ActionType action)                     const;
+    int			                    getNumCompleted(ActionType action)                      const;
+    int			                    getNumTotal(ActionType action)                          const;
     void			                getLegalActions(std::vector<ActionType> & legalActions) const;
     bool			                isLegal(ActionType type)                                const;
     bool			                haveType(ActionType action)                             const;
@@ -82,13 +82,13 @@ class GameState
     void			                setGas(FracType gas) { m_gas = gas; }
 
     bool			                canBuildNow(ActionType action)      const { return whenCanBuild(action) == getCurrentFrame(); }
-    NumUnits			            getNumMineralWorkers()              const { return m_mineralWorkers; }
-    NumUnits			            getNumGasWorkers()                  const { return m_gasWorkers; }
+    int			                    getNumMineralWorkers()              const { return m_mineralWorkers; }
+    int			                    getNumGasWorkers()                  const { return m_gasWorkers; }
     size_t                          getNumberChronoBoostsCast()         const { return m_chronoBoosts.size(); }
     size_t                          getNumUnits()                       const { return m_units.size(); }
     TimeType                        getLastActionFinishTime()           const { return m_unitsBeingBuilt.empty() ? getCurrentFrame() : m_units[m_unitsBeingBuilt.front()].getTimeUntilBuilt(); }
-    NumUnits		                getCurrentSupply()                  const { return m_currentSupply; }
-    NumUnits		                getMaxSupply()                      const { return m_maxSupply; }
+    int		                        getCurrentSupply()                  const { return m_currentSupply; }
+    int		                        getMaxSupply()                      const { return m_maxSupply; }
     TimeType 	                    getCurrentFrame()                   const { return m_currentFrame; }
     RaceID				            getRace()                           const { return m_race; }
     FracType	                    getMinerals()                       const { return m_minerals; }

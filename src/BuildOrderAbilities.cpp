@@ -162,19 +162,16 @@ std::string BuildOrderAbilities::getIDString() const
     return ss.str();
 }
 
-std::string BuildOrderAbilities::getNameString(size_t charactersPerName, size_t printUpToIndex) const
+std::string BuildOrderAbilities::getNameString(size_t charactersPerName, int printUpToIndex) const
 {
     std::stringstream ss;
-
-#if 0    
-    //!!!PROBLEM can't be -1
+ 
     if (printUpToIndex == -1)
     {
         printUpToIndex = m_buildOrder.size();
     }
-#endif
     
-    for (size_t i(0); i < printUpToIndex; ++i)
+    for (int i(0); i < printUpToIndex; ++i)
     {
         std::string name = charactersPerName == 0 ? m_buildOrder[i].first.getName() : m_buildOrder[i].first.getName().substr(0, charactersPerName);;
         if (m_buildOrder[i].first.getName() == "ChronoBoost")

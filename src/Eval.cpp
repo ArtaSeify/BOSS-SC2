@@ -53,11 +53,11 @@ namespace Eval
         return sum;
     }
 
-    FracType ArmyResourceSumToIndex(const GameState & state, size_t finishedUnitsIndex)
+    FracType ArmyResourceSumToIndex(const GameState & state, int finishedUnitsIndex)
     {
         FracType sum(0);
         auto & finishedUnits = state.getFinishedUnits();
-        size_t index = finishedUnitsIndex;
+        int index = finishedUnitsIndex;
 
         for (; index < finishedUnitsIndex + 1; ++index)
         {

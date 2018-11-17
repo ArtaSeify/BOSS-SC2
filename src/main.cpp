@@ -144,7 +144,7 @@ void testjson()
 
 }
 
-int main(int /*!!! PROBLEM UNUSED argc*/, char */*!!! PROBLEM UNUSED argv*/[])
+int main(int /*!!! PROBLEM UNUSED argc*/, char * /*!!! PROBLEM UNUSED argv*/ [])
 {
     // Initialize all the BOSS internal data
     //BOSS::Init("../bin/BWData.json");

@@ -108,11 +108,11 @@ namespace BOSS
 
     public:
 
-    // alternate constructor
-    CombatSearchParameters();
+        // alternate constructor
+        CombatSearchParameters();
     
-    void 	                    setRepetitions(ActionType a, int repetitions);
-    int 	                    getRepetitions(ActionType a) const;
+        void 	                    setRepetitions(ActionType a, int repetitions);
+        int 	                    getRepetitions(ActionType a) const;
 
         void                        setMaxActions(ActionType a, int max);
         int 	                    getMaxActions(ActionType a) const;
@@ -132,16 +132,16 @@ namespace BOSS
         void                        setEnemyBuildOrder(const BuildOrderAbilities & buildOrder);
         const BuildOrderAbilities & getEnemyBuildOrder() const;
 
-    void                        setSearchTimeLimit(double timeLimitMS);
-    double                      getSearchTimeLimit() const;
+        void                        setSearchTimeLimit(double timeLimitMS);
+        double                      getSearchTimeLimit() const;
 
-    void                        setFrameTimeLimit(int limit);
-    int                         getFrameTimeLimit() const;
+        void                        setFrameTimeLimit(int limit);
+        int                         getFrameTimeLimit() const;
 
-    void                        setAlwaysMakeWorkers(bool flag);
-    bool                  getAlwaysMakeWorkers() const;
+        void                        setAlwaysMakeWorkers(bool flag);
+        bool                        getAlwaysMakeWorkers() const;
     
-    void print();
+        void print();
 };
 
 }

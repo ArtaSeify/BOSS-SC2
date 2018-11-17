@@ -7,8 +7,7 @@
 using namespace BOSS;
 
 GameState::GameState()
-    : m_numUnits(0)
-    , m_race(Races::None)
+    : m_race(Races::None)
     , m_minerals(0.0f)
     , m_gas(0.0f)
     , m_currentSupply(0)
@@ -228,7 +227,7 @@ void GameState::fastForward(TimeType toFrame)
     m_gas           += timeElapsed * CONSTANTS::GPWPF * m_gasWorkers;
 
     // update all the intances to the ff time
-    for (int i(0); i < m_numUnits; ++i )
+    for (int i(0); i < int(m_units.size()); ++i )
     {
         m_units[i].fastForward(toFrame - previousFrame);
     }
@@ -599,7 +598,7 @@ bool GameState::havePrerequisites(ActionType type) const
            [this](ActionType req) { return this->haveType(req); });
 }
 
-NumUnits GameState::getNumInProgress(ActionType action) const
+int GameState::getNumInProgress(ActionType action) const
 {
     //return std::count_if(m_unitsBeingBuilt.begin(), m_unitsBeingBuilt.end(),
     //       [this, &action](const size_t & id) { return action == this->getUnit(id).getType(); } );
@@ -615,12 +614,12 @@ NumUnits GameState::getNumInProgress(ActionType action) const
     return numInProgress;
 }
 
-NumUnits GameState::getNumCompleted(ActionType action) const
+int GameState::getNumCompleted(ActionType action) const
 {
     //return std::count_if(m_units.begin(), m_units.end(),
     //       [&action](const Unit & unit) { return action == unit.getType() && unit.getTimeUntilBuilt() == 0; } );
 
-    uint4 numCompleted = 0;
+    int numCompleted = 0;
     for (int i(0); i < int(m_units.size()); ++i)
     {
         auto & unit = m_units[i];
@@ -632,12 +631,12 @@ NumUnits GameState::getNumCompleted(ActionType action) const
     return numCompleted;
 }
 
-NumUnits GameState::getNumTotal(ActionType action) const
+int GameState::getNumTotal(ActionType action) const
 {
     //return std::count_if(m_units.begin(), m_units.end(), 
     //       [&action](const Unit & unit) { return action == unit.getType(); } );
 
-    uint4 numTotal = 0;
+    int numTotal = 0;
     for (int i(0); i < int(m_units.size()); ++i)
     {
         auto & unit = m_units[i];
@@ -678,7 +677,7 @@ bool GameState::haveType(ActionType action) const
     return false;
 }
 
-NumUnits GameState::getSupplyInProgress() const
+int GameState::getSupplyInProgress() const
 {
     //return std::accumulate(m_unitsBeingBuilt.begin(), m_unitsBeingBuilt.end(), 0, 
     //       [this](size_t lhs, size_t rhs) { return lhs + this->getUnit(rhs).getType().supplyProvided(); });
@@ -691,7 +690,7 @@ NumUnits GameState::getSupplyInProgress() const
     return supplyInProgress;
 }
 
-void GameState::getSpecialAbilityTargets(ActionSetAbilities & actionSet, NumUnits index) const
+void GameState::getSpecialAbilityTargets(ActionSetAbilities & actionSet, int index) const
 {
     if (m_race == Races::Protoss)
     {
@@ -722,7 +721,7 @@ bool GameState::canChronoBoost() const
     return false;
 }
 
-void GameState::storeChronoBoostTargets(ActionSetAbilities & actionSet, NumUnits index) const
+void GameState::storeChronoBoostTargets(ActionSetAbilities & actionSet, int index) const
 {
     for (int i(0); i < int(m_units.size()); ++i)
     {

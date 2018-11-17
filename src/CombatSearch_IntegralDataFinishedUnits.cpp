@@ -86,7 +86,7 @@ void CombatSearch_IntegralDataFinishedUnits::print() const
 
 void CombatSearch_IntegralDataFinishedUnits::printIntegralData(const int index, const std::vector<IntegralDataFinishedUnits> & integral_stack, const GameState & /*!!! PROBLEM UNUSED state */, const BuildOrderAbilities & buildOrder) const
 {
-  printf("%7d %8d %10.2lf %15.2lf %16.2lf   ", (int)integral_stack[index].timeStarted, (int)integral_stack[index].timeFinished, integral_stack[index].eval, integral_stack[index].integral_ToThisPoint, integral_stack[index].integral_UntilFrameLimit);
+    printf("%7d %8d %10.2lf %15.2lf %16.2lf   ", (int)integral_stack[index].timeStarted, (int)integral_stack[index].timeFinished, integral_stack[index].eval, integral_stack[index].integral_ToThisPoint, integral_stack[index].integral_UntilFrameLimit);
     std::cout << buildOrder.getNameString(2, index) << std::endl;
 }
 

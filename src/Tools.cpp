@@ -249,7 +249,7 @@ BuildOrder Tools::GetNaiveBuildOrderAddWorkersOld(const GameState & state, const
                 currentState.doAction(supplyProvider);
                 continue;
             }
-            catch (BOSSException & e)
+            catch (BOSSException & /*e*/)
             {
                 break;
             }

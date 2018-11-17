@@ -150,7 +150,7 @@ void DFBB_BuildOrderStackSearch::generateLegalActions(const GameState & state, A
     }
 }
 
-size_t DFBB_BuildOrderStackSearch::getRepetitions(const GameState & state, ActionType a)
+int DFBB_BuildOrderStackSearch::getRepetitions(const GameState & state, ActionType a)
 {
     // set the repetitions if we are using repetitions, otherwise set to 1
     int repeat = m_params.m_useRepetitions ? m_params.getRepetitions(a) : 1;
@@ -159,7 +159,7 @@ size_t DFBB_BuildOrderStackSearch::getRepetitions(const GameState & state, Actio
     if (m_params.m_useIncreasingRepetitions)
     {
         // if we don't have the threshold amount of units, use a repetition value of 1
-        repeat = size_t(state.getNumTotal(a)) >= m_params.getRepetitionThreshold(a) ? repeat : 1;
+        repeat = state.getNumTotal(a) >= m_params.getRepetitionThreshold(a) ? repeat : 1;
     }
 
     // make sure we don't repeat to more than we need for this unit type
@@ -225,7 +225,7 @@ SEARCH_BEGIN:
     }
 
     generateLegalActions(STATE, LEGAL_ACTIONS);
-    for (CHILD_NUM = 0; CHILD_NUM < LEGAL_ACTIONS.size(); ++CHILD_NUM)
+    for (CHILD_NUM = 0; CHILD_NUM < int(LEGAL_ACTIONS.size()); ++CHILD_NUM)
     {
         ACTION_TYPE = LEGAL_ACTIONS[CHILD_NUM];
 
@@ -268,7 +268,7 @@ SEARCH_BEGIN:
 
 SEARCH_RETURN:
 
-        for (size_t r(0); r < COMPLETED_REPS; ++r)
+        for (int r(0); r < COMPLETED_REPS; ++r)
         {
             m_buildOrder.pop_back();
         }
