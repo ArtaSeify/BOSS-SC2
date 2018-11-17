@@ -12,7 +12,7 @@ namespace BOSS
         typedef std::pair<ActionType, AbilityAction>    ActionTargetPair;
         typedef std::vector<ActionTargetPair>           BuildOrder;
         BuildOrder                                      m_buildOrder;
-        std::vector<size_t>		                        m_typeCount;
+        std::vector<ActionID>		                    m_typeCount;
 
     public:
 
@@ -28,7 +28,7 @@ namespace BOSS
         void                        sortByPrerequisites();
 
         size_t                      size() const;
-        size_t                      getTypeCount(ActionType type) const;
+        int                         getTypeCount(ActionType type) const;
         bool                        empty() const;
         //ActionType          getAbilityTargetType(size_t index) const;
         //size_t                      getAbilityTarget(size_t index) const;

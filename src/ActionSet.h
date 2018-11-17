@@ -9,7 +9,7 @@ namespace BOSS
 class ActionType;
 class ActionSet
 {
-	std::vector<ActionType> m_actions;
+    std::vector<ActionType> m_actions;
 
 public:
 
@@ -25,8 +25,8 @@ public:
     void remove(const ActionSet & set);
     void clear();
 
-          ActionType & operator[] (const size_t & index);
-    ActionType operator[] (const size_t & index) const;
+          ActionType & operator[] (size_t index);
+    ActionType operator[] (size_t index) const;
 
     const std::string toString() const;
 };

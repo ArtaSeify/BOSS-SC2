@@ -21,9 +21,9 @@ public:
 	DFBB_BuildOrderSearchSaveState(const std::vector<ActionType> & buildOrder, int ub);
 	
 	int getUpperBound() const;
-	int operator [] (const int index) const;
+	int operator [] (int index) const;
 	int getDepth() const;
-	int getAction(const int d) const;
+	int getAction(int d) const;
 
 	void print() const;
 };

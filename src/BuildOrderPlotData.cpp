@@ -64,7 +64,7 @@ void BuildOrderPlotData::calculateStartEndTimes()
     size_t numInitialUnits = m_initialState.getNumUnits();
     state.fastForward(5000); // ff far enough so everything is done
     const GameState constState = std::as_const(state);
-    size_t abilities = 0;
+    int abilities = 0;
     m_maxFinishTime = 0;
     for (size_t i(0); i < m_buildOrder.size(); ++i)
     {
@@ -79,7 +79,7 @@ void BuildOrderPlotData::calculateStartEndTimes()
 
         else
         {
-            finish = constState.getUnit(numInitialUnits + i - abilities).getFinishFrame();
+            finish = constState.getUnit(NumUnits(numInitialUnits + i - abilities)).getFinishFrame();
         }
         
 

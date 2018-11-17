@@ -7,17 +7,17 @@ namespace Eval
     /*double ArmyCompletedResourceSum(const GameState & state)
     {
         double sum(0);
-	    
-	    for (auto & type : ActionTypes::GetAllActionTypes())
-	    {
-	        if (!type.isBuilding() && !type.isWorker() && !type.isSupplyProvider())
-	        {
+        
+        for (auto & type : ActionTypes::GetAllActionTypes())
+        {
+            if (!type.isBuilding() && !type.isWorker() && !type.isSupplyProvider())
+            {
                 sum += state.getNumCompleted(type)*type.mineralPrice();
-	            sum += 2*state.getNumCompleted(type)*type.gasPrice();
-	        }
-	    }
-	    
-	    return sum;
+                sum += 2*state.getNumCompleted(type)*type.gasPrice();
+            }
+        }
+        
+        return sum;
     }*/
 
     /*double ArmyCompletedResourceSum(const GameState & state)
@@ -35,25 +35,25 @@ namespace Eval
         return sum;
     }*/
 
-    double ArmyTotalResourceSum(const GameState & state)
+    FracType ArmyTotalResourceSum(const GameState & state)
     {
-        double sum(0);
-	    
-	    for (auto & type : ActionTypes::GetAllActionTypes())
-	    {
-	        if (!type.isBuilding() && !type.isWorker() && !type.isSupplyProvider())
-	        {
+        FracType sum(0);
+        
+        for (auto & type : ActionTypes::GetAllActionTypes())
+        {
+            if (!type.isBuilding() && !type.isWorker() && !type.isSupplyProvider())
+            {
                 sum += state.getNumTotal(type)*type.mineralPrice();
-	            sum += 2*state.getNumTotal(type)*type.gasPrice();
-	        }
-	    }
-	    
-	    return sum;
+                sum += 2*state.getNumTotal(type)*type.gasPrice();
+            }
+        }
+        
+        return sum;
     }
 
-    double ArmyResourceSumToIndex(const GameState & state, size_t finishedUnitsIndex)
+    FracType ArmyResourceSumToIndex(const GameState & state, size_t finishedUnitsIndex)
     {
-        double sum(0);
+        FracType sum(0);
         auto & finishedUnits = state.getFinishedUnits();
         size_t index = finishedUnitsIndex;
 

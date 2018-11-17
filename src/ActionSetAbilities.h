@@ -10,7 +10,7 @@ class ActionType;
 class CombatSearchParameters;
 class ActionSetAbilities
 {
-    typedef std::pair<ActionType, uint4> ActionTargetPair;
+    typedef std::pair<ActionType, NumUnits> ActionTargetPair;
     typedef std::vector<ActionTargetPair> Actions;
     Actions m_actionsAndTargets;
 
@@ -26,8 +26,8 @@ public:
 
     void add(ActionType action);
     void add(const ActionSetAbilities & set);
-    void add(ActionType action, uint4 abilityTargetID);
-    void add(ActionType action, uint4 abilityTargetID, size_t index);
+    void add(ActionType action, NumUnits abilityTargetID);
+    void add(ActionType action, NumUnits abilityTargetID, size_t index);
 
     void sort(const GameState & state, const CombatSearchParameters & params);
 
@@ -35,7 +35,7 @@ public:
     void remove(ActionType action, size_t index);
     void remove(const ActionSetAbilities & set);
 
-    uint4 getAbilityTarget(uint4 index) const;
+    NumUnits getAbilityTarget(size_t index) const;
     const std::string toString() const;
 
     // iterator
@@ -47,8 +47,8 @@ public:
     const_iterator end() const { return m_actionsAndTargets.end(); }
 
     // index
-    ActionTargetPair & operator[] (uint4 index) { return m_actionsAndTargets[index]; }
-    const ActionTargetPair & operator[] (uint4 index) const { return m_actionsAndTargets[index]; }
+    ActionTargetPair & operator[] (size_t index) { return m_actionsAndTargets[index]; }
+    const ActionTargetPair & operator[] (size_t index) const { return m_actionsAndTargets[index]; }
 };
 
 }

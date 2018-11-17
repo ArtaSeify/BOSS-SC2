@@ -106,8 +106,8 @@ void BuildOrderPlotter::writeBuildOrderPlot(const std::vector<BuildOrderPlotData
         for (size_t i(0); i < buildOrder.size(); ++i)
         {
             const Rectangle & rect = plots[p].m_rectangles[i];
-            const int rectWidth = (rect.bottomRight.x() - rect.topLeft.x());
-            const int rectCenterX = rect.bottomRight.x() - (rectWidth / 2);
+            int rectWidth = (rect.bottomRight.x() - rect.topLeft.x());
+            int rectCenterX = rect.bottomRight.x() - (rectWidth / 2);
         
             std::stringstream pos;
 
@@ -264,7 +264,7 @@ std::string BuildOrderPlotter::GetFileNameFromPath(const std::string & path)
 {
     std::string temp(path);
 
-    const size_t last_slash_idx = temp.find_last_of("\\/");
+    size_t last_slash_idx = temp.find_last_of("\\/");
     if (std::string::npos != last_slash_idx)
     {
         temp.erase(0, last_slash_idx + 1);
@@ -277,7 +277,7 @@ std::string BuildOrderPlotter::RemoveFileExtension(const std::string & path)
 {
     std::string temp(path);
 
-    const size_t period_idx = temp.rfind('.');
+    size_t period_idx = temp.rfind('.');
     if (std::string::npos != period_idx)
     {
         temp.erase(period_idx);

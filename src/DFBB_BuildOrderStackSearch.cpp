@@ -77,7 +77,7 @@ void DFBB_BuildOrderStackSearch::generateLegalActions(const GameState & state, A
     {
         ActionType actionType = m_params.m_relevantActions[a];
         const std::string & actionName = actionType.getName();
-        const size_t numTotal = state.getNumTotal(actionType);
+        size_t numTotal = state.getNumTotal(actionType);
 
         if (state.isLegal(actionType))
         {
@@ -125,7 +125,7 @@ void DFBB_BuildOrderStackSearch::generateLegalActions(const GameState & state, A
         for (size_t a(0); a < legalActions.size(); ++a)
         {
             ActionType actionType = legalActions[a];
-            const int whenCanPerformAction = state.whenCanBuild(actionType);
+            int whenCanPerformAction = state.whenCanBuild(actionType);
             if (whenCanPerformAction < workerReady)
             {
                 actionLegalBeforeWorker = true;
@@ -158,7 +158,7 @@ size_t DFBB_BuildOrderStackSearch::getRepetitions(const GameState & state, Actio
     if (m_params.m_useIncreasingRepetitions)
     {
         // if we don't have the threshold amount of units, use a repetition value of 1
-        repeat = state.getNumTotal(a) >= m_params.getRepetitionThreshold(a) ? repeat : 1;
+        repeat = size_t(state.getNumTotal(a)) >= m_params.getRepetitionThreshold(a) ? repeat : 1;
     }
 
     // make sure we don't repeat to more than we need for this unit type

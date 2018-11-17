@@ -18,7 +18,7 @@ namespace Assert
         return ss.str();
     }
 
-    void ReportFailure(const GameState * state, const char * condition, const char * file, int line, const char * msg, ...)
+    void ReportFailure(const GameState * /*state*/, const char * condition, const char * file, int line, const char * msg, ...)
     {
         std::cerr << "Assertion thrown!\n";
         // get the extra parameters

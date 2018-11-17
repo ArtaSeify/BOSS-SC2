@@ -28,14 +28,14 @@ void CombatSearch_Integral::recurse(const GameState & state, size_t depth)
 
     for (size_t a(0); a < legalActions.size(); ++a)
     {
-        const size_t index = legalActions.size() - (a + 1);
+        int index = legalActions.size() - (a + 1);
 
         GameState child(state);
 
         const auto & actionTargetPair = legalActions[index];
 
         ActionType action = actionTargetPair.first;
-        size_t actionTarget = actionTargetPair.second;
+        uint4 actionTarget = actionTargetPair.second;
 
         // get the targets for the ability
         if (action == ActionTypes::GetSpecialAction(state.getRace()) && actionTarget == -1)

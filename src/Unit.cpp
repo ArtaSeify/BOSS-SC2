@@ -23,7 +23,7 @@ Unit::Unit()
 
 }
 
-/*Unit::Unit(ActionType type, uint4 id, int builderID, uint4 frameStarted)
+Unit::Unit(ActionType type, NumUnits id, NumUnits builderID, TimeType frameStarted)
     : m_job                     (UnitJobs::None)
     , m_id                      (id)
     , m_frameStarted            (frameStarted)
@@ -36,15 +36,15 @@ Unit::Unit()
     , m_timeUntilFree           (builderID != -1 ? type.buildTime() : 0)
     , m_numLarva                (0)
     , m_builderID               (builderID)
-	, m_timeChronoBoost         (0)
+    , m_timeChronoBoost         (0)
     , m_timeChronoBoostAgain    (0)
     , m_maxEnergyAllowed        (float(type.maxEnergy()))
-	, m_energy			        (float(type.startingEnergy()))
+    , m_energy			        (float(type.startingEnergy()))
 {
     
-}*/
+}
 
-void Unit::initializeUnit(ActionType type, short id, short builderID, uint2 frameStarted)
+/*void Unit::initializeUnit(ActionType type, short id, short builderID, uint2 frameStarted)
 {
     m_id = id;
     m_frameStarted = frameStarted;
@@ -54,7 +54,7 @@ void Unit::initializeUnit(ActionType type, short id, short builderID, uint2 fram
     m_builderID = builderID;
     m_maxEnergyAllowed = float(type.maxEnergy());
     m_energy = float(type.startingEnergy());
-}
+}*/
 
 void Unit::startBuilding(Unit & Unit)
 {
@@ -84,14 +84,14 @@ void Unit::startBuilding(Unit & Unit)
     }
 }
 
-void Unit::complete(uint2 frameFinished)
+void Unit::complete(TimeType frameFinished)
 {
     m_timeUntilFree = 0;
     m_timeUntilBuilt = 0;
     m_frameFinished = frameFinished;
 }
 
-void Unit::fastForward(uint2 frames)
+void Unit::fastForward(TimeType frames)
 {
     // if we are completing the thing that this Unit is building
     if ((m_buildType != ActionTypes::None) && frames >= m_timeUntilFree)
@@ -112,14 +112,14 @@ void Unit::fastForward(uint2 frames)
         m_energy += std::abs(m_timeUntilBuilt) * CONSTANTS::ERPF;
         m_energy = std::min(m_energy, m_maxEnergyAllowed);
     }
-    m_timeUntilFree = (short)std::max(0, m_timeUntilFree - frames);
-    m_timeUntilBuilt = (short)std::max(short(0), m_timeUntilBuilt);
-    m_timeChronoBoostAgain = (uint2)std::max(0, m_timeChronoBoostAgain - frames); 
-    m_timeChronoBoost = (uint2)std::min(m_timeChronoBoost, m_timeChronoBoostAgain);
+    m_timeUntilFree         = (TimeType)std::max(0, m_timeUntilFree - frames);
+    m_timeUntilBuilt        = (TimeType)std::max(0, m_timeUntilBuilt);
+    m_timeChronoBoostAgain  = (TimeType)std::max(0, m_timeChronoBoostAgain - frames);
+    m_timeChronoBoost       = (TimeType)std::min(m_timeChronoBoost, m_timeChronoBoostAgain);
 }
 
 // returns when this Unit can build a given type, -1 if it can't
-short Unit::whenCanBuild(ActionType type) const
+int Unit::whenCanBuild(ActionType type) const
 {
     // check to see if this type can build the given type
     // TODO: check equivalent types (hatchery gspire etc)
@@ -151,7 +151,7 @@ void Unit::castAbility(ActionType type, Unit & abilityTarget, Unit & abilityTarg
     BOSS_ASSERT(type.whatBuilds() == m_type, "Ability %s can't be cast by unit %s on unit %s", type.getName().c_str(), m_type.getName().c_str(), abilityTarget.getType().getName().c_str());
 
     // reduce energy of unit based on energy cost of action
-    reduceEnergy(type.energyCost());
+    reduceEnergy(FracType(type.energyCost()));
 
     // use ability on target
     if (type.getName() == "ChronoBoost")
@@ -160,7 +160,7 @@ void Unit::castAbility(ActionType type, Unit & abilityTarget, Unit & abilityTarg
     }
 }
 
-void Unit::applyChronoBoost(uint2 time, Unit & unitBeingProduced)
+void Unit::applyChronoBoost(TimeType time, Unit & unitBeingProduced)
 {
     if (m_timeChronoBoostAgain > 0)
     {

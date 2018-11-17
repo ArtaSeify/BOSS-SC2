@@ -42,7 +42,7 @@ void ActionTypeData::Init(const json & j)
             data.race = Races::GetRaceID(data.raceName);
             JSONTools::ReadInt("mineralCost",       actions[a], data.mineralCost);
             JSONTools::ReadInt("gasCost",           actions[a], data.gasCost);
-			JSONTools::ReadFloat("supplyCost",      actions[a], data.supplyCost); // demical supply cost in SC2
+            JSONTools::ReadFloat("supplyCost",      actions[a], data.supplyCost); // demical supply cost in SC2
             JSONTools::ReadInt("energyCost",        actions[a], data.energyCost);
             JSONTools::ReadInt("supplyProvided",    actions[a], data.supplyProvided);
             JSONTools::ReadInt("buildTime",         actions[a], data.buildTime);

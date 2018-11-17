@@ -255,23 +255,23 @@ const BuildOrder & NaiveBuildOrderSearch::solve()
         int currentSupply = m_state.getCurrentSupply();
         int supplyInProgress = m_state.getSupplyInProgress();
 
-		// insert 1 or more supply providers if needed
+        // insert 1 or more supply providers if needed
         // TODO: don't go over 200 supply
-		while (!nextAction.isMorphed() && !nextAction.isSupplyProvider() && (nextAction.supplyCost() > (maxSupply + supplyInProgress - currentSupply)))
-		{
-			BOSS_ASSERT(m_state.isLegal(supplyProvider), "Should be able to build more supply here. Max: %d", maxSupply);
-			finalBuildOrder.add(supplyProvider);
-			m_state.doAction(supplyProvider);
+        while (!nextAction.isMorphed() && !nextAction.isSupplyProvider() && (nextAction.supplyCost() > (maxSupply + supplyInProgress - currentSupply)))
+        {
+            BOSS_ASSERT(m_state.isLegal(supplyProvider), "Should be able to build more supply here. Max: %d", maxSupply);
+            finalBuildOrder.add(supplyProvider);
+            m_state.doAction(supplyProvider);
 
-			maxSupply = m_state.getMaxSupply();
-			currentSupply = m_state.getCurrentSupply();
-			supplyInProgress = m_state.getSupplyInProgress();
-		}
+            maxSupply = m_state.getMaxSupply();
+            currentSupply = m_state.getCurrentSupply();
+            supplyInProgress = m_state.getSupplyInProgress();
+        }
 
-		BOSS_ASSERT(m_state.isLegal(nextAction), "Should be able to build the next action now");
-		finalBuildOrder.add(nextAction);
-		m_state.doAction(nextAction);
-	}
+        BOSS_ASSERT(m_state.isLegal(nextAction), "Should be able to build the next action now");
+        finalBuildOrder.add(nextAction);
+        m_state.doAction(nextAction);
+    }
 
     m_buildOrder = finalBuildOrder;
     m_naiveSolved = true;

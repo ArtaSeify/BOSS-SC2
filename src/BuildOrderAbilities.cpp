@@ -64,7 +64,7 @@ const AbilityAction & BuildOrderAbilities::getAbilityAction(size_t index) const
     return m_buildOrder[index].second;
 }*/
 
-size_t BuildOrderAbilities::getTypeCount(ActionType type) const
+int BuildOrderAbilities::getTypeCount(ActionType type) const
 {
     if (empty())
     {

@@ -7,5 +7,5 @@
 namespace BOSS
 {
     void Init(const std::string & filename);
-	void InitializeConstants(const json & j);
+    void InitializeConstants(const json & j);
 }

@@ -45,7 +45,7 @@ void ActionSetAbilities::add(const ActionSetAbilities & set)
     }
 }
 
-void ActionSetAbilities::add(ActionType action, uint4 abilityTargetID)
+void ActionSetAbilities::add(ActionType action, NumUnits abilityTargetID)
 {
     if (action.isAbility() || !contains(action))
     {
@@ -54,7 +54,7 @@ void ActionSetAbilities::add(ActionType action, uint4 abilityTargetID)
 }
 
 // add action and target at a specific index
-void ActionSetAbilities::add(ActionType action, uint4 abilityTargetID, size_t index)
+void ActionSetAbilities::add(ActionType action, NumUnits abilityTargetID, size_t index)
 {
     if (action.isAbility() || !contains(action))
     {
@@ -145,7 +145,7 @@ void ActionSetAbilities::remove(ActionType action, size_t index)
     m_actionsAndTargets.erase(m_actionsAndTargets.begin() + index);
 }
 
-uint4 ActionSetAbilities::getAbilityTarget(uint4 index) const
+NumUnits ActionSetAbilities::getAbilityTarget(size_t index) const
 { 
     return m_actionsAndTargets[index].second; 
 }

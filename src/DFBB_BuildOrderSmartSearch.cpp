@@ -234,7 +234,7 @@ size_t DFBB_BuildOrderSmartSearch::calculateSupplyProvidersRequired()
     for (ActionType actionType : ActionTypes::GetAllActionTypes())
     {
         // add the supply required for this number of goal units and all units currently made
-        supplyNeeded += std::max(m_goal.getGoal(actionType), m_initialState.getNumTotal(actionType)) * actionType.supplyCost();
+        supplyNeeded += std::max(m_goal.getGoal(actionType), size_t(m_initialState.getNumTotal(actionType))) * actionType.supplyCost();
     }
 
     // set the upper bound on supply based on these values
@@ -271,7 +271,7 @@ void DFBB_BuildOrderSmartSearch::setRepetitions()
     }
 }
 
-void DFBB_BuildOrderSmartSearch::addGoal(ActionType a, const size_t & count)
+void DFBB_BuildOrderSmartSearch::addGoal(ActionType a, size_t count)
 {
     m_goal.setGoal(a,count);
 }

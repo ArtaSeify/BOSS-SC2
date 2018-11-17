@@ -9,19 +9,19 @@ using namespace BOSS;
 // The number of buckets and the frame limit determine the size of the buckets
 
 
-CombatSearch_BucketData::CombatSearch_BucketData(const int frameLimit, const size_t numBuckets)
+CombatSearch_BucketData::CombatSearch_BucketData(int frameLimit, size_t numBuckets)
         : m_buckets(numBuckets, BucketData())
         , m_frameLimit(frameLimit)
 {
     
 }
 
-const size_t CombatSearch_BucketData::numBuckets() const
+size_t CombatSearch_BucketData::numBuckets() const
 {
     return m_buckets.size();
 }
 
-const size_t CombatSearch_BucketData::getBucketIndex(const GameState & state) const
+size_t CombatSearch_BucketData::getBucketIndex(const GameState & state) const
 {
     return (size_t)(((double)state.getCurrentFrame() / (double)m_frameLimit) * m_buckets.size());
 }
@@ -93,7 +93,7 @@ void CombatSearch_BucketData::print() const
     }
 }
 
-const BucketData & CombatSearch_BucketData::getBucket(const size_t index) const
+const BucketData & CombatSearch_BucketData::getBucket(size_t index) const
 {
     return m_buckets[index];
 }

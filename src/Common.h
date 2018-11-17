@@ -22,22 +22,27 @@ namespace BOSS
     typedef unsigned char   uint1;
     typedef unsigned short  uint2;
     typedef unsigned int    uint4;
+    typedef signed char     int1;
+    typedef signed short    int2;
+    typedef signed int      int4;
 
-    // ~~~~~!!! CAN CHANGE THIS
-    typedef uint2  ActionID;
-    typedef uint1  RaceID;
+    using ActionID  = uint2;
+    using RaceID    = uint1;
+    using TimeType  = int4;
+    using NumUnits  = int2;
+    using FracType  = float;
 
-	// constants declared in data file
-	class CONSTANTS
-	{
-	public:
-		static float MPWPF;			        // minerals per worker per frame
-		static float GPWPF;		            // gas per worker per frame
-		static float ERPF;				    // energy regen per frame
-		static float HRPF;				    // health regen per frame
-		static float SRPF;				    // shield regen per frame
-		static short WorkersPerRefinery;    // number of workers per refinery
-	};
+    // constants declared in data file
+    class CONSTANTS
+    {
+    public:
+        static float MPWPF;			        // minerals per worker per frame
+        static float GPWPF;		            // gas per worker per frame
+        static float ERPF;				    // energy regen per frame
+        static float HRPF;				    // health regen per frame
+        static float SRPF;				    // shield regen per frame
+        static short WorkersPerRefinery;    // number of workers per refinery
+    };
 
     namespace Races
     {

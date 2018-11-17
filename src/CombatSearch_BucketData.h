@@ -30,11 +30,11 @@ class CombatSearch_BucketData
 
 public:
 
-    CombatSearch_BucketData(const int frameLimit, const size_t numBuckets);
+    CombatSearch_BucketData(int frameLimit, size_t numBuckets);
 
-    const BucketData & getBucket(const size_t index) const;
-    const size_t numBuckets() const;
-    const size_t getBucketIndex(const GameState & state) const;
+    const BucketData & getBucket(size_t index) const;
+    size_t numBuckets() const;
+    size_t getBucketIndex(const GameState & state) const;
         
     void update(const GameState & state, const BuildOrderAbilities & buildOrder);
 

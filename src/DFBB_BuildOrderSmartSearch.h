@@ -41,7 +41,7 @@ public:
 
     DFBB_BuildOrderSmartSearch();
 
-    void addGoal(ActionType a, const size_t & count);
+    void addGoal(ActionType a, size_t count);
     void setGoal(const BuildOrderSearchGoal & goal);
     void setState(const GameState & state);
     void print();

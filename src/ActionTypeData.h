@@ -11,7 +11,7 @@ struct ActionTypeData
     std::string                 name            = "None";
     std::string                 raceName        = "None";
     ActionID                    id              = 0;
-    int                         race            = Races::None;            
+    RaceID                      race            = Races::None;            
     int                         mineralCost     = 0;      
     int                         gasCost         = 0;       
     int                         supplyCost      = 0;   

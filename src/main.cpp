@@ -155,13 +155,13 @@ int main(int argc, char *argv[])
 
     //testBuildOrder();
     
-	// Initialize all the BOSS internal data
-	BOSS::Init("../bin/SC2Data.json");
+    // Initialize all the BOSS internal data
+    BOSS::Init("../bin/SC2Data.json");
 
-	// Read in the config parameters that will be used for experiments
-	BOSS::BOSSConfig::Instance().ParseConfig("../bin/BOSS_SC2_Config.txt");
+    // Read in the config parameters that will be used for experiments
+    BOSS::BOSSConfig::Instance().ParseConfig("../bin/BOSS_SC2_Config.txt");
 
-	BOSS::Experiments::RunExperiments("../bin/BOSS_SC2_Config.txt");
+    BOSS::Experiments::RunExperiments("../bin/BOSS_SC2_Config.txt");
 
     return 0;
 }

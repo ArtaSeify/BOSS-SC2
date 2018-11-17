@@ -11,7 +11,7 @@ class ActionType
     const ActionID	    m_id;
 
 public:
-	
+    
     ActionType();
     ActionType(const ActionType & type);
     ActionType(const ActionID & actionID);
@@ -21,16 +21,16 @@ public:
 
     ActionID getID()             const;
     RaceID   getRace()           const;
-	
-	int  buildTime()        const;
-	int  mineralPrice()     const;
+    
+    int  buildTime()        const;
+    int  mineralPrice()     const;
     int  gasPrice()         const;
     int  supplyCost()       const;
     int  energyCost()       const;
     int  supplyProvided()   const;
     int  numProduced()      const;
-	int  startingEnergy()	const;
-	int  maxEnergy()		const;
+    int  startingEnergy()	const;
+    int  maxEnergy()		const;
     bool isUnit()           const;
     bool isUpgrade()        const;
     bool isAbility()        const;

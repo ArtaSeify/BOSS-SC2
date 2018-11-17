@@ -30,16 +30,16 @@ void CombatSearch_IntegralDataFinishedUnits::update(const GameState & state, con
         std::cout << "unit name: " << state.getUnit(unitTimes[finishedUnits[index]].first).getType().getName() << std::endl;
         std::cout << "start time of unit: " << unitTimes[finishedUnits[index]].second.first << std::endl;
         std::cout << "end time of unit: " << unitTimes[finishedUnits[index]].second.second << std::endl;*/
-        size_t unitIndex = finishedUnits[index];
+        NumUnits unitIndex = finishedUnits[index];
 
-        size_t startFrame = state.getUnit(unitIndex).getStartFrame();
-        size_t finishFrame = state.getUnit(unitIndex).getFinishFrame();
+        TimeType startFrame = state.getUnit(unitIndex).getStartFrame();
+        TimeType finishFrame = state.getUnit(unitIndex).getFinishFrame();
         
-        double value = Eval::ArmyResourceSumToIndex(state, index) + m_integralStack.back().eval;
-        double timeElapsed = finishFrame - m_integralStack.back().timeFinished;
-        double valueToAdd = m_integralStack.back().eval * timeElapsed;
-        double integralToThisPoint = m_integralStack.back().integral_ToThisPoint + valueToAdd;
-        double integralUntilFrameLimit = integralToThisPoint + (params.getFrameTimeLimit() - finishFrame) * value;
+        FracType value = Eval::ArmyResourceSumToIndex(state, index) + m_integralStack.back().eval;
+        TimeType timeElapsed = finishFrame - m_integralStack.back().timeFinished;
+        FracType valueToAdd = m_integralStack.back().eval * timeElapsed;
+        FracType integralToThisPoint = m_integralStack.back().integral_ToThisPoint + valueToAdd;
+        FracType integralUntilFrameLimit = integralToThisPoint + (params.getFrameTimeLimit() - finishFrame) * value;
         IntegralDataFinishedUnits entry(value, integralToThisPoint, integralUntilFrameLimit, startFrame, finishFrame);
         m_integralStack.push_back(entry);
     }

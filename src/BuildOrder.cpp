@@ -8,7 +8,7 @@ BuildOrder::BuildOrder()
 
 }
 
-void BuildOrder::add(ActionType type)
+void BuildOrder::add(const ActionType & type)
 {
     BOSS_ASSERT((m_buildOrder.size() == 0) || (type.getRace() == m_buildOrder.back().getRace()), "Cannot have a build order with multiple races");
 
@@ -16,16 +16,7 @@ void BuildOrder::add(ActionType type)
     m_typeCount[type.getID()]++;
 }
 
-void BuildOrder::add(ActionType type, const AbilityAction & ability)
-{
-    add(type);
-    if (type.isAbility())
-    {
-        m_abilityTargets[m_buildOrder.size() - 1] = ability;
-    }
-}
-
-void BuildOrder::add(ActionType type, int amount)
+void BuildOrder::add(const ActionType & type, int amount)
 {
     for (int i(0); i < amount; ++i)
     {
@@ -47,27 +38,13 @@ void BuildOrder::clear()
     m_typeCount.clear();
 }
 
-const bool BuildOrder::empty() const
+bool BuildOrder::empty() const
 {
     return size() == 0;
 }
 
-/*ActionType BuildOrder::getAbilityTargetType(size_t index) const
-{
-    return m_abilityTargets.at(index).targetType;
-}
 
-const size_t & BuildOrder::getAbilityTarget(size_t index) const
-{
-    return m_abilityTargets.at(index).targetID;
-}
-
-const AbilityAction & BuildOrder::getAbilityAction(size_t index) const
-{
-    return m_abilityTargets.at(index);
-}*/
-
-const size_t BuildOrder::getTypeCount(ActionType type) const
+size_t BuildOrder::getTypeCount(ActionType type) const
 {
     if (empty())
     {
@@ -81,30 +58,20 @@ const size_t BuildOrder::getTypeCount(ActionType type) const
 
 void BuildOrder::pop_back()
 {
-    if ((--m_buildOrder.end())->isAbility())
-    {
-        m_abilityTargets.erase(--m_abilityTargets.end());
-    }
     m_buildOrder.pop_back();
-    
 }
 
-ActionType BuildOrder::operator [] (size_t i) const
+const ActionType & BuildOrder::operator [] (size_t i) const
 {
     return m_buildOrder[i];
 }
 
-ActionType & BuildOrder::operator [] (size_t i) 
+ActionType & BuildOrder::operator [] (size_t i)
 {
     return m_buildOrder[i];
 }
 
-ActionType BuildOrder::back() const
-{
-    return m_buildOrder.back();
-}
-
-const size_t BuildOrder::size() const
+size_t BuildOrder::size() const
 {
     return m_buildOrder.size();
 }
@@ -172,32 +139,16 @@ std::string BuildOrder::getIDString() const
     return ss.str();
 }
 
-std::string BuildOrder::getNameString(size_t charactersPerName, size_t printUpToIndex) const
+std::string BuildOrder::getNameString(const size_t charactersPerName) const
 {
     std::stringstream ss;
 
-    if (printUpToIndex == -1)
+    for (size_t i(0); i < m_buildOrder.size(); ++i)
     {
-        printUpToIndex = m_buildOrder.size();
-    }
-
-    for (size_t i(0); i < printUpToIndex; ++i)
-    {
-        std::string name = charactersPerName == 0 ? m_buildOrder[i].getName() : m_buildOrder[i].getName().substr(0, charactersPerName);;
-        if (m_buildOrder[i].getName() == "ChronoBoost")
-        {
-            if (charactersPerName == 0)
-            {
-                name += "_" + m_abilityTargets.at(i).targetType.getName();
-            }
-            else
-            {
-                name += "_" + m_abilityTargets.at(i).targetType.getName().substr(0, charactersPerName);
-            }
-        }
+        std::string name = charactersPerName == 0 ? m_buildOrder[i].getName() : m_buildOrder[i].getName().substr(0, charactersPerName);
 
         ss << name << " ";
     }
-    
+
     return ss.str();
 }

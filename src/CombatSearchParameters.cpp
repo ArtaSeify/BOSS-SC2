@@ -105,17 +105,17 @@ int CombatSearchParameters::getRepetitions(ActionType a) const
     return m_repetitionValues[a.getID()]; 
 }
 
-void CombatSearchParameters::setFrameTimeLimit(const int limit)
+void CombatSearchParameters::setFrameTimeLimit(int limit)
 {
     m_frameTimeLimit = limit;
 }
 
-void CombatSearchParameters::setAlwaysMakeWorkers(const bool flag)
+void CombatSearchParameters::setAlwaysMakeWorkers(bool flag)
 {
     m_useAlwaysMakeWorkers = flag;
 }
 
-const bool CombatSearchParameters::getAlwaysMakeWorkers() const
+bool CombatSearchParameters::getAlwaysMakeWorkers() const
 {
     return m_useAlwaysMakeWorkers;
 }   

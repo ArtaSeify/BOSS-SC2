@@ -238,21 +238,21 @@ BuildOrder Tools::GetNaiveBuildOrderAddWorkersOld(const GameState & state, const
 
         // insert a supply provider if we are behind
         int surplusSupply = maxSupply - currentSupply;
-		if (surplusSupply < nextAction.supplyCost() + 2)
-		{
-			try
-			{
-				BOSS_ASSERT(currentState.isLegal(supplyProvider), "supplyProvider should be legal");
-				finalBuildOrder.add(supplyProvider);
-				currentState.doAction(supplyProvider);
-				continue;
-			}
-			catch (BOSSException e)
-			{
-				break;
-			}
+        if (surplusSupply < nextAction.supplyCost() + 2)
+        {
+            try
+            {
+                BOSS_ASSERT(currentState.isLegal(supplyProvider), "supplyProvider should be legal");
+                finalBuildOrder.add(supplyProvider);
+                currentState.doAction(supplyProvider);
+                continue;
+            }
+            catch (BOSSException e)
+            {
+                break;
+            }
 
-		}
+        }
 
        
         int whenWorkerReady      = currentState.whenCanBuild(worker);
@@ -260,26 +260,26 @@ BuildOrder Tools::GetNaiveBuildOrderAddWorkersOld(const GameState & state, const
 
         if ((numWorkers < maxWorkers) && (whenWorkerReady < whennextActionReady))
         {
-			// check to see if we should insert a worker
-			try
-			{
-				BOSS_ASSERT(currentState.isLegal(worker), "Worker should be legal");
-				finalBuildOrder.add(worker);
-				currentState.doAction(worker);
-			}
-			catch (BOSSException)
-			{
-			}
-			continue;
-		}
-		else
-		{
-			ActionType testNextAction = buildOrder[i];
-			BOSS_ASSERT(currentState.isLegal(nextAction), "nextAction should be legal");
-			finalBuildOrder.add(nextAction);
-			currentState.doAction(nextAction);
-			++i;
-		}
+            // check to see if we should insert a worker
+            try
+            {
+                BOSS_ASSERT(currentState.isLegal(worker), "Worker should be legal");
+                finalBuildOrder.add(worker);
+                currentState.doAction(worker);
+            }
+            catch (BOSSException)
+            {
+            }
+            continue;
+        }
+        else
+        {
+            ActionType testNextAction = buildOrder[i];
+            BOSS_ASSERT(currentState.isLegal(nextAction), "nextAction should be legal");
+            finalBuildOrder.add(nextAction);
+            currentState.doAction(nextAction);
+            ++i;
+        }
     }
 
     return finalBuildOrder;

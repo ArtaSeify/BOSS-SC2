@@ -11,103 +11,94 @@ namespace BOSS
 
 class GameState 
 {
-    typedef StaticVector<Unit, 70>              Vector_unit;
-    typedef StaticVector<uint2, 35>             Vector_sizet;
-    typedef StaticVector<AbilityAction, 10>     Vector_abilityaction;
+    typedef StaticVector<Unit, 70>              Vector_Unit;
+    typedef StaticVector<NumUnits, 35>          Vector_NumUnits;
+    typedef StaticVector<AbilityAction, 10>     Vector_AbilityAction;
 
-    Vector_unit                 m_units;
-    Vector_sizet	            m_unitsBeingBuilt;      // indices of m_units which are not completed, sorted descending by finish time
-    Vector_sizet                m_unitsSortedEndFrame;  // indices of m_units which are completed, in order
-    Vector_abilityaction        m_chronoBoosts;
-    uint4                       m_numUnits;
-    RaceID					    m_race;
-    float				        m_minerals;
-    float				        m_gas;
-    short					    m_currentSupply;
-    short					    m_maxSupply;
-    short					    m_currentFrame;
-    short					    m_previousFrame;
-    short					    m_mineralWorkers;
-    short					    m_gasWorkers;
-    short					    m_buildingWorkers;
-    short					    m_numRefineries;
-    short					    m_numDepots;
-    ActionType			        m_lastAction;
-    AbilityAction               m_lastAbility;
+    Vector_Unit                     m_units;
+    Vector_NumUnits	                m_unitsBeingBuilt;      // indices of m_units which are not completed, sorted descending by finish time
+    Vector_NumUnits                 m_unitsSortedEndFrame;  // indices of m_units which are completed, in order
+    Vector_AbilityAction            m_chronoBoosts;
+    RaceID					        m_race;
+    FracType    		            m_minerals;
+    FracType				        m_gas;
+    NumUnits					    m_currentSupply;
+    NumUnits					    m_maxSupply;
+    TimeType					    m_currentFrame;
+    TimeType					    m_previousFrame;
+    NumUnits					    m_mineralWorkers;
+    NumUnits					    m_gasWorkers;
+    NumUnits					    m_buildingWorkers;
+    NumUnits					    m_numRefineries;
+    NumUnits					    m_numDepots;
+    ActionType			            m_lastAction;
+    AbilityAction                   m_lastAbility;
 
-    short		getBuilderID(ActionType type)               const;
-    bool		haveBuilder(ActionType type)                const;
-    bool		havePrerequisites(ActionType type)          const;
+    int		                        getBuilderID(ActionType type)               const;
+    bool		                    haveBuilder(ActionType type)                const;
+    bool		                    havePrerequisites(ActionType type)          const;
 
-    short		whenSupplyReady(ActionType action)          const;
-    short		whenPrerequisitesReady(ActionType action)   const;
-    short		whenResourcesReady(ActionType action)       const;
-    short		whenBuilderReady(ActionType action)         const;
+    int		                        whenSupplyReady(ActionType action)          const;
+    int		                        whenPrerequisitesReady(ActionType action)   const;
+    int		                        whenResourcesReady(ActionType action)       const;
+    int		                        whenBuilderReady(ActionType action)         const;
 
-    void        addUnitToSpecialVectors(uint4 unitIndex);
+    void                            addUnitToSpecialVectors(NumUnits unitIndex);
 
-    Unit &		getUnit(uint4 id)
-                { 
-                    //BOSS_ASSERT(id < m_numUnits, "getUnit() called with invalid id");
-                    return m_units[id]; 
-                }
-    void		completeUnit(Unit & Unit);
+    Unit &		                    getUnit(NumUnits id) { return m_units[id]; }
+    void		                    completeUnit(Unit & Unit);
 
 public: 
 
     GameState();
 
-    short				                    whenCanBuild(ActionType action)                     const;
-    short                                   whenCanCast(ActionType action, uint4 targetID)     const;
-    short                                   whenEnergyReady(ActionType action)                  const;
-    short			                        getSupplyInProgress()                                       const;
-    short                                   getNextFinishTime(ActionType type)                  const;
+    TimeType				        whenCanBuild(ActionType action)                         const;
+    TimeType                        whenCanCast(ActionType action, NumUnits targetID)       const;
+    TimeType                        whenEnergyReady(ActionType action)                      const;
+    NumUnits			            getSupplyInProgress()                                   const;
+    TimeType                        getNextFinishTime(ActionType type)                      const;
 
-    void                                    getSpecialAbilityTargets(ActionSetAbilities & actionSet, size_t index)    const;
-    void                                    storeChronoBoostTargets(ActionSetAbilities & actionSet, size_t index)     const;
-    bool                                    chronoBoostableTarget(const Unit & unit)                    const;
-    bool                                    canChronoBoostTarget(const Unit & unit)                     const;
-    bool                                    canChronoBoost()                                            const;
+    void                            getSpecialAbilityTargets(ActionSetAbilities & actionSet, NumUnits index)      const;
+    void                            storeChronoBoostTargets(ActionSetAbilities & actionSet, NumUnits index)       const;
+    bool                            chronoBoostableTarget(const Unit & unit)                                    const;
+    bool                            canChronoBoostTarget(const Unit & unit)                                     const;
+    bool                            canChronoBoost()                                                            const;
 
-    uint4			                        getNumInProgress(ActionType action)                 const;
-    uint4			                        getNumCompleted(ActionType action)                  const;
-    uint4			                        getNumTotal(ActionType action)                      const;
-    void			                        getLegalActions(std::vector<ActionType> & legalActions)     const;
-    bool			                        isLegal(ActionType type)                            const;
-    bool			                        haveType(ActionType action)                         const;
+    NumUnits			            getNumInProgress(ActionType action)                     const;
+    NumUnits			            getNumCompleted(ActionType action)                      const;
+    NumUnits			            getNumTotal(ActionType action)                          const;
+    void			                getLegalActions(std::vector<ActionType> & legalActions) const;
+    bool			                isLegal(ActionType type)                                const;
+    bool			                haveType(ActionType action)                             const;
 
-    bool                                    doAbility(ActionType type, uint4 targetID);
-    void			                        doAction(ActionType type);
-    void			                        fastForward(short frames);
-    void			                        addUnit(ActionType Unit, short builderID = -1);
+    bool                            doAbility(ActionType type, NumUnits targetID);
+    void			                doAction(ActionType type);
+    void			                fastForward(TimeType frames);
+    void			                addUnit(ActionType Unit, NumUnits builderID = -1);
   
-    void			                        setMinerals(float minerals) { m_minerals = minerals; }
-    void			                        setGas(float gas) { m_gas = gas; }
+    void			                setMinerals(FracType minerals) { m_minerals = minerals; }
+    void			                setGas(FracType gas) { m_gas = gas; }
 
-    bool			                        canBuildNow(ActionType action) const { return whenCanBuild(action) == getCurrentFrame(); }
-    uint4			                        getNumMineralWorkers() const { return m_mineralWorkers; }
-    uint4			                        getNumGasWorkers() const { return m_gasWorkers; }
-    uint4                                   getNumberChronoBoostsCast() const { return m_chronoBoosts.size(); }
-    uint4                                   getNumUnits() const { return m_numUnits; }
-    short                                   getLastActionFinishTime() const { return m_unitsBeingBuilt.empty() ? getCurrentFrame() : m_units[m_unitsBeingBuilt.front()].getTimeUntilBuilt(); }
-    short		                            getCurrentSupply() const { return m_currentSupply; }
-    short		                            getMaxSupply() const { return m_maxSupply; }
-    short 	                                getCurrentFrame() const { return m_currentFrame; }
-    RaceID				                    getRace() const { return m_race; }
-    float	                                getMinerals() const { return m_minerals; }
-    float	                                getGas() const { return m_gas; }
-    const Vector_abilityaction &            getChronoBoostTargets() const { return m_chronoBoosts; }
-    const Vector_sizet &                    getFinishedUnits() const { return m_unitsSortedEndFrame; }
-    ActionType                              getUnitType(uint4 id) const { return m_units[id].getType(); }
-    ActionType                              getLastAction() const { return m_lastAction; }
-    const AbilityAction &                   getLastAbility() const { return m_lastAbility; }
-    const Unit &	                        getUnit(uint4 id) const
-                                            { 
-                                                //BOSS_ASSERT(id < m_numUnits, "getUnit() called with invalid id");
-                                                return m_units[id]; 
-                                            }
+    bool			                canBuildNow(ActionType action)      const { return whenCanBuild(action) == getCurrentFrame(); }
+    NumUnits			            getNumMineralWorkers()              const { return m_mineralWorkers; }
+    NumUnits			            getNumGasWorkers()                  const { return m_gasWorkers; }
+    size_t                          getNumberChronoBoostsCast()         const { return m_chronoBoosts.size(); }
+    size_t                          getNumUnits()                       const { return m_units.size(); }
+    TimeType                        getLastActionFinishTime()           const { return m_unitsBeingBuilt.empty() ? getCurrentFrame() : m_units[m_unitsBeingBuilt.front()].getTimeUntilBuilt(); }
+    NumUnits		                getCurrentSupply()                  const { return m_currentSupply; }
+    NumUnits		                getMaxSupply()                      const { return m_maxSupply; }
+    TimeType 	                    getCurrentFrame()                   const { return m_currentFrame; }
+    RaceID				            getRace()                           const { return m_race; }
+    FracType	                    getMinerals()                       const { return m_minerals; }
+    FracType	                    getGas()                            const { return m_gas; }
+    const Vector_AbilityAction &    getChronoBoostTargets()             const { return m_chronoBoosts; }
+    const Vector_NumUnits &         getFinishedUnits()                  const { return m_unitsSortedEndFrame; }
+    ActionType                      getUnitType(NumUnits id)            const { return m_units[id].getType(); }
+    ActionType                      getLastAction()                     const { return m_lastAction; }
+    const AbilityAction &           getLastAbility()                    const { return m_lastAbility; }
+    const Unit &	                getUnit(NumUnits id)                const { return m_units[id]; }
     
-    std::string		                        toString() const;
-    void                                    printunitsbeingbuilt() const;
+    std::string		                toString()                          const;
+    void                            printunitsbeingbuilt()              const;
 };
 }
