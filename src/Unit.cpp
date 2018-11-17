@@ -25,22 +25,22 @@ Unit::Unit()
 }
 
 Unit::Unit(ActionType type, NumUnits id, NumUnits builderID, TimeType frameStarted)
-    : m_job                     (UnitJobs::None)
-    , m_id                      (id)
+    : m_id                      (id)
     , m_frameStarted            (frameStarted)
     , m_frameFinished           (-1)
+    , m_builderID               (builderID)
     , m_type                    (type)
     , m_addon                   (ActionTypes::None)
     , m_buildType               (ActionTypes::None)
     , m_buildID                 (0)
+    , m_job                     (UnitJobs::None)
     , m_timeUntilBuilt          (builderID != -1 ? type.buildTime() : 0)
     , m_timeUntilFree           (builderID != -1 ? type.buildTime() : 0)
     //, m_numLarva                (0)
-    , m_builderID               (builderID)
     , m_timeChronoBoost         (0)
     , m_timeChronoBoostAgain    (0)
     , m_maxEnergyAllowed        (float(type.maxEnergy()))
-    , m_energy                    (float(type.startingEnergy()))
+    , m_energy                  (float(type.startingEnergy()))
 {
     
 }

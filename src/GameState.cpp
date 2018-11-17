@@ -156,8 +156,8 @@ bool GameState::doAbility(ActionType type, NumUnits targetID)
 
         // have to resort the list, because build time of a unit is changed
         // find the index of the unit whos time is changed
-        uint4 index = 0;
-        uint4 buildID = getUnit(targetID).getBuildID();
+        size_t index = 0;
+        int buildID = getUnit(targetID).getBuildID();
         for (; index < m_unitsBeingBuilt.size(); ++index)
         {
             if (m_unitsBeingBuilt[index] == buildID)

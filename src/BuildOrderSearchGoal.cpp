@@ -14,7 +14,7 @@ BuildOrderSearchGoal::BuildOrderSearchGoal()
 void BuildOrderSearchGoal::calculateSupplyRequired()
 {
     m_supplyRequiredVal = 0;
-    for (ActionID a(0); a<m_goalUnits.size(); ++a)
+    for (ActionID a(0); a < m_goalUnits.size(); ++a)
     {
         m_supplyRequiredVal += m_goalUnits[a] * ActionType(a).supplyCost();
     }
@@ -22,7 +22,7 @@ void BuildOrderSearchGoal::calculateSupplyRequired()
 
 bool BuildOrderSearchGoal::operator == (const BuildOrderSearchGoal & g)
 {
-    for (size_t a(0); a<m_goalUnits.size(); ++a)
+    for (size_t a(0); a < m_goalUnits.size(); ++a)
     {
         if ((m_goalUnits[a] != g.m_goalUnits[a]) || (m_goalUnitsMax[a] != g.m_goalUnitsMax[a]))
         {
@@ -44,7 +44,7 @@ void BuildOrderSearchGoal::setGoal(ActionType a, int num)
 
 bool BuildOrderSearchGoal::hasGoal() const
 {
-    for (size_t a(0); a<m_goalUnits.size(); ++a)
+    for (size_t a(0); a < m_goalUnits.size(); ++a)
     {
         if (m_goalUnits[a] > 0)
         {

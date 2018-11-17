@@ -148,27 +148,27 @@ namespace ActionTypes
         }
     }
 
-    ActionType GetWorker(const RaceID raceID)
+    ActionType GetWorker(RaceID raceID)
     {
         return workerActionTypes[raceID];
     }
 
-    ActionType GetSupplyProvider(const RaceID raceID)
+    ActionType GetSupplyProvider(RaceID raceID)
     {
         return supplyProviderActionTypes[raceID];
     }
 
-    ActionType GetRefinery(const RaceID raceID)
+    ActionType GetRefinery(RaceID raceID)
     {
         return refineryActionTypes[raceID];
     }
 
-    ActionType GetResourceDepot(const RaceID raceID)
+    ActionType GetResourceDepot(RaceID raceID)
     {
         return resourceDepotActionTypes[raceID];
     }
 
-    ActionType GetSpecialAction(const RaceID raceID)
+    ActionType GetSpecialAction(RaceID raceID)
     {
         return specialActionTypes[raceID];
     }
