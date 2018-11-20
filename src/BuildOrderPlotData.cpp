@@ -23,7 +23,7 @@ void BuildOrderPlotData::calculateStartEndTimes()
 
     //BOSS_ASSERT(_buildOrder.isLegalFromState(state), "Build order isn't legal!");
 
-    for (size_t i(0); i < m_buildOrder.size(); ++i)
+    for (int i(0); i < m_buildOrder.size(); ++i)
     {
         auto & actionTargetPair = m_buildOrder[i];
         ActionType type = actionTargetPair.first;
@@ -69,7 +69,7 @@ void BuildOrderPlotData::calculateStartEndTimes()
     int abilities = 0;
     m_maxFinishTime = 0;
 
-    for (size_t i(0); i < m_buildOrder.size(); ++i)
+    for (int i(0); i < m_buildOrder.size(); ++i)
     {
         auto & actionTargetPair = m_buildOrder[i];
         ActionType type = actionTargetPair.first;
@@ -150,7 +150,7 @@ void BuildOrderPlotData::calculatePlot()
         }
     }
 
-    for (size_t i(0); i < m_buildOrder.size(); ++i)
+    for (int i(0); i < m_buildOrder.size(); ++i)
     {
         Position topLeft(m_startTimes[i], m_layers[i] * (m_boxHeight + m_boxHeightBuffer));
         Position bottomRight(m_finishTimes[i], topLeft.y() + m_boxHeight);

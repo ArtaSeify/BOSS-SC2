@@ -25,7 +25,7 @@ void CombatSearch_IntegralDataFinishedUnits::update(const GameState & state, con
     }
 
     // go through all new units
-    for (size_t index = finishedUnits.size() - new_units; index < finishedUnits.size(); ++index)
+    for (int index = finishedUnits.size() - new_units; index < finishedUnits.size(); ++index)
     {
         /*std::cout << "index of unit times: " << finishedUnits[index] << std::endl;
         std::cout << "index of unit: " << unitTimes[finishedUnits[index]].first << std::endl;

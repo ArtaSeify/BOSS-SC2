@@ -123,7 +123,7 @@ void DFBB_BuildOrderStackSearch::generateLegalActions(const GameState & state, A
         ActionSet legalEqualWorker;
         int workerReady = state.whenCanBuild(worker);
 
-        for (size_t a(0); a < legalActions.size(); ++a)
+        for (int a(0); a < legalActions.size(); ++a)
         {
             ActionType actionType = legalActions[a];
             const int whenCanPerformAction = state.whenCanBuild(actionType);

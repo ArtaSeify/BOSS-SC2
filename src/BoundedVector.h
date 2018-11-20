@@ -18,7 +18,7 @@ template <typename T, int N>
 class BoundedVector
 {
     static_assert(N > 0, "N=0");
-    static_assert(is_trivially_copyable<T>::value, "not trivial");
+    static_assert(std::is_trivially_copyable<T>::value, "not trivial");
 
     T data[N];
     int n; // number of active elements
@@ -93,7 +93,23 @@ public:
         return data[n-1];
     }
 
+    //!!! ADDED BY ARTA
+    const T &front() const
+    {
+        assert(n > 0);
+        return data[0];
+    }
+
+    T &front()
+    {
+        assert(n > 0);
+        return data[0];
+    }
+
     int size() const { return n; }
+
+    //!!! ADDED BY ARTA
+    bool empty() const { return n == 0; }
 
     // [r]begin/[r]end interface
 

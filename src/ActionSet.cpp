@@ -9,7 +9,7 @@ ActionSet::ActionSet()
 {
 }
 
-size_t ActionSet::size() const
+int ActionSet::size() const
 {
     return m_actions.size();
 }
@@ -70,12 +70,12 @@ void ActionSet::clear()
     m_actions.clear();
 }
 
-ActionType & ActionSet::operator[] (size_t index)
+ActionType & ActionSet::operator[] (int index)
 {
     return m_actions[index];
 }
 
-ActionType ActionSet::operator[] (size_t index) const
+ActionType ActionSet::operator[] (int index) const
 {
     return m_actions[index];
 }

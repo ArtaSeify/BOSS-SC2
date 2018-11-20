@@ -39,7 +39,7 @@ void CombatSearch_IntegralData::pop_back()
     m_integralStack.pop_back();
 }
 
-void CombatSearch_IntegralData::printIntegralData(const size_t index) const
+void CombatSearch_IntegralData::printIntegralData(int index) const
 {
     printf("%7d %10.2lf %13.2lf   ", m_bestIntegralStack[index].timeAdded, m_bestIntegralStack[index].eval, m_bestIntegralStack[index].integral);
     std::cout << m_bestIntegralBuildOrder.getNameString(2) << std::endl;   

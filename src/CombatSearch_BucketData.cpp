@@ -18,12 +18,12 @@ CombatSearch_BucketData::CombatSearch_BucketData(int frameLimit, int numBuckets)
     
 }
 
-size_t CombatSearch_BucketData::numBuckets() const
+int CombatSearch_BucketData::numBuckets() const
 {
     return m_buckets.size();
 }
 
-size_t CombatSearch_BucketData::getBucketIndex(const GameState & state) const
+int CombatSearch_BucketData::getBucketIndex(const GameState & state) const
 {
     return (size_t)(((double)state.getCurrentFrame() / (double)m_frameLimit) * m_buckets.size());
 }
@@ -69,7 +69,7 @@ bool CombatSearch_BucketData::isDominated(const GameState & state)
 
 BucketData & CombatSearch_BucketData::getBucketData(const GameState & state)
 {
-    BOSS_ASSERT(getBucketIndex(state) < m_buckets.size(), "State goes over bucket limit");
+    BOSS_ASSERT(getBucketIndex(state) < int(m_buckets.size()), "State goes over bucket limit");
 
     return m_buckets[getBucketIndex(state)];
 }
@@ -95,7 +95,7 @@ void CombatSearch_BucketData::print() const
     }
 }
 
-const BucketData & CombatSearch_BucketData::getBucket(size_t index) const
+const BucketData & CombatSearch_BucketData::getBucket(int index) const
 {
     return m_buckets[index];
 }

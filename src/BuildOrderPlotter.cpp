@@ -105,7 +105,7 @@ void BuildOrderPlotter::writeBuildOrderPlot(const std::vector<BuildOrderPlotData
     {
         const BuildOrderAbilities & buildOrder = plots[p].m_buildOrder;
 
-        for (size_t i(0); i < buildOrder.size(); ++i)
+        for (int i(0); i < buildOrder.size(); ++i)
         {
             const Rectangle & rect = plots[p].m_rectangles[i];
             int rectWidth = (rect.bottomRight.x() - rect.topLeft.x());
@@ -195,7 +195,7 @@ std::string BuildOrderPlotter::getPlotJSON(const std::vector<BuildOrderPlotData>
         
         ss << "{ name : \"" << m_buildOrderNames[p] << "\", buildOrder : [";
 
-        for (size_t i(0); i < buildOrder.size(); ++i)
+        for (int i(0); i < buildOrder.size(); ++i)
         {
             ActionType type = buildOrder[i].first;
 
@@ -253,7 +253,7 @@ const std::vector<BuildOrderPlotData> & BuildOrderPlotter::getPlots() const
 void BuildOrderPlotter::writeArmyValuePlot(const BuildOrderPlotData & plot, const std::string & filename)
 {
     std::stringstream datass;
-    for (size_t i(0); i < plot.m_buildOrder.size(); ++i)
+    for (int i(0); i < plot.m_buildOrder.size(); ++i)
     {
         datass << plot.m_startTimes[i] << " " << plot.m_armyValues[i] << std::endl;
     }

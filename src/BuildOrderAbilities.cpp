@@ -45,21 +45,6 @@ void BuildOrderAbilities::clear()
     m_typeCount.clear();
 }
 
-/*ActionType BuildOrderAbilities::getAbilityTargetType(size_t index) const
-{
-    return m_buildOrder[index].second.targetType;
-}
-
-size_t BuildOrderAbilities::getAbilityTarget(size_t index) const
-{
-    return m_buildOrder[index].second.targetID;
-}
-
-const AbilityAction & BuildOrderAbilities::getAbilityAction(size_t index) const
-{
-    return m_buildOrder[index].second;
-}*/
-
 int BuildOrderAbilities::getTypeCount(ActionType type) const
 {
     if (empty())
@@ -78,12 +63,12 @@ void BuildOrderAbilities::pop_back()
     m_buildOrder.pop_back();
 }
 
-const BuildOrderAbilities::ActionTargetPair & BuildOrderAbilities::operator [] (size_t i) const
+const BuildOrderAbilities::ActionTargetPair & BuildOrderAbilities::operator [] (int i) const
 {
     return m_buildOrder[i];
 }
 
-BuildOrderAbilities::ActionTargetPair & BuildOrderAbilities::operator [] (size_t i)
+BuildOrderAbilities::ActionTargetPair & BuildOrderAbilities::operator [] (int i)
 {
     return m_buildOrder[i];
 }
@@ -91,11 +76,6 @@ BuildOrderAbilities::ActionTargetPair & BuildOrderAbilities::operator [] (size_t
 const BuildOrderAbilities::ActionTargetPair & BuildOrderAbilities::back() const
 {
     return m_buildOrder.back();
-}
-
-size_t BuildOrderAbilities::size() const
-{
-    return m_buildOrder.size();
 }
 
 void BuildOrderAbilities::sortByPrerequisites()

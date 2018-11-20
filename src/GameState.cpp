@@ -156,7 +156,7 @@ bool GameState::doAbility(ActionType type, NumUnits targetID)
 
         // have to resort the list, because build time of a unit is changed
         // find the index of the unit whos time is changed
-        size_t index = 0;
+        int index = 0;
         int buildID = getUnit(targetID).getBuildID();
         for (; index < m_unitsBeingBuilt.size(); ++index)
         {
@@ -478,7 +478,7 @@ TimeType GameState::whenSupplyReady(ActionType action) const
     if (supplyNeeded <= 0) { return m_currentFrame; }
 
     // search the actions in progress in reverse for the first supply provider
-    for (size_t i(0); i < m_unitsBeingBuilt.size(); ++i)
+    for (int i(0); i < m_unitsBeingBuilt.size(); ++i)
     {
         const Unit & unit = getUnit(m_unitsBeingBuilt[m_unitsBeingBuilt.size() - 1 - i]);   
         if (unit.getType().supplyProvided() > supplyNeeded)
@@ -604,7 +604,7 @@ int GameState::getNumInProgress(ActionType action) const
     //       [this, &action](const size_t & id) { return action == this->getUnit(id).getType(); } );
 
     int numInProgress = 0;
-    for (size_t i(0); i < m_unitsBeingBuilt.size(); ++i)
+    for (int i(0); i < m_unitsBeingBuilt.size(); ++i)
     {
         if (getUnit(m_unitsBeingBuilt[i]).getType() == action)
         {
@@ -683,7 +683,7 @@ int GameState::getSupplyInProgress() const
     //       [this](size_t lhs, size_t rhs) { return lhs + this->getUnit(rhs).getType().supplyProvided(); });
 
     int supplyInProgress = 0;
-    for (size_t i(0); i < m_unitsBeingBuilt.size(); ++i)
+    for (int i(0); i < m_unitsBeingBuilt.size(); ++i)
     {
         supplyInProgress += getUnit(m_unitsBeingBuilt[i]).getType().supplyProvided();
     }
@@ -812,9 +812,9 @@ std::string GameState::toString() const
   }
 
   ss << "\nUnits In Progress:\n";
-  for (size_t i(0); i < m_unitsBeingBuilt.size(); ++i)
+  for (int i(0); i < m_unitsBeingBuilt.size(); ++i)
   {
-    auto & id = m_unitsBeingBuilt[i];
+    auto id = m_unitsBeingBuilt[i];
     auto & unit = getUnit(id);
     sprintf(buf, "%5d %5d %s\n", unit.getID(), unit.getTimeUntilBuilt(), unit.getType().getName().c_str());
     ss << buf;
@@ -856,9 +856,9 @@ std::string GameState::toString() const
 
 void GameState::printunitsbeingbuilt() const
 {
-    for (size_t i(0); i < m_unitsBeingBuilt.size(); ++i)
+    for (int i(0); i < m_unitsBeingBuilt.size(); ++i)
     {
-        auto & index = m_unitsBeingBuilt[i];
+        auto index = m_unitsBeingBuilt[i];
         std::cout << getUnit(index).getTimeUntilBuilt() << std::endl;
     }
     std::cout << std::endl;

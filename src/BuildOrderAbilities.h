@@ -29,7 +29,7 @@ namespace BOSS
         void pop_back();
         void sortByPrerequisites();
 
-        int size() const;
+        int size() const { return int(m_buildOrder.size()); }
         int getTypeCount(ActionType type) const;
         bool empty() const { return size() == 0; }
         //ActionType          getAbilityTargetType(size_t index) const;

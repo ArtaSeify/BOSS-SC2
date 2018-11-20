@@ -34,7 +34,7 @@ void CombatSearch_Bucket::recurse(const GameState & state, int depth)
     ActionSetAbilities legalActions;
     generateLegalActions(state, legalActions, m_params);
     
-    for (size_t a(0); a < legalActions.size(); ++a)
+    for (int a(0); a < legalActions.size(); ++a)
     {
         GameState child(state);
         child.doAction(legalActions[a].first);

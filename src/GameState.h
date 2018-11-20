@@ -6,16 +6,16 @@
 #include "ActionType.h"
 #include "Unit.h"
 #include "AbilityAction.h"
-#include "StaticVector.h"
+#include "BoundedVector.h"
 
 namespace BOSS
 {
 
 class GameState 
 {
-    using Vector_Unit           = StaticVector<Unit, 70>;
-    using Vector_NumUnits       = StaticVector<NumUnits, 35>;
-    using Vector_AbilityAction  = StaticVector<AbilityAction, 10>;
+    using Vector_Unit           = BoundedVector<Unit, 70>;
+    using Vector_NumUnits       = BoundedVector<NumUnits, 35>;
+    using Vector_AbilityAction  = BoundedVector<AbilityAction, 10>;
 
     Vector_Unit             m_units;
     Vector_NumUnits         m_unitsBeingBuilt;      // indices of m_units which are not completed, sorted descending by finish time

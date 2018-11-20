@@ -18,7 +18,7 @@ void CombatSearch_BestResponseData::calculateArmyValues(const GameState & initia
 {
     values.clear();
     GameState state(initialState);
-    for (size_t i(0); i < buildOrder.size(); ++i)
+    for (int i(0); i < buildOrder.size(); ++i)
     {
         state.doAction(buildOrder[i].first);
         values.push_back(std::pair<TimeType,FracType>(state.getCurrentFrame(), Eval::ArmyTotalResourceSum(state)));
@@ -75,7 +75,7 @@ float CombatSearch_BestResponseData::compareBuildOrder(const GameState & initial
     return maxDiff;
 }
 
-size_t CombatSearch_BestResponseData::getStateIndex(const GameState & state)
+int CombatSearch_BestResponseData::getStateIndex(const GameState & state)
 {
     int frame = state.getCurrentFrame();
 

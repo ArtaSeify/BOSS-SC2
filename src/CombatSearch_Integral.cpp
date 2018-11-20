@@ -28,7 +28,7 @@ void CombatSearch_Integral::recurse(const GameState & state, int depth)
     ActionSetAbilities legalActions;
     generateLegalActions(state, legalActions, m_params);
 
-    for (size_t a(0); a < legalActions.size(); ++a)
+    for (int a(0); a < legalActions.size(); ++a)
     {
         const int index = legalActions.size() - (a + 1);
 
@@ -42,7 +42,7 @@ void CombatSearch_Integral::recurse(const GameState & state, int depth)
         // if it's the plain CB without a target, we need to get the targets for the ability
         if (action == ActionTypes::GetSpecialAction(state.getRace()) && actionTarget == -1)
         {
-            size_t sizeBefore = legalActions.size();
+            int sizeBefore = legalActions.size();
 
             state.getSpecialAbilityTargets(legalActions, index);
 
