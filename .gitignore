@@ -21,3 +21,4 @@ bin/results
 emscripten/BOSS.data
 *.o
 /bin/WTF.txt
+/vs/x64
