@@ -42,6 +42,12 @@ CombatSearchExperiment::CombatSearchExperiment(const std::string & name, const j
     BOSS_ASSERT(val.count("SearchTimeLimitMS") && val["SearchTimeLimitMS"].is_number_integer(), "CombatSearchExperiment must have a 'SearchTimeLimitMS' int");
     m_params.setSearchTimeLimit(val["SearchTimeLimitMS"]);
 
+    BOSS_ASSERT(val.count("PrintNewBest") && val["PrintNewBest"].is_boolean(), "CombatSearchExperiment must have a PrintNewBest bool");
+    m_params.setPrintNewBest(val["PrintNewBest"]);
+
+    BOSS_ASSERT(val.count("SortActions") && val["SortActions"].is_boolean(), "CombatSearchExperiment must have a SortActions bool");
+    m_params.setSortActions(val["SortActions"]);
+
     if (val.count("MaxActions"))
     {
         const json & maxActions = val["MaxActions"];

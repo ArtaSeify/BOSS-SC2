@@ -22,14 +22,49 @@ GameState::GameState()
     , m_lastAction(ActionTypes::None)
   //!!! PROBLEM m_lastAbility undefined?
 {
-    /*for (int i = 0; i < 70; ++i) {
-        m_units.push_back(BOSS::Unit());
-    }*/
-    //m_units.reserve(20);
-    //m_unitsBeingBuilt.reserve(2);
-    //m_chronoBoosts.reserve(2);
-    //m_unitsSortedEndFrame.reserve(2);
-    //m_armyUnits.reserve(2);
+    //using Vector_Unit = BoundedVector<Unit, 70>;
+    //using Vector_NumUnits = BoundedVector<NumUnits, 35>;
+    //using Vector_AbilityAction = BoundedVector<AbilityAction, 10>;
+
+    //Vector_Unit             m_units;
+    //Vector_NumUnits         m_unitsBeingBuilt;
+    //Vector_NumUnits         m_unitsSortedEndFrame; 
+    //Vector_AbilityAction    m_chronoBoosts;
+}
+
+GameState::GameState(Vector_Unit & unitVector, RaceID race, FracType minerals, FracType gas,
+    NumUnits currentSupply, NumUnits maxSupply, NumUnits mineralWorkers, NumUnits gasWorkers,
+    NumUnits builerWorkers, TimeType currentFrame, NumUnits numRefineries, NumUnits numDepots)
+    : m_units (unitVector)
+    , m_race(race)
+    , m_minerals(minerals)
+    , m_gas(gas)
+    , m_currentSupply(currentSupply)
+    , m_maxSupply(maxSupply)
+    , m_currentFrame(currentFrame)
+    , m_previousFrame(0)
+    , m_mineralWorkers(mineralWorkers)
+    , m_gasWorkers(gasWorkers)
+    , m_buildingWorkers(builerWorkers)
+    , m_numRefineries(numRefineries)
+    , m_numDepots(numDepots)
+    , m_lastAction(ActionTypes::None)
+{
+    /*for (auto & unit : m_units)
+    {
+        std::cout << "name: " << unit.getType().getName() << std::endl;
+    }
+    std::cout << Races::GetRaceName(m_race) << std::endl;
+    std::cout << m_minerals << std::endl;
+    std::cout << m_gas << std::endl;
+    std::cout << m_currentSupply << std::endl;
+    std::cout << m_maxSupply << std::endl;
+    std::cout << m_currentFrame << std::endl;
+    std::cout << m_mineralWorkers << std::endl;
+    std::cout << m_gasWorkers << std::endl;
+    std::cout << m_buildingWorkers << std::endl;
+    std::cout << m_numRefineries << std::endl;
+    std::cout << m_numDepots << std::endl;*/
 }
 
 void GameState::getLegalActions(std::vector<ActionType> & legalActions) const
@@ -71,7 +106,7 @@ bool GameState::isLegal(ActionType action) const
 
     // we can Chrono Boost as long as we have a Nexus
     if (action.isAbility() && m_race == Races::Protoss && numDepots == 0) { return false; }
-        
+
 
     const NumUnits totalSupply = m_maxSupply + getSupplyInProgress();
     // if it's a unit and we are out of supply and aren't making a supply providing unit, it's not legal
@@ -79,6 +114,13 @@ bool GameState::isLegal(ActionType action) const
 
     // we don't need to go over the maximum supply limit with supply providers
     if (action.isSupplyProvider() && (totalSupply > 400)) { return false; }
+
+    // need to have at least 1 Pylon to build Protoss buildings, except if it's an Assimilator
+    if (m_race == Races::Protoss && action.isBuilding() && !action.isSupplyProvider() && !action.isRefinery() 
+                                && !haveType(ActionTypes::GetSupplyProvider(m_race))) { return false; }
+
+    // Pylon is invalid if we have 16 or over free supply
+    if (m_race == Races::Protoss && action == ActionTypes::GetSupplyProvider(m_race) && totalSupply - m_currentSupply >= 16) { return false; }
 
     // TODO: can only build one of a tech type
     // TODO: check to see if an addon can ever be built
@@ -126,7 +168,7 @@ void GameState::doAction(ActionType type)
     return;
 }
 
-bool GameState::doAbility(ActionType type, NumUnits targetID)
+void GameState::doAbility(ActionType type, NumUnits targetID)
 {
     BOSS_ASSERT(type.isAbility(), "doAbility should not be called with a non-ability action");
     BOSS_ASSERT(targetID != -1, "Target of ability %s is invalid. Target ID: %u", type.getName().c_str(), targetID);
@@ -136,11 +178,8 @@ bool GameState::doAbility(ActionType type, NumUnits targetID)
 
     // figure out when this action can be done and fast forward to it
     const TimeType timeWhenReady = whenCanCast(type, targetID);
-    // can't cast ability
-    if (timeWhenReady == -1)
-    {
-        return false;
-    }
+
+    BOSS_ASSERT(timeWhenReady != -1, "Unable to cast ability");
 
     fastForward(timeWhenReady);
 
@@ -179,7 +218,6 @@ bool GameState::doAbility(ActionType type, NumUnits targetID)
             }
         }
     }
-    return true;
 }
 
 void GameState::fastForward(TimeType toFrame)
@@ -362,14 +400,15 @@ TimeType GameState::whenCanBuild(ActionType action) const
 TimeType GameState::whenCanCast(ActionType action, NumUnits targetID) const
 {
     BOSS_ASSERT(action.isAbility(), "whenCanCast should only be called with an ability");
+    BOSS_ASSERT(getUnit(targetID).getTimeUntilBuilt() == 0, "Casting on a unit that is not built yet");
 
     TimeType maxTime                = m_currentFrame;
     TimeType energyReady            = whenEnergyReady(action);
-    TimeType buildingFinished       = m_currentFrame + getUnit(targetID).getTimeUntilBuilt();
+    //TimeType buildingFinished       = m_currentFrame + getUnit(targetID).getTimeUntilBuilt();
     TimeType canChronoBoostAgain    = m_currentFrame + getUnit(targetID).getChronoBoostAgainTime();
 
     maxTime = std::max(energyReady,         maxTime);
-    maxTime = std::max(buildingFinished,    maxTime);
+    //maxTime = std::max(buildingFinished,    maxTime);
     maxTime = std::max(canChronoBoostAgain, maxTime);
 
     // the building will finish its production by the time we can chrono boost it
@@ -499,8 +538,23 @@ TimeType GameState::whenPrerequisitesReady(ActionType action) const
         return m_currentFrame;
     }
 
-    // if it has prerequisites, we need to find the max-min time that any of the prereqs are free
     TimeType whenPrereqReady = 0;
+
+    // Protoss needs to have a Pylon to be able to produce buildings
+    if (m_race == Races::Protoss)
+    {
+        if (action.isBuilding() && !action.isRefinery() && !action.isSupplyProvider())
+        {
+            whenPrereqReady = timeUntilFirstPylonDone();
+
+            if (whenPrereqReady == std::numeric_limits<TimeType>::max())
+            {
+                return whenPrereqReady;
+            }
+        }
+    }
+
+    // if it has prerequisites, we need to find the max-min time that any of the prereqs are free
     for (auto & req : action.required())
     {
         // find the minimum time that this particular prereq will be ready
@@ -518,6 +572,19 @@ TimeType GameState::whenPrerequisitesReady(ActionType action) const
     }
       
     return m_currentFrame + whenPrereqReady;
+}
+
+TimeType GameState::timeUntilFirstPylonDone() const
+{
+    for (auto & unit : m_units)
+    {
+        if (unit.getType() == ActionTypes::GetSupplyProvider(Races::Protoss))
+        {
+            return unit.getTimeUntilBuilt();
+        }
+    }
+
+    return std::numeric_limits<TimeType>::max();
 }
 
 TimeType GameState::whenEnergyReady(ActionType action) const
@@ -578,10 +645,10 @@ int GameState::getBuilderID(ActionType action) const
 
 bool GameState::haveBuilder(ActionType type) const
 {
-    //return std::any_of(m_units.begin(), m_units.end(), 
-    //       [&type](const Unit & u){ return u.whenCanBuild(type) != -1; });
+    return std::any_of(m_units.begin(), m_units.end(), 
+           [&type](const Unit & u){ return u.whenCanBuild(type) != -1; });
 
-    for (int i(0); i < int(m_units.size()); ++i)
+    /*for (int i(0); i < int(m_units.size()); ++i)
     {
         auto & unit = m_units[i];
         if (unit.whenCanBuild(type) != -1)
@@ -589,7 +656,7 @@ bool GameState::haveBuilder(ActionType type) const
             return true;
         }
     }
-    return false;
+    return false;*/
 }
 
 bool GameState::havePrerequisites(ActionType type) const
@@ -600,10 +667,10 @@ bool GameState::havePrerequisites(ActionType type) const
 
 int GameState::getNumInProgress(ActionType action) const
 {
-    //return std::count_if(m_unitsBeingBuilt.begin(), m_unitsBeingBuilt.end(),
-    //       [this, &action](const size_t & id) { return action == this->getUnit(id).getType(); } );
+    return (int)std::count_if(m_unitsBeingBuilt.begin(), m_unitsBeingBuilt.end(),
+           [this, &action](int id) { return action == this->getUnit(id).getType(); } );
 
-    int numInProgress = 0;
+   /* int numInProgress = 0;
     for (int i(0); i < m_unitsBeingBuilt.size(); ++i)
     {
         if (getUnit(m_unitsBeingBuilt[i]).getType() == action)
@@ -611,15 +678,15 @@ int GameState::getNumInProgress(ActionType action) const
             numInProgress++;
         }
     }
-    return numInProgress;
+    return numInProgress;*/
 }
 
 int GameState::getNumCompleted(ActionType action) const
 {
-    //return std::count_if(m_units.begin(), m_units.end(),
-    //       [&action](const Unit & unit) { return action == unit.getType() && unit.getTimeUntilBuilt() == 0; } );
+    return (int)std::count_if(m_units.begin(), m_units.end(),
+           [&action](const Unit & unit) { return action == unit.getType() && unit.getTimeUntilBuilt() == 0; } );
 
-    int numCompleted = 0;
+    /*int numCompleted = 0;
     for (int i(0); i < int(m_units.size()); ++i)
     {
         auto & unit = m_units[i];
@@ -628,15 +695,23 @@ int GameState::getNumCompleted(ActionType action) const
             numCompleted++;
         }
     }
-    return numCompleted;
+    return numCompleted;*/
 }
 
 int GameState::getNumTotal(ActionType action) const
 {
-    //return std::count_if(m_units.begin(), m_units.end(), 
-    //       [&action](const Unit & unit) { return action == unit.getType(); } );
+    if (action.isAbility)
+    { 
+        if (m_race == Races::Protoss)
+        {
+            return int(m_chronoBoosts.size());
+        }
+    }
 
-    int numTotal = 0;
+    return (int)std::count_if(m_units.begin(), m_units.end(), 
+           [&action](const Unit & unit) { return action == unit.getType(); } );
+
+    /*int numTotal = 0;
     for (int i(0); i < int(m_units.size()); ++i)
     {
         auto & unit = m_units[i];
@@ -645,28 +720,15 @@ int GameState::getNumTotal(ActionType action) const
             numTotal++;
         }
     }
-    return numTotal;
+    return numTotal;*/
 }
-
-/*size_t GameState::getNumTotalCompleted(ActionType action) const
-{
-    return std::count_if(m_units.begin(), m_units.end(),
-        [&action](const Unit & unit) { return (action == unit.getType() && unit.getTimeUntilBuilt() == 0); });
-
-    size_t numTotalCompleted = 0;
-    for (size_t i(0); i < m_numUnits; ++i)
-    {
-        auto & unit = m_units[i];
-        if (unit.getType() == action && unit.getTimeUntilBuilt() == 0)
-
-}*/
 
 bool GameState::haveType(ActionType action) const
 {
-    //return std::any_of(m_units.begin(), m_units.end(), 
-    //       [&action](const Unit & i){ return i.getType() == action; });
+    return std::any_of(m_units.begin(), m_units.end(), 
+           [&action](const Unit & i){ return i.getType() == action; });
 
-    for (int i(0); i < int(m_units.size()); ++i)
+    /*for (int i(0); i < int(m_units.size()); ++i)
     {
         auto & unit = m_units[i];
         if (unit.getType() == action)
@@ -674,20 +736,20 @@ bool GameState::haveType(ActionType action) const
             return true;
         }
     }
-    return false;
+    return false;*/
 }
 
 int GameState::getSupplyInProgress() const
 {
-    //return std::accumulate(m_unitsBeingBuilt.begin(), m_unitsBeingBuilt.end(), 0, 
-    //       [this](size_t lhs, size_t rhs) { return lhs + this->getUnit(rhs).getType().supplyProvided(); });
+    return std::accumulate(m_unitsBeingBuilt.begin(), m_unitsBeingBuilt.end(), 0, 
+           [this](int lhs, int rhs) { return lhs + this->getUnit(rhs).getType().supplyProvided(); });
 
-    int supplyInProgress = 0;
+    /*int supplyInProgress = 0;
     for (int i(0); i < m_unitsBeingBuilt.size(); ++i)
     {
         supplyInProgress += getUnit(m_unitsBeingBuilt[i]).getType().supplyProvided();
     }
-    return supplyInProgress;
+    return supplyInProgress;*/
 }
 
 void GameState::getSpecialAbilityTargets(ActionSetAbilities & actionSet, int index) const
@@ -705,11 +767,11 @@ bool GameState::canChronoBoost() const
     if (m_race != Races::Protoss)
         return false;
 
-    //return std::any_of(m_units.begin(), m_units.end(),
-    //    [this](const Unit & u) { return (u.getType() == ActionTypes::GetResourceDepot(this->getRace()) && 
-    //                                            u.getTimeUntilBuilt() == 0 && u.getEnergy() >= ActionTypes::GetSpecialAction(m_race).energyCost); });
+    return std::any_of(m_units.begin(), m_units.end(),
+        [this](const Unit & u) { return (u.getType() == ActionTypes::GetResourceDepot(this->getRace()) && 
+                                                u.getTimeUntilBuilt() == 0 && u.getEnergy() >= ActionTypes::GetSpecialAction(m_race).energyCost()); });
 
-    for (int i(0); i < int(m_units.size()); ++i)
+    /*for (int i(0); i < int(m_units.size()); ++i)
     {
         auto & unit = m_units[i];
         if (unit.getType() == ActionTypes::GetResourceDepot(m_race) && unit.getTimeUntilBuilt() == 0 &&
@@ -718,7 +780,7 @@ bool GameState::canChronoBoost() const
             return true;
         }
     }
-    return false;
+    return false;*/
 }
 
 void GameState::storeChronoBoostTargets(ActionSetAbilities & actionSet, int index) const
@@ -735,6 +797,7 @@ void GameState::storeChronoBoostTargets(ActionSetAbilities & actionSet, int inde
     }
 }
 
+// minimum criteria that a unit must meet in order to be Chronoboostable
 bool GameState::chronoBoostableTarget(const Unit & unit) const
 {
     // can only be used on buildings
@@ -746,37 +809,26 @@ bool GameState::chronoBoostableTarget(const Unit & unit) const
     // can't chrono boost pylon
     if (unit.getType().isSupplyProvider()) { return false; }
 
-    // the unit must be producing something
-    if (unit.getTimeUntilFree() == 0) { return false; }
-
-    return true;
-}
-
-bool GameState::canChronoBoostTarget(const Unit & unit) const
-{
-    // can only be used on buildings
-    if (!unit.getType().isBuilding()) { return false; }
-
-    // the unit must be fully built
+    // the building must be finished
     if (unit.getTimeUntilBuilt() > 0) { return false; }
 
     // the unit must be producing something
-    if (unit.getTimeUntilFree() == 0) { return false; }
+    if (whenCanCast(ActionTypes::GetSpecialAction(m_race), unit.getID()) == -1) { return false; }
 
-    // can't chronoboost a building that is already chronoboosted
-    if (unit.getChronoBoostAgainTime() > 0) { return false; }
+    // only allow chronoboost to be used on buildings that are producing a combat unit
+    if (unit.getBuildType().isWorker()) { return false; }
 
     return true;
 }
 
 TimeType GameState::getNextFinishTime(ActionType type) const
 {
-    //auto it = std::find_if(m_unitsBeingBuilt.rbegin(), m_unitsBeingBuilt.rend(),
-    //          [this, &type](const size_t & uid) { return this->getUnit(uid).getType() == type; });
+    auto it = std::find_if(m_unitsBeingBuilt.rbegin(), m_unitsBeingBuilt.rend(),
+              [this, &type](int uid) { return this->getUnit(uid).getType() == type; });
 
-    //return it == m_unitsBeingBuilt.rend() ? getCurrentFrame() : m_units[*it].getTimeUntilFree();
+    return it == m_unitsBeingBuilt.rend() ? getCurrentFrame() : m_units[*it].getTimeUntilFree();
 
-    bool typeFound = false;
+    /*bool typeFound = false;
     int i = m_units.size();
     for (; i >= 0; --i)
     {
@@ -787,7 +839,7 @@ TimeType GameState::getNextFinishTime(ActionType type) const
         }
     }
 
-    return typeFound ? m_units[i].getTimeUntilFree() : getCurrentFrame();
+    return typeFound ? m_units[i].getTimeUntilFree() : getCurrentFrame();*/
 }
 
 std::string GameState::toString() const

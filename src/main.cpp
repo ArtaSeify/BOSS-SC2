@@ -166,3 +166,18 @@ int main(int /*!!! PROBLEM UNUSED argc*/, char * /*!!! PROBLEM UNUSED argv*/ [])
 
     return 0;
 }
+
+//#include "BoundedVector.h"
+/*int main()
+{
+    BoundedVector<int, 20> units1;
+
+    for (int i = 0; i < 20; ++i)
+    {
+        units1.push_back(0);
+    }
+
+    BoundedVector<int, 20> units2(units1);
+
+    return 0;
+}*/

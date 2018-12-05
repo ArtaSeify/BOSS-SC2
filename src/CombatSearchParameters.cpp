@@ -127,7 +127,25 @@ int CombatSearchParameters::getFrameTimeLimit() const
     return m_frameTimeLimit;
 }
 
+void CombatSearchParameters::setPrintNewBest(bool flag)
+{
+    m_printNewBest = flag;
+}
 
+bool CombatSearchParameters::getPrintNewBest() const
+{
+    return m_printNewBest;
+}
+
+void CombatSearchParameters::setSortActions(bool flag)
+{
+    m_sortActions = flag;
+}
+
+bool CombatSearchParameters::getSortActions() const
+{
+    return m_sortActions;
+}
 
 void CombatSearchParameters::print()
 {

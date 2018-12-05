@@ -12,7 +12,7 @@ namespace Eval
 {
     //double ArmyCompletedResourceSum(const GameState & state);
     FracType ArmyTotalResourceSum(const GameState & state);
-    FracType ArmyResourceSumToIndex(const GameState & state, int finishedUnitsIndex);
+    FracType ArmyResourceUnit(const GameState & state, int unitIndex);
 
     bool BuildOrderBetter(const BuildOrderAbilities & buildOrder, const BuildOrderAbilities & compareTo);
     bool StateBetter(const GameState & state, const GameState & compareTo);

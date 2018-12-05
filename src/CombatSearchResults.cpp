@@ -32,10 +32,18 @@ void CombatSearchResults::printResults(bool pbo)
     printf("\n");
 }
 
-void CombatSearchResults::printBuildOrder()
+/*void CombatSearchResults::printBuildOrder()
 {
     for (size_t i(0); i<buildOrder.size(); ++i)
     {
         printf("%d ", buildOrder[buildOrder.size()-1-i].getID());
+    }
+}*/
+
+void CombatSearchResults::printBuildOrder()
+{
+    for (auto & actionTargetPair : buildOrder)
+    {
+        printf("%s %d", actionTargetPair.first.getName().c_str(), actionTargetPair.second.targetID);
     }
 }

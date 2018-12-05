@@ -96,7 +96,7 @@ void BuildOrderPlotData::calculatePlot()
     m_layers = std::vector<int>(m_startTimes.size(), -1); 
 
     // determine the layers for each action
-    for (size_t i(0); i < m_startTimes.size(); ++i)
+    for (int i(0); i < m_startTimes.size(); ++i)
     {
         int start               = m_startTimes[i];
 #if 0
@@ -124,7 +124,7 @@ void BuildOrderPlotData::calculatePlot()
         std::vector<int> layerOverlap;
 
         // loop through everything up to this action and see which layers it can't be in
-        for (size_t j(0); j < i; ++j)
+        for (int j(0); j < i; ++j)
         {
             if (start < m_finishTimes[j] && !m_buildOrder[j].first.isAbility())
             {

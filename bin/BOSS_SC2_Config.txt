@@ -21,14 +21,15 @@
             "SearchTypes"       : [ "Integral"],
             "Race"              : "Protoss",
             "State"             : "Protoss Start State",
-            "PrintNewBest"      : true,
+            "PrintNewBest"      : false,
             "OutputDir"         : "../bin/results",
             "SearchTimeLimitMS" : 30000000,
-            "FrameTimeLimit"    : 2000,
+            "FrameTimeLimit"    : 3000,
             "RelevantActions"   : [ "Probe", "Pylon", "Nexus", "Assimilator", "Gateway", "CyberneticsCore", "Stalker", "Zealot", "ChronoBoost"],
-            "MaxActions"        : [ ["Nexus", 1], ["CyberneticsCore", 1]],
+            "MaxActions"        : [ ["Nexus", 1], ["Pylon", 4], ["CyberneticsCore", 1], ["Gateway", 4] ],
             "AlwaysMakeWorkers" : true,
-            "OpeningBuildOrder" : "Empty"
+            "OpeningBuildOrder" : "Empty",
+            "SortActions"       : false
         },
         
         "DT Rush" :   
@@ -51,7 +52,9 @@
     "Build Orders" :
     {
         "Empty"                 : [ ],     
-        "Test1"                 : [ "Probe", "Gateway", "Probe", "Pylon", "Probe", "Pylon", "Pylon", "Probe", "Zealot", "Probe", ["ChronoBoost", "Gateway", 14], ["ChronoBoost", "Gateway", 14], "Probe", "Zealot" ], 
-        "UAB Zealot Rush"       : [ "Probe", "Probe", "Pylon", "Gateway", "Gateway", "Zealot", "Zealot", "Zealot", "Pylon", "Zealot", "Probe", "Zealot", "Zealot", "Zealot" ]
+        "Test1"                 : [ "Probe", "Pylon", "Probe", "Assimilator", ["ChronoBoost", "Nexus", 12], "Probe", "Assimilator", "Probe"], 
+        "UAB Zealot Rush"       : [ "Probe", "Probe", "Pylon", "Gateway", "Gateway", "Zealot", "Zealot", "Zealot", "Pylon", "Zealot", "Probe", "Zealot", "Zealot", "Zealot" ],
+        "Test2"                 : [ "Probe", "Pylon", "Probe", "Gateway", "Probe", "Gateway", "Probe", "Gateway", "Probe", "Zealot", "Probe", "Pylon", "Probe", "Zealot", "Assimilator", "Probe", "Zealot", "Zealot", "Probe", "CyberneticsCore"],
+        "Test3"                 : [ "Probe", "Pylon", "Probe", "Gateway", "Probe", "Gateway", "Probe", "Gateway", "Probe", "Zealot", "Probe", "Pylon", "Probe", "Zealot", "Pylon", "Probe", "Zealot", "Zealot", "Probe", "CyberneticsCore"]
     }
 }

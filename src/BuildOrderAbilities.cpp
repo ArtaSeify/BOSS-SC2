@@ -147,7 +147,7 @@ std::string BuildOrderAbilities::getNameString(int charactersPerName, int printU
 
     if (printUpToIndex == -1)
     {
-        printUpToIndex = m_buildOrder.size();
+        printUpToIndex = int(m_buildOrder.size());
     }
     
     for (int i(0); i < printUpToIndex; ++i)

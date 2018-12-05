@@ -469,10 +469,7 @@ void Tools::DoBuildOrder(GameState & state, const BuildOrderAbilities & buildOrd
         ActionType type = x.first;
         if (type.isAbility())
         {
-            if (!state.doAbility(type, x.second.targetID))
-            {
-                std::cout << "invalid chronoboost!" << std::endl;
-            }
+            state.doAbility(type, x.second.targetID);
         }
         else
         {

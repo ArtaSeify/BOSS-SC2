@@ -45,45 +45,33 @@ Unit::Unit(ActionType type, NumUnits id, NumUnits builderID, TimeType frameStart
     
 }
 
-/*void Unit::initializeUnit(ActionType type, intt id, int builderID, int frameStarted)
+void Unit::startBuilding(Unit & Unit)
 {
-    m_id = id;
-    m_frameStarted = frameStarted;
-    m_type = type;
-    m_timeUntilBuilt = builderID != -1 ? type.buildTime() : 0;
-    m_timeUntilFree = builderID != -1 ? type.buildTime() : 0;
-    m_builderID = builderID;
-    m_maxEnergyAllowed = float(type.maxEnergy());
-    m_energy = float(type.startingEnergy());
-}*/
-
-    void Unit::startBuilding(Unit & Unit)
+    // if it's not a probe, this Unit won't be free until the build time is done
+    // !! Double check. Think it was a mistake
+    //if (!m_type.isWorker() || !m_type.getRace() == Races::Protoss)
+    if (!m_type.isWorker() || m_type.getRace() != Races::Protoss)
     {
-        // if it's not a probe, this Unit won't be free until the build time is done
-        // !! Double check. Think it was a mistake
-        //if (!m_type.isWorker() || !m_type.getRace() == Races::Protoss)
-        if (!m_type.isWorker() || m_type.getRace() != Races::Protoss)
+        if (Unit.getType().whatBuildsStatus() != "None")
         {
-            if (Unit.getType().whatBuildsStatus() != "None")
-            {
-                m_timeUntilFree = Unit.getType().buildTime();
-            }
-        }
-    
-        m_buildType = Unit.getType();
-        m_buildID = Unit.getID();
-
-        if (Unit.getType().isMorphed())
-        {
-            m_type = Unit.getType();
-        }
-
-        // the building might still be chrono boosted
-        if (m_timeChronoBoost > 0)
-        {
-            applyChronoBoost(m_timeChronoBoost, Unit);
+            m_timeUntilFree = Unit.getType().buildTime();
         }
     }
+    
+    m_buildType = Unit.getType();
+    m_buildID = Unit.getID();
+
+    if (Unit.getType().isMorphed())
+    {
+        m_type = Unit.getType();
+    }
+
+    // the building might still be chrono boosted
+    if (m_timeChronoBoost > 0)
+    {
+        applyChronoBoost(m_timeChronoBoost, Unit);
+    }
+}
 
 void Unit::complete(TimeType frameFinished)
 {
@@ -151,8 +139,8 @@ int Unit::whenCanBuild(ActionType type) const
     {
         BOSS_ASSERT(type.whatBuilds() == m_type, "Ability %s can't be cast by unit %s on unit %s", type.getName().c_str(), m_type.getName().c_str(), abilityTarget.getType().getName().c_str());
 
-    // reduce energy of unit based on energy cost of action
-    reduceEnergy(FracType(type.energyCost()));
+        // reduce energy of unit based on energy cost of action
+        reduceEnergy(FracType(type.energyCost()));
 
         // use ability on target
         if (type.getName() == "ChronoBoost")

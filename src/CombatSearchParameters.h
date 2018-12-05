@@ -103,6 +103,7 @@ namespace BOSS
         ActionSetAbilities m_relevantActions;
         int m_frameTimeLimit;
         bool m_printNewBest;
+        bool m_sortActions;
 
     public:
 
@@ -138,6 +139,12 @@ namespace BOSS
 
         void setAlwaysMakeWorkers(bool flag);
         bool getAlwaysMakeWorkers() const;
+
+        void setPrintNewBest(bool flag);
+        bool getPrintNewBest() const;
+
+        void setSortActions(bool flag);
+        bool getSortActions() const;
     
         void print();
     };

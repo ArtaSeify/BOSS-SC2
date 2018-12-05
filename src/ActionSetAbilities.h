@@ -20,7 +20,7 @@ namespace BOSS
         ActionSetAbilities();
         void setNewSet(const ActionSetAbilities & newSet);
 
-        int size() const { return m_actionsAndTargets.size(); }
+        int size() const { return int(m_actionsAndTargets.size()); }
         bool isEmpty() const { return m_actionsAndTargets.empty(); }
         void clear() { m_actionsAndTargets.clear(); }
 

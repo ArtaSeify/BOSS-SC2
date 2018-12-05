@@ -27,6 +27,7 @@ namespace BOSS
         CombatSearch_Integral(const CombatSearchParameters p = CombatSearchParameters());
     
         virtual void printResults();
+        virtual void setBestBuildOrder();
         virtual void writeResultsFile(const std::string & dir, const std::string & filename);
     };
 }

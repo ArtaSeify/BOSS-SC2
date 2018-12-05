@@ -69,10 +69,11 @@ namespace BOSS
         BuildOrderAbilities createBuildOrderEndTimes(const std::vector<IntegralDataFinishedUnits> & integral_stack, const GameState & state) const;
 
     public:
-
         CombatSearch_IntegralDataFinishedUnits();
 
         void update(const GameState & state, const BuildOrderAbilities & buildOrder, const CombatSearchParameters & params, Timer & timer);
+        void addUnitEntry(const GameState & state, int unitIndex, TimeType startFrame, TimeType endFrame, const CombatSearchParameters & params);
+        void addChronoBoostEntry(TimeType startFrame, TimeType endFrame, const CombatSearchParameters & params);
         void pop_back();
         void popFinishedLastOrder(const GameState & prevState, const GameState & currState);
 

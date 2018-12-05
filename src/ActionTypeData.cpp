@@ -6,7 +6,7 @@
 
 using namespace BOSS;
 
-std::vector<ActionTypeData>     AllActionTypeData;
+std::vector<ActionTypeData>                 AllActionTypeData;
 std::unordered_map<std::string, ActionID>   ActionTypeNameMap;
 
 const ActionTypeData & ActionTypeData::GetActionTypeData(const std::string & name)
@@ -18,7 +18,7 @@ const ActionTypeData & ActionTypeData::GetActionTypeData(const std::string & nam
 
 const ActionTypeData & ActionTypeData::GetActionTypeData(const ActionID & action)
 {
-    BOSS_ASSERT(action < AllActionTypeData.size(), "ActionID overflow: %d", action);
+    //BOSS_ASSERT(action < AllActionTypeData.size(), "ActionID overflow: %d", action);
 
     return AllActionTypeData[action];
 }
@@ -30,6 +30,10 @@ const std::vector<ActionTypeData> & ActionTypeData::GetAllActionTypeData()
 
 void ActionTypeData::Init(const json & j)
 {
+    // add the None type for error returns
+    AllActionTypeData.push_back(ActionTypeData());
+    ActionTypeNameMap["None"] = 0;
+
     // read all of the action types in the file
     if (j.count("Types") && j["Types"].is_array())
     {

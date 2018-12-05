@@ -6,6 +6,7 @@
 #include "GameState.h"
 #include "ActionType.h"
 #include "Timer.hpp"
+#include "BuildOrderAbilities.h"
 
 namespace BOSS
 {
@@ -30,7 +31,8 @@ namespace BOSS
 
         GameState winner;
 
-        std::vector<ActionType> buildOrder; // the build order
+        //std::vector<ActionType> buildOrder; // the build order
+        BuildOrderAbilities buildOrder;
 
         float highestEval;
 

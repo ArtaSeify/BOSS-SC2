@@ -20,12 +20,12 @@ CombatSearch_BucketData::CombatSearch_BucketData(int frameLimit, int numBuckets)
 
 int CombatSearch_BucketData::numBuckets() const
 {
-    return m_buckets.size();
+    return int(m_buckets.size());
 }
 
 int CombatSearch_BucketData::getBucketIndex(const GameState & state) const
 {
-    return (size_t)(((double)state.getCurrentFrame() / (double)m_frameLimit) * m_buckets.size());
+    return (int)(((double)state.getCurrentFrame() / (double)m_frameLimit) * m_buckets.size());
 }
 
 void CombatSearch_BucketData::update(const GameState & state, const BuildOrderAbilities & buildOrder)

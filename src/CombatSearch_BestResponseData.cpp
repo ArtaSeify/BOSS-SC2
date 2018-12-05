@@ -57,7 +57,7 @@ float CombatSearch_BestResponseData::compareBuildOrder(const GameState & initial
         int selfIndex = 0;
 
         // find the corresponding self army value for this time
-        for (size_t si(0); si < m_selfArmyValues.size(); ++si)
+        for (int si(0); si < m_selfArmyValues.size(); ++si)
         {
             if (enemyTime < m_selfArmyValues[si].first)
             {
@@ -81,10 +81,10 @@ int CombatSearch_BestResponseData::getStateIndex(const GameState & state)
 
     if (frame > m_enemyStates.back().getCurrentFrame())
     {
-        return m_enemyStates.size() - 1;
+        return int(m_enemyStates.size() - 1);
     }
 
-    for (size_t i(0); i < m_enemyStates.size(); ++i)
+    for (int i(0); i < m_enemyStates.size(); ++i)
     {
         if (frame < m_enemyStates[i].getCurrentFrame())
         {

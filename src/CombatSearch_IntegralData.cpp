@@ -12,7 +12,7 @@ CombatSearch_IntegralData::CombatSearch_IntegralData()
 
 void CombatSearch_IntegralData::update(const GameState & state, const BuildOrderAbilities & buildOrder)
 {
-    float value = Eval::ArmyResourceSumToIndex(state, (int)state.getFinishedUnits().size() - 1);
+    float value = Eval::ArmyTotalResourceSum(state);
     TimeType timeElapsed = state.getCurrentFrame() - m_integralStack.back().timeAdded; 
     FracType valueToAdd = m_integralStack.back().eval * timeElapsed;
     IntegralData entry(value, m_integralStack.back().integral + valueToAdd, state.getCurrentFrame());
@@ -30,7 +30,7 @@ void CombatSearch_IntegralData::update(const GameState & state, const BuildOrder
         m_bestIntegralGameState = state;
 
         // print the newly found best to console
-        printIntegralData(m_integralStack.size()-1);
+        printIntegralData(int(m_integralStack.size()-1));
     }
 }
 
@@ -50,7 +50,7 @@ void CombatSearch_IntegralData::print() const
     std::cout << "\nFinal CombatSearchIntegral Results\n\n";
     std::cout << "  Frame   ArmyEval  ArmyIntegral   BuildOrder\n";
     
-    for (size_t i(0); i<m_bestIntegralStack.size(); ++i)
+    for (int i(0); i<m_bestIntegralStack.size(); ++i)
     {
         printIntegralData(i);
     }

@@ -34,7 +34,7 @@ public:
         : n(0)
     { }
 
-    BoundedVector(const BoundedVector &x)
+    /*BoundedVector(const BoundedVector &x)
     {
         n = x.n;
 
@@ -42,7 +42,7 @@ public:
         for (int i=0; i < n; ++i) {
             new (&data[i]) T(x.data[i]);
         }
-    }
+    }*/
 
     BoundedVector &operator=(const BoundedVector &x)
     {
@@ -110,6 +110,12 @@ public:
 
     //!!! ADDED BY ARTA
     bool empty() const { return n == 0; }
+
+    void clear()
+    {
+        this->~BoundedVector();
+        new (this) BoundedVector();
+    }
 
     // [r]begin/[r]end interface
 

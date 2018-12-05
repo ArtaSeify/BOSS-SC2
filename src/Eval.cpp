@@ -41,33 +41,29 @@ namespace Eval
     {
         FracType sum(0);
         
-        for (auto & type : ActionTypes::GetAllActionTypes())
+        for (int unitIndex = 0; unitIndex < state.getNumUnits(); ++unitIndex)
         {
-            if (!type.isBuilding() && !type.isWorker() && !type.isSupplyProvider())
-            {
-                sum += state.getNumTotal(type)*type.mineralPrice();
-                sum += 2*state.getNumTotal(type)*type.gasPrice();
-            }
-        }
-        
-        return sum;
-    }
+            auto & type = state.getUnit(unitIndex).getType();
 
-    FracType ArmyResourceSumToIndex(const GameState & state, int finishedUnitsIndex)
-    {
-        FracType sum(0);
-        auto & finishedUnits = state.getFinishedUnits();
-        int index = finishedUnitsIndex;
-
-        //!!! PROBLEM only runs exactly one time?!
-        for (; index < finishedUnitsIndex + 1; ++index)
-        {
-            ActionType type = state.getUnit(finishedUnits[index]).getType();
             if (!type.isBuilding() && !type.isWorker() && !type.isSupplyProvider())
             {
                 sum += type.mineralPrice();
                 sum += 2 * type.gasPrice();
             }
+        }
+
+        return sum;
+    }
+
+    FracType ArmyResourceUnit(const GameState & state, int unitIndex)
+    {
+        FracType sum = 0;
+
+        ActionType type = state.getUnit(unitIndex).getType();
+        if (!type.isBuilding() && !type.isWorker() && !type.isSupplyProvider())
+        {
+            sum += type.mineralPrice();
+            sum += 2 * type.gasPrice();
         }
 
         return sum;
@@ -96,14 +92,34 @@ namespace Eval
         }
     }
 
+    // condition 1: more workers
+    // condition 2: more army units in production
+    // condition 3: less units
     bool StateBetter(const GameState & state, const GameState & compareTo)
     {
-        int numWorkers = state.getNumCompleted(ActionTypes::GetWorker(state.getRace()));
-        int numWorkersOther = compareTo.getNumCompleted(ActionTypes::GetWorker(compareTo.getRace()));
+        if (compareTo.getNumMineralWorkers() == 0)
+        {
+            return true;
+        }
+
+        int numWorkers = state.getNumTotalWorkers();
+        int numWorkersOther = compareTo.getNumTotalWorkers();
 
         if (numWorkers == numWorkersOther)
         {
-            return (state.getMinerals()) > (compareTo.getMinerals());
+            FracType armyVal = ArmyTotalResourceSum(state);
+            FracType armyValOther = ArmyTotalResourceSum(compareTo);
+
+            if (armyVal == armyValOther)
+            {
+                return state.getNumUnits() < compareTo.getNumUnits();
+            }
+            
+            else
+            {
+                return armyVal > armyValOther;
+            }
+            
         }
         else
         {

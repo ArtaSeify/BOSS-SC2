@@ -9,12 +9,14 @@ using namespace BOSS;
 // function which is called to do the actual search
 void CombatSearch::search()
 {
+    std::cout << "Search started!" << std::endl;
     m_searchTimer.start();
 
     // apply the opening build order to the initial state
     GameState initialState(m_params.getInitialState());
     m_buildOrder = m_params.getOpeningBuildOrder();
     Tools::DoBuildOrder(initialState, m_buildOrder);
+
     try
     {
         recurse(initialState, 0);
@@ -30,9 +32,15 @@ void CombatSearch::search()
     }
 
     m_results.timeElapsed = m_searchTimer.getElapsedTimeInMilliSec();
+    setBestBuildOrder();
 }
 
 void CombatSearch::continueSearch()
+{
+
+}
+
+void CombatSearch::setBestBuildOrder()
 {
 
 }
@@ -47,6 +55,7 @@ void CombatSearch::generateLegalActions(const GameState & state, ActionSetAbilit
         ActionType action = actionAndTarget.first;
 
         bool isLegal = state.isLegal(action);
+
         if (!isLegal)
         {
             continue;
@@ -57,7 +66,7 @@ void CombatSearch::generateLegalActions(const GameState & state, ActionSetAbilit
         {
             continue;
         }
-        
+
         legalActions.add(action);
     }
 
@@ -69,7 +78,7 @@ void CombatSearch::generateLegalActions(const GameState & state, ActionSetAbilit
 
         // when can we make a worker
         int workerReady = state.whenCanBuild(worker);
-        
+
         // if we can make a worker in the next couple of frames, do it
         if (workerReady <= state.getCurrentFrame() + 2)
         {
@@ -110,7 +119,10 @@ void CombatSearch::generateLegalActions(const GameState & state, ActionSetAbilit
     }
 
     // sort the actions
-    //legalActions.sort(state, m_params);
+    if (params.getSortActions())
+    {
+        legalActions.sort(state, m_params);
+    }    
 }
 
 const CombatSearchResults & CombatSearch::getResults() const
@@ -123,22 +135,21 @@ bool CombatSearch::timeLimitReached()
     return (m_params.getSearchTimeLimit() && (m_results.nodesExpanded % 100 == 0) && (m_searchTimer.getElapsedTimeInMilliSec() > m_params.getSearchTimeLimit()));
 }
 
+void CombatSearch::finishSearch()
+{
+    m_params.setSearchTimeLimit(1);
+}
+
 bool CombatSearch::isTerminalNode(const GameState & s, int /*!!! PROBLEM NOT USED depth */)
 {
   //!!! IMPROVEMENT: just say return s.getCurrent....
-    if (s.getCurrentFrame() >= m_params.getFrameTimeLimit())
-    {
-        return true;
-    }
-
-    return false;
+    return s.getCurrentFrame() >= m_params.getFrameTimeLimit();
 }
 
 void CombatSearch::recurse(const GameState & /*!!! PROBLEM NOT USED state*/, int /*!!! PROBLEM NOT USED depth*/)
 {
     // This base class function should never be called, leaving the code
     // here as a basis to form child classes
-
     BOSS_ASSERT(false, "Base CombatSearch recurse() should never be called");
 
     //if (timeLimitReached())

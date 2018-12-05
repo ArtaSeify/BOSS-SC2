@@ -10,13 +10,11 @@
 
 namespace BOSS
 {
-
+    using Vector_Unit = BoundedVector<Unit, 60>;
+    using Vector_NumUnits = BoundedVector<NumUnits, 40>;
+    using Vector_AbilityAction = BoundedVector<AbilityAction, 5>;
 class GameState 
 {
-    using Vector_Unit           = BoundedVector<Unit, 70>;
-    using Vector_NumUnits       = BoundedVector<NumUnits, 35>;
-    using Vector_AbilityAction  = BoundedVector<AbilityAction, 10>;
-
     Vector_Unit             m_units;
     Vector_NumUnits         m_unitsBeingBuilt;      // indices of m_units which are not completed, sorted descending by finish time
     Vector_NumUnits         m_unitsSortedEndFrame;  // indices of m_units which are completed, in order
@@ -35,7 +33,7 @@ class GameState
     NumUnits                m_numDepots;
     ActionType              m_lastAction;
     AbilityAction           m_lastAbility;
-
+ 
     int                     getBuilderID(ActionType type)               const;
     bool                    haveBuilder(ActionType type)                const;
     bool                    havePrerequisites(ActionType type)          const;
@@ -51,19 +49,21 @@ class GameState
     void                    completeUnit(Unit & Unit);
 
   public: 
-
     GameState();
+    GameState(Vector_Unit & unitVector, RaceID race, FracType minerals, FracType gas,
+        NumUnits currentSupply, NumUnits maxSupply, NumUnits mineralWorkers, NumUnits gasWorkers,
+        NumUnits builerWorkers, TimeType currentFrame, NumUnits numRefineries, NumUnits numDepots);
 
     TimeType                        whenCanBuild(ActionType action)                         const;
     TimeType                        whenCanCast(ActionType action, NumUnits targetID)       const;
     TimeType                        whenEnergyReady(ActionType action)                      const;
     int                             getSupplyInProgress()                                   const;
     TimeType                        getNextFinishTime(ActionType type)                      const;
+    TimeType                        timeUntilFirstPylonDone()                               const;
 
     void                            getSpecialAbilityTargets(ActionSetAbilities & actionSet, int index)         const;
     void                            storeChronoBoostTargets(ActionSetAbilities & actionSet, int index)          const;
     bool                            chronoBoostableTarget(const Unit & unit)                                    const;
-    bool                            canChronoBoostTarget(const Unit & unit)                                     const;
     bool                            canChronoBoost()                                                            const;
 
     int                             getNumInProgress(ActionType action)                     const;
@@ -73,7 +73,7 @@ class GameState
     bool                            isLegal(ActionType type)                                const;
     bool                            haveType(ActionType action)                             const;
 
-    bool                            doAbility(ActionType type, NumUnits targetID);
+    void                            doAbility(ActionType type, NumUnits targetID);
     void                            doAction(ActionType type);
     void                            fastForward(TimeType frames);
     void                            addUnit(ActionType Unit, NumUnits builderID = -1);
@@ -84,6 +84,7 @@ class GameState
     bool                            canBuildNow(ActionType action)      const { return whenCanBuild(action) == getCurrentFrame(); }
     int                             getNumMineralWorkers()              const { return m_mineralWorkers; }
     int                             getNumGasWorkers()                  const { return m_gasWorkers; }
+    int                             getNumTotalWorkers()                const { return m_mineralWorkers + m_gasWorkers + m_buildingWorkers; }
     int                             getNumberChronoBoostsCast()         const { return m_chronoBoosts.size(); }
     int                             getNumUnits()                       const { return m_units.size(); }
     TimeType                        getLastActionFinishTime()           const { return m_unitsBeingBuilt.empty() ? getCurrentFrame() : m_units[m_unitsBeingBuilt.front()].getTimeUntilBuilt(); }

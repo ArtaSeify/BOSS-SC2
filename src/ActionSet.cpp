@@ -11,7 +11,7 @@ ActionSet::ActionSet()
 
 int ActionSet::size() const
 {
-    return m_actions.size();
+    return int(m_actions.size());
 }
 
 bool ActionSet::isEmpty() const

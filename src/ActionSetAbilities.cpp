@@ -168,8 +168,7 @@ const std::string ActionSetAbilities::toString() const
 
     for (const auto & val : m_actionsAndTargets)
     {
-        ss << "Action: " << val.first.getName() << std::endl;
-        ss << "Target ID: " << val.second << std::endl;
+        ss << "Action: " << val.first.getName() << ". Target ID : " << val.second << std::endl;
     }
 
     return ss.str();

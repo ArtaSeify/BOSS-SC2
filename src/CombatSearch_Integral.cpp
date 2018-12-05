@@ -8,7 +8,7 @@ CombatSearch_Integral::CombatSearch_Integral(const CombatSearchParameters p)
 {
     m_params = p;
 
-    BOSS_ASSERT(m_params.getInitialState().getRace() != Races::None, "Combat search initial state is invalid");
+    //BOSS_ASSERT(m_params.getInitialState().getRace() != Races::None, "Combat search initial state is invalid");
 }
 
 void CombatSearch_Integral::recurse(const GameState & state, int depth)
@@ -31,7 +31,6 @@ void CombatSearch_Integral::recurse(const GameState & state, int depth)
     for (int a(0); a < legalActions.size(); ++a)
     {
         const int index = legalActions.size() - (a + 1);
-
         GameState child(state);
 
         const auto & actionTargetPair = legalActions[index];
@@ -49,6 +48,7 @@ void CombatSearch_Integral::recurse(const GameState & state, int depth)
             // the ability is no longer valid, skip
             if (sizeBefore > legalActions.size())
             {
+                --a;
                 continue;
             }
 
@@ -61,11 +61,7 @@ void CombatSearch_Integral::recurse(const GameState & state, int depth)
 
         if (action.isAbility())
         {
-            // ability can't be cast
-            if (!child.doAbility(action, actionTarget))
-            {
-                continue;
-            }
+            child.doAbility(action, actionTarget);
             m_buildOrder.add(action, child.getLastAbility());
         } 
         else
@@ -107,6 +103,12 @@ void CombatSearch_Integral::printResults()
 {
     m_integral.print();
 }
+
+void CombatSearch_Integral::setBestBuildOrder()
+{
+    m_results.buildOrder = m_integral.getBestBuildOrder();
+}
+
 
 #include "BuildOrderPlotter.h"
 void CombatSearch_Integral::writeResultsFile(const std::string & dir, const std::string & /*!!! PROBLEM UNUSED filename*/)
