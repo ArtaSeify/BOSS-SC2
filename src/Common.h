@@ -44,7 +44,7 @@ namespace BOSS
     
     using ActionID = uint2;
     using RaceID   = uint1;
-    using TimeType = sint4;
+    using TimeType = sint2;
     using NumUnits = sint2;
     using FracType = float;
 

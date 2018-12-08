@@ -102,7 +102,7 @@ void Unit::fastForward(TimeType frames)
         m_energy = std::min(m_energy, m_maxEnergyAllowed);
     }
     m_timeUntilFree         = (TimeType)std::max(0, m_timeUntilFree - frames);
-    m_timeUntilBuilt        = (TimeType)std::max(0, m_timeUntilBuilt);
+    m_timeUntilBuilt        = (TimeType)std::max((TimeType)0, m_timeUntilBuilt);
     m_timeChronoBoostAgain  = (TimeType)std::max(0, m_timeChronoBoostAgain - frames);
     m_timeChronoBoost       = (TimeType)std::min(m_timeChronoBoost, m_timeChronoBoostAgain);
 }

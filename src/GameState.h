@@ -10,14 +10,15 @@
 
 namespace BOSS
 {
-    using Vector_Unit = BoundedVector<Unit, 60>;
-    using Vector_NumUnits = BoundedVector<NumUnits, 40>;
-    using Vector_AbilityAction = BoundedVector<AbilityAction, 5>;
+    using Vector_Unit = BoundedVector<Unit, 200>;
+    using Vector_BuildingUnits = BoundedVector<NumUnits, 20>;
+    using Vector_FinishedUnits = BoundedVector<NumUnits, 180>;
+    using Vector_AbilityAction = BoundedVector<AbilityAction, 1>;
 class GameState 
 {
     Vector_Unit             m_units;
-    Vector_NumUnits         m_unitsBeingBuilt;      // indices of m_units which are not completed, sorted descending by finish time
-    Vector_NumUnits         m_unitsSortedEndFrame;  // indices of m_units which are completed, in order
+    Vector_BuildingUnits    m_unitsBeingBuilt;      // indices of m_units which are not completed, sorted descending by finish time
+    Vector_FinishedUnits    m_unitsSortedEndFrame;  // indices of m_units which are completed, in order
     Vector_AbilityAction    m_chronoBoosts;
     RaceID                  m_race;
     FracType                m_minerals;
@@ -54,12 +55,12 @@ class GameState
         NumUnits currentSupply, NumUnits maxSupply, NumUnits mineralWorkers, NumUnits gasWorkers,
         NumUnits builerWorkers, TimeType currentFrame, NumUnits numRefineries, NumUnits numDepots);
 
-    TimeType                        whenCanBuild(ActionType action)                         const;
-    TimeType                        whenCanCast(ActionType action, NumUnits targetID)       const;
-    TimeType                        whenEnergyReady(ActionType action)                      const;
+    int                             whenCanBuild(ActionType action)                         const;
+    int                             whenCanCast(ActionType action, NumUnits targetID)       const;
+    int                             whenEnergyReady(ActionType action)                      const;
     int                             getSupplyInProgress()                                   const;
-    TimeType                        getNextFinishTime(ActionType type)                      const;
-    TimeType                        timeUntilFirstPylonDone()                               const;
+    int                             getNextFinishTime(ActionType type)                      const;
+    int                             timeUntilFirstPylonDone()                               const;
 
     void                            getSpecialAbilityTargets(ActionSetAbilities & actionSet, int index)         const;
     void                            storeChronoBoostTargets(ActionSetAbilities & actionSet, int index)          const;
@@ -87,15 +88,15 @@ class GameState
     int                             getNumTotalWorkers()                const { return m_mineralWorkers + m_gasWorkers + m_buildingWorkers; }
     int                             getNumberChronoBoostsCast()         const { return m_chronoBoosts.size(); }
     int                             getNumUnits()                       const { return m_units.size(); }
-    TimeType                        getLastActionFinishTime()           const { return m_unitsBeingBuilt.empty() ? getCurrentFrame() : m_units[m_unitsBeingBuilt.front()].getTimeUntilBuilt(); }
+    int                             getLastActionFinishTime()           const { return m_unitsBeingBuilt.empty() ? getCurrentFrame() : m_units[m_unitsBeingBuilt.front()].getTimeUntilBuilt(); }
     int                             getCurrentSupply()                  const { return m_currentSupply; }
     int                             getMaxSupply()                      const { return m_maxSupply; }
-    TimeType                        getCurrentFrame()                   const { return m_currentFrame; }
+    int                             getCurrentFrame()                   const { return m_currentFrame; }
     RaceID                          getRace()                           const { return m_race; }
     FracType                        getMinerals()                       const { return m_minerals; }
     FracType                        getGas()                            const { return m_gas; }
     const Vector_AbilityAction &    getChronoBoostTargets()             const { return m_chronoBoosts; }
-    const Vector_NumUnits &         getFinishedUnits()                  const { return m_unitsSortedEndFrame; }
+    const Vector_FinishedUnits &    getFinishedUnits()                  const { return m_unitsSortedEndFrame; }
     ActionType                      getUnitType(NumUnits id)            const { return m_units[id].getType(); }
     ActionType                      getLastAction()                     const { return m_lastAction; }
     const AbilityAction &           getLastAbility()                    const { return m_lastAbility; }

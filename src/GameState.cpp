@@ -373,7 +373,7 @@ void GameState::addUnitToSpecialVectors(NumUnits unitIndex)
     m_unitsSortedEndFrame.push_back(unitIndex);
 }
 
-TimeType GameState::whenCanBuild(ActionType action) const
+int GameState::whenCanBuild(ActionType action) const
 {
     if (action.isAbility())
     {
@@ -397,7 +397,7 @@ TimeType GameState::whenCanBuild(ActionType action) const
     return maxTime;
 }
 
-TimeType GameState::whenCanCast(ActionType action, NumUnits targetID) const
+int GameState::whenCanCast(ActionType action, NumUnits targetID) const
 {
     BOSS_ASSERT(action.isAbility(), "whenCanCast should only be called with an ability");
     BOSS_ASSERT(getUnit(targetID).getTimeUntilBuilt() == 0, "Casting on a unit that is not built yet");
@@ -422,7 +422,7 @@ TimeType GameState::whenCanCast(ActionType action, NumUnits targetID) const
 
 // returns the game frame that we will have the resources available to construction given action type
 // this function assumes the action is legal (must be checked beforehand)
-TimeType GameState::whenResourcesReady(ActionType action) const
+int GameState::whenResourcesReady(ActionType action) const
 {
     if (m_minerals >= action.mineralPrice() && m_gas >= action.gasPrice())
     {
@@ -496,7 +496,7 @@ TimeType GameState::whenResourcesReady(ActionType action) const
     return addedTime + m_currentFrame;
 }
 
-TimeType GameState::whenBuilderReady(ActionType action) const
+int GameState::whenBuilderReady(ActionType action) const
 {
     NumUnits builderID = getBuilderID(action);
 
@@ -511,7 +511,7 @@ TimeType GameState::whenBuilderReady(ActionType action) const
     return m_currentFrame + getUnit(builderID).getTimeUntilFree();
 }
 
-TimeType GameState::whenSupplyReady(ActionType action) const
+int GameState::whenSupplyReady(ActionType action) const
 {
     int supplyNeeded = action.supplyCost() + m_currentSupply - m_maxSupply;
     if (supplyNeeded <= 0) { return m_currentFrame; }
@@ -530,7 +530,7 @@ TimeType GameState::whenSupplyReady(ActionType action) const
     return m_currentFrame;
 }
 
-TimeType GameState::whenPrerequisitesReady(ActionType action) const
+int GameState::whenPrerequisitesReady(ActionType action) const
 {
     // if this action requires no prerequisites, then they are ready right now
     if (action.required().empty())
@@ -538,7 +538,7 @@ TimeType GameState::whenPrerequisitesReady(ActionType action) const
         return m_currentFrame;
     }
 
-    TimeType whenPrereqReady = 0;
+    int whenPrereqReady = 0;
 
     // Protoss needs to have a Pylon to be able to produce buildings
     if (m_race == Races::Protoss)
@@ -547,7 +547,7 @@ TimeType GameState::whenPrerequisitesReady(ActionType action) const
         {
             whenPrereqReady = timeUntilFirstPylonDone();
 
-            if (whenPrereqReady == std::numeric_limits<TimeType>::max())
+            if (whenPrereqReady == std::numeric_limits<int>::max())
             {
                 return whenPrereqReady;
             }
@@ -558,7 +558,7 @@ TimeType GameState::whenPrerequisitesReady(ActionType action) const
     for (auto & req : action.required())
     {
         // find the minimum time that this particular prereq will be ready
-        TimeType minReady = std::numeric_limits<TimeType>::max();
+        int minReady = std::numeric_limits<int>::max();
         for (int i(0); i < int(m_units.size()); ++i)
         {
             auto & unit = m_units[i];
@@ -574,7 +574,7 @@ TimeType GameState::whenPrerequisitesReady(ActionType action) const
     return m_currentFrame + whenPrereqReady;
 }
 
-TimeType GameState::timeUntilFirstPylonDone() const
+int GameState::timeUntilFirstPylonDone() const
 {
     for (auto & unit : m_units)
     {
@@ -587,7 +587,7 @@ TimeType GameState::timeUntilFirstPylonDone() const
     return std::numeric_limits<TimeType>::max();
 }
 
-TimeType GameState::whenEnergyReady(ActionType action) const
+int GameState::whenEnergyReady(ActionType action) const
 {
     TimeType minWhenReady = std::numeric_limits<TimeType>::max();
 
@@ -700,7 +700,7 @@ int GameState::getNumCompleted(ActionType action) const
 
 int GameState::getNumTotal(ActionType action) const
 {
-    if (action.isAbility)
+    if (action.isAbility())
     { 
         if (m_race == Races::Protoss)
         {
@@ -821,7 +821,7 @@ bool GameState::chronoBoostableTarget(const Unit & unit) const
     return true;
 }
 
-TimeType GameState::getNextFinishTime(ActionType type) const
+int GameState::getNextFinishTime(ActionType type) const
 {
     auto it = std::find_if(m_unitsBeingBuilt.rbegin(), m_unitsBeingBuilt.rend(),
               [this, &type](int uid) { return this->getUnit(uid).getType() == type; });

@@ -38,7 +38,7 @@ void ActionTypeData::Init(const json & j)
     if (j.count("Types") && j["Types"].is_array())
     {
         const json & actions = j["Types"];
-        for (ActionID a(0); a < actions.size(); ++a)
+        for (ActionID a(1); a < actions.size(); ++a)
         {
             ActionTypeData data;
 
