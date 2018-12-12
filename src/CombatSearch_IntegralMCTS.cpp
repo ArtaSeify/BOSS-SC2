@@ -2,20 +2,14 @@
 
 using namespace BOSS;
 
-CombatSearch_IntegralMCTS::CombatSearch_IntegralMCTS(const CombatSearchParameters p = CombatSearchParameters())
+CombatSearch_IntegralMCTS::CombatSearch_IntegralMCTS(const CombatSearchParameters p)
+    : m_exploration_parameter (5)
 {
     m_params = p;
 }
 
 void CombatSearch_IntegralMCTS::recurse(const GameState & state, int depth)
 {
-    if (timeLimitReached())
-    {
-        throw BOSS_COMBATSEARCH_TIMEOUT;
-    }
-
-    updateResults(state);
-
     if (isTerminalNode(state, depth))
     {
         return;
@@ -24,10 +18,22 @@ void CombatSearch_IntegralMCTS::recurse(const GameState & state, int depth)
     ActionSetAbilities legalActions;
     generateLegalActions(state, legalActions, m_params);
 
-    pickAction(legalActions);
+    Node root(m_params, state, Node());
+    
+    while (!timeLimitReached())
+    {
+        Node & promisingNode = getPromisingNode(root);
+    }
 }
 
-void CombatSearch_IntegralMCTS::pickAction(ActionSetAbilities legalActions)
+Node & CombatSearch_IntegralMCTS::getPromisingNode(const Node & root) const
 {
+    Node & child = root.selectChild(m_exploration_parameter);
+    
+    while (child.getChildNodes().size() > 0)
+    {
+        child = child.selectChild(m_exploration_parameter);
+    }
 
+    return child;
 }

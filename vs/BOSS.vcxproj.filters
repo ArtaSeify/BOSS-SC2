@@ -101,7 +101,10 @@
     </ClCompile>
     <ClCompile Include="..\src\BuildOrderAbilities.cpp" />
     <ClCompile Include="..\src\CombatSearch_IntegralMCTS.cpp">
-      <Filter>search\CombatSearch\Integral</Filter>
+      <Filter>search\CombatSearch\Integral\MCTS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Node.cpp">
+      <Filter>search\CombatSearch\Integral\MCTS</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -211,7 +214,10 @@
       <Filter>util</Filter>
     </ClInclude>
     <ClInclude Include="..\src\CombatSearch_IntegralMCTS.h">
-      <Filter>search\CombatSearch\Integral</Filter>
+      <Filter>search\CombatSearch\Integral\MCTS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Node.h">
+      <Filter>search\CombatSearch\Integral\MCTS</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -247,6 +253,9 @@
     </Filter>
     <Filter Include="search\CombatSearch\Integral">
       <UniqueIdentifier>{841059ad-587a-41f4-9642-a83478d31d49}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="search\CombatSearch\Integral\MCTS">
+      <UniqueIdentifier>{117c0c5b-8945-40cb-ab9d-a69dc5b223b0}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
