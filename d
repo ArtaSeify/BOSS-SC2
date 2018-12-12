@@ -1,0 +1,280 @@
+[33mcommit b24fe2f83aadb70e19e6471a7c73c1e3d38d5d3a[m[33m ([m[1;36mHEAD -> [m[1;32mmaster[m[33m)[m
+Author: Arta Seify <arta.seify@gmail.com>
+Date:   Wed Dec 5 00:15:53 2018 -0700
+
+    Making BOSS compatible with CC. Added a few heuristics. Fixed a few bugs.
+
+[33mcommit 9a708f5877a9777691a3d1c3c6e314f7283a21ce[m
+Author: Arta Seify <arta.seify@gmail.com>
+Date:   Tue Nov 20 22:36:23 2018 -0700
+
+    Small changes to VS options
+
+[33mcommit 05c3d7409fe07cd734ffdea90fe206bf4fe17323[m
+Author: Arta Seify <arta.seify@gmail.com>
+Date:   Tue Nov 20 13:09:33 2018 -0700
+
+    Fixed compilation errors and warnings. Replaced StaticVector with BoundedVector.
+
+[33mcommit 4e776e6bf2dd0150d69923ec8e1188178f020343[m
+Author: Michael Buro <michael.buro@gmail.com>
+Date:   Sat Nov 17 16:42:42 2018 -0700
+
+    removed size_t and uint4, renamed intx to sintx, added size checks, added range based for
+
+[33mcommit 24fb4ff8935f4e1ed4e2f43462b7cf4798cd2674[m
+Author: Michael Buro <michael.buro@gmail.com>
+Date:   Sat Nov 17 14:20:20 2018 -0700
+
+    fixed initialization order
+
+[33mcommit 7d6b1797df618f4178aaab94bda73850ddab7c57[m
+Author: Arta Seify <arta.seify@gmail.com>
+Date:   Sat Nov 17 01:54:19 2018 -0700
+
+    Merged all changes. System sped up to 250k/sec somehow?
+
+[33mcommit d0084514d6e430a55f31e2de844eba28b8035722[m
+Merge: 7c2e106 0b924c3
+Author: Arta Seify <arta.seify@gmail.com>
+Date:   Sat Nov 17 01:53:53 2018 -0700
+
+    Merged with second set of changes
+
+[33mcommit 7c2e106714dfcad5e32f963bcfad7a40c1a26b3f[m
+Author: Arta Seify <arta.seify@gmail.com>
+Date:   Sat Nov 17 01:22:37 2018 -0700
+
+    Merging project with changes from Dr. Buro
+
+[33mcommit f445d32d814d86da322c080cccbb83f9a6ef8058[m
+Merge: 45b2d30 4903cde
+Author: Arta Seify <arta.seify@gmail.com>
+Date:   Sat Nov 17 01:17:59 2018 -0700
+
+    Merged current project with first changes from Dr. Buro
+
+[33mcommit 0b924c364420a0f4233b2b75aac3a78a4961ec04[m
+Author: Michael Buro <michael.buro@gmail.com>
+Date:   Sat Nov 17 00:40:10 2018 -0700
+
+    polished more
+
+[33mcommit 45b2d3021db9d1369a9c086274c540be1eb847ac[m
+Author: Arta Seify <arta.seify@gmail.com>
+Date:   Fri Nov 16 23:17:22 2018 -0700
+
+    Changing all tabs to spaces. Use custom value types. Remove redundant const types
+
+[33mcommit 4903cde95790542cb54bd56d06f0a9f858894003[m
+Author: Michael Buro <michael.buro@gmail.com>
+Date:   Fri Nov 16 22:47:58 2018 -0700
+
+    cleanup
+
+[33mcommit 09f0c5f18a473e4e4700145093417fd7729f28bf[m
+Merge: 29ad85a d82490d
+Author: Arta Seify <arta.seify@gmail.com>
+Date:   Wed Nov 14 15:35:27 2018 -0700
+
+    Merge branch 'master' of https://github.com/ArtaSeify/BOSS
+
+[33mcommit 29ad85a908fd27c09fdb4273f67ad6f6aa0336f0[m
+Author: Arta Seify <arta.seify@gmail.com>
+Date:   Thu Nov 8 12:38:34 2018 -0700
+
+    Commiting changes before pull
+
+[33mcommit 6490c4e3cd29337a7e625af88fc5511391c8e4e3[m
+Author: Arta Seify <arta.seify@gmail.com>
+Date:   Thu Nov 8 12:35:33 2018 -0700
+
+    Revert "Changhes before pull"
+    
+    This reverts commit 724b29f8062a6cce91d29e17589c375abe4b97ef.
+
+[33mcommit 724b29f8062a6cce91d29e17589c375abe4b97ef[m
+Author: Arta Seify <arta.seify@gmail.com>
+Date:   Thu Nov 8 12:33:59 2018 -0700
+
+    Changhes before pull
+
+[33mcommit d82490dd5dde035d2ace2007b9eb6b69dba654b5[m
+Author: Arta Seify <arta.seify@gmail.com>
+Date:   Wed Nov 7 15:10:48 2018 -0700
+
+    Added move sorting. BossAssert works in 5 lines of code now.
+
+[33mcommit 8d68b0c7ea83ef0fef36325276394fd82071c806[m
+Author: Arta Seify <arta.seify@gmail.com>
+Date:   Wed Nov 7 08:56:35 2018 -0700
+
+    Adding sorting of moves
+
+[33mcommit a198170c1f6c4411bc4425a3b8daf6436a3125d7[m
+Author: Arta Seify <arta.seify@gmail.com>
+Date:   Tue Nov 6 15:17:23 2018 -0700
+
+    Using StaticVector instead of vector. x2 Speedup. Search around 200k/s
+
+[33mcommit e494e6f2ca6ed821202031e3c2761ab5ba0d9ffd[m
+Author: Arta Seify <arta.seify@gmail.com>
+Date:   Fri Nov 2 00:19:12 2018 -0600
+
+    Speeding up the system. Build order doesn't work
+
+[33mcommit 92b671966d099495226665fed1a3c8efd4357e49[m
+Author: Arta Seify <arta.seify@gmail.com>
+Date:   Thu Nov 1 14:43:42 2018 -0600
+
+    Changes after talking with Dr. Buro
+
+[33mcommit a456e26e5bdb9a809bba91b9ba3e3ef2db2a06c4[m
+Author: Arta Seify <arta.seify@gmail.com>
+Date:   Tue Oct 30 23:09:35 2018 -0600
+
+    Graphs can now handle chrono boost. Better handling of chrono boost during search
+
+[33mcommit 16ae09c53826b51394a0120fa393543482e86862[m
+Author: Arta Seify <arta.seify@gmail.com>
+Date:   Mon Oct 29 10:59:26 2018 -0600
+
+    Minor changes to Eval function
+
+[33mcommit a0028a98f1076d2beea3864458815898aa2f3733[m
+Author: Arta Seify <arta.seify@gmail.com>
+Date:   Fri Oct 26 14:11:51 2018 -0600
+
+    More than twice as fast. Unit uses mostly ints instead of doubles now.
+
+[33mcommit 91aacf26fb9d341301925e2c44d1ed13577d1f57[m
+Author: Arta Seify <arta.seify@gmail.com>
+Date:   Tue Oct 23 18:29:45 2018 -0600
+
+    Chrono Boost is fully functional. No immediate bugs
+
+[33mcommit f8a423e7d1a5e5754f96c9863fb87c951ad4b2fc[m
+Author: Arta Seify <arta.seify@gmail.com>
+Date:   Tue Oct 16 22:08:53 2018 -0600
+
+    Chronoboost works properly.. I think.. Integral evaluation now considers when units are produced than when they are issued.
+
+[33mcommit 837b9d5afbf4eace276de8d26e1d3c5a40dc6f31[m
+Author: Arta Seify <arta.seify@gmail.com>
+Date:   Wed Oct 10 09:20:53 2018 -0600
+
+    Changing how the integral value is calculated
+
+[33mcommit e0c41e33c03c5dc8be15f68a06c9e63613e8a48b[m
+Author: Arta Seify <arta.seify@gmail.com>
+Date:   Thu Oct 4 23:44:38 2018 -0600
+
+    Fixed some small bugs
+
+[33mcommit 315195d7ac783d61772befcb95f6cee46c323450[m
+Author: Arta Seify <arta.seify@gmail.com>
+Date:   Mon Oct 1 15:18:16 2018 -0600
+
+    Assert messages work properly
+
+[33mcommit 2f066a4c45c66d22b5c15a1af78c24bd97ee8463[m
+Author: Arta Seify <arta.seify@gmail.com>
+Date:   Fri Sep 28 17:19:51 2018 -0600
+
+    Chrono Boost works. Assert error message broken.
+
+[33mcommit 5346f7599c59a6968d377b737996dad2c99fc3f6[m
+Author: Arta Seify <arta.seify@gmail.com>
+Date:   Wed Sep 26 02:27:15 2018 -0600
+
+    Chronoboost added. It does nothing yet.
+
+[33mcommit 8066499ec7132019075f70efe3a0de99b33114ec[m
+Author: Arta Seify <arta.seify@gmail.com>
+Date:   Fri Sep 21 23:27:17 2018 -0600
+
+    Remove .txt files in results folder
+
+[33mcommit 720fea77570de27d0055c32cda72e8842ed21808[m
+Author: Arta Seify <arta.seify@gmail.com>
+Date:   Fri Sep 21 01:58:58 2018 -0600
+
+    Read per frame values from data file. json file read in BOSS instead of ActionTypeData
+
+[33mcommit 941e76b484f8eaa5e65ab92700e584d5218c67d8[m
+Author: Arta Seify <arta.seify@gmail.com>
+Date:   Thu Sep 20 14:48:17 2018 -0600
+
+    Assert shows message properly
+
+[33mcommit 6a669a94fa0a80140f82cad180be03bc42943746[m
+Author: Arta Seify <arta.seify@gmail.com>
+Date:   Wed Sep 19 17:38:19 2018 -0600
+
+    Adding StarCraft II compatibility
+
+[33mcommit 0c9f65accda097bf9f38ebd6dbf14f0889b806c9[m
+Author: Dave Churchill <dave.churchill@gmail.com>
+Date:   Thu Jul 12 14:53:26 2018 -0230
+
+    fixed results output
+
+[33mcommit 6667f696ab59c3405f62fc83588a12433af5a750[m
+Author: David Churchill <dave.churchill@gmail.com>
+Date:   Mon Jun 4 05:40:18 2018 -0230
+
+    small fix
+
+[33mcommit 8774629af83261e24f6367d2588a4ccbc9b88f72[m
+Author: David Churchill <dave.churchill@gmail.com>
+Date:   Mon Jun 4 02:27:17 2018 -0230
+
+    combat search works
+
+[33mcommit cc971d2304f9bda7999545f1f02b26279fd915f4[m
+Author: David Churchill <dave.churchill@gmail.com>
+Date:   Sun Jun 3 05:22:22 2018 -0230
+
+    project separation
+
+[33mcommit 7cc5a3df5abbe88c02e3344655abda611059421c[m
+Author: David Churchill <dave.churchill@gmail.com>
+Date:   Fri Jun 1 15:57:29 2018 -0230
+
+    combat search compiles
+
+[33mcommit 29bff9414f4f3cdabeff07f1148881eb602daf2e[m
+Author: David Churchill <dave.churchill@gmail.com>
+Date:   Wed May 23 03:40:39 2018 -0230
+
+    goal search compiles
+
+[33mcommit f29a7f28145bbdfc76572a9f90b8ef8369083848[m
+Author: David Churchill <dave.churchill@gmail.com>
+Date:   Tue Mar 20 04:15:19 2018 -0230
+
+    some refactoring
+
+[33mcommit a201017998ca1d445d1cdd7415af02632a6fe531[m
+Author: David Churchill <dave.churchill@gmail.com>
+Date:   Wed Nov 8 01:21:48 2017 -0330
+
+    big update
+
+[33mcommit 00852e68ef2077191cddec07a4e45ab99856c8a3[m
+Author: David Churchill <dave.churchill@gmail.com>
+Date:   Thu Aug 24 23:27:19 2017 -0230
+
+    plots work
+
+[33mcommit 42cb0023cd2199c082699c98db5f710b1fa246aa[m
+Author: David Churchill <dave.churchill@gmail.com>
+Date:   Wed Aug 23 14:11:13 2017 -0230
+
+    initial commit
+
+[33mcommit 5123fb3d111fcf106b3eef8dbffd3bc526cd5737[m
+Author: David Churchill <dave.churchill@gmail.com>
+Date:   Tue Aug 22 17:24:46 2017 -0230
+
+    Initial commit

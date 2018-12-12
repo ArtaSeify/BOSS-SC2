@@ -41,6 +41,7 @@
     <ClCompile Include="..\src\CombatSearch_Integral.cpp" />
     <ClCompile Include="..\src\CombatSearch_IntegralData.cpp" />
     <ClCompile Include="..\src\CombatSearch_IntegralDataFinishedUnits.cpp" />
+    <ClCompile Include="..\src\CombatSearch_IntegralMCTS.cpp" />
     <ClCompile Include="..\src\DFBB_BuildOrderSearchParameters.cpp" />
     <ClCompile Include="..\src\DFBB_BuildOrderSearchResults.cpp" />
     <ClCompile Include="..\src\DFBB_BuildOrderSearchSaveState.cpp" />
@@ -82,6 +83,7 @@
     <ClInclude Include="..\src\CombatSearch_Integral.h" />
     <ClInclude Include="..\src\CombatSearch_IntegralData.h" />
     <ClInclude Include="..\src\CombatSearch_IntegralDataFinishedUnits.h" />
+    <ClInclude Include="..\src\CombatSearch_IntegralMCTS.h" />
     <ClInclude Include="..\src\Common.h" />
     <ClInclude Include="..\src\DFBB_BuildOrderSearchParameters.h" />
     <ClInclude Include="..\src\DFBB_BuildOrderSearchResults.h" />

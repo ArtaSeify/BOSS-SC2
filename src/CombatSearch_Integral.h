@@ -17,10 +17,11 @@ namespace BOSS
 
     class CombatSearch_Integral : public CombatSearch
     {
+        virtual void recurse(const GameState & s, int depth);
+
+    protected:
         //CombatSearch_IntegralData   m_integral;
         CombatSearch_IntegralDataFinishedUnits  m_integral;
-
-        virtual void recurse(const GameState & s, int depth);
 
     public:
     

@@ -32,7 +32,7 @@ GameState::GameState()
     //Vector_AbilityAction    m_chronoBoosts;
 }
 
-GameState::GameState(Vector_Unit & unitVector, RaceID race, FracType minerals, FracType gas,
+/*GameState::GameState(Vector_Unit & unitVector, RaceID race, FracType minerals, FracType gas,
     NumUnits currentSupply, NumUnits maxSupply, NumUnits mineralWorkers, NumUnits gasWorkers,
     NumUnits builerWorkers, TimeType currentFrame, NumUnits numRefineries, NumUnits numDepots)
     : m_units (unitVector)
@@ -65,7 +65,7 @@ GameState::GameState(Vector_Unit & unitVector, RaceID race, FracType minerals, F
     std::cout << m_buildingWorkers << std::endl;
     std::cout << m_numRefineries << std::endl;
     std::cout << m_numDepots << std::endl;*/
-}
+//}
 
 void GameState::getLegalActions(std::vector<ActionType> & legalActions) const
 {

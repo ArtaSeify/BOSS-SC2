@@ -100,6 +100,9 @@
       <Filter>search\BuildOrderSearch</Filter>
     </ClCompile>
     <ClCompile Include="..\src\BuildOrderAbilities.cpp" />
+    <ClCompile Include="..\src\CombatSearch_IntegralMCTS.cpp">
+      <Filter>search\CombatSearch\Integral</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\ActionType.h" />
@@ -206,6 +209,9 @@
     <ClInclude Include="..\src\BuildOrderAbilities.h" />
     <ClInclude Include="..\src\BoundedVector.h">
       <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\CombatSearch_IntegralMCTS.h">
+      <Filter>search\CombatSearch\Integral</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
