@@ -10,7 +10,9 @@ namespace BOSS
 
         void recurse(const GameState & state, int depth);
         
-        Node & getPromisingNode(const Node & root) const;
+        Node & getPromisingNode(Node & root) const;
+        bool isTerminalNode(const Node & node) const;
+
     public:
         CombatSearch_IntegralMCTS(const CombatSearchParameters p = CombatSearchParameters());
 

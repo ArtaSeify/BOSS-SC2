@@ -95,3 +95,8 @@ Node & Node::selectChild(int exploration_param) const
 
     return *m_children[index].first;
 }
+
+Node & Node::getRandomChild() const
+{
+    return *m_children[std::rand() % m_children.size()].first;
+}

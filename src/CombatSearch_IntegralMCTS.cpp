@@ -10,25 +10,29 @@ CombatSearch_IntegralMCTS::CombatSearch_IntegralMCTS(const CombatSearchParameter
 
 void CombatSearch_IntegralMCTS::recurse(const GameState & state, int depth)
 {
-    if (isTerminalNode(state, depth))
-    {
-        return;
-    }
-
-    ActionSetAbilities legalActions;
-    generateLegalActions(state, legalActions, m_params);
-
     Node root(m_params, state, Node());
     
     while (!timeLimitReached())
     {
         Node & promisingNode = getPromisingNode(root);
+        if (!isTerminalNode(promisingNode))
+        {
+            ActionSetAbilities legalActions;
+            generateLegalActions(promisingNode.getState(), legalActions, m_params);
+            promisingNode.createChildren(legalActions, m_params);
+        }
+
+        Node & nodeToExplore = promisingNode;
+        if (promisingNode.getChildNodes().size() > 0)
+        {
+            nodeToExplore = promisingNode.getRandomChild();
+        }
     }
 }
 
-Node & CombatSearch_IntegralMCTS::getPromisingNode(const Node & root) const
+Node & CombatSearch_IntegralMCTS::getPromisingNode(Node & root) const
 {
-    Node & child = root.selectChild(m_exploration_parameter);
+    Node & child = root;
     
     while (child.getChildNodes().size() > 0)
     {
@@ -36,4 +40,9 @@ Node & CombatSearch_IntegralMCTS::getPromisingNode(const Node & root) const
     }
 
     return child;
+}
+
+bool CombatSearch_IntegralMCTS::isTerminalNode(const Node & node) const
+{
+    return node.getState().getCurrentFrame() >= m_params.getFrameTimeLimit();
 }

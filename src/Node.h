@@ -22,10 +22,17 @@ namespace BOSS
         Node();
         Node(const CombatSearchParameters & params, const GameState & state, BOSS::Node & parent);
 
+        // creates the child nodes and stores them inside of m_children
         void createChildren(ActionSetAbilities & actions, const CombatSearchParameters & params);
+        
+        // selects a child based on UCB
         Node & selectChild(int exploration_param) const;
+
+        // gets a chi   ld at random
+        Node & getRandomChild() const;
 
         int timesVisited() const { return m_timesVisited; }
         const std::vector<Edge> & getChildNodes() const { return m_children; }
+        const GameState & getState() const { return m_state; }
     };
 }
