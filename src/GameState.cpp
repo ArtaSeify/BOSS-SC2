@@ -756,8 +756,12 @@ void GameState::getSpecialAbilityTargets(ActionSetAbilities & actionSet, int ind
 {
     if (m_race == Races::Protoss)
     {
-        actionSet.remove(ActionTypes::GetSpecialAction(m_race), index);
-        storeChronoBoostTargets(actionSet, index);
+        // if there are any chronoboostable targets, we remove the placeholder CB
+        // action with target -1. Otherwise, we keep it in
+        if (storeChronoBoostTargets(actionSet, index) != 0)
+        {
+            actionSet.remove(ActionTypes::GetSpecialAction(m_race), index);
+        }
     }
 }
 
@@ -783,8 +787,9 @@ bool GameState::canChronoBoost() const
     return false;*/
 }
 
-void GameState::storeChronoBoostTargets(ActionSetAbilities & actionSet, int index) const
+int GameState::storeChronoBoostTargets(ActionSetAbilities & actionSet, int index) const
 {
+    int numTargets = 0;
     for (int i(0); i < int(m_units.size()); ++i)
     {
         auto & unit = m_units[i];
@@ -793,8 +798,11 @@ void GameState::storeChronoBoostTargets(ActionSetAbilities & actionSet, int inde
         {
             //std::cout << "Chronoboost target: " << unit.getType().getName() << std::endl;
             actionSet.add(ActionTypes::GetSpecialAction(m_race), unit.getID(), index);
+            numTargets++;
         }
     }
+
+    return numTargets;
 }
 
 // minimum criteria that a unit must meet in order to be Chronoboostable

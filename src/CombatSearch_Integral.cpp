@@ -45,18 +45,14 @@ void CombatSearch_Integral::recurse(const GameState & state, int depth)
 
             state.getSpecialAbilityTargets(legalActions, index);
 
-            // the ability is no longer valid, skip
-            if (sizeBefore > legalActions.size())
-            {
-                --a;
-                continue;
-            }
-
             // the new target 
             actionTarget = legalActions.getAbilityTarget(index + (legalActions.size() - sizeBefore));
 
-            // target is at the same index
-            //actionTarget = legalActions.getAbilityTarget(index);
+            // the ability is no longer valid, skip
+            if (actionTarget == -1)
+            {
+                continue;
+            }
         }
 
         if (action.isAbility())

@@ -12,8 +12,11 @@ namespace BOSS
     class CombatSearchParameters;
     class ActionSetAbilities
     {
+    public:
         typedef std::pair<ActionType, NumUnits> ActionTargetPair;
         typedef std::vector<ActionTargetPair> Actions;
+
+    private:
         Actions m_actionsAndTargets;
 
     public:
@@ -36,6 +39,8 @@ namespace BOSS
         void remove(ActionType action);
         void remove(ActionType action, int index);
         void remove(const ActionSetAbilities & set);
+
+        const ActionTargetPair & getRandomElement() const;
 
         int getAbilityTarget(int index) const;
         const std::string toString() const;

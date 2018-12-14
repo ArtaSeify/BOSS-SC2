@@ -162,6 +162,11 @@ int ActionSetAbilities::getAbilityTarget(int index) const
 }
 */
 
+const ActionSetAbilities::ActionTargetPair & ActionSetAbilities::getRandomElement() const
+{
+    return m_actionsAndTargets[std::rand() % size()];
+}
+
 const std::string ActionSetAbilities::toString() const
 {
     std::stringstream ss;

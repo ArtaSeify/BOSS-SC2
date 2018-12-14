@@ -24,6 +24,7 @@ namespace BOSS
         void add(ActionType type, const AbilityAction & ability);
         void add(ActionType type, int amount);
         void add(const BuildOrderAbilities & other);
+
         void clear();
         const ActionTargetPair & back() const;
         void pop_back();

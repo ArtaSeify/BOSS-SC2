@@ -74,6 +74,8 @@ namespace BOSS
         void update(const GameState & state, const BuildOrderAbilities & buildOrder, const CombatSearchParameters & params, Timer & timer);
         void addUnitEntry(const GameState & state, int unitIndex, TimeType startFrame, TimeType endFrame, const CombatSearchParameters & params);
         void addChronoBoostEntry(TimeType startFrame, TimeType endFrame, const CombatSearchParameters & params);
+        
+        void clear();
         void pop_back();
         void popFinishedLastOrder(const GameState & prevState, const GameState & currState);
 

@@ -158,6 +158,12 @@ void CombatSearch_IntegralDataFinishedUnits::pop_back()
     m_integralStack.pop_back();
 }
 
+void CombatSearch_IntegralDataFinishedUnits::clear()
+{
+    m_integralStack.clear();
+    m_integralStack.push_back(IntegralDataFinishedUnits());
+}
+
 void CombatSearch_IntegralDataFinishedUnits::popFinishedLastOrder(const GameState & prevState, const GameState & currState)
 {
     int chronoBoostsToRemove = currState.getNumberChronoBoostsCast() - prevState.getNumberChronoBoostsCast();

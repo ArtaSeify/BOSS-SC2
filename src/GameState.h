@@ -10,10 +10,10 @@
 
 namespace BOSS
 {
-    using Vector_Unit = BoundedVector<Unit, 200>;
+    using Vector_Unit = BoundedVector<Unit, 70>;
     using Vector_BuildingUnits = BoundedVector<NumUnits, 20>;
-    using Vector_FinishedUnits = BoundedVector<NumUnits, 180>;
-    using Vector_AbilityAction = BoundedVector<AbilityAction, 1>;
+    using Vector_FinishedUnits = BoundedVector<NumUnits, 50>;
+    using Vector_AbilityAction = BoundedVector<AbilityAction, 5>;
 class GameState 
 {
     Vector_Unit             m_units;
@@ -67,7 +67,7 @@ class GameState
     int                             timeUntilFirstPylonDone()                               const;
 
     void                            getSpecialAbilityTargets(ActionSetAbilities & actionSet, int index)         const;
-    void                            storeChronoBoostTargets(ActionSetAbilities & actionSet, int index)          const;
+    int                             storeChronoBoostTargets(ActionSetAbilities & actionSet, int index)          const;
     bool                            chronoBoostableTarget(const Unit & unit)                                    const;
     bool                            canChronoBoost()                                                            const;
 
