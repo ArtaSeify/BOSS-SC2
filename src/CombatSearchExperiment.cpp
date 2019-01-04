@@ -4,6 +4,7 @@
 #include "CombatSearch.h"
 #include "CombatSearch_Bucket.h"
 #include "CombatSearch_Integral.h"
+#include "CombatSearch_IntegralMCTS.h"
 #include "CombatSearch_BestResponse.h"
 #include "FileTools.h"
 
@@ -143,6 +144,11 @@ void CombatSearchExperiment::run()
         {
             combatSearch = std::shared_ptr<CombatSearch>(new CombatSearch_BestResponse(m_params));
             resultsFile += "_BestResponse"; 
+        }
+        else if (m_searchTypes[i] == "IntegralMCTS")
+        {
+            combatSearch = std::shared_ptr<CombatSearch>(new CombatSearch_IntegralMCTS(m_params));
+            resultsFile += "_IntegralMCTS";
         }
         else
         {

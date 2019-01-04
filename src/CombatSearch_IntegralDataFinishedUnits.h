@@ -84,5 +84,7 @@ namespace BOSS
         void print(const std::vector<IntegralDataFinishedUnits> & integral_stack, const GameState & state, const BuildOrderAbilities & buildOrder) const;
 
         const BuildOrderAbilities & getBestBuildOrder() const;
+
+        FracType getIntegralValue() const { return m_bestIntegralValue; }
     };
 }

@@ -797,11 +797,10 @@ int GameState::storeChronoBoostTargets(ActionSetAbilities & actionSet, int index
         if (chronoBoostableTarget(unit))
         {
             //std::cout << "Chronoboost target: " << unit.getType().getName() << std::endl;
-            actionSet.add(ActionTypes::GetSpecialAction(m_race), unit.getID(), index);
+            actionSet.add(ActionTypes::GetSpecialAction(m_race), unit.getID(), index + 1);
             numTargets++;
         }
     }
-
     return numTargets;
 }
 
