@@ -18,18 +18,18 @@
         {
             "Run"               : true,
             "Type"              : "CombatSearch",
-            "SearchTypes"       : [ "IntegralMCTS"],
+            "SearchTypes"       : [ "Integral"],
             "Race"              : "Protoss",
             "State"             : "Protoss Start State",
             "PrintNewBest"      : false,
             "OutputDir"         : "../bin/results",
-            "SearchTimeLimitMS" : 30000000,
-            "FrameTimeLimit"    : 2000,
+            "SearchTimeLimitMS" : 120000,
+            "FrameTimeLimit"    : 4000,
             "RelevantActions"   : [ "Probe", "Pylon", "Nexus", "Assimilator", "Gateway", "CyberneticsCore", "Stalker", "Zealot", "ChronoBoost"],
             "MaxActions"        : [ ["Nexus", 1], ["Pylon", 12], ["CyberneticsCore", 1], ["Gateway", 4] ],
             "AlwaysMakeWorkers" : true,
             "OpeningBuildOrder" : "Empty",
-            "SortActions"       : false
+            "SortActions"       : true
         },
         
         "DT Rush" :   

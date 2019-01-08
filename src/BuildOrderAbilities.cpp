@@ -24,6 +24,12 @@ void BuildOrderAbilities::add(ActionType type, const AbilityAction & ability)
     m_typeCount[type.getID()]++;
 }
 
+void BuildOrderAbilities::add(const ActionTargetPair & pair)
+{
+    m_buildOrder.push_back(pair);
+    m_typeCount[pair.first.getID()]++;
+}
+
 void BuildOrderAbilities::add(ActionType type, int amount)
 {
     for (int i(0); i < amount; ++i)

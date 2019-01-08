@@ -7,51 +7,100 @@ CombatSearch_IntegralMCTS::CombatSearch_IntegralMCTS(const CombatSearchParameter
 {
     m_params = p;
 
-    std::srand(std::time(0)); //use current time as seed for random generator
+    std::srand(uint4(std::time(0))); //use current time as seed for random generator
 }
 
 void CombatSearch_IntegralMCTS::recurse(const GameState & state, int depth)
 {
+    int nodes_visited = 0;
     Node root(state);
     
-    //while (!timeLimitReached())
+    while (!timeLimitReached())
+    //for (int i = 0; i < 100000; ++i)
     {
-        Node & promisingNode = getPromisingNode(root);
-        if (!isTerminalNode(promisingNode))
+        Node * promisingNode = &getPromisingNode(root);
+        if (!isTerminalNode(*promisingNode))
         {
             ActionSetAbilities legalActions;
-            generateLegalActions(promisingNode.getState(), legalActions, m_params);
-            promisingNode.createChildren(legalActions);
+            generateLegalActions(promisingNode->getState(), legalActions, m_params);
+            promisingNode->createChildren(legalActions, m_params);
         
             // there might be no action possible, so createChildren creates 0 children
-            Node & nodeToExplore = promisingNode;
-            if (promisingNode.getChildNodes().size() > 0)
+            if (promisingNode->getChildNodes().size() > 0)
             {
                 // get a random child node
-                nodeToExplore = promisingNode.getRandomChild();
+                promisingNode = &promisingNode->getRandomChild();
             }
 
-            randomPlayout(nodeToExplore);
-            backPropogation(nodeToExplore);
+            if (promisingNode->timesVisited() == 0)
+            {
+                ++nodes_visited;
+            }
+
+            randomPlayout(*promisingNode);
         }
+        backPropogation(*promisingNode);
     }
+    pickBestBuildOrder(root);
+
+    std::cout << "number of nodes visited: " << nodes_visited << std::endl;
+
+    root.~Node();
+
+    /*Node * bestBO = &root;
+    std::cout << bestBO->timesVisited() << std::endl;
+    bestBO = &bestBO->getChildNode(ActionTypes::GetActionType("Probe"));
+    std::cout << bestBO->timesVisited() << std::endl;
+    bestBO = &bestBO->getChildNode(ActionTypes::GetActionType("Pylon"));
+    std::cout << bestBO->timesVisited() << std::endl;
+    bestBO = &bestBO->getChildNode(ActionTypes::GetActionType("Probe"));
+    std::cout << bestBO->timesVisited() << std::endl;
+    bestBO = &bestBO->getChildNode(ActionTypes::GetActionType("Gateway"));
+    std::cout << bestBO->timesVisited() << std::endl;
+    bestBO = &bestBO->getChildNode(ActionTypes::GetActionType("Probe"));
+    std::cout << bestBO->timesVisited() << std::endl;
+    bestBO = &bestBO->getChildNode(ActionTypes::GetActionType("Gateway"));
+    std::cout << bestBO->timesVisited() << std::endl;
+    bestBO = &bestBO->getChildNode(ActionTypes::GetActionType("Probe"));
+    std::cout << bestBO->timesVisited() << std::endl;
+    bestBO = &bestBO->getChildNode(ActionTypes::GetActionType("Gateway"));
+    std::cout << bestBO->timesVisited() << std::endl;
+    bestBO = &bestBO->getChildNode(ActionTypes::GetActionType("Probe"));
+    std::cout << bestBO->timesVisited() << std::endl;
+    bestBO = &bestBO->getChildNode(ActionTypes::GetActionType("Zealot"));
+    std::cout << bestBO->timesVisited() << std::endl;
+    bestBO = &bestBO->getChildNode(ActionTypes::GetActionType("Probe"));
+    std::cout << bestBO->timesVisited() << std::endl;
+    bestBO = &bestBO->getChildNode(ActionTypes::GetActionType("ChronoBoost"));
+    std::cout << bestBO->timesVisited() << std::endl;
+    bestBO = &bestBO->getChildNode(ActionTypes::GetActionType("Pylon"));
+    std::cout << bestBO->timesVisited() << std::endl;
+    bestBO = &bestBO->getChildNode(ActionTypes::GetActionType("Zealot"));
+    std::cout << bestBO->timesVisited() << std::endl;
+    bestBO = &bestBO->getChildNode(ActionTypes::GetActionType("Probe"));
+    std::cout << bestBO->timesVisited() << std::endl;
+    bestBO = &bestBO->getChildNode(ActionTypes::GetActionType("ChronoBoost"));
+    std::cout << bestBO->timesVisited() << std::endl;
+    bestBO = &bestBO->getChildNode(ActionTypes::GetActionType("Zealot"));
+    std::cout << bestBO->timesVisited() << std::endl;*/
 }
 
-Node CombatSearch_IntegralMCTS::getPromisingNode(Node node)
+Node & CombatSearch_IntegralMCTS::getPromisingNode(Node & node)
 {
-    // create copies
+    // create copies of integral and the build order
     m_promisingNodeBuildOrder = m_buildOrder;
     m_promisingNodeIntegral = m_integral;
 
-    while (node.getChildNodes().size() > 0)
+    Node * returnNode = &node;
+    while (returnNode->getChildNodes().size() > 0)
     {
         // get the next child
-        node = node.selectChild(m_exploration_parameter);
+        returnNode = &returnNode->selectChild(m_exploration_parameter);
         
-        updateBOIntegral(node);
+        // update build order and integral
+        updateBOIntegral(*returnNode, GameState(returnNode->getState()));
     }
-
-    return node;
+    return *returnNode;
 }
 
 bool CombatSearch_IntegralMCTS::isTerminalNode(const Node & node) const
@@ -78,7 +127,7 @@ void CombatSearch_IntegralMCTS::doRandomAction(Node & node)
     GameState stateCopy(node.getState());
 
     // do an action at random
-    node.doAction(legalActions, std::rand() % legalActions.size());
+    node.doAction(legalActions, std::rand() % legalActions.size(), m_params);
 
     updateBOIntegral(node, stateCopy);    
 }
@@ -107,13 +156,37 @@ void CombatSearch_IntegralMCTS::updateBOIntegral(const Node & node, GameState & 
 
 void CombatSearch_IntegralMCTS::backPropogation(Node & node)
 {
-    Node * current_node(&node);
+    Node * current_node = &node;
+
+    //std::cout << "\nvalue of search: " << m_promisingNodeIntegral.getIntegralValue() << std::endl;
 
     while (current_node != NULL)
     {
-        std::cout << current_node->getChildNodes().size() << std::endl;
         current_node->updateNodeValue(m_promisingNodeIntegral.getIntegralValue());
-        std::cout << "value of " << current_node->getAction().first.getName() << " changed to: " << current_node->getValue() << std::endl;
+
+        //std::cout << "value of " << current_node->getAction().first.getName() << " changed to: " << current_node->getValue() << std::endl;
+        //std::cout << std::endl;
+
         current_node = current_node->getParent();
     }
+}
+
+void CombatSearch_IntegralMCTS::pickBestBuildOrder(Node & root)
+{
+    Node * bestNodes = &root;
+
+    // pick the child node with the highest action value until we reach a leaf node
+    while (bestNodes->getChildNodes().size() > 0)
+    {
+        bestNodes = &bestNodes->getChildHighestValue();
+        
+        m_buildOrder.add(bestNodes->getAction().first, bestNodes->getState().getLastAbility());
+        m_integral.update(bestNodes->getState(), m_buildOrder, m_params, m_searchTimer);
+    }
+
+    // there are no more actions, but we still need to fast forward to the time
+    // limit to properly calculate the integral
+    GameState finalState(bestNodes->getState());
+    finalState.fastForward(m_params.getFrameTimeLimit());
+    m_integral.update(finalState, m_buildOrder, m_params, m_searchTimer);
 }

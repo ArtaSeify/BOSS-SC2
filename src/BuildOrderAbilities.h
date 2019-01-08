@@ -22,6 +22,7 @@ namespace BOSS
 
         void add(ActionType type);
         void add(ActionType type, const AbilityAction & ability);
+        void add(const ActionTargetPair & pair);
         void add(ActionType type, int amount);
         void add(const BuildOrderAbilities & other);
 

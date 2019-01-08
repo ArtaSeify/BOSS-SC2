@@ -33,7 +33,7 @@ void CombatSearch_Integral::recurse(const GameState & state, int depth)
         const int index = legalActions.size() - (a + 1);
         GameState child(state);
 
-        const auto & actionTargetPair = legalActions[index];
+        const ActionSetAbilities::ActionTargetPair & actionTargetPair = legalActions[index];
 
         ActionType action = actionTargetPair.first;
         NumUnits actionTarget = actionTargetPair.second;

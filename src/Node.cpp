@@ -1,10 +1,13 @@
 #include "Node.h"
+#include "Eval.h"
 
 using namespace BOSS;
 
+FracType Node::CURRENT_HIGHEST_VALUE = 1.f;
+
 Node::Node()
-    : //m_parent ()
-     m_state ()
+    : m_parent ()
+    , m_state ()
     , m_action()
     , m_timesVisited (0)
     , m_children()
@@ -14,8 +17,8 @@ Node::Node()
 }
 
 Node::Node(const GameState & state)
-    : //m_parent()
-     m_state(state)
+    : m_parent()
+    , m_state(state)
     , m_action()
     , m_timesVisited(0)
     , m_children()
@@ -29,31 +32,29 @@ Node::Node(const GameState & state, BOSS::Node * parent)
     , m_state (state)
     , m_action ()
     , m_timesVisited (0)
-    //, m_children ()
+    , m_children ()
     , m_value (0.f)
 {
 
 }
 
-void Node::createChildren(ActionSetAbilities & actions)
+void Node::createChildren(ActionSetAbilities & actions, const CombatSearchParameters & params)
 {
     // create all the children
     for (int a = 0; a < actions.size(); ++a)
     {
         const int index = actions.size() - (a + 1);
 
-        Node * childNode = new Node(m_state, this);
+        Node childNode(m_state, this);
 
-        if (childNode->doAction(actions, index))
+        if (childNode.doAction(actions, index, params))
         {
             m_children.push_back(childNode);
         }
     }
-
-    std::cout << "done with creating children" << std::endl;
 }
 
-bool Node::doAction(ActionSetAbilities & actions, int index)
+bool Node::doAction(ActionSetAbilities & actions, int index, const CombatSearchParameters & params)
 {
     const auto & actionTargetPair = actions[index];
     ActionType action = actionTargetPair.first;
@@ -75,8 +76,6 @@ bool Node::doAction(ActionSetAbilities & actions, int index)
             return false;
         }
     }
-    
-    std::cout << "doing action: " << action.getName() << std::endl;
 
     if (action.isAbility())
     {
@@ -87,25 +86,31 @@ bool Node::doAction(ActionSetAbilities & actions, int index)
         m_state.doAction(action);
     }
 
+    // if we go over the frame time limit, this node is invalid
+    if (m_state.getCurrentFrame() > params.getFrameTimeLimit())
+    {
+        return false;
+    }
+
     // set the action of this child node
     setAction(actions[index]);
 
     return true;
 }
 
-Node & Node::selectChild(int exploration_param) const
+Node & Node::selectChild(int exploration_param)
 {
     // uniform policy
     float policyValue = 1.f / m_children.size();
 
-    int totalEdgeVisits = 0;
+    int totalChildVisits = 0;
     for (auto & child : m_children)
     {
-        totalEdgeVisits += child->timesVisited();
+        totalChildVisits += child.timesVisited();
     }
 
     float UCBValue = exploration_param * policyValue *
-        static_cast<float>(std::sqrt(totalEdgeVisits));
+        static_cast<float>(std::sqrt(totalChildVisits));
 
     float maxActionValue = 0;
     int maxIndex = 0;
@@ -115,8 +120,12 @@ Node & Node::selectChild(int exploration_param) const
     {
         // calculate UCB value and get the total value of action
         // Q(s, a) + u(s, a)
-        float childUCBValue = UCBValue / (1 + child->timesVisited());
-        float actionValue = child->getValue() + childUCBValue;
+        // we normalize the action value to a range of [0, 1] using the highest
+        // value of the search thus far. 
+        float childUCBValue = UCBValue / (1 + child.timesVisited());
+        float actionValue = (child.getValue() / CURRENT_HIGHEST_VALUE) + childUCBValue;
+
+        //std::cout << "times visited: " << child.timesVisited() << std::endl;
 
         // store the index of this action
         if (maxActionValue < actionValue)
@@ -128,16 +137,57 @@ Node & Node::selectChild(int exploration_param) const
         ++index;
     }
 
-    return *m_children[index];
+    //std::cout << std::endl;
+
+    return m_children[maxIndex];
 }
 
-Node & Node::getRandomChild() const
+Node & Node::getChildHighestValue()
 {
-    return *m_children[std::rand() % m_children.size()];
+    // get the nodde with the highest action value
+    auto child = std::max_element(m_children.begin(), m_children.end(),
+        [this](const Node & lhs, const Node & rhs) 
+        { 
+            if (lhs.getValue() == rhs.getValue())
+            {
+                return Eval::StateBetter(rhs.getState(), lhs.getState());
+            }
+        
+            return lhs.getValue() < rhs.getValue();
+        });
+
+    return *child;
+}
+
+Node & Node::getRandomChild()
+{
+    return m_children[std::rand() % m_children.size()];
 }
 
 void Node::updateNodeValue(FracType newActionValue)
 {
+    //std::cout << m_action.first.getName() << " node updated" << std::endl;
+
     m_timesVisited++;
     m_value = m_value + ((1.f / m_timesVisited) * (newActionValue - m_value));
+
+    if (m_value > CURRENT_HIGHEST_VALUE)
+    {
+        CURRENT_HIGHEST_VALUE = m_value;
+    }
+}
+
+Node & Node::getChildNode(ActionType action)
+{
+    BOSS_ASSERT(m_children.size() > 0, "Number of children is %i", m_children.size());
+
+    for (Node & child : m_children)
+    {
+        if (child.getAction().first == action)
+        {
+            return child;
+        }
+    }
+
+    BOSS_ASSERT(false, "Tried to get node with action %s, but it doesn't exist", action.getName().c_str());
 }

@@ -11,19 +11,19 @@
 namespace BOSS
 {
     using Vector_Unit = BoundedVector<Unit, 70>;
-    using Vector_BuildingUnits = BoundedVector<NumUnits, 20>;
+    using Vector_BuildingUnits = BoundedVector<NumUnits, 25>;
     using Vector_FinishedUnits = BoundedVector<NumUnits, 50>;
-    using Vector_AbilityAction = BoundedVector<AbilityAction, 5>;
+    using Vector_AbilityAction = BoundedVector<AbilityAction, 7>;
 class GameState 
 {
-    Vector_Unit             m_units;
-    Vector_BuildingUnits    m_unitsBeingBuilt;      // indices of m_units which are not completed, sorted descending by finish time
-    Vector_FinishedUnits    m_unitsSortedEndFrame;  // indices of m_units which are completed, in order
-    Vector_AbilityAction    m_chronoBoosts;
-    //std::vector<Unit>             m_units;
-    //std::vector<NumUnits>    m_unitsBeingBuilt;      // indices of m_units which are not completed, sorted descending by finish time
-    //std::vector<NumUnits>    m_unitsSortedEndFrame;  // indices of m_units which are completed, in order
-    //std::vector<AbilityAction>    m_chronoBoosts;
+    //Vector_Unit             m_units;
+    //Vector_BuildingUnits    m_unitsBeingBuilt;      // indices of m_units which are not completed, sorted descending by finish time
+    //Vector_FinishedUnits    m_unitsSortedEndFrame;  // indices of m_units which are completed, in order
+    //Vector_AbilityAction    m_chronoBoosts;
+    std::vector<Unit>             m_units;
+    std::vector<NumUnits>    m_unitsBeingBuilt;      // indices of m_units which are not completed, sorted descending by finish time
+    std::vector<NumUnits>    m_unitsSortedEndFrame;  // indices of m_units which are completed, in order
+    std::vector<AbilityAction>    m_chronoBoosts;
     RaceID                  m_race;
     FracType                m_minerals;
     FracType                m_gas;
@@ -99,10 +99,10 @@ class GameState
     RaceID                          getRace()                           const { return m_race; }
     FracType                        getMinerals()                       const { return m_minerals; }
     FracType                        getGas()                            const { return m_gas; }
-    const Vector_AbilityAction &    getChronoBoostTargets()             const { return m_chronoBoosts; }
-    const Vector_FinishedUnits &    getFinishedUnits()                  const { return m_unitsSortedEndFrame; }
-    /*const std::vector<AbilityAction> & getChronoBoostTargets()             const { return m_chronoBoosts; }
-    const std::vector<NumUnits> &    getFinishedUnits()                  const { return m_unitsSortedEndFrame; }*/
+    //const Vector_AbilityAction &    getChronoBoostTargets()             const { return m_chronoBoosts; }
+    //const Vector_FinishedUnits &    getFinishedUnits()                  const { return m_unitsSortedEndFrame; }
+    const std::vector<AbilityAction> & getChronoBoostTargets()             const { return m_chronoBoosts; }
+    const std::vector<NumUnits> &    getFinishedUnits()                  const { return m_unitsSortedEndFrame; }
     ActionType                      getUnitType(NumUnits id)            const { return m_units[id].getType(); }
     ActionType                      getLastAction()                     const { return m_lastAction; }
     const AbilityAction &           getLastAbility()                    const { return m_lastAbility; }
