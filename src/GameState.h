@@ -99,8 +99,8 @@ class GameState
     RaceID                          getRace()                           const { return m_race; }
     FracType                        getMinerals()                       const { return m_minerals; }
     FracType                        getGas()                            const { return m_gas; }
-    //const Vector_AbilityAction &    getChronoBoostTargets()             const { return m_chronoBoosts; }
-    //const Vector_FinishedUnits &    getFinishedUnits()                  const { return m_unitsSortedEndFrame; }
+    /*const Vector_AbilityAction &    getChronoBoostTargets()             const { return m_chronoBoosts; }
+    const Vector_FinishedUnits &    getFinishedUnits()                  const { return m_unitsSortedEndFrame; }*/
     const std::vector<AbilityAction> & getChronoBoostTargets()             const { return m_chronoBoosts; }
     const std::vector<NumUnits> &    getFinishedUnits()                  const { return m_unitsSortedEndFrame; }
     ActionType                      getUnitType(NumUnits id)            const { return m_units[id].getType(); }

@@ -43,6 +43,7 @@ namespace BOSS
         // updates the value and the visit count of the node
         void updateNodeValue(FracType newActionValue);
 
+		// returns the child node that is the result of action
         Node & getChildNode(ActionType action);
 
 

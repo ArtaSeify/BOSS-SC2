@@ -1,0 +1,43 @@
+Combat Search Experiment - CombatSearch
+Could not make directory: ../bin/results
+
+************************************************
+* Running Experiment: CombatSearch [Integral]
+************************************************
+Search started!
+
+CombatSearchIntegral Results
+
+BuildOrder sorted by start times
+Pr As Pr As Py Pr Ga Pr Ga Pr Ze Pr Py Pr Ze Pr Ch_Ga Ze Pr Ch_Ga Ze Ze Ch_Ga Py Ze Pr Ze
+  Start   Finish   ArmyEval  ArmyIntegral_N   ArmyIntegral_E   BuildOrder
+      0      272       0.00            0.00             0.00   Pr
+    272      544       0.00            0.00             0.00   Pr Pr
+    139      619       0.00            0.00             0.00   Pr Pr As
+    363      843       0.00            0.00             0.00   Pr Pr As As
+    614      886       0.00            0.00             0.00   Pr Pr As As Pr
+    534      934       0.00            0.00             0.00   Pr Pr As As Pr Py
+   1060     1332       0.00            0.00             0.00   Pr Pr As As Pr Py Pr
+   1532     1804       0.00            0.00             0.00   Pr Pr As As Pr Py Pr Pr
+    937     1977       0.00            0.00             0.00   Pr Pr As As Pr Py Pr Pr Ga
+   1977     2249       0.00            0.00             0.00   Pr Pr As As Pr Py Pr Pr Ga Pr
+   1421     2461       0.00            0.00             0.00   Pr Pr As As Pr Py Pr Pr Ga Pr Ga
+   2062     2462       0.00            0.00             0.00   Pr Pr As As Pr Py Pr Pr Ga Pr Ga Py
+   2249     2521       0.00            0.00             0.00   Pr Pr As As Pr Py Pr Pr Ga Pr Ga Py Pr
+   2521     2521       0.00            0.00             0.00   Pr Pr As As Pr Py Pr Pr Ga Pr Ga Py Pr Ch_Ga
+   1977     2585       1.00            0.00          1415.00   Pr Pr As As Pr Py Pr Pr Ga Pr Ga Py Pr Ch_Ga Ze
+   2521     2793       1.00          208.00          1415.00   Pr Pr As As Pr Py Pr Pr Ga Pr Ga Py Pr Ch_Ga Ze Pr
+   2793     2793       1.00          208.00          1415.00   Pr Pr As As Pr Py Pr Pr Ga Pr Ga Py Pr Ch_Ga Ze Pr Ch_Ga 
+   2461     2909       2.00          324.00          2506.00   Pr Pr As As Pr Py Pr Pr Ga Pr Ga Py Pr Ch_Ga Ze Pr Ch_Ga Ze
+   2793     3065       2.00          636.00          2506.00   Pr Pr As As Pr Py Pr Pr Ga Pr Ga Py Pr Ch_Ga Ze Pr Ch_Ga Ze Pr
+   2624     3086       3.00          678.00          3420.00   Pr Pr As As Pr Py Pr Pr Ga Pr Ga Py Pr Ch_Ga Ze Pr Ch_Ga Ze Pr Ze
+   3226     3226       3.00         1098.00          3420.00   Pr Pr As As Pr Py Pr Pr Ga Pr Ga Py Pr Ch_Ga Ze Pr Ch_Ga Ze Pr Ze Ch_Ga
+   2909     3517       4.00         1971.00          3903.00   Pr Pr As As Pr Py Pr Pr Ga Pr Ga Py Pr Ch_Ga Ze Pr Ch_Ga Ze Pr Ze Ch_Ga Ze
+   3086     3530       5.00         2023.00          4373.00   Pr Pr As As Pr Py Pr Pr Ga Pr Ga Py Pr Ch_Ga Ze Pr Ch_Ga Ze Pr Ze Ch_Ga Ze Ze
+   3226     3626       5.00         2503.00          4373.00   Pr Pr As As Pr Py Pr Pr Ga Pr Ga Py Pr Ch_Ga Ze Pr Ch_Ga Ze Pr Ze Ch_Ga Ze Ze Py
+   3626     3898       5.00         3863.00          4373.00   Pr Pr As As Pr Py Pr Pr Ga Pr Ga Py Pr Ch_Ga Ze Pr Ch_Ga Ze Pr Ze Ch_Ga Ze Ze Py Pr
+
+Searched 33058000 nodes in 120000ms @ 275482 nodes/sec
+
+    CombatSearch completed
+
