@@ -8,10 +8,22 @@ CombatSearch_Integral::CombatSearch_Integral(const CombatSearchParameters p)
 {
     m_params = p;
 
+    file.open("../bin/data/states.csv", std::ofstream::out | std::ofstream::trunc);
+
     //BOSS_ASSERT(m_params.getInitialState().getRace() != Races::None, "Combat search initial state is invalid");
 }
 
+CombatSearch_Integral::~CombatSearch_Integral()
+{
+    file.close();
+}
+
 void CombatSearch_Integral::recurse(const GameState & state, int depth)
+{
+    FracType highestValueFound = recurseReturnValue(state, depth);
+}
+
+FracType CombatSearch_Integral::recurseReturnValue(const GameState & state, int depth)
 {
     if (timeLimitReached())
     {
@@ -20,10 +32,8 @@ void CombatSearch_Integral::recurse(const GameState & state, int depth)
 
     updateResults(state);
 
-    if (isTerminalNode(state, depth))
-    {
-        return;
-    }
+    FracType nodeIntegralValue = 0;
+    bool ffCalculated = false;
 
     ActionSetAbilities legalActions;
     generateLegalActions(state, legalActions, m_params);
@@ -75,7 +85,7 @@ void CombatSearch_Integral::recurse(const GameState & state, int depth)
             
             m_integral.update(child, m_buildOrder, m_params, m_searchTimer);
 
-            recurse(child, depth + 1);
+            nodeIntegralValue = std::max(nodeIntegralValue, recurseReturnValue(child, depth + 1));
 
             m_buildOrder.pop_back();
             m_integral.popFinishedLastOrder(state, child);
@@ -85,14 +95,27 @@ void CombatSearch_Integral::recurse(const GameState & state, int depth)
         else
         {
             m_buildOrder.pop_back();
+            if (!ffCalculated)
+            {
+                GameState child_framelimit(state);
+                child_framelimit.fastForward(m_params.getFrameTimeLimit());
 
-            GameState child_framelimit(state);
-            child_framelimit.fastForward(m_params.getFrameTimeLimit());
+                m_integral.update(child_framelimit, m_buildOrder, m_params, m_searchTimer);
+                nodeIntegralValue = std::max(nodeIntegralValue, m_integral.getCurrentStackValue());
 
-            m_integral.update(child_framelimit, m_buildOrder, m_params, m_searchTimer);
-            m_integral.popFinishedLastOrder(state, child_framelimit);
+                m_integral.popFinishedLastOrder(state, child_framelimit);
+
+                ffCalculated = true;
+            }
         }
     }
+
+    state.writeToFile(file);
+    file << ", " << nodeIntegralValue << "\n";
+
+    //std::cout << nodeIntegralValue << std::endl;
+
+    return nodeIntegralValue;
 }
 
 void CombatSearch_Integral::printResults()

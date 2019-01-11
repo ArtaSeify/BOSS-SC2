@@ -90,8 +90,8 @@ class GameState
     int                             getNumMineralWorkers()              const { return m_mineralWorkers; }
     int                             getNumGasWorkers()                  const { return m_gasWorkers; }
     int                             getNumTotalWorkers()                const { return m_mineralWorkers + m_gasWorkers + m_buildingWorkers; }
-    int                             getNumberChronoBoostsCast()         const { return m_chronoBoosts.size(); }
-    int                             getNumUnits()                       const { return m_units.size(); }
+    int                             getNumberChronoBoostsCast()         const { return int(m_chronoBoosts.size()); }
+    int                             getNumUnits()                       const { return int(m_units.size()); }
     int                             getLastActionFinishTime()           const { return m_unitsBeingBuilt.empty() ? getCurrentFrame() : m_units[m_unitsBeingBuilt.front()].getTimeUntilBuilt(); }
     int                             getCurrentSupply()                  const { return m_currentSupply; }
     int                             getMaxSupply()                      const { return m_maxSupply; }
@@ -110,5 +110,6 @@ class GameState
     
     std::string                     toString()                          const;
     void                            printunitsbeingbuilt()              const;
+    void                            writeToFile(std::ofstream & file)   const;
 };
 }

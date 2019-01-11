@@ -143,7 +143,7 @@ void CombatSearch::finishSearch()
 bool CombatSearch::isTerminalNode(const GameState & s, int /*!!! PROBLEM NOT USED depth */)
 {
   //!!! IMPROVEMENT: just say return s.getCurrent....
-    return s.getCurrentFrame() >= m_params.getFrameTimeLimit();
+    return s.getCurrentFrame() > m_params.getFrameTimeLimit();
 }
 
 void CombatSearch::recurse(const GameState & /*!!! PROBLEM NOT USED state*/, int /*!!! PROBLEM NOT USED depth*/)

@@ -22,11 +22,15 @@ namespace BOSS
     protected:
         //CombatSearch_IntegralData   m_integral;
         CombatSearch_IntegralDataFinishedUnits  m_integral;
+        std::ofstream                           file;
 
     public:
     
         CombatSearch_Integral(const CombatSearchParameters p = CombatSearchParameters());
+        ~CombatSearch_Integral();
     
+        FracType CombatSearch_Integral::recurseReturnValue(const GameState & state, int depth);
+
         virtual void printResults();
         virtual void setBestBuildOrder();
         virtual void writeResultsFile(const std::string & dir, const std::string & filename);

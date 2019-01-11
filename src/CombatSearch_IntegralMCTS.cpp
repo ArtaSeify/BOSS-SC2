@@ -162,7 +162,7 @@ void CombatSearch_IntegralMCTS::backPropogation(Node & node)
 
     while (current_node != NULL)
     {
-        current_node->updateNodeValue(m_promisingNodeIntegral.getIntegralValue());
+        current_node->updateNodeValue(m_promisingNodeIntegral.getBestStackValue());
 
         //std::cout << "value of " << current_node->getAction().first.getName() << " changed to: " << current_node->getValue() << std::endl;
         //std::cout << std::endl;

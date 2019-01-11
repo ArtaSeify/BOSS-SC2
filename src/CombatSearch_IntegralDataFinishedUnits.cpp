@@ -29,7 +29,7 @@ void CombatSearch_IntegralDataFinishedUnits::update(const GameState & state, con
     auto & chronoboosts = state.getChronoBoostTargets();
 
     // go through all new units
-    for (int index = finishedUnits.size() - new_units; index < finishedUnits.size(); ++index)
+    for (int index = int(finishedUnits.size() - new_units); index < finishedUnits.size(); ++index)
     {
         /*std::cout << "index of unit times: " << finishedUnits[index] << std::endl;
         std::cout << "index of unit: " << unitTimes[finishedUnits[index]].first << std::endl;

@@ -31,6 +31,8 @@ namespace BOSS
             targetProductionID = newTargetProductionID;
             targetType = newTargetType;
         }
+
+        void writeToFile(std::ofstream & file) const;
     };
 }
 
