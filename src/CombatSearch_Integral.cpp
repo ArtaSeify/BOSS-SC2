@@ -33,6 +33,7 @@ FracType CombatSearch_Integral::recurseReturnValue(const GameState & state, int 
     updateResults(state);
 
     FracType nodeIntegralValue = 0;
+	FracType nodeIntegralToThisPoint = m_integral.getValueToThisPoint();
     bool ffCalculated = false;
 
     ActionSetAbilities legalActions;
@@ -111,8 +112,9 @@ FracType CombatSearch_Integral::recurseReturnValue(const GameState & state, int 
     }
 
     state.writeToFile(file);
-    file << ", " << nodeIntegralValue << "\n";
+    file << ", " << nodeIntegralValue - nodeIntegralToThisPoint << "\n";
 
+	//std::cout << "Value to this point: " << nodeIntegralToThisPoint << ". Total value: " << nodeIntegralValue << std::endl;
     //std::cout << nodeIntegralValue << std::endl;
 
     return nodeIntegralValue;

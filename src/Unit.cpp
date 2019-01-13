@@ -185,20 +185,20 @@ void Unit::applyChronoBoost(TimeType time, Unit & unitBeingProduced)
 void Unit::writeToFile(std::ofstream & file) const
 {    
     file << "[";
-    file << m_id << ", ";
-    file << m_frameStarted << ", ";
-    file << m_frameFinished << ", ";
-    file << m_builderID << ", ";
-    file << m_type.getID() << ", ";
-    file << m_addon.getID() << ", ";
-    file << m_buildType.getID() << ", ";
-    file << m_buildID << ", ";
-    file << m_job << ", ";
-    file << m_timeUntilBuilt << ", ";
-    file << m_timeUntilFree << ", ";
-    file << m_timeChronoBoost << ", ";
-    file << m_timeChronoBoostAgain << ", ";
+    file << m_id << ",";
+    file << m_frameStarted << ",";
+    file << m_frameFinished << ",";
+    file << m_builderID << ",";
+    file << m_type.getID() << ",";
+    file << m_addon.getID() << ",";
+    file << m_buildType.getID() << ",";
+    file << m_buildID << ",";
+    file << m_job << ",";
+    file << m_timeUntilBuilt << ",";
+    file << m_timeUntilFree << ",";
+    file << m_timeChronoBoost << ",";
+    file << m_timeChronoBoostAgain << ",";
     //file << m_numLarva << ", ";
-    file << m_maxEnergyAllowed << ", ";
+    file << m_maxEnergyAllowed << ",";
     file << m_energy << "]";
 }

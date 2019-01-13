@@ -24,7 +24,7 @@
             "PrintNewBest"      : false,
             "OutputDir"         : "../bin/results",
             "SearchTimeLimitMS" : 12000000,
-            "FrameTimeLimit"    : 2500,
+            "FrameTimeLimit"    : 2200,
             "RelevantActions"   : [ "Probe", "Pylon", "Nexus", "Assimilator", "Gateway", "CyberneticsCore", "Stalker", "Zealot", "ChronoBoost"],
             "MaxActions"        : [ ["Nexus", 1], ["Pylon", 12], ["CyberneticsCore", 1], ["Gateway", 4] ],
             "AlwaysMakeWorkers" : true,

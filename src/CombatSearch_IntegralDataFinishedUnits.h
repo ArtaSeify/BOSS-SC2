@@ -85,6 +85,7 @@ namespace BOSS
 
         const BuildOrderAbilities & getBestBuildOrder() const;
 
+		FracType getValueToThisPoint() const { return m_integralStack.back().integral_ToThisPoint; }
         FracType getCurrentStackValue() const { return m_integralStack.back().integral_UntilFrameLimit; }
         FracType getBestStackValue() const { return m_bestIntegralValue; }
     };
