@@ -4,12 +4,12 @@
 
 using namespace BOSS;
 
-void AbilityAction::writeToFile(std::ofstream & file) const
+void AbilityAction::writeToSS(std::stringstream & ss) const
 {
-    file << "[";
-    file << type.getID() << ",";
-    file << frameCast << ",";
-    file << targetID << ",";
-    file << targetProductionID << ",";
-    file << targetType.getID() << "]";
+    ss << "[";
+    ss << type.getID() << ",";
+    ss << frameCast << ",";
+    ss << targetID << ",";
+    ss << targetProductionID << ",";
+    ss << targetType.getID() << "]";
 }

@@ -923,64 +923,64 @@ void GameState::printunitsbeingbuilt() const
     std::cout << std::endl;
 }
 
-void GameState::writeToFile(std::ofstream & file) const
-{
-    file << "[";
+void GameState::writeToSS(std::stringstream & ss) const
+{    
+    ss << "[";
     for (int index = 0; index < m_units.size(); ++index)
     {
-        m_units[index].writeToFile(file);
+        m_units[index].writeToSS(ss);
         if (index != m_units.size() - 1)
         {
-            file << ",";
+            ss << ",";
         }
     }
-    file << "],";
+    ss << "],";
 
-    file << "[";
+    ss << "[";
     for (int index = 0; index < m_unitsBeingBuilt.size(); ++index)
     {
-        file << m_unitsBeingBuilt[index];
+        ss << m_unitsBeingBuilt[index];
         if (index != m_unitsBeingBuilt.size() - 1)
         {
-            file << ",";
+            ss << ",";
         }
     }
-    file << "],";
+    ss << "],";
 
-    file << "[";
+    ss << "[";
     for (int index = 0; index < m_unitsSortedEndFrame.size(); ++index)
     {
-        file << m_unitsSortedEndFrame[index];
+        ss << m_unitsSortedEndFrame[index];
         if (index != m_unitsSortedEndFrame.size() - 1)
         {
-            file << ",";
+            ss << ",";
         }
     }
-    file << "],";
+    ss << "],";
 
-    file << "[";
+    ss << "[";
     for (int index = 0; index < m_chronoBoosts.size(); ++index)
     {
-        m_chronoBoosts[index].writeToFile(file);
+        m_chronoBoosts[index].writeToSS(ss);
         if (index != m_chronoBoosts.size() - 1)
         {
-            file << ",";
+            ss << ",";
         }
     }
-    file << "],";
+    ss << "],";
 
-    file << int(m_race) << ",";
-    file << m_minerals << ",";
-    file << m_gas << ",";
-    file << m_currentSupply << ",";
-    file << m_maxSupply << ",";
-    file << m_currentFrame << ",";
-    file << m_previousFrame << ",";
-    file << m_mineralWorkers << ",";
-    file << m_gasWorkers << ",";
-    file << m_buildingWorkers << ",";
-    file << m_numRefineries << ",";
-    file << m_numDepots << ",";
-    file << m_lastAction.getID() << ",";
-    m_lastAbility.writeToFile(file);
+    ss << int(m_race) << ",";
+    ss << m_minerals << ",";
+    ss << m_gas << ",";
+    ss << m_currentSupply << ",";
+    ss << m_maxSupply << ",";
+    ss << m_currentFrame << ",";
+    ss << m_previousFrame << ",";
+    ss << m_mineralWorkers << ",";
+    ss << m_gasWorkers << ",";
+    ss << m_buildingWorkers << ",";
+    ss << m_numRefineries << ",";
+    ss << m_numDepots << ",";
+    ss << m_lastAction.getID() << ",";
+    m_lastAbility.writeToSS(ss);
 }

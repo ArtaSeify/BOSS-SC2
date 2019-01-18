@@ -8,14 +8,16 @@ CombatSearch_Integral::CombatSearch_Integral(const CombatSearchParameters p)
 {
     m_params = p;
 
-    file.open("../bin/data/states.csv", std::ofstream::out | std::ofstream::trunc);
+    m_file.open("../bin/data/states.csv", std::ofstream::out | std::ofstream::trunc);
 
     //BOSS_ASSERT(m_params.getInitialState().getRace() != Races::None, "Combat search initial state is invalid");
 }
 
 CombatSearch_Integral::~CombatSearch_Integral()
 {
-    file.close();
+    m_file << m_ss.rdbuf();
+    m_ss.clear();
+    m_file.close();
 }
 
 void CombatSearch_Integral::recurse(const GameState & state, int depth)
@@ -32,8 +34,14 @@ FracType CombatSearch_Integral::recurseReturnValue(const GameState & state, int 
 
     updateResults(state);
 
+    if (m_results.nodesExpanded % 100000 == 0)
+    {
+        m_file << m_ss.rdbuf();
+        m_ss.clear();
+    }
+
     FracType nodeIntegralValue = 0;
-	FracType nodeIntegralToThisPoint = m_integral.getValueToThisPoint();
+    FracType nodeIntegralToThisPoint = m_integral.getValueToThisPoint();
     bool ffCalculated = false;
 
     ActionSetAbilities legalActions;
@@ -111,10 +119,10 @@ FracType CombatSearch_Integral::recurseReturnValue(const GameState & state, int 
         }
     }
 
-    state.writeToFile(file);
-    file << ", " << nodeIntegralValue - nodeIntegralToThisPoint << "\n";
+    state.writeToSS(m_ss);
+    m_ss << ", " << nodeIntegralValue - nodeIntegralToThisPoint << "\n";
 
-	//std::cout << "Value to this point: " << nodeIntegralToThisPoint << ". Total value: " << nodeIntegralValue << std::endl;
+    //std::cout << "Value to this point: " << nodeIntegralToThisPoint << ". Total value: " << nodeIntegralValue << std::endl;
     //std::cout << nodeIntegralValue << std::endl;
 
     return nodeIntegralValue;

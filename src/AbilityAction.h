@@ -32,7 +32,7 @@ namespace BOSS
             targetType = newTargetType;
         }
 
-        void writeToFile(std::ofstream & file) const;
+        void writeToSS(std::stringstream & ss) const;
     };
 }
 

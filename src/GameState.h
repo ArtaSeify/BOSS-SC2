@@ -110,6 +110,6 @@ class GameState
     
     std::string                     toString()                          const;
     void                            printunitsbeingbuilt()              const;
-    void                            writeToFile(std::ofstream & file)   const;
+    void                            writeToSS(std::stringstream & ss)   const;
 };
 }

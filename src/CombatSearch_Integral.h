@@ -22,7 +22,8 @@ namespace BOSS
     protected:
         //CombatSearch_IntegralData   m_integral;
         CombatSearch_IntegralDataFinishedUnits  m_integral;
-        std::ofstream                           file;
+        std::ofstream                           m_file;
+        std::stringstream                       m_ss;
 
     public:
     

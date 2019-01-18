@@ -62,8 +62,8 @@ public:
     void        fastForward(TimeType frames);
     int         whenCanBuild(ActionType type) const;
 
-    // writes the data of a unit in CSV format to file
-    void        writeToFile(std::ofstream & file) const;
+    // writes the data of a unit in CSV format to a ss
+    void        writeToSS(std::stringstream & ss) const;
 };
 
 }

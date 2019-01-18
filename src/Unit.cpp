@@ -182,23 +182,23 @@ void Unit::applyChronoBoost(TimeType time, Unit & unitBeingProduced)
     unitBeingProduced.setTimeUntilBuilt(m_timeUntilFree);
 }
 
-void Unit::writeToFile(std::ofstream & file) const
+void Unit::writeToSS(std::stringstream & ss) const
 {    
-    file << "[";
-    file << m_id << ",";
-    file << m_frameStarted << ",";
-    file << m_frameFinished << ",";
-    file << m_builderID << ",";
-    file << m_type.getID() << ",";
-    file << m_addon.getID() << ",";
-    file << m_buildType.getID() << ",";
-    file << m_buildID << ",";
-    file << m_job << ",";
-    file << m_timeUntilBuilt << ",";
-    file << m_timeUntilFree << ",";
-    file << m_timeChronoBoost << ",";
-    file << m_timeChronoBoostAgain << ",";
-    //file << m_numLarva << ", ";
-    file << m_maxEnergyAllowed << ",";
-    file << m_energy << "]";
+    ss << "[";
+    ss << m_id << ",";
+    ss << m_frameStarted << ",";
+    ss << m_frameFinished << ",";
+    ss << m_builderID << ",";
+    ss << m_type.getID() << ",";
+    ss << m_addon.getID() << ",";
+    ss << m_buildType.getID() << ",";
+    ss << m_buildID << ",";
+    ss << m_job << ",";
+    ss << m_timeUntilBuilt << ",";
+    ss << m_timeUntilFree << ",";
+    ss << m_timeChronoBoost << ",";
+    ss << m_timeChronoBoostAgain << ",";
+    //ss << m_numLarva << ", ";
+    ss << m_maxEnergyAllowed << ",";
+    ss << m_energy << "]";
 }
