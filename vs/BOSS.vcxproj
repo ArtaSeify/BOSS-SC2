@@ -47,6 +47,7 @@
     <ClCompile Include="..\src\DFBB_BuildOrderSearchSaveState.cpp" />
     <ClCompile Include="..\src\DFBB_BuildOrderSmartSearch.cpp" />
     <ClCompile Include="..\src\DFBB_BuildOrderStackSearch.cpp" />
+    <ClCompile Include="..\src\Edge.cpp" />
     <ClCompile Include="..\src\Eval.cpp" />
     <ClCompile Include="..\src\ExternalInterface.cpp" />
     <ClCompile Include="..\src\BuildOrder.cpp" />
@@ -91,6 +92,7 @@
     <ClInclude Include="..\src\DFBB_BuildOrderSearchSaveState.h" />
     <ClInclude Include="..\src\DFBB_BuildOrderSmartSearch.h" />
     <ClInclude Include="..\src\DFBB_BuildOrderStackSearch.h" />
+    <ClInclude Include="..\src\Edge.h" />
     <ClInclude Include="..\src\Eval.h" />
     <ClInclude Include="..\src\FileTools.h" />
     <ClInclude Include="..\src\GameState.h" />

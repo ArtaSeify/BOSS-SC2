@@ -14,44 +14,6 @@ void CombatSearch_IntegralMCTS::recurse(const GameState & state, int depth)
 {
     int nodes_visited = 0;
     Node root(state);
-
-    while (!timeLimitReached())
-    //for (int i = 0; i < 100000; ++i)
-    {
-        Node * promisingNode = &getPromisingNode(root);
-        if (!isTerminalNode(*promisingNode))
-        {
-            ActionSetAbilities legalActions;
-            generateLegalActions(promisingNode->getState(), legalActions, m_params);
-            promisingNode->createChildren(legalActions, m_params);
-
-            // there might be no action possible, so createChildren creates 0 children
-            if (promisingNode->getChildNodes().size() > 0)
-            {
-                // get a random child node
-                promisingNode = &promisingNode->getRandomChild();
-            }
-
-            if (promisingNode->timesVisited() == 0)
-            {
-                ++nodes_visited;
-            }
-
-            randomPlayout(*promisingNode);
-        }
-        backPropogation(*promisingNode);
-    }
-    pickBestBuildOrder(root);
-
-    std::cout << "number of nodes visited: " << nodes_visited << std::endl;
-
-    root.~Node();
-}
-
-/*void CombatSearch_IntegralMCTS::recurse(const GameState & state, int depth)
-{
-    int nodes_visited = 0;
-    Node root(state);
     
     while (!timeLimitReached())
     //for (int i = 0; i < 100000; ++i)
@@ -84,7 +46,44 @@ void CombatSearch_IntegralMCTS::recurse(const GameState & state, int depth)
     std::cout << "number of nodes visited: " << nodes_visited << std::endl;
 
     root.~Node();
-}*/
+
+    /*Node * bestBO = &root;
+    std::cout << bestBO->timesVisited() << std::endl;
+    bestBO = &bestBO->getChildNode(ActionTypes::GetActionType("Probe"));
+    std::cout << bestBO->timesVisited() << std::endl;
+    bestBO = &bestBO->getChildNode(ActionTypes::GetActionType("Pylon"));
+    std::cout << bestBO->timesVisited() << std::endl;
+    bestBO = &bestBO->getChildNode(ActionTypes::GetActionType("Probe"));
+    std::cout << bestBO->timesVisited() << std::endl;
+    bestBO = &bestBO->getChildNode(ActionTypes::GetActionType("Gateway"));
+    std::cout << bestBO->timesVisited() << std::endl;
+    bestBO = &bestBO->getChildNode(ActionTypes::GetActionType("Probe"));
+    std::cout << bestBO->timesVisited() << std::endl;
+    bestBO = &bestBO->getChildNode(ActionTypes::GetActionType("Gateway"));
+    std::cout << bestBO->timesVisited() << std::endl;
+    bestBO = &bestBO->getChildNode(ActionTypes::GetActionType("Probe"));
+    std::cout << bestBO->timesVisited() << std::endl;
+    bestBO = &bestBO->getChildNode(ActionTypes::GetActionType("Gateway"));
+    std::cout << bestBO->timesVisited() << std::endl;
+    bestBO = &bestBO->getChildNode(ActionTypes::GetActionType("Probe"));
+    std::cout << bestBO->timesVisited() << std::endl;
+    bestBO = &bestBO->getChildNode(ActionTypes::GetActionType("Zealot"));
+    std::cout << bestBO->timesVisited() << std::endl;
+    bestBO = &bestBO->getChildNode(ActionTypes::GetActionType("Probe"));
+    std::cout << bestBO->timesVisited() << std::endl;
+    bestBO = &bestBO->getChildNode(ActionTypes::GetActionType("ChronoBoost"));
+    std::cout << bestBO->timesVisited() << std::endl;
+    bestBO = &bestBO->getChildNode(ActionTypes::GetActionType("Pylon"));
+    std::cout << bestBO->timesVisited() << std::endl;
+    bestBO = &bestBO->getChildNode(ActionTypes::GetActionType("Zealot"));
+    std::cout << bestBO->timesVisited() << std::endl;
+    bestBO = &bestBO->getChildNode(ActionTypes::GetActionType("Probe"));
+    std::cout << bestBO->timesVisited() << std::endl;
+    bestBO = &bestBO->getChildNode(ActionTypes::GetActionType("ChronoBoost"));
+    std::cout << bestBO->timesVisited() << std::endl;
+    bestBO = &bestBO->getChildNode(ActionTypes::GetActionType("Zealot"));
+    std::cout << bestBO->timesVisited() << std::endl;*/
+}
 
 Node & CombatSearch_IntegralMCTS::getPromisingNode(Node & node)
 {
@@ -93,10 +92,10 @@ Node & CombatSearch_IntegralMCTS::getPromisingNode(Node & node)
     m_promisingNodeIntegral = m_integral;
 
     Node * returnNode = &node;
-    while (returnNode->getNumEdgesOut() > 0)
+    while (returnNode->getChildNodes().size() > 0)
     {
         // get the next child
-        returnNode = &returnNode->selectChild(m_exploration_parameter, m_params);
+        returnNode = &returnNode->selectChild(m_exploration_parameter);
         
         // update build order and integral
         updateBOIntegral(*returnNode, GameState(returnNode->getState()));

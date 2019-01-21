@@ -5,85 +5,61 @@ using namespace BOSS;
 
 FracType Node::CURRENT_HIGHEST_VALUE = 1.f;
 
-Node::Node()
-    : m_parent ()
-    , m_state ()
-    , m_action()
-    , m_timesVisited (0)
-    , m_children()
-    , m_value (0.f)
-{
-
-}
-
 Node::Node(const GameState & state)
-    : m_parent()
+    : m_parentEdge()
     , m_state(state)
-    , m_action()
-    , m_timesVisited(0)
-    , m_children()
-    , m_value(0.f)
+    , m_edges()
 {
 
 }
 
-Node::Node(const GameState & state, BOSS::Node * parent)
-    : m_parent (parent)
-    , m_state (state)
-    , m_action ()
-    , m_timesVisited (0)
-    , m_children ()
-    , m_value (0.f)
+void Node::createChildrenEdges(ActionSetAbilities & legalActions, const CombatSearchParameters & params)
 {
-
-}
-
-void Node::createChildren(ActionSetAbilities & actions, const CombatSearchParameters & params)
-{
-    // create all the children
-    for (int a = 0; a < actions.size(); ++a)
+    for (auto & action : legalActions)
     {
-        const int index = actions.size() - (a + 1);
-
-        Node childNode(m_state, this);
-
-        if (childNode.doAction(actions, index, params))
-        {
-            m_children.push_back(childNode);
-        }
+        std::unique_ptr<Edge> edge(new Edge(action, this, nullptr));
+        m_edges.push_back(edge);
     }
 }
 
-bool Node::doAction(ActionSetAbilities & actions, int index, const CombatSearchParameters & params)
+bool Node::doAction(std::unique_ptr<Edge> & edge, const CombatSearchParameters & params)
 {
-    const auto & actionTargetPair = actions[index];
-    ActionType action = actionTargetPair.first;
-    NumUnits actionTarget = actionTargetPair.second;
+    const Action & action = edge->getAction();
+    ActionType actionType = action.first;
+    NumUnits actionTarget = action.second;
 
     // if it's the plain CB without a target, we need to get the targets for the ability
-    if (action == ActionTypes::GetSpecialAction(m_state.getRace()) && actionTarget == -1)
+    // we create a new edge for each target
+    if (actionType == ActionTypes::GetSpecialAction(m_state.getRace()) && actionTarget == -1)
     {
-        int sizeBefore = actions.size();
-
-        m_state.getSpecialAbilityTargets(actions, index);
-
-        // the new target 
-        actionTarget = actions.getAbilityTarget(index + (actions.size() - sizeBefore));
+        ActionSetAbilities actions;
+        actions.add(ActionTypes::GetSpecialAction(m_state.getRace()), -1);
+        m_state.getSpecialAbilityTargets(actions, 0);
 
         // the ability is no longer valid, skip
-        if (actionTarget == -1)
+        if (actions[0].second == -1)
         {
             return false;
         }
+
+        // store the first new target as the edge's action. 
+        // for each new target, create a new edge
+        edge->setAction(actions[0]);
+        actionTarget = actions[0].second;
+        for (int i = 1; i < actions.size(); ++i)
+        {
+            std::unique_ptr<Edge> newEdge(new Edge(actions[i], this, nullptr));
+            m_edges.push_back(newEdge);
+        }
     }
 
-    if (action.isAbility())
+    if (actionType.isAbility())
     {
-        m_state.doAbility(action, actionTarget);
+        m_state.doAbility(actionType, actionTarget);
     }
     else
     {
-        m_state.doAction(action);
+        m_state.doAction(actionType);
     }
 
     // if we go over the frame time limit, this node is invalid
@@ -92,21 +68,29 @@ bool Node::doAction(ActionSetAbilities & actions, int index, const CombatSearchP
         return false;
     }
 
-    // set the action of this child node
-    setAction(actions[index]);
+    edge->incrementVisited();
 
     return true;
 }
 
-Node & Node::selectChild(int exploration_param)
+void Node::printChildren() const
+{
+    for (auto & edge : m_edges)
+    {
+        std::cout << "action: " << edge->getAction().first.getName() << std::endl;
+        std::cout << "child state frame: " << edge->getChild()->getState().getCurrentFrame() << std::endl;
+    }
+}
+
+std::unique_ptr<Node> Node::selectChild(int exploration_param, const CombatSearchParameters & params)
 {
     // uniform policy
-    float policyValue = 1.f / m_children.size();
+    float policyValue = 1.f / m_edges.size();
 
     int totalChildVisits = 0;
-    for (auto & child : m_children)
+    for (auto & edge : m_edges)
     {
-        totalChildVisits += child.timesVisited();
+        totalChildVisits += edge->timesVisited();
     }
 
     float UCBValue = exploration_param * policyValue *
@@ -116,14 +100,14 @@ Node & Node::selectChild(int exploration_param)
     int maxIndex = 0;
     int index = 0;
 
-    for (auto & child : m_children)
+    for (auto & edge : m_edges)
     {
         // calculate UCB value and get the total value of action
         // Q(s, a) + u(s, a)
         // we normalize the action value to a range of [0, 1] using the highest
         // value of the search thus far. 
-        float childUCBValue = UCBValue / (1 + child.timesVisited());
-        float actionValue = (child.getValue() / CURRENT_HIGHEST_VALUE) + childUCBValue;
+        float childUCBValue = UCBValue / (1 + edge->timesVisited());
+        float actionValue = (edge->getValue() / CURRENT_HIGHEST_VALUE) + childUCBValue;
 
         //std::cout << "times visited: " << child.timesVisited() << std::endl;
 
@@ -137,26 +121,50 @@ Node & Node::selectChild(int exploration_param)
         ++index;
     }
 
-    //std::cout << std::endl;
+    if (m_edges[maxIndex]->getChild() == nullptr)
+    {
+        std::unique_ptr<Node> chosenNode(new Node(m_state));
+        chosenNode->doAction(m_edges[maxIndex], params);
+        return chosenNode;
+    }
 
-    return m_children[maxIndex];
+    return std::move(m_edges[maxIndex]->getChild());
 }
 
-Node & Node::getChildHighestValue()
+std::unique_ptr<Node> Node::getHighestValueChild(const CombatSearchParameters & params)
 {
-    // get the nodde with the highest action value
-    auto child = std::max_element(m_children.begin(), m_children.end(),
-        [this](const Node & lhs, const Node & rhs) 
+    // get the node with the highest action value
+    auto edge = std::max_element(m_edges.begin(), m_edges.end(),
+        [this](const CombatSearchParameters & params, std::unique_ptr<Edge> & lhs, std::unique_ptr<Edge> & rhs)
         { 
-            if (lhs.getValue() == rhs.getValue())
+            if (lhs->getValue() == rhs->getValue())
             {
-                return Eval::StateBetter(rhs.getState(), lhs.getState());
+                std::unique_ptr<Node> lhsNode;
+                std::unique_ptr<Node> rhsNode;
+                if (lhs->getChild() == nullptr)
+                {
+                    lhsNode = std::unique_ptr<Node>(new Node(lhs->getParent()->getState()));
+                    lhsNode->doAction(lhs, params);
+                }
+                if (rhs->getChild() == nullptr)
+                {
+                    rhsNode = std::unique_ptr<Node>(new Node(rhs->getParent()->getState()));
+                    rhsNode->doAction(rhs, params);
+                }
+                return Eval::StateBetter(rhsNode->getState(), lhsNode->getState());
             }
         
-            return lhs.getValue() < rhs.getValue();
+            return lhs->getValue() < rhs->getValue();
         });
 
-    return *child;
+    if ((*edge)->getChild() == nullptr)
+    {
+        std::unique_ptr<Node> childNode(new Node(m_state));
+        childNode->doAction(*edge, params);
+        return childNode;
+    }
+
+    return std::move((*edge)->getChild());
 }
 
 Node & Node::getRandomChild()
