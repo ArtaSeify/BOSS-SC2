@@ -22,12 +22,16 @@
     <ClCompile Include="..\src\BOSSConfig.cpp" />
     <ClCompile Include="..\src\BOSSExperiments.cpp" />
     <ClCompile Include="..\src\CombatSearchExperiment.cpp" />
+    <ClCompile Include="..\src\Experiments.cpp" />
+    <ClCompile Include="..\src\IntegralExperiment.cpp" />
     <ClCompile Include="..\src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\BOSSConfig.h" />
     <ClInclude Include="..\src\BOSSExperiments.h" />
     <ClInclude Include="..\src\CombatSearchExperiment.h" />
+    <ClInclude Include="..\src\Experiments.h" />
+    <ClInclude Include="..\src\IntegralExperiment.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="BOSS.vcxproj">

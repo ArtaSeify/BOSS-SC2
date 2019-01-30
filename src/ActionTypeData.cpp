@@ -38,48 +38,49 @@ void ActionTypeData::Init(const json & j)
     if (j.count("Types") && j["Types"].is_array())
     {
         const json & actions = j["Types"];
-        for (ActionID a(1); a < actions.size(); ++a)
+        for (ActionID a(1); a < actions.size() + 1; ++a)
         {
             ActionTypeData data;
+            size_t index = a - 1;
 
             data.id = a;
-            JSONTools::ReadString("name",           actions[a], data.name);
-            JSONTools::ReadString("race",           actions[a], data.raceName);
+            JSONTools::ReadString("name",           actions[index], data.name);
+            JSONTools::ReadString("race",           actions[index], data.raceName);
             data.race = Races::GetRaceID(data.raceName);
-            JSONTools::ReadInt("mineralCost",       actions[a], data.mineralCost);
-            JSONTools::ReadInt("gasCost",           actions[a], data.gasCost);
-            JSONTools::ReadFloat("supplyCost",      actions[a], data.supplyCost); // demical supply cost in SC2
-            JSONTools::ReadInt("energyCost",        actions[a], data.energyCost);
-            JSONTools::ReadInt("supplyProvided",    actions[a], data.supplyProvided);
-            JSONTools::ReadInt("buildTime",         actions[a], data.buildTime);
-            JSONTools::ReadInt("numProduced",       actions[a], data.numProduced);
-            JSONTools::ReadInt("startingEnergy",    actions[a], data.startingEnergy);
-            JSONTools::ReadInt("maxEnergy",         actions[a], data.maxEnergy);
-            JSONTools::ReadBool("isUnit",           actions[a], data.isUnit);
-            JSONTools::ReadBool("isUpgrade",        actions[a], data.isUpgrade);
-            JSONTools::ReadBool("isAbility",        actions[a], data.isAbility);
-            JSONTools::ReadBool("isBuilding",       actions[a], data.isBuilding);
-            JSONTools::ReadBool("isWorker",         actions[a], data.isWorker);
-            JSONTools::ReadBool("isRefinery",       actions[a], data.isRefinery);
-            JSONTools::ReadBool("isSupplyProvider", actions[a], data.isSupplyProvider);
-            JSONTools::ReadBool("isResourceDepot",  actions[a], data.isDepot);
-            JSONTools::ReadBool("isAddon",          actions[a], data.isAddon);
+            JSONTools::ReadInt("mineralCost",       actions[index], data.mineralCost);
+            JSONTools::ReadInt("gasCost",           actions[index], data.gasCost);
+            JSONTools::ReadFloat("supplyCost",      actions[index], data.supplyCost); // demical supply cost is possible in SC2
+            JSONTools::ReadInt("energyCost",        actions[index], data.energyCost);
+            JSONTools::ReadInt("supplyProvided",    actions[index], data.supplyProvided);
+            JSONTools::ReadInt("buildTime",         actions[index], data.buildTime);
+            JSONTools::ReadInt("numProduced",       actions[index], data.numProduced);
+            JSONTools::ReadInt("startingEnergy",    actions[index], data.startingEnergy);
+            JSONTools::ReadInt("maxEnergy",         actions[index], data.maxEnergy);
+            JSONTools::ReadBool("isUnit",           actions[index], data.isUnit);
+            JSONTools::ReadBool("isUpgrade",        actions[index], data.isUpgrade);
+            JSONTools::ReadBool("isAbility",        actions[index], data.isAbility);
+            JSONTools::ReadBool("isBuilding",       actions[index], data.isBuilding);
+            JSONTools::ReadBool("isWorker",         actions[index], data.isWorker);
+            JSONTools::ReadBool("isRefinery",       actions[index], data.isRefinery);
+            JSONTools::ReadBool("isSupplyProvider", actions[index], data.isSupplyProvider);
+            JSONTools::ReadBool("isResourceDepot",  actions[index], data.isDepot);
+            JSONTools::ReadBool("isAddon",          actions[index], data.isAddon);
 
-            BOSS_ASSERT(actions[a].count("whatBuilds"), "no 'whatBuilds' member");
-            auto & whatBuilds = actions[a]["whatBuilds"];
+            BOSS_ASSERT(actions[index].count("whatBuilds"), "no 'whatBuilds' member");
+            auto & whatBuilds = actions[index]["whatBuilds"];
             data.whatBuildsStr = whatBuilds[0].get<std::string>();
             data.whatBuildsCount = std::stoul(whatBuilds[1].get<std::string>());
             data.whatBuildsStatus = whatBuilds[2].get<std::string>();
             if (whatBuilds.size() == 4) { data.whatBuildsAddonStr = whatBuilds[3].get<std::string>(); }
 
-            BOSS_ASSERT(actions[a].count("required"), "no 'required' member");
-            for (auto & req : actions[a]["required"])
+            BOSS_ASSERT(actions[index].count("required"), "no 'required' member");
+            for (auto & req : actions[index]["required"])
             {
                 data.requiredStrings.push_back(req);
             }
 
-            BOSS_ASSERT(actions[a].count("equivalent"), "no 'equivalent' member");
-            for (auto & equiv : actions[a]["equivalent"])
+            BOSS_ASSERT(actions[index].count("equivalent"), "no 'equivalent' member");
+            for (auto & equiv : actions[index]["equivalent"])
             {
                 data.equivalentStrings.push_back(equiv);
             }

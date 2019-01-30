@@ -31,7 +31,7 @@ void Node::createChildrenEdges(ActionSetAbilities & legalActions, const CombatSe
 
     for (int index = 0; index < legalActions.size(); ++index)
     {
-        auto & action = legalActions[index];
+        auto action = legalActions[index];
 
         // the placeholder Chronoboost is expanded into a Chronoboost for each target
         if (action.first.isAbility() && action.second == -1)
@@ -39,7 +39,7 @@ void Node::createChildrenEdges(ActionSetAbilities & legalActions, const CombatSe
             m_state.getSpecialAbilityTargets(legalActions, index);
 
             // Chronoboost is no longer a legal action
-            if (action.second == -1)
+            if (legalActions[index].second == -1)
             {
                 continue;
             }
@@ -47,6 +47,7 @@ void Node::createChildrenEdges(ActionSetAbilities & legalActions, const CombatSe
         
         // test the action to see if it's valid. if it's valid, we create the edge.
         // if it's not valid, we don't create the edge
+        action = legalActions[index];
         GameState testState(m_state);
         if (action.first.isAbility())
         {

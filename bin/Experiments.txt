@@ -1,0 +1,58 @@
+{
+    "Experiments" : 
+    {    
+        "MCTSSome" :
+        {
+            "Run"               : [ true, 100 ],
+            "SearchType"        : [ "IntegralMCTS", 0.25, 100000 ],
+            "Race"              : "Protoss",
+            "StartingState"     : "Protoss Start State",
+            "PrintNewBest"      : false,
+            "OutputDir"         : "../bin/results",
+            "SearchTimeLimitMS" : 100000000,
+            "FrameTimeLimit"    : 4000,
+            "RelevantActions"   : [ "Probe", "Pylon", "Nexus", "Assimilator", "Gateway", "CyberneticsCore", "Stalker", "Zealot", "ChronoBoost",
+            "Adept", "Sentry"],
+            "MaxActions"        : [],
+            "AlwaysMakeWorkers" : true,
+            "OpeningBuildOrder" : "Empty",
+            "SortActions"       : false,
+            "SaveResults"       : false
+        },
+        "MCTSAll" :
+        {
+            "Run"               : [ true, 100 ],
+            "SearchType"        : [ "IntegralMCTS", 0.25, 100000 ],
+            "Race"              : "Protoss",
+            "StartingState"     : "Protoss Start State",
+            "PrintNewBest"      : false,
+            "OutputDir"         : "../bin/results",
+            "SearchTimeLimitMS" : 100000000,
+            "FrameTimeLimit"    : 4000,
+            "RelevantActions"   : [ "Probe", "Pylon", "Nexus", "Assimilator", "Gateway", "CyberneticsCore", "Stalker", "Zealot", "ChronoBoost", "Adept", "Sentry", "Colossus", "Mothership", "FleetBeacon", "Forge", "TwilightCouncil", "PhotonCannon", "Stargate", "TemplarArchive", "DarkShrine", "RoboticsBay", "RoboticsFacility", "HighTemplar", "DarkTemplar", "Phoenix", "Carrier", "VoidRay", "WarpPrism", "Observer", "Immortal", "Interceptor", "Oracle", "Tempest", "Disruptor", "ShieldBattery"],
+            "MaxActions"        : [],
+            "AlwaysMakeWorkers" : true,
+            "OpeningBuildOrder" : "Empty",
+            "SortActions"       : false,
+            "SaveResults"       : false
+        }
+    },
+
+    "States" : 
+    {
+        "Protoss Start State"   : { "race" : "Protoss", "minerals" : 50, "gas" : 0, "units" : [ ["Probe", 12], ["Nexus", 1] ] },
+        "Zerg Start State"      : { "race" : "Zerg",    "minerals" : 50, "gas" : 0, "units" : [ ["Drone", 12], ["Hatchery", 1], ["Overlord", 1] ] },
+        "Terran Start State"    : { "race" : "Terran",  "minerals" : 50, "gas" : 0, "units" : [ ["SCV", 12], ["CommandCenter", 1] ] }
+    },
+    
+    "Build Orders" :
+    {
+        "Empty"                 : [ ],     
+        "Test1"                 : [ "Probe", "Pylon", "Probe", "Assimilator", ["ChronoBoost", "Nexus", 12], "Probe", "Assimilator", "Probe"], 
+        "UAB Zealot Rush"       : [ "Probe", "Probe", "Pylon", "Gateway", "Gateway", "Zealot", "Zealot", "Zealot", "Pylon", "Zealot", "Probe", "Zealot", "Zealot", "Zealot" ],
+        "Test2"                 : [ "Probe", "Pylon", "Probe", "Gateway", "Probe", "Gateway", "Probe", "Gateway", "Probe", "Zealot", "Probe", "Pylon", "Probe", "Zealot", "Assimilator", "Probe", "Zealot", "Zealot", "Probe", "CyberneticsCore"],
+        "Test3"                 : ["Probe", "Pylon", "Probe", "Gateway", "Probe", "Gateway", "Probe", "Gateway", "Probe", "CyberneticsCore", "Probe", "Zealot", "Assimilator", "Pylon", "Probe", "Zealot", "Zealot", "Probe", "Stalker", "Pylon", "Probe", "Stalker", "Stalker", "Probe", "Stalker", "Pylon", "Probe", "Stalker", "Stalker", "Probe", "Stalker"]
+    },
+
+    "Game Data" : "SC2Data.json"
+}

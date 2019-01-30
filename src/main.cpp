@@ -5,6 +5,7 @@
 #include "BOSS.h"
 #include "GameState.h"
 #include "BOSSExperiments.h"
+#include "Experiments.h"
 #include <chrono>
 #include <thread>
 //#include "CImg/CImg.h"
@@ -160,9 +161,11 @@ int main(int /*!!! PROBLEM UNUSED argc*/, char * /*!!! PROBLEM UNUSED argv*/ [])
     BOSS::Init("../bin/SC2Data.json");
 
     // Read in the config parameters that will be used for experiments
-    BOSS::BOSSConfig::Instance().ParseConfig("../bin/BOSS_SC2_Config.txt");
+    //BOSS::BOSSConfig::Instance().ParseConfig("../bin/BOSS_SC2_Config.txt");
+    //BOSS::Experiments::RunExperiments("../bin/BOSS_SC2_Config.txt");
 
-    BOSS::Experiments::RunExperiments("../bin/BOSS_SC2_Config.txt");
+    BOSS::BOSSConfig::Instance().ParseConfig("../bin/Experiments.txt");
+    BOSS::ExperimentsArta::RunExperiments("../bin/Experiments.txt");
 
     std::string exit = "";
     while (exit == "")
