@@ -83,8 +83,9 @@ namespace BOSS
         void printIntegralData(const int index, const std::vector<IntegralDataFinishedUnits> & integral_stack, const GameState & state, const BuildOrderAbilities & buildOrder) const;
         void print(const std::vector<IntegralDataFinishedUnits> & integral_stack, const GameState & state, const BuildOrderAbilities & buildOrder) const;
 
-        const BuildOrderAbilities & getBestBuildOrder() const;
+        void writeToFile(const std::string & dir, const std::string & filename);
 
+        const BuildOrderAbilities & getBestBuildOrder() const;
         FracType getValueToThisPoint() const { return m_integralStack.back().integral_ToThisPoint; }
         FracType getCurrentStackValue() const { return m_integralStack.back().integral_UntilFrameLimit; }
         FracType getBestStackValue() const { return m_bestIntegralValue; }

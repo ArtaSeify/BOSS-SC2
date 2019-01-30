@@ -281,11 +281,11 @@ std::string BuildOrderPlotter::RemoveFileExtension(const std::string & path)
 
     size_t period_idx = temp.rfind('.');
 
-	// period could be part of path (eg. ../bin
-	if (std::string::npos != period_idx && temp.at(period_idx-1) == '.')
-	{
-		period_idx = std::string::npos;
-	}
+    // period could be part of path (eg. ../bin
+    if (std::string::npos != period_idx && temp.at(period_idx-1) == '.')
+    {
+        period_idx = std::string::npos;
+    }
 
     if (std::string::npos != period_idx)
     {

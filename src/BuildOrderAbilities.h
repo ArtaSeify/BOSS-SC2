@@ -41,7 +41,7 @@ namespace BOSS
         std::string getJSONString() const;
         std::string getNumberedString() const;
         std::string getIDString() const;
-        std::string getNameString(int charactersPerName = 0, int printUpToIndex = -1) const;
+        std::string getNameString(int charactersPerName = 0, int printUpToIndex = -1, bool withComma = false) const;
     
         // iterator
         using iterator = BuildOrder::iterator;

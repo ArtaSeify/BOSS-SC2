@@ -46,8 +46,27 @@ CombatSearchExperiment::CombatSearchExperiment(const std::string & name, const j
     BOSS_ASSERT(val.count("PrintNewBest") && val["PrintNewBest"].is_boolean(), "CombatSearchExperiment must have a PrintNewBest bool");
     m_params.setPrintNewBest(val["PrintNewBest"]);
 
-    BOSS_ASSERT(val.count("SortActions") && val["SortActions"].is_boolean(), "CombatSearchExperiment must have a SortActions bool");
-    m_params.setSortActions(val["SortActions"]);
+    for (auto & searchType : m_searchTypes)
+    {
+        if (searchType == "Integral")
+        {
+            BOSS_ASSERT(val.count("SortActions") && val["SortActions"].is_boolean(), "IntegralSearch must have a SortActions bool");
+            m_params.setSortActions(val["SortActions"]);
+
+            BOSS_ASSERT(val.count("SaveResults") && val["SaveResults"].is_boolean(), "IntegralSearch must have a SaveResults bool");
+            m_params.setSaveResults(val["SaveResults"]);
+        }
+
+        else if (searchType == "IntegralMCTS")
+        {
+            BOSS_ASSERT(val.count("ExplorationValue") && val["ExplorationValue"].is_number_float(), "IntegralMCTSSearch must have a ExplorationValue int");
+            m_params.setExplorationValue(val["ExplorationValue"]);
+
+            BOSS_ASSERT(val.count("NumSimulations") && val["NumSimulations"].is_number_integer(), "IntegralMCTSSearch must have a NumSimulations int");
+            m_params.setNumberOfSimulations(val["NumSimulations"]);
+        }
+    }
+    
 
     if (val.count("MaxActions"))
     {
@@ -147,8 +166,8 @@ void CombatSearchExperiment::run()
         }
         else if (m_searchTypes[i] == "IntegralMCTS")
         {
-            combatSearch = std::shared_ptr<CombatSearch>(new CombatSearch_IntegralMCTS(m_params));
             resultsFile += "_IntegralMCTS";
+            combatSearch = std::shared_ptr<CombatSearch>(new CombatSearch_IntegralMCTS(m_params, m_outputDir, resultsFile));
         }
         else
         {
@@ -159,6 +178,9 @@ void CombatSearchExperiment::run()
         combatSearch->printResults();
         combatSearch->writeResultsFile(m_outputDir, resultsFile);
         const CombatSearchResults & results = combatSearch->getResults();
-        std::cout << "\nSearched " << results.nodesExpanded << " nodes in " << results.timeElapsed << "ms @ " << (1000.0*results.nodesExpanded/results.timeElapsed) << " nodes/sec\n\n";
+        if (m_searchTypes[i] != "IntegralMCTS")
+        {
+            std::cout << "\nSearched " << results.nodesExpanded << " nodes in " << results.timeElapsed << "ms @ " << (1000.0*results.nodesExpanded / results.timeElapsed) << " nodes/sec\n\n";
+        }
     }
 }

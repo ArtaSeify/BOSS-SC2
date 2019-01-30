@@ -147,7 +147,7 @@ std::string BuildOrderAbilities::getIDString() const
     return ss.str();
 }
 
-std::string BuildOrderAbilities::getNameString(int charactersPerName, int printUpToIndex) const
+std::string BuildOrderAbilities::getNameString(int charactersPerName, int printUpToIndex, bool withComma) const
 {
     std::stringstream ss;
 
@@ -171,7 +171,17 @@ std::string BuildOrderAbilities::getNameString(int charactersPerName, int printU
             }
         }
 
-        ss << name << " ";
+        ss << name;
+
+        if (withComma)
+        {
+            ss << ",";
+        }
+
+        else
+        {
+            ss << " ";
+        }
     }
 
     return ss.str();

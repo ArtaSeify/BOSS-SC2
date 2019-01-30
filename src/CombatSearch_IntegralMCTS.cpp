@@ -1,112 +1,144 @@
 #include "CombatSearch_IntegralMCTS.h"
+#include <random>
 
 using namespace BOSS;
 
-CombatSearch_IntegralMCTS::CombatSearch_IntegralMCTS(const CombatSearchParameters p)
-    : m_exploration_parameter (EXPLORATION_PARAMETER)
+CombatSearch_IntegralMCTS::CombatSearch_IntegralMCTS(const CombatSearchParameters p, const std::string & dir, const std::string & prefix)
+    : m_exploration_parameter (p.getExplorationValue())
 {
     m_params = p;
 
-    std::srand(uint4(std::time(0))); //use current time as seed for random generator
+    m_writeEveryKSimulations = 10;
+    m_save_dir = dir;
+    m_file_prefix = prefix;
+
+    std::random_device rd; // obtain a random number from hardware
+    m_rnggen.seed(rd());
 }
 
 void CombatSearch_IntegralMCTS::recurse(const GameState & state, int depth)
 {
-    int nodes_visited = 0;
-    Node root(state);
+    //test(state);
+    m_numSimulations = 0;
 
-    while (!timeLimitReached())
-    //for (int i = 0; i < 100000; ++i)
+    std::shared_ptr<Node> root = std::make_shared<Node>(state);
+
+    while (!timeLimitReached() && m_numSimulations < m_params.getNumberOfSimulations())
+    //for (int i = 0; i < 150000; ++i)
     {
-        Node * promisingNode = &getPromisingNode(root);
-        if (!isTerminalNode(*promisingNode))
+        if ((m_numSimulations % 1000) == 0)
         {
-            ActionSetAbilities legalActions;
-            generateLegalActions(promisingNode->getState(), legalActions, m_params);
-            promisingNode->createChildren(legalActions, m_params);
-
-            // there might be no action possible, so createChildren creates 0 children
-            if (promisingNode->getChildNodes().size() > 0)
-            {
-                // get a random child node
-                promisingNode = &promisingNode->getRandomChild();
-            }
-
-            if (promisingNode->timesVisited() == 0)
-            {
-                ++nodes_visited;
-            }
-
+            std::cout << "have run : " << m_numSimulations << " simulations thus far." << std::endl;
+        }
+        auto & nodePair = getPromisingNode(root);
+        std::shared_ptr<Node> promisingNode = nodePair.first;
+        
+        // a node that isn't part of the graph yet. We just simulate from this point
+        if (nodePair.second)
+        {
             randomPlayout(*promisingNode);
         }
-        backPropogation(*promisingNode);
+
+        // the node is part of the graph, so we create its edges and pick one at random
+        else
+        {
+            if (!isTerminalNode(*promisingNode))
+            {
+                ActionSetAbilities legalActions;
+                generateLegalActions(promisingNode->getState(), legalActions, m_params);
+                promisingNode->createChildrenEdges(legalActions, m_params);
+
+                // there might be no action possible, so createChildrenEdges creates 0 edges
+                if (promisingNode->getNumEdges() > 0)
+                {
+                    // get a random child node
+                    promisingNode = promisingNode->notExpandedChild(promisingNode->getRandomEdge(), m_params);
+                }
+                randomPlayout(*promisingNode);
+            }
+        }
+        backPropogation(promisingNode);
+
+        m_numSimulations++;
+
+        if (m_numSimulations%m_writeEveryKSimulations == 0)
+        {
+            writeResultsToFile(root);
+        }
     }
-    pickBestBuildOrder(root);
+    pickBestBuildOrder(root, true);
 
-    std::cout << "number of nodes visited: " << nodes_visited << std::endl;
-
-    root.~Node();
+    m_buildOrder = m_promisingNodeBuildOrder;
+    m_integral = m_promisingNodeIntegral;
 }
 
-/*void CombatSearch_IntegralMCTS::recurse(const GameState & state, int depth)
+void CombatSearch_IntegralMCTS::test(const GameState & state)
 {
-    int nodes_visited = 0;
     Node root(state);
-    
-    while (!timeLimitReached())
-    //for (int i = 0; i < 100000; ++i)
-    {
-        Node * promisingNode = &getPromisingNode(root);
-        if (!isTerminalNode(*promisingNode))
-        {
-            ActionSetAbilities legalActions;
-            generateLegalActions(promisingNode->getState(), legalActions, m_params);
-            promisingNode->createChildren(legalActions, m_params);
-        
-            // there might be no action possible, so createChildren creates 0 children
-            if (promisingNode->getChildNodes().size() > 0)
-            {
-                // get a random child node
-                promisingNode = &promisingNode->getRandomChild();
-            }
+    ActionSetAbilities legalActions;
+    generateLegalActions(state, legalActions, m_params);
+    root.createChildrenEdges(legalActions, m_params);
+    root.printChildren();
+    std::cout << std::endl;
+    root.doAction(root.getChild(ActionTypes::GetActionType("Probe")), m_params);
+    root.printChildren();
+    std::cout << std::endl;
 
-            if (promisingNode->timesVisited() == 0)
-            {
-                ++nodes_visited;
-            }
+    Node & secondLevel = root.getChild(0);
+    legalActions.clear();
+    generateLegalActions(secondLevel.getState(), legalActions, m_params);
+    secondLevel.createChildrenEdges(legalActions, m_params);
+    secondLevel.printChildren();
+    std::cout << std::endl;
+    secondLevel.doAction(secondLevel.getChild(ActionTypes::GetActionType("Pylon")), m_params);
+    secondLevel.printChildren();
+    std::cout << std::endl;
 
-            randomPlayout(*promisingNode);
-        }
-        backPropogation(*promisingNode);
-    }
-    pickBestBuildOrder(root);
+    Node & thirdLevel = secondLevel.getChild(0);
+    legalActions.clear();
+    generateLegalActions(thirdLevel.getState(), legalActions, m_params);
+    thirdLevel.createChildrenEdges(legalActions, m_params);
+    thirdLevel.printChildren();
+}
 
-    std::cout << "number of nodes visited: " << nodes_visited << std::endl;
-
-    root.~Node();
-}*/
-
-Node & CombatSearch_IntegralMCTS::getPromisingNode(Node & node)
+std::pair<std::shared_ptr<Node>, bool> CombatSearch_IntegralMCTS::getPromisingNode(std::shared_ptr<Node> node) 
 {
     // create copies of integral and the build order
     m_promisingNodeBuildOrder = m_buildOrder;
     m_promisingNodeIntegral = m_integral;
 
-    Node * returnNode = &node;
-    while (returnNode->getNumEdgesOut() > 0)
+    std::shared_ptr<Node> returnNode = node;
+    std::shared_ptr<Edge> edge;
+
+    while(returnNode->getNumEdges() > 0)
     {
+        const GameState & prevStateNode = returnNode->getState();
+
+        // select the edge with the highest UCT value
+        edge = returnNode->selectChildEdge(m_exploration_parameter, m_params);
+
+        // the node doesn't exist, so we return this edge
+        if (edge->getChild() == nullptr)
+        {
+            returnNode = returnNode->notExpandedChild(edge, m_params);
+            updateBOIntegral(*returnNode, edge->getAction(), prevStateNode);
+            return std::pair<std::shared_ptr<Node>, bool>(returnNode, true);
+        }
+
+        // the node exists and is pointed to by the edge
         // get the next child
-        returnNode = &returnNode->selectChild(m_exploration_parameter, m_params);
-        
+        returnNode = edge->getChild();
+
         // update build order and integral
-        updateBOIntegral(*returnNode, GameState(returnNode->getState()));
+        updateBOIntegral(*returnNode, edge->getAction(), prevStateNode);
     }
-    return *returnNode;
+
+    return std::pair<std::shared_ptr<Node>, bool>(returnNode, false);
 }
 
 bool CombatSearch_IntegralMCTS::isTerminalNode(const Node & node) const
 {
-    return node.getState().getCurrentFrame() >= m_params.getFrameTimeLimit();
+    return node.isTerminal();
 }
 
 void CombatSearch_IntegralMCTS::randomPlayout(Node node)
@@ -114,31 +146,32 @@ void CombatSearch_IntegralMCTS::randomPlayout(Node node)
     // do a rollout until we reach a terminal state
     while (!isTerminalNode(node))
     {
-        doRandomAction(node);
+        GameState prevGameState(node.getState());
+        doRandomAction(node, prevGameState);
     }
 }
 
-void CombatSearch_IntegralMCTS::doRandomAction(Node & node)
+void CombatSearch_IntegralMCTS::doRandomAction(Node & node, const GameState & prevGameState)
 {
     // generate possible actions
     ActionSetAbilities legalActions;
     generateLegalActions(node.getState(), legalActions, m_params);
 
-    // create copy of state in case we reach the time limit
-    GameState stateCopy(node.getState());
-
     // do an action at random
-    node.doAction(legalActions, std::rand() % legalActions.size(), m_params);
+    std::uniform_int_distribution<> distribution(0, legalActions.size()-1);
+    const Action & action = legalActions[distribution(m_rnggen)];
+    node.doAction(action, m_params);
 
-    updateBOIntegral(node, stateCopy);    
+    updateBOIntegral(node, action, prevGameState);    
 }
 
-void CombatSearch_IntegralMCTS::updateBOIntegral(const Node & node, GameState & stateCopy)
+void CombatSearch_IntegralMCTS::updateBOIntegral(const Node & node, const Action & action, const GameState & prevGameState)
 {
     // if the node is terminal, we don't consider its action, instead we fastforward
     // to the end of the timelimit and update the integrals.
     if (isTerminalNode(node))
     {
+        GameState stateCopy(prevGameState);
         // fast forward to the end of the timelimit
         stateCopy.fastForward(m_params.getFrameTimeLimit());
 
@@ -149,45 +182,95 @@ void CombatSearch_IntegralMCTS::updateBOIntegral(const Node & node, GameState & 
     // add the action and calculate the integral
     else
     {
-        auto & action = node.getAction();
         m_promisingNodeBuildOrder.add(action.first, action.second);
         m_promisingNodeIntegral.update(node.getState(), m_promisingNodeBuildOrder, m_params, m_searchTimer);
     }
 }
 
-void CombatSearch_IntegralMCTS::backPropogation(Node & node)
+void CombatSearch_IntegralMCTS::backPropogation(std::shared_ptr<Node> node)
 {
-    Node * current_node = &node;
+    std::shared_ptr<Node> current_node = node;
+    std::shared_ptr<Edge> parent_edge = current_node->getParentEdge();
 
     //std::cout << "\nvalue of search: " << m_promisingNodeIntegral.getIntegralValue() << std::endl;
 
-    while (current_node != NULL)
+    while (parent_edge != nullptr)
     {
-        current_node->updateNodeValue(m_promisingNodeIntegral.getBestStackValue());
+        parent_edge->updateEdge(m_promisingNodeIntegral.getBestStackValue());
 
         //std::cout << "value of " << current_node->getAction().first.getName() << " changed to: " << current_node->getValue() << std::endl;
         //std::cout << std::endl;
 
-        current_node = current_node->getParent();
+        current_node = parent_edge->getParent();
+        parent_edge = current_node->getParentEdge();
     }
 }
 
-void CombatSearch_IntegralMCTS::pickBestBuildOrder(Node & root)
+void CombatSearch_IntegralMCTS::pickBestBuildOrder(std::shared_ptr<Node> root,  bool useVisitCount)
 {
-    Node * bestNodes = &root;
+    // create copies of integral and the build order
+    m_promisingNodeBuildOrder = m_buildOrder;
+    m_promisingNodeIntegral = m_integral;
+
+    std::shared_ptr<Node> bestNode = root;
+    std::shared_ptr<Edge> bestEdge;
 
     // pick the child node with the highest action value until we reach a leaf node
-    while (bestNodes->getChildNodes().size() > 0)
+    while (bestNode->getNumEdges() > 0)
     {
-        bestNodes = &bestNodes->getChildHighestValue();
-        
-        m_buildOrder.add(bestNodes->getAction().first, bestNodes->getState().getLastAbility());
-        m_integral.update(bestNodes->getState(), m_buildOrder, m_params, m_searchTimer);
+        if (useVisitCount)
+        {
+            bestEdge = bestNode->getHighestVisitedChild();
+        }
+        else
+        {
+            bestEdge = bestNode->getHighestValueChild(m_params);
+        }
+        bestNode = bestEdge->getChild();
+        if (bestNode == nullptr)
+        {
+            bestNode = bestNode->notExpandedChild(bestEdge, m_params);
+        }
+        const Action & action = bestEdge->getAction();
+
+        if (action.first.isAbility())
+        {
+            m_promisingNodeBuildOrder.add(action.first, bestNode->getState().getLastAbility());
+        }
+        else
+        {
+            m_promisingNodeBuildOrder.add(action.first);
+        }
+        m_promisingNodeIntegral.update(bestNode->getState(), m_promisingNodeBuildOrder, m_params, m_searchTimer);
     }
 
     // there are no more actions, but we still need to fast forward to the time
     // limit to properly calculate the integral
-    GameState finalState(bestNodes->getState());
+    GameState finalState(bestNode->getState());
     finalState.fastForward(m_params.getFrameTimeLimit());
-    m_integral.update(finalState, m_buildOrder, m_params, m_searchTimer);
+    m_promisingNodeIntegral.update(finalState, m_buildOrder, m_params, m_searchTimer);
 }
+
+void CombatSearch_IntegralMCTS::writeResultsToFile(std::shared_ptr<Node> root)
+{
+    std::ofstream file(m_save_dir + "/" + m_file_prefix + "_Results.csv", std::ofstream::out | std::ofstream::app);
+    std::stringstream ss;
+
+    // picking the most visited route
+    pickBestBuildOrder(root, true);
+    ss << m_promisingNodeIntegral.getCurrentStackValue() << ",";
+
+    // picking the route with the highest value
+    pickBestBuildOrder(root, false);
+    ss << m_promisingNodeIntegral.getCurrentStackValue() << "\n";
+
+    file << ss.str();
+    file.close();
+}
+
+void CombatSearch_IntegralMCTS::printResults()
+{
+    m_integral.print();
+    std::cout << "\nRan " << m_numSimulations << " simulations in " << m_results.timeElapsed << "ms @ " << (1000*m_numSimulations / m_results.timeElapsed) << " simulations/sec\n\n";
+}
+

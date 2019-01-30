@@ -135,7 +135,7 @@ void CombatSearch_IntegralDataFinishedUnits::print(const std::vector<IntegralDat
 {
     BuildOrderAbilities BOEndTimes = createBuildOrderEndTimes(integral_stack, state);
 
-    std::cout << "\nCombatSearchIntegral Results\n\n";
+    std::cout << "\nSearch Results\n\n";
 
     std::cout << "BuildOrder sorted by start times" << std::endl;
     std::cout << buildOrder.getNameString(2) << std::endl;
@@ -145,6 +145,40 @@ void CombatSearch_IntegralDataFinishedUnits::print(const std::vector<IntegralDat
     {
         printIntegralData(i, integral_stack, state, BOEndTimes);
     }
+}
+
+void CombatSearch_IntegralDataFinishedUnits::writeToFile(const std::string & dir, const std::string & filename)
+{
+    std::stringstream ss;
+
+    // build order sorted by start times
+    ss << m_bestIntegralBuildOrder.getNameString(2) << "\n";
+
+    // build order sorted by end times
+    BuildOrderAbilities BOEndTimes = createBuildOrderEndTimes(m_bestIntegralStack, m_bestIntegralGameState);
+    ss << BOEndTimes.getNameString(2) << "\n";
+
+    for (int i = 1; i < m_bestIntegralStack.size(); ++i)
+    {
+        auto & element = m_bestIntegralStack[i];
+        ss << element.timeStarted << " " << element.timeFinished << " " << element.eval << " "
+            << element.integral_ToThisPoint << " " << element.integral_UntilFrameLimit << " ";
+
+        if (i <= BOEndTimes.size())
+        {
+            ss << BOEndTimes[i - 1].first.getName();
+            if (BOEndTimes[i - 1].first.getName() == "ChronoBoost")
+            {
+                ss << "_" << BOEndTimes[i - 1].second.targetType.getName();
+            }
+        }
+
+        ss << "\n";
+    }
+
+    std::ofstream file(dir + "/" + filename + "_BuildOrder.txt");
+    file << ss.str();
+    file.close();
 }
 
 const BuildOrderAbilities & CombatSearch_IntegralDataFinishedUnits::getBestBuildOrder() const
@@ -186,17 +220,14 @@ BuildOrderAbilities CombatSearch_IntegralDataFinishedUnits::createBuildOrderEndT
     auto & finishedUnits = state.getFinishedUnits();
     auto & chronoBoostTargets = state.getChronoBoostTargets();
     int chronoboosts = 0;
-    for (int index = 0; index < (int)integral_stack.size() - 1; ++index)
+    for (int index = 0; index < int(integral_stack.size() - 1); ++index)
     {
-        const AbilityAction & current_ability = chronoBoostTargets[chronoboosts];
         // chronoboost
         if (integral_stack[index + 1].id == 'c')
         {
+            const AbilityAction & ability = chronoBoostTargets[chronoboosts];
             chronoboosts++;
-            if (state.getRace() == Races::Protoss)
-            {
-                buildOrder.add(ActionTypes::GetActionType("ChronoBoost"), current_ability);
-            }
+            buildOrder.add(ActionTypes::GetSpecialAction(state.getRace()), ability);
             continue;
         }
         buildOrder.add(state.getUnit(finishedUnits[index - chronoboosts]).getType());

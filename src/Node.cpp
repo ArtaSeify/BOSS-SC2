@@ -3,55 +3,82 @@
 
 using namespace BOSS;
 
-FracType Node::CURRENT_HIGHEST_VALUE = 1.f;
-
 Node::Node(const GameState & state)
     : m_parentEdge()
     , m_state(state)
     , m_edges()
+    , isTerminalNode(false)
+{
+
+}
+
+Node::Node(const GameState & state, std::shared_ptr<Edge> parentEdge)
+    : m_parentEdge(parentEdge)
+    , m_state(state)
+    , m_edges()
+    , isTerminalNode(false)
 {
 
 }
 
 void Node::createChildrenEdges(ActionSetAbilities & legalActions, const CombatSearchParameters & params)
 {
-    for (auto & action : legalActions)
+    // if we already know it's a terminal node, just return
+    if (isTerminalNode)
     {
-        std::unique_ptr<Edge> edge(new Edge(action, this, nullptr));
-        m_edges.push_back(edge);
+        return;
+    }
+
+    for (int index = 0; index < legalActions.size(); ++index)
+    {
+        auto & action = legalActions[index];
+
+        // the placeholder Chronoboost is expanded into a Chronoboost for each target
+        if (action.first.isAbility() && action.second == -1)
+        {
+            m_state.getSpecialAbilityTargets(legalActions, index);
+
+            // Chronoboost is no longer a legal action
+            if (action.second == -1)
+            {
+                continue;
+            }
+        }
+        
+        // test the action to see if it's valid. if it's valid, we create the edge.
+        // if it's not valid, we don't create the edge
+        GameState testState(m_state);
+        if (action.first.isAbility())
+        {
+            testState.doAbility(action.first, action.second);
+        }
+
+        else
+        {
+            testState.doAction(action.first);
+        }
+
+        if (testState.getCurrentFrame() > params.getFrameTimeLimit())
+        {
+            continue;
+        }
+
+        // action is valid, so create an edge
+        m_edges.push_back(std::make_shared<Edge>(action, std::shared_ptr<Node>(this)));
+    }
+
+    // no edges were created, so this is a terminal node
+    if (m_edges.size() == 0)
+    {
+        isTerminalNode = true;
     }
 }
 
-bool Node::doAction(std::unique_ptr<Edge> & edge, const CombatSearchParameters & params)
+bool Node::doAction(std::shared_ptr<Edge> edge, const CombatSearchParameters & params)
 {
     const Action & action = edge->getAction();
     ActionType actionType = action.first;
     NumUnits actionTarget = action.second;
-
-    // if it's the plain CB without a target, we need to get the targets for the ability
-    // we create a new edge for each target
-    if (actionType == ActionTypes::GetSpecialAction(m_state.getRace()) && actionTarget == -1)
-    {
-        ActionSetAbilities actions;
-        actions.add(ActionTypes::GetSpecialAction(m_state.getRace()), -1);
-        m_state.getSpecialAbilityTargets(actions, 0);
-
-        // the ability is no longer valid, skip
-        if (actions[0].second == -1)
-        {
-            return false;
-        }
-
-        // store the first new target as the edge's action. 
-        // for each new target, create a new edge
-        edge->setAction(actions[0]);
-        actionTarget = actions[0].second;
-        for (int i = 1; i < actions.size(); ++i)
-        {
-            std::unique_ptr<Edge> newEdge(new Edge(actions[i], this, nullptr));
-            m_edges.push_back(newEdge);
-        }
-    }
 
     if (actionType.isAbility())
     {
@@ -65,10 +92,67 @@ bool Node::doAction(std::unique_ptr<Edge> & edge, const CombatSearchParameters &
     // if we go over the frame time limit, this node is invalid
     if (m_state.getCurrentFrame() > params.getFrameTimeLimit())
     {
+        BOSS_ASSERT(false, "invalid action given to doAction()");
         return false;
     }
 
-    edge->incrementVisited();
+    if (edge->timesVisited() == Edge::NODE_VISITS_BEFORE_EXPAND - 1)
+    {
+        std::shared_ptr<Node> newNode = std::make_shared<Node>(m_state, edge);
+        edge->setChild(newNode);
+    }
+
+    return true;
+}
+
+bool Node::doAction(const Action & action, const CombatSearchParameters & params)
+{
+    ActionType actionType = action.first;
+    NumUnits actionTarget = action.second;
+
+    // Chronoboost place holder action. Need to find all valid targets, then we pick a target at random
+    if (actionType == ActionTypes::GetSpecialAction(m_state.getRace()) && actionTarget == -1)
+    {
+        ActionSetAbilities legalActions;
+        legalActions.add(action.first, action.second);
+        m_state.getSpecialAbilityTargets(legalActions, 0);
+        // Chronoboost is no longer a legal action
+        if (legalActions[0].second == -1)
+        {
+            return false;
+        }
+
+        // if only one target, set that to be the target
+        if (legalActions.size() == 1)
+        {
+            actionTarget = legalActions[0].second;
+        }
+
+        // otherwise randomly choose between the targets
+        else
+        {
+            std::random_device rd;
+            std::mt19937 gen(rd());
+            std::uniform_int_distribution<> dis(0, legalActions.size() - 1);
+            actionTarget = legalActions[dis(gen)].second;
+        }
+    }
+    
+    if (actionType.isAbility())
+    {
+        m_state.doAbility(actionType, actionTarget);
+    }
+    else
+    {
+        m_state.doAction(actionType);
+    }
+
+    // if we go over the frame time limit, this node is invalid
+    if (m_state.getCurrentFrame() > params.getFrameTimeLimit())
+    {
+        isTerminalNode = true;
+        return false;
+    }
 
     return true;
 }
@@ -77,13 +161,24 @@ void Node::printChildren() const
 {
     for (auto & edge : m_edges)
     {
-        std::cout << "action: " << edge->getAction().first.getName() << std::endl;
-        std::cout << "child state frame: " << edge->getChild()->getState().getCurrentFrame() << std::endl;
+        std::cout << "action: " << edge->getAction().first.getName();
+        if (edge->getChild() != nullptr)
+        {
+            std::cout << ", state frame: " << edge->getChild()->getState().getCurrentFrame() << std::endl;
+        }
+        else
+        {
+            std::cout << std::endl;
+        }
     }
+
+    std::cout << std::endl;
 }
 
-std::unique_ptr<Node> Node::selectChild(int exploration_param, const CombatSearchParameters & params)
+std::shared_ptr<Edge> Node::selectChildEdge(FracType exploration_param, const CombatSearchParameters & params) const
 {
+    BOSS_ASSERT(m_edges.size() > 0, "selectChildEdge called when there are no edges.");
+
     // uniform policy
     float policyValue = 1.f / m_edges.size();
 
@@ -107,7 +202,9 @@ std::unique_ptr<Node> Node::selectChild(int exploration_param, const CombatSearc
         // we normalize the action value to a range of [0, 1] using the highest
         // value of the search thus far. 
         float childUCBValue = UCBValue / (1 + edge->timesVisited());
-        float actionValue = (edge->getValue() / CURRENT_HIGHEST_VALUE) + childUCBValue;
+        float actionValue = (edge->getValue() / Edge::CURRENT_HIGHEST_VALUE) + childUCBValue;
+
+        //std::cout << "edge value: " << edge->getValue() / Edge::CURRENT_HIGHEST_VALUE << ". UCT value: " << childUCBValue << std::endl;
 
         //std::cout << "times visited: " << child.timesVisited() << std::endl;
 
@@ -121,35 +218,34 @@ std::unique_ptr<Node> Node::selectChild(int exploration_param, const CombatSearc
         ++index;
     }
 
-    if (m_edges[maxIndex]->getChild() == nullptr)
-    {
-        std::unique_ptr<Node> chosenNode(new Node(m_state));
-        chosenNode->doAction(m_edges[maxIndex], params);
-        return chosenNode;
-    }
-
-    return std::move(m_edges[maxIndex]->getChild());
+    return m_edges[maxIndex];
 }
 
-std::unique_ptr<Node> Node::getHighestValueChild(const CombatSearchParameters & params)
+std::shared_ptr<Node> Node::notExpandedChild(std::shared_ptr<Edge> edge, const CombatSearchParameters & params) const
+{
+    // create a temporary node
+    std::shared_ptr<Node> node = std::make_shared<Node>(m_state, edge);
+    node->doAction(edge, params);
+    return node;
+}
+
+std::shared_ptr<Edge> Node::getHighestValueChild(const CombatSearchParameters & params) const
 {
     // get the node with the highest action value
     auto edge = std::max_element(m_edges.begin(), m_edges.end(),
-        [this](const CombatSearchParameters & params, std::unique_ptr<Edge> & lhs, std::unique_ptr<Edge> & rhs)
+        [this, &params](const std::shared_ptr<Edge> & lhs, const std::shared_ptr<Edge> & rhs)
         { 
             if (lhs->getValue() == rhs->getValue())
             {
-                std::unique_ptr<Node> lhsNode;
-                std::unique_ptr<Node> rhsNode;
-                if (lhs->getChild() == nullptr)
+                std::shared_ptr<Node> lhsNode(lhs->getChild());
+                std::shared_ptr<Node> rhsNode(rhs->getChild());
+                if (lhsNode == nullptr)
                 {
-                    lhsNode = std::unique_ptr<Node>(new Node(lhs->getParent()->getState()));
-                    lhsNode->doAction(lhs, params);
+                    lhsNode = notExpandedChild(lhs, params);
                 }
                 if (rhs->getChild() == nullptr)
                 {
-                    rhsNode = std::unique_ptr<Node>(new Node(rhs->getParent()->getState()));
-                    rhsNode->doAction(rhs, params);
+                    rhsNode = notExpandedChild(rhs, params);
                 }
                 return Eval::StateBetter(rhsNode->getState(), lhsNode->getState());
             }
@@ -157,45 +253,37 @@ std::unique_ptr<Node> Node::getHighestValueChild(const CombatSearchParameters & 
             return lhs->getValue() < rhs->getValue();
         });
 
-    if ((*edge)->getChild() == nullptr)
-    {
-        std::unique_ptr<Node> childNode(new Node(m_state));
-        childNode->doAction(*edge, params);
-        return childNode;
-    }
-
-    return std::move((*edge)->getChild());
+    return *edge;
 }
 
-Node & Node::getRandomChild()
+std::shared_ptr<Edge> Node::getHighestVisitedChild() const
 {
-    return m_children[std::rand() % m_children.size()];
-}
-
-void Node::updateNodeValue(FracType newActionValue)
-{
-    //std::cout << m_action.first.getName() << " node updated" << std::endl;
-
-    m_timesVisited++;
-    m_value = m_value + ((1.f / m_timesVisited) * (newActionValue - m_value));
-
-    if (m_value > CURRENT_HIGHEST_VALUE)
-    {
-        CURRENT_HIGHEST_VALUE = m_value;
-    }
-}
-
-Node & Node::getChildNode(ActionType action)
-{
-    BOSS_ASSERT(m_children.size() > 0, "Number of children is %i", m_children.size());
-
-    for (Node & child : m_children)
-    {
-        if (child.getAction().first == action)
+    auto edge = std::max_element(m_edges.begin(), m_edges.end(),
+        [](const std::shared_ptr<Edge> & lhs, const std::shared_ptr<Edge> & rhs)
         {
-            return child;
+            return lhs->timesVisited() < rhs->timesVisited();
+        });
+
+    return *edge;
+}
+
+std::shared_ptr<Edge> Node::getRandomEdge()
+{
+    return m_edges[std::rand() % m_edges.size()];
+}
+
+std::shared_ptr<Edge> Node::getChild(const ActionType & action)
+{
+    BOSS_ASSERT(m_edges.size() > 0, "Number of edges is %i", m_edges.size());
+
+    for (auto & edge : m_edges)
+    {
+        if (edge->getAction().first == action)
+        {
+            return edge;
         }
     }
 
-    BOSS_ASSERT(false, "Tried to get node with action %s, but it doesn't exist", action.getName().c_str());
+    BOSS_ASSERT(false, "Tried to get edge with action %s, but it doesn't exist", action.getName().c_str());
+    return std::make_shared<Edge>();
 }

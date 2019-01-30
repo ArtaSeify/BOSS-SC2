@@ -104,6 +104,9 @@ namespace BOSS
         int m_frameTimeLimit;
         bool m_printNewBest;
         bool m_sortActions;
+        bool m_saveResults;
+        FracType m_explorationValue;
+        int m_numberOfSimulations;
 
     public:
 
@@ -145,6 +148,15 @@ namespace BOSS
 
         void setSortActions(bool flag);
         bool getSortActions() const;
+
+        void setSaveResults(bool flag);
+        bool getSaveResults() const;
+
+        void setExplorationValue(FracType value);
+        FracType getExplorationValue() const;
+
+        void setNumberOfSimulations(int value);
+        int getNumberOfSimulations() const;
     
         void print();
     };

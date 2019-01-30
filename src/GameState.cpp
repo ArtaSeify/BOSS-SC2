@@ -20,7 +20,7 @@ GameState::GameState()
     , m_numRefineries(0)
     , m_numDepots(0)
     , m_lastAction(ActionTypes::None)
-  //!!! PROBLEM m_lastAbility undefined?
+    , m_lastAbility()
 {
     //using Vector_Unit = BoundedVector<Unit, 70>;
     //using Vector_NumUnits = BoundedVector<NumUnits, 35>;
@@ -823,7 +823,7 @@ bool GameState::chronoBoostableTarget(const Unit & unit) const
     if (whenCanCast(ActionTypes::GetSpecialAction(m_race), unit.getID()) == -1) { return false; }
 
     // only allow chronoboost to be used on buildings that are producing a combat unit
-    if (unit.getBuildType().isWorker()) { return false; }
+    //if (unit.getBuildType().isWorker()) { return false; }
 
     return true;
 }
@@ -920,6 +920,16 @@ void GameState::printunitsbeingbuilt() const
         auto index = m_unitsBeingBuilt[i];
         std::cout << getUnit(index).getTimeUntilBuilt() << std::endl;
     }
+    std::cout << std::endl;
+}
+
+void GameState::printUnits() const
+{
+    for (auto & unit : m_units)
+    {
+        std::cout << "id: " << unit.getID() << ". name: " << unit.getType().getName() << std::endl;
+    }
+
     std::cout << std::endl;
 }
 

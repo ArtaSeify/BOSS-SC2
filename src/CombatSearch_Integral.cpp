@@ -34,7 +34,7 @@ FracType CombatSearch_Integral::recurseReturnValue(const GameState & state, int 
 
     updateResults(state);
 
-    if (m_results.nodesExpanded % 100000 == 0)
+    if (m_params.getSaveResults() && m_results.nodesExpanded % 100000 == 0)
     {
         m_file << m_ss.rdbuf();
         m_ss.clear();
@@ -119,8 +119,11 @@ FracType CombatSearch_Integral::recurseReturnValue(const GameState & state, int 
         }
     }
 
-    state.writeToSS(m_ss);
-    m_ss << ", " << nodeIntegralValue - nodeIntegralToThisPoint << "\n";
+    if (m_params.getSaveResults())
+    {
+        state.writeToSS(m_ss);
+        m_ss << ", " << nodeIntegralValue - nodeIntegralToThisPoint << "\n";
+    }
 
     //std::cout << "Value to this point: " << nodeIntegralToThisPoint << ". Total value: " << nodeIntegralValue << std::endl;
     //std::cout << nodeIntegralValue << std::endl;
@@ -140,10 +143,12 @@ void CombatSearch_Integral::setBestBuildOrder()
 
 
 #include "BuildOrderPlotter.h"
-void CombatSearch_Integral::writeResultsFile(const std::string & dir, const std::string & /*!!! PROBLEM UNUSED filename*/)
+void CombatSearch_Integral::writeResultsFile(const std::string & dir, const std::string & filename)
 {
     BuildOrderPlotter plot;
     plot.setOutputDir(dir);
-    plot.addPlot("IntegralPlot", m_params.getInitialState(), m_integral.getBestBuildOrder());
+    plot.addPlot(filename, m_params.getInitialState(), m_integral.getBestBuildOrder());
     plot.doPlots();
+
+    m_integral.writeToFile(dir, filename);
 }

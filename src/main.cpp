@@ -164,8 +164,8 @@ int main(int /*!!! PROBLEM UNUSED argc*/, char * /*!!! PROBLEM UNUSED argv*/ [])
 
     BOSS::Experiments::RunExperiments("../bin/BOSS_SC2_Config.txt");
 
-    char exit = 'a';
-    while (exit == 'a')
+    std::string exit = "";
+    while (exit == "")
     {
         std::cin >> exit;
     }

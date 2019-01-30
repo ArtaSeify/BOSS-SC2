@@ -147,6 +147,36 @@ bool CombatSearchParameters::getSortActions() const
     return m_sortActions;
 }
 
+void CombatSearchParameters::setSaveResults(bool flag)
+{
+    m_saveResults = flag;
+}
+
+bool CombatSearchParameters::getSaveResults() const
+{
+    return m_saveResults;
+}
+
+void CombatSearchParameters::setExplorationValue(FracType value)
+{
+    m_explorationValue = value;
+}
+
+FracType CombatSearchParameters::getExplorationValue() const
+{
+    return m_explorationValue;
+}
+
+void CombatSearchParameters::setNumberOfSimulations(int value)
+{
+    m_numberOfSimulations = value;
+}
+
+int CombatSearchParameters::getNumberOfSimulations() const
+{
+    return m_numberOfSimulations;
+}
+
 void CombatSearchParameters::print()
 {
     printf("\n\nSearch Parameter Information\n\n");

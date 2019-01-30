@@ -5,21 +5,20 @@
 #include "ActionSetAbilities.h"
 #include "CombatSearchParameters.h"
 #include "Edge.h"
+#include <random>
 
 namespace BOSS
 {
     class Node
     {
-    public:
-        static FracType CURRENT_HIGHEST_VALUE;
-
-    private:
-        std::unique_ptr<Edge> m_parentEdge;            // the edge leading to the parent
+        std::shared_ptr<Edge> m_parentEdge;            // the edge leading to the parent
         GameState m_state;              // the current game state
-        std::vector<std::unique_ptr<Edge>> m_edges;     // each edge leads to a child node
+        std::vector<std::shared_ptr<Edge>> m_edges;     // each edge leads to a child node
+        bool isTerminalNode;
         
     public:
         Node(const GameState & state);
+        Node(const GameState & state, std::shared_ptr<Edge> parentEdge);
 
         // creates edges pointing to the states we can get to 
         // from this state
@@ -27,29 +26,39 @@ namespace BOSS
 
         // does action at index of actions. Returns true if the action is sucessful
         // and the state is valid (doesn't go past the time limit). Otherwise returns false
-        bool doAction(std::unique_ptr<Edge> & edge, const CombatSearchParameters & params);
+        bool doAction(std::shared_ptr<Edge> edge, const CombatSearchParameters & params);
+        bool doAction(const Action & action, const CombatSearchParameters & params);
         
         void printChildren() const;
         
         // selects a child based on UCB
-        std::unique_ptr<Node> selectChild(int exploration_param, const CombatSearchParameters & params);
+        std::shared_ptr<Edge> selectChildEdge(FracType exploration_param, const CombatSearchParameters & params) const;
+
+        // creates a node that hasn't been expanded in the tree yet 
+        std::shared_ptr<Node> notExpandedChild(std::shared_ptr<Edge> edge, const CombatSearchParameters & params) const;
         
         // returns the child with the highest action value
-        std::unique_ptr<Node> getHighestValueChild(const CombatSearchParameters & params);
+        std::shared_ptr<Edge> getHighestValueChild(const CombatSearchParameters & params) const;
+
+        // returns the child with the highest visit count
+        std::shared_ptr<Edge> getHighestVisitedChild() const;
 
         // gets a child at random
-        std::unique_ptr<Node> getRandomChild();
-
-        // updates the value and the visit count of the node
-        void updateNodeValue(FracType newActionValue);
+        std::shared_ptr<Edge> getRandomEdge();
 
         // returns the child node that is the result of action
-        std::unique_ptr<Node> getChildNode(ActionType action);
+        std::shared_ptr<Edge> getChild(const ActionType & action);
+        Node & getChild(int index) 
+        { 
+            BOSS_ASSERT(index < m_edges.size(), "index out of range for m_edges"); 
+            return *m_edges[index]->getChild(); 
+        }
 
-        void setParentEdge(Edge * edge) { m_parentEdge = std::unique_ptr<Edge>(edge); }
+        std::shared_ptr<Edge> getParentEdge() { return m_parentEdge; }
+        void setParentEdge(std::shared_ptr<Edge> edge) { edge.swap(m_parentEdge); }
         const GameState & getState() const { return m_state; }
-        Node & getParent() { return *m_parentEdge->getParent(); }
-        Node & getChild(int index) { return *m_edges[index]->getChild(); }
-        int getNumEdgesOut() const { return int(m_edges.size()); }
+        std::shared_ptr<Node> getParent() { return m_parentEdge->getParent(); }
+        int getNumEdges() const { return int(m_edges.size()); }
+        bool isTerminal() const { return isTerminalNode; }
     };
 }
