@@ -3,8 +3,8 @@
     {    
         "MCTSSome" :
         {
-            "Run"               : [ true, 100 ],
-            "SearchType"        : [ "IntegralMCTS", 0.25, 100000 ],
+            "Run"               : [ true, 10 ],
+            "SearchType"        : [ "IntegralMCTS", 0.25, 5000 ],
             "Race"              : "Protoss",
             "StartingState"     : "Protoss Start State",
             "PrintNewBest"      : false,
@@ -13,23 +13,6 @@
             "FrameTimeLimit"    : 4000,
             "RelevantActions"   : [ "Probe", "Pylon", "Nexus", "Assimilator", "Gateway", "CyberneticsCore", "Stalker", "Zealot", "ChronoBoost",
             "Adept", "Sentry"],
-            "MaxActions"        : [],
-            "AlwaysMakeWorkers" : true,
-            "OpeningBuildOrder" : "Empty",
-            "SortActions"       : false,
-            "SaveResults"       : false
-        },
-        "MCTSAll" :
-        {
-            "Run"               : [ true, 100 ],
-            "SearchType"        : [ "IntegralMCTS", 0.25, 100000 ],
-            "Race"              : "Protoss",
-            "StartingState"     : "Protoss Start State",
-            "PrintNewBest"      : false,
-            "OutputDir"         : "../bin/results",
-            "SearchTimeLimitMS" : 100000000,
-            "FrameTimeLimit"    : 4000,
-            "RelevantActions"   : [ "Probe", "Pylon", "Nexus", "Assimilator", "Gateway", "CyberneticsCore", "Stalker", "Zealot", "ChronoBoost", "Adept", "Sentry", "Colossus", "Mothership", "FleetBeacon", "Forge", "TwilightCouncil", "PhotonCannon", "Stargate", "TemplarArchive", "DarkShrine", "RoboticsBay", "RoboticsFacility", "HighTemplar", "DarkTemplar", "Phoenix", "Carrier", "VoidRay", "WarpPrism", "Observer", "Immortal", "Interceptor", "Oracle", "Tempest", "Disruptor", "ShieldBattery"],
             "MaxActions"        : [],
             "AlwaysMakeWorkers" : true,
             "OpeningBuildOrder" : "Empty",

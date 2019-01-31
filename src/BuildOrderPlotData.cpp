@@ -62,9 +62,21 @@ void BuildOrderPlotData::calculateStartEndTimes()
         m_gas.push_back(gasAfter);
     }
 
+    
+    int latestTimeFinish = 0;
+    const GameState stateLatestFinish = std::as_const(state);
+    for (int i = 0; i < stateLatestFinish.getNumUnits(); ++i)
+    {
+        int timeUntilBuilt = stateLatestFinish.getUnit(i).getTimeUntilBuilt();
+        if (timeUntilBuilt > latestTimeFinish)
+        {
+            latestTimeFinish = timeUntilBuilt;
+        }
+    }
+    state.fastForward(state.getCurrentFrame() + latestTimeFinish + 1); // ff far enough so everything is done
+
     // get the finish times
     int numInitialUnits = m_initialState.getNumUnits();
-    state.fastForward(5000); // ff far enough so everything is done
     const GameState constState = std::as_const(state);
     int abilities = 0;
     m_maxFinishTime = 0;
@@ -94,6 +106,7 @@ void BuildOrderPlotData::calculateStartEndTimes()
 void BuildOrderPlotData::calculatePlot()
 {
     m_layers = std::vector<int>(m_startTimes.size(), -1); 
+    int chronoBoosts = 0;
 
     // determine the layers for each action
     for (int i(0); i < m_startTimes.size(); ++i)
@@ -116,7 +129,8 @@ void BuildOrderPlotData::calculatePlot()
             {
                 int numInitialUnits = m_initialState.getNumUnits();
                 AbilityAction action = actionTargetPair.second;
-                m_layers[i] = m_layers[action.targetProductionID - numInitialUnits];
+                m_layers[i] = m_layers[action.targetProductionID - numInitialUnits + chronoBoosts];
+                chronoBoosts++;
                 continue;
             }
         }

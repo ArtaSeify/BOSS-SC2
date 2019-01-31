@@ -100,7 +100,7 @@ void BuildOrderPlotter::writeBuildOrderPlot(const std::vector<BuildOrderPlotData
     
     int currentLayer = 0;
     int currentObject = plots[0].m_buildOrder.size();
-
+    
     for (size_t p(0); p < plots.size(); ++p)
     {
         const BuildOrderAbilities & buildOrder = plots[p].m_buildOrder;

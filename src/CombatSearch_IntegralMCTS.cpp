@@ -248,7 +248,7 @@ void CombatSearch_IntegralMCTS::pickBestBuildOrder(std::shared_ptr<Node> root,  
     // limit to properly calculate the integral
     GameState finalState(bestNode->getState());
     finalState.fastForward(m_params.getFrameTimeLimit());
-    m_promisingNodeIntegral.update(finalState, m_buildOrder, m_params, m_searchTimer);
+    m_promisingNodeIntegral.update(finalState, m_promisingNodeBuildOrder, m_params, m_searchTimer);
 }
 
 void CombatSearch_IntegralMCTS::writeResultsToFile(std::shared_ptr<Node> root)
