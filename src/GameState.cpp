@@ -110,7 +110,7 @@ bool GameState::isLegal(ActionType action) const
 
     const NumUnits totalSupply = m_maxSupply + getSupplyInProgress();
     // if it's a unit and we are out of supply and aren't making a supply providing unit, it's not legal
-    if (!action.isMorphed() && !action.isSupplyProvider() && ((m_currentSupply + action.supplyCost()) > totalSupply)) { return false; }    
+    if (!action.isMorphed() && !action.isSupplyProvider() && ((m_currentSupply + action.supplyCost()) > totalSupply)) { return false; }  
 
     // we don't need to go over the maximum supply limit with supply providers
     if (action.isSupplyProvider() && (totalSupply > 400)) { return false; }
@@ -119,7 +119,7 @@ bool GameState::isLegal(ActionType action) const
     if (m_race == Races::Protoss && action.isBuilding() && !action.isSupplyProvider() && !action.isRefinery() 
                                 && !haveType(ActionTypes::GetSupplyProvider(m_race))) { return false; }
 
-    // Pylon is invalid if we have 16 or over free supply
+    // Don't build a supply depot if we have 16 or over free supply
     if (m_race == Races::Protoss && action == ActionTypes::GetSupplyProvider(m_race) && totalSupply - m_currentSupply >= 16) { return false; }
 
     // TODO: can only build one of a tech type
@@ -520,7 +520,7 @@ int GameState::whenSupplyReady(ActionType action) const
     for (int i(0); i < m_unitsBeingBuilt.size(); ++i)
     {
         const Unit & unit = getUnit(m_unitsBeingBuilt[m_unitsBeingBuilt.size() - 1 - i]);   
-        if (unit.getType().supplyProvided() > supplyNeeded)
+        if (unit.getType().supplyProvided() >= supplyNeeded)
         {
             return m_currentFrame + unit.getTimeUntilBuilt();
         }
