@@ -20,6 +20,7 @@ void CombatSearch_IntegralMCTS::recurse(const GameState & state, int depth)
 {
     //test(state);
     m_numSimulations = 0;
+    int simulationsWritten = 0;
 
     std::shared_ptr<Node> root = std::make_shared<Node>(state);
 
@@ -63,7 +64,7 @@ void CombatSearch_IntegralMCTS::recurse(const GameState & state, int depth)
 
         if (m_numSimulations%m_writeEveryKSimulations == 0)
         {
-            writeResultsToFile(root);
+            writeResultsToFile(root, ++simulationsWritten);
         }
     }
     pickBestBuildOrder(root, true);
@@ -251,21 +252,23 @@ void CombatSearch_IntegralMCTS::pickBestBuildOrder(std::shared_ptr<Node> root,  
     m_promisingNodeIntegral.update(finalState, m_promisingNodeBuildOrder, m_params, m_searchTimer);
 }
 
-void CombatSearch_IntegralMCTS::writeResultsToFile(std::shared_ptr<Node> root)
+void CombatSearch_IntegralMCTS::writeResultsToFile(std::shared_ptr<Node> root, int simulationsWritten)
 {
-    std::ofstream file(m_save_dir + "/" + m_file_prefix + "_Results.csv", std::ofstream::out | std::ofstream::app);
-    std::stringstream ss;
-
     // picking the most visited route
     pickBestBuildOrder(root, true);
-    ss << m_promisingNodeIntegral.getCurrentStackValue() << ",";
+    m_ss << m_promisingNodeIntegral.getCurrentStackValue() << ",";
 
     // picking the route with the highest value
     pickBestBuildOrder(root, false);
-    ss << m_promisingNodeIntegral.getCurrentStackValue() << "\n";
+    m_ss << m_promisingNodeIntegral.getCurrentStackValue() << "\n";
 
-    file << ss.str();
-    file.close();
+    if (simulationsWritten%int(std::floor(m_params.getNumberOfSimulations() / (2 * m_writeEveryKSimulations))) == 0)
+    {
+        std::ofstream file(m_save_dir + "/" + m_file_prefix + "_Results.csv", std::ofstream::out | std::ofstream::app);
+        file << m_ss.str();
+        file.close();
+        m_ss.str(std::string());
+    }
 }
 
 void CombatSearch_IntegralMCTS::printResults()

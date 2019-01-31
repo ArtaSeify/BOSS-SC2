@@ -8,8 +8,11 @@ namespace BOSS
     class CombatSearch_IntegralMCTS : public CombatSearch_Integral
     {
         FracType m_exploration_parameter;
+
         int m_numSimulations;
         int m_writeEveryKSimulations;
+        std::stringstream m_ss;
+
         std::mt19937 m_rnggen;
 
         std::string m_save_dir;
@@ -41,7 +44,7 @@ namespace BOSS
 
         void test(const GameState & state);
 
-        void writeResultsToFile(std::shared_ptr<Node> root);
+        void writeResultsToFile(std::shared_ptr<Node> root, int simulationsWritten);
 
         virtual void printResults();
 

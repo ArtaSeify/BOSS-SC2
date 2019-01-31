@@ -16,7 +16,7 @@ CombatSearch_Integral::CombatSearch_Integral(const CombatSearchParameters p)
 CombatSearch_Integral::~CombatSearch_Integral()
 {
     m_file << m_ss.rdbuf();
-    m_ss.clear();
+    m_ss.str(std::string());
     m_file.close();
 }
 
@@ -37,7 +37,7 @@ FracType CombatSearch_Integral::recurseReturnValue(const GameState & state, int 
     if (m_params.getSaveResults() && m_results.nodesExpanded % 100000 == 0)
     {
         m_file << m_ss.rdbuf();
-        m_ss.clear();
+        m_ss.str(std::string());
     }
 
     FracType nodeIntegralValue = 0;
