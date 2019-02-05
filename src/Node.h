@@ -9,7 +9,7 @@
 
 namespace BOSS
 {
-    class Node
+    class Node : public std::enable_shared_from_this<Node>
     {
         std::shared_ptr<Edge> m_parentEdge;            // the edge leading to the parent
         GameState m_state;              // the current game state
@@ -19,6 +19,8 @@ namespace BOSS
     public:
         Node(const GameState & state);
         Node(const GameState & state, std::shared_ptr<Edge> parentEdge);
+
+        void cleanUp();
 
         // creates edges pointing to the states we can get to 
         // from this state
@@ -60,5 +62,7 @@ namespace BOSS
         std::shared_ptr<Node> getParent() { return m_parentEdge->getParent(); }
         int getNumEdges() const { return int(m_edges.size()); }
         bool isTerminal() const { return isTerminalNode; }
+
+        void clearChildren() { m_edges.clear(); }
     };
 }

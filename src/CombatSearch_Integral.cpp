@@ -34,7 +34,7 @@ FracType CombatSearch_Integral::recurseReturnValue(const GameState & state, int 
 
     updateResults(state);
 
-    if (m_params.getSaveResults() && m_results.nodesExpanded % 100000 == 0)
+    if (m_params.getSaveStates() && m_results.nodesExpanded % 100000 == 0)
     {
         m_file << m_ss.rdbuf();
         m_ss.str(std::string());
@@ -119,7 +119,7 @@ FracType CombatSearch_Integral::recurseReturnValue(const GameState & state, int 
         }
     }
 
-    if (m_params.getSaveResults())
+    if (m_params.getSaveStates())
     {
         state.writeToSS(m_ss);
         m_ss << ", " << nodeIntegralValue - nodeIntegralToThisPoint << "\n";

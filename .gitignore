@@ -23,3 +23,9 @@ emscripten/BOSS.data
 /bin/WTF.txt
 /vs/x64
 /bin/data
+/bin/results2
+/bin/test
+/MCTS Results/small range
+/MCTS Results/parsed data
+/MCTS Results/graphs
+/MCTS Results/big range

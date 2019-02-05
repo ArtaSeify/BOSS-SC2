@@ -18,19 +18,18 @@ CombatSearch_IntegralMCTS::CombatSearch_IntegralMCTS(const CombatSearchParameter
 
 void CombatSearch_IntegralMCTS::recurse(const GameState & state, int depth)
 {
-    //test(state);
+    //test2(state);
     m_numSimulations = 0;
     int simulationsWritten = 0;
 
     std::shared_ptr<Node> root = std::make_shared<Node>(state);
 
     while (!timeLimitReached() && m_numSimulations < m_params.getNumberOfSimulations())
-    //for (int i = 0; i < 150000; ++i)
     {
-        if ((m_numSimulations % 1000) == 0)
+        /*if ((m_numSimulations % 1000) == 0)
         {
             std::cout << "have run : " << m_numSimulations << " simulations thus far." << std::endl;
-        }
+        }*/
         auto & nodePair = getPromisingNode(root);
         std::shared_ptr<Node> promisingNode = nodePair.first;
         
@@ -67,10 +66,12 @@ void CombatSearch_IntegralMCTS::recurse(const GameState & state, int depth)
             writeResultsToFile(root, ++simulationsWritten);
         }
     }
-    pickBestBuildOrder(root, true);
-
+    
+    pickBestBuildOrder(root, false);
     m_buildOrder = m_promisingNodeBuildOrder;
     m_integral = m_promisingNodeIntegral;
+
+    root->cleanUp();
 }
 
 void CombatSearch_IntegralMCTS::test(const GameState & state)
@@ -100,6 +101,23 @@ void CombatSearch_IntegralMCTS::test(const GameState & state)
     generateLegalActions(thirdLevel.getState(), legalActions, m_params);
     thirdLevel.createChildrenEdges(legalActions, m_params);
     thirdLevel.printChildren();
+}
+
+void CombatSearch_IntegralMCTS::test2(const GameState & state)
+{
+    std::shared_ptr<Node> root = std::make_shared<Node>(state);
+
+    ActionSetAbilities legalActions;
+    generateLegalActions(state, legalActions, m_params);
+    root->createChildrenEdges(legalActions, m_params);
+    root->printChildren();
+
+    std::cout << "root use count: " << root.use_count() << std::endl;
+
+    //std::shared_ptr<Node> child1 = std::make_shared<Node>(state);
+    //child1->doAction(root->getChild(ActionTypes::GetActionType("Probe")), m_params);
+
+    //root->cleanUp();
 }
 
 std::pair<std::shared_ptr<Node>, bool> CombatSearch_IntegralMCTS::getPromisingNode(std::shared_ptr<Node> node) 
@@ -254,13 +272,14 @@ void CombatSearch_IntegralMCTS::pickBestBuildOrder(std::shared_ptr<Node> root,  
 
 void CombatSearch_IntegralMCTS::writeResultsToFile(std::shared_ptr<Node> root, int simulationsWritten)
 {
-    // picking the most visited route
-    pickBestBuildOrder(root, true);
-    m_ss << m_promisingNodeIntegral.getCurrentStackValue() << ",";
 
-    // picking the route with the highest value
+    pickBestBuildOrder(root, true);
+    FracType mostVisitedRoute = m_promisingNodeIntegral.getCurrentStackValue();
+
     pickBestBuildOrder(root, false);
-    m_ss << m_promisingNodeIntegral.getCurrentStackValue() << "\n";
+    FracType highestValueRoute = m_promisingNodeIntegral.getCurrentStackValue();
+
+    m_ss << mostVisitedRoute << "," << highestValueRoute << "\n";
 
     if (simulationsWritten%int(std::floor(m_params.getNumberOfSimulations() / (2 * m_writeEveryKSimulations))) == 0)
     {

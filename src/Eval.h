@@ -8,15 +8,16 @@
 
 namespace BOSS
 {
-namespace Eval
-{
-    //double ArmyCompletedResourceSum(const GameState & state);
-    FracType ArmyTotalResourceSum(const GameState & state);
-    FracType ArmyResourceUnit(const GameState & state, int unitIndex);
+    namespace Eval
+    {
+        //double ArmyCompletedResourceSum(const GameState & state);
+        FracType ArmyInProgressResourceSum(const GameState & state);
+        FracType ArmyTotalResourceSum(const GameState & state);
+        FracType ArmyResourceUnit(const GameState & state, int unitIndex);
 
-    bool BuildOrderBetter(const BuildOrderAbilities & buildOrder, const BuildOrderAbilities & compareTo);
-    bool StateBetter(const GameState & state, const GameState & compareTo);
+        bool BuildOrderBetter(const BuildOrderAbilities & buildOrder, const BuildOrderAbilities & compareTo);
+        bool StateBetter(const GameState & state, const GameState & compareTo);
 
-    bool StateDominates(const GameState & state, const GameState & other);
-}
+        bool StateDominates(const GameState & state, const GameState & other);
+    }
 }

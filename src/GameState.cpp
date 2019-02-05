@@ -12,13 +12,16 @@ GameState::GameState()
     , m_gas(0.0f)
     , m_currentSupply(0)
     , m_maxSupply(0)
+    , m_inProgressSupply(0)
     , m_currentFrame(0)
     , m_previousFrame(0)
     , m_mineralWorkers(0)
     , m_gasWorkers(0)
     , m_buildingWorkers(0)
     , m_numRefineries(0)
+    , m_inProgressRefineries(0)
     , m_numDepots(0)
+    , m_inProgressDepots(0)
     , m_lastAction(ActionTypes::None)
     , m_lastAbility()
 {
@@ -32,7 +35,7 @@ GameState::GameState()
     //Vector_AbilityAction    m_chronoBoosts;
 }
 
-/*GameState::GameState(Vector_Unit & unitVector, RaceID race, FracType minerals, FracType gas,
+GameState::GameState(const std::vector<Unit> & unitVector, RaceID race, FracType minerals, FracType gas,
     NumUnits currentSupply, NumUnits maxSupply, NumUnits mineralWorkers, NumUnits gasWorkers,
     NumUnits builerWorkers, TimeType currentFrame, NumUnits numRefineries, NumUnits numDepots)
     : m_units (unitVector)
@@ -41,17 +44,35 @@ GameState::GameState()
     , m_gas(gas)
     , m_currentSupply(currentSupply)
     , m_maxSupply(maxSupply)
+    , m_inProgressSupply(0)
     , m_currentFrame(currentFrame)
     , m_previousFrame(0)
     , m_mineralWorkers(mineralWorkers)
     , m_gasWorkers(gasWorkers)
     , m_buildingWorkers(builerWorkers)
     , m_numRefineries(numRefineries)
+    , m_inProgressRefineries(0)
     , m_numDepots(numDepots)
+    , m_inProgressDepots(0)
     , m_lastAction(ActionTypes::None)
+    , m_lastAbility()
 {
-    /*for (auto & unit : m_units)
+    for (auto & unit : m_units)
     {
+        if (unit.getTimeUntilBuilt() > 0)
+        {
+            m_inProgressSupply += unit.getType().supplyProvided();
+
+            if (unit.getType().isRefinery())
+            {
+                m_inProgressRefineries++;
+            }
+
+            else if (unit.getType().isDepot())
+            {
+                m_inProgressDepots++;
+            }
+        }
         std::cout << "name: " << unit.getType().getName() << std::endl;
     }
     std::cout << Races::GetRaceName(m_race) << std::endl;
@@ -64,8 +85,8 @@ GameState::GameState()
     std::cout << m_gasWorkers << std::endl;
     std::cout << m_buildingWorkers << std::endl;
     std::cout << m_numRefineries << std::endl;
-    std::cout << m_numDepots << std::endl;*/
-//}
+    std::cout << m_numDepots << std::endl;
+}
 
 void GameState::getLegalActions(std::vector<ActionType> & legalActions) const
 {
@@ -91,24 +112,27 @@ bool GameState::isLegal(ActionType action) const
     // if we have no mineral income we'll never have a minerla unit
     if ((m_minerals < action.mineralPrice()) && (mineralWorkers == 0)) { return false; }
 
+    // only one Mothership is allowed
+    if (action.supplyCost() == 8 && haveType(action)) { return false; }
+
     // TODO: require an extra for refineries but not buildings
     // rules for buildings which are built by workers
     if (action.isBuilding() && !action.isMorphed() && !action.isAddon() && (mineralWorkers == 0)) { return false; }
 
-    const int refineriesInProgress = getNumInProgress(ActionTypes::GetRefinery(m_race));
-    const int numRefineries = m_numRefineries + refineriesInProgress;
+
+    const int numRefineries = m_numRefineries + m_inProgressRefineries;
     // don't build a refinery if we don't have enough mineral workers to transfer over
     if (action.isRefinery() && (mineralWorkers <= (CONSTANTS::WorkersPerRefinery * (numRefineries + 1)))) { return false; }
 
-    const int numDepots = m_numDepots + getNumInProgress(ActionTypes::GetResourceDepot(m_race));
-    // don't build more refineries than resource depots
+    const int numDepots = m_numDepots + m_inProgressDepots;
+    // don't build more refineries than depots
     if (action.isRefinery() && (numRefineries >= 2 * numDepots)) { return false; }
 
     // we can Chrono Boost as long as we have a Nexus
     if (action.isAbility() && m_race == Races::Protoss && numDepots == 0) { return false; }
 
 
-    const NumUnits totalSupply = m_maxSupply + getSupplyInProgress();
+    const NumUnits totalSupply = m_maxSupply + m_inProgressSupply;
     // if it's a unit and we are out of supply and aren't making a supply providing unit, it's not legal
     if (!action.isMorphed() && !action.isSupplyProvider() && ((m_currentSupply + action.supplyCost()) > totalSupply)) { return false; }  
 
@@ -117,7 +141,7 @@ bool GameState::isLegal(ActionType action) const
 
     // need to have at least 1 Pylon to build Protoss buildings, except if it's an Assimilator
     if (m_race == Races::Protoss && action.isBuilding() && !action.isSupplyProvider() && !action.isRefinery() 
-                                && !haveType(ActionTypes::GetSupplyProvider(m_race))) { return false; }
+           && totalSupply%ActionTypes::GetResourceDepot(m_race).supplyProvided() == 0) { return false; }
 
     // Don't build a supply depot if we have 16 or over free supply
     if (m_race == Races::Protoss && action == ActionTypes::GetSupplyProvider(m_race) && totalSupply - m_currentSupply >= 16) { return false; }
@@ -277,8 +301,7 @@ void GameState::completeUnit(Unit & unit)
 {
     unit.complete(m_currentFrame);
     m_maxSupply += unit.getType().supplyProvided();
-
-    //addUnitToSpecialVectors(unit.getID());
+    m_inProgressSupply -= unit.getType().supplyProvided();
 
     // stores units in the order they were finished, except the units we start with
     if (m_units[unit.getID()].getBuilderID() != -1)
@@ -299,9 +322,10 @@ void GameState::completeUnit(Unit & unit)
     else if (unit.getType().isRefinery())
     {
         //std::cout << "mineral workers before refinery build: " << m_mineralWorkers << std::endl;
+        m_inProgressRefineries--;
         m_numRefineries++;
         //std::cout << "we have " << m_numRefineries << " refineries, and " << (int)(m_numDepots + getNumInProgress(ActionTypes::GetResourceDepot(m_race))) << " bases." << std::endl;
-        BOSS_ASSERT(m_numRefineries <= 2 * (m_numDepots + getNumInProgress(ActionTypes::GetResourceDepot(m_race))), "Shouldn't have more refineries than 2*depots");
+        BOSS_ASSERT(m_numRefineries <= 2 * (m_numDepots + m_inProgressDepots), "Shouldn't have more refineries than 2*depots");
         int needGasWorkers = std::max(0, (CONSTANTS::WorkersPerRefinery*m_numRefineries - m_gasWorkers));
         BOSS_ASSERT(needGasWorkers < m_mineralWorkers, "Shouldn't need more gas workers than we have mineral workers. "
                                                        "%d required gas workers, %d mineral workers", needGasWorkers, m_mineralWorkers);
@@ -311,6 +335,7 @@ void GameState::completeUnit(Unit & unit)
     }
     else if (unit.getType().isDepot())
     {
+        m_inProgressDepots--;
         m_numDepots++;
     }
 }
@@ -325,6 +350,16 @@ void GameState::addUnit(ActionType type, NumUnits builderID)
     Unit unit(type, NumUnits(m_units.size()), builderID, m_currentFrame);
     m_units.push_back(unit);
     m_currentSupply += unit.getType().supplyCost();
+    m_inProgressSupply += unit.getType().supplyProvided();
+
+    if (type.isDepot())
+    {
+        m_inProgressDepots++;
+    }
+    else if (type.isRefinery())
+    {
+        m_inProgressRefineries++;
+    }
     
     // if we have a valid builder for this object, add it to the Units being built
     if (builderID != -1)
@@ -352,25 +387,6 @@ void GameState::addUnit(ActionType type, NumUnits builderID)
     {
         completeUnit(m_units[m_units.size() - 1]);
     }
-}
-
-void GameState::addUnitToSpecialVectors(NumUnits unitIndex)
-{
-    // we don't want to store units that we start with
-    if (m_units[unitIndex].getBuilderID() == -1)
-    {
-        return;
-    }
-
-    // if it's a combat unit add it to the armyUnits vector
-    /*ActionType type = m_units[unitIndex].getType();
-    if (!type.isBuilding() && !type.isWorker() && !type.isSupplyProvider())
-    {
-        m_armyUnits.push_back(unitIndex);
-    }*/
-  
-    // add to finished units vector
-    m_unitsSortedEndFrame.push_back(unitIndex);
 }
 
 int GameState::whenCanBuild(ActionType action) const
@@ -559,15 +575,15 @@ int GameState::whenPrerequisitesReady(ActionType action) const
     {
         // find the minimum time that this particular prereq will be ready
         int minReady = std::numeric_limits<int>::max();
-        for (int i(0); i < int(m_units.size()); ++i)
+        for (auto & unit : m_units)
         {
-            auto & unit = m_units[i];
             if (unit.getType() != req) { continue; }
-            minReady = std::min(minReady, unit.getTimeUntilFree());
-            if (unit.getTimeUntilFree() == 0) { break; }
+            minReady = std::min(minReady, unit.getTimeUntilBuilt());
+            if (unit.getTimeUntilBuilt() == 0) { break; }
         }
         // we can only build the type after the LAST of the prereqs are ready
         whenPrereqReady = std::max(whenPrereqReady, minReady);
+
         BOSS_ASSERT(whenPrereqReady != std::numeric_limits<TimeType>::max(), "Did not find a prerequisite required to build %s", action.getName().c_str());
     }
       
@@ -578,13 +594,13 @@ int GameState::timeUntilFirstPylonDone() const
 {
     for (auto & unit : m_units)
     {
-        if (unit.getType() == ActionTypes::GetSupplyProvider(Races::Protoss))
+        if (unit.getType() == ActionTypes::GetSupplyProvider(m_race))
         {
             return unit.getTimeUntilBuilt();
         }
     }
 
-    return std::numeric_limits<TimeType>::max();
+    return std::numeric_limits<int>::max();
 }
 
 int GameState::whenEnergyReady(ActionType action) const
@@ -592,9 +608,8 @@ int GameState::whenEnergyReady(ActionType action) const
     TimeType minWhenReady = std::numeric_limits<TimeType>::max();
 
     // look over all our units and get when the next builder type is free
-    for (int i(0); i < int(m_units.size()); ++i)
+    for (auto & unit : m_units)
     {
-        auto & unit = m_units[i];
         TimeType whenReady = unit.whenCanBuild(action);
 
         // shortcut return if we found something that can cast now
@@ -619,9 +634,8 @@ int GameState::getBuilderID(ActionType action) const
     int builderID = -1;
 
     // look over all our units and get when the next builder type is free
-    for (int i(0); i < int(m_units.size()); ++i)
+    for (auto & unit : m_units)
     {
-        auto & unit = m_units[i];
         TimeType whenReady = unit.whenCanBuild(action);
         
         // shortcut return if we found something that can build now
@@ -645,18 +659,19 @@ int GameState::getBuilderID(ActionType action) const
 
 bool GameState::haveBuilder(ActionType type) const
 {
-    return std::any_of(m_units.begin(), m_units.end(), 
-           [&type](const Unit & u){ return u.whenCanBuild(type) != -1; });
-
-    /*for (int i(0); i < int(m_units.size()); ++i)
+    // check if it's built by a worker. Speeds things up
+    if (type.whatBuilds() == ActionTypes::GetWorker(m_race))
     {
-        auto & unit = m_units[i];
-        if (unit.whenCanBuild(type) != -1)
+        if (m_mineralWorkers > 0 || m_gasWorkers > 0 || m_buildingWorkers > 0)
         {
             return true;
         }
+
+        return false;
     }
-    return false;*/
+
+    return std::any_of(m_units.rbegin(), m_units.rend(), 
+           [&type](const Unit & u){ return u.whenCanBuild(type) != -1; });
 }
 
 bool GameState::havePrerequisites(ActionType type) const
@@ -669,33 +684,12 @@ int GameState::getNumInProgress(ActionType action) const
 {
     return (int)std::count_if(m_unitsBeingBuilt.begin(), m_unitsBeingBuilt.end(),
            [this, &action](int id) { return action == this->getUnit(id).getType(); } );
-
-   /* int numInProgress = 0;
-    for (int i(0); i < m_unitsBeingBuilt.size(); ++i)
-    {
-        if (getUnit(m_unitsBeingBuilt[i]).getType() == action)
-        {
-            numInProgress++;
-        }
-    }
-    return numInProgress;*/
 }
 
 int GameState::getNumCompleted(ActionType action) const
 {
     return (int)std::count_if(m_units.begin(), m_units.end(),
            [&action](const Unit & unit) { return action == unit.getType() && unit.getTimeUntilBuilt() == 0; } );
-
-    /*int numCompleted = 0;
-    for (int i(0); i < int(m_units.size()); ++i)
-    {
-        auto & unit = m_units[i];
-        if (unit.getType() == action && unit.getTimeUntilBuilt() == 0)
-        {
-            numCompleted++;
-        }
-    }
-    return numCompleted;*/
 }
 
 int GameState::getNumTotal(ActionType action) const
@@ -710,46 +704,12 @@ int GameState::getNumTotal(ActionType action) const
 
     return (int)std::count_if(m_units.begin(), m_units.end(), 
            [&action](const Unit & unit) { return action == unit.getType(); } );
-
-    /*int numTotal = 0;
-    for (int i(0); i < int(m_units.size()); ++i)
-    {
-        auto & unit = m_units[i];
-        if (unit.getType() == action)
-        {
-            numTotal++;
-        }
-    }
-    return numTotal;*/
 }
 
 bool GameState::haveType(ActionType action) const
 {
-    return std::any_of(m_units.begin(), m_units.end(), 
+    return std::any_of(m_units.rbegin(), m_units.rend(), 
            [&action](const Unit & i){ return i.getType() == action; });
-
-    /*for (int i(0); i < int(m_units.size()); ++i)
-    {
-        auto & unit = m_units[i];
-        if (unit.getType() == action)
-        {
-            return true;
-        }
-    }
-    return false;*/
-}
-
-int GameState::getSupplyInProgress() const
-{
-    return std::accumulate(m_unitsBeingBuilt.begin(), m_unitsBeingBuilt.end(), 0, 
-           [this](int lhs, int rhs) { return lhs + this->getUnit(rhs).getType().supplyProvided(); });
-
-    /*int supplyInProgress = 0;
-    for (int i(0); i < m_unitsBeingBuilt.size(); ++i)
-    {
-        supplyInProgress += getUnit(m_unitsBeingBuilt[i]).getType().supplyProvided();
-    }
-    return supplyInProgress;*/
 }
 
 void GameState::getSpecialAbilityTargets(ActionSetAbilities & actionSet, int index) const
@@ -790,10 +750,8 @@ bool GameState::canChronoBoost() const
 int GameState::storeChronoBoostTargets(ActionSetAbilities & actionSet, int index) const
 {
     int numTargets = 0;
-    for (int i(0); i < int(m_units.size()); ++i)
+    for (auto & unit : m_units)
     {
-        auto & unit = m_units[i];
-
         if (chronoBoostableTarget(unit))
         {
             //std::cout << "Chronoboost target: " << unit.getType().getName() << std::endl;
@@ -906,7 +864,7 @@ std::string GameState::toString() const
   ss << buf;
 
   ss << "--------------------------------------\n";
-  ss << "Supply In Progress: " << getSupplyInProgress() << "\n";
+  ss << "Supply In Progress: " << m_inProgressSupply << "\n";
   ss << "Next Probe Finish: " << getNextFinishTime(ActionTypes::GetActionType("Probe")) << "\n";
   //printPath();
 
@@ -915,9 +873,8 @@ std::string GameState::toString() const
 
 void GameState::printunitsbeingbuilt() const
 {
-    for (int i(0); i < m_unitsBeingBuilt.size(); ++i)
+    for (int index : m_unitsBeingBuilt)
     {
-        auto index = m_unitsBeingBuilt[i];
         std::cout << getUnit(index).getTimeUntilBuilt() << std::endl;
     }
     std::cout << std::endl;

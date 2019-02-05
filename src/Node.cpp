@@ -21,6 +21,18 @@ Node::Node(const GameState & state, std::shared_ptr<Edge> parentEdge)
 
 }
 
+void Node::cleanUp()
+{
+    for (auto & edge : m_edges)
+    {
+        edge->cleanUp();
+        //std::cout << "removing ownership of edge" << std::endl;
+        //std::cout << "edge use count: " << edge.use_count() << std::endl;
+        edge.reset();
+    }
+    //std::cout << "all edges of this node cleaned up!" << std::endl;
+}
+
 void Node::createChildrenEdges(ActionSetAbilities & legalActions, const CombatSearchParameters & params)
 {
     // if we already know it's a terminal node, just return
@@ -29,6 +41,7 @@ void Node::createChildrenEdges(ActionSetAbilities & legalActions, const CombatSe
         return;
     }
 
+    std::shared_ptr<Node> thisNode = shared_from_this();
     for (int index = 0; index < legalActions.size(); ++index)
     {
         auto action = legalActions[index];
@@ -65,7 +78,7 @@ void Node::createChildrenEdges(ActionSetAbilities & legalActions, const CombatSe
         }
 
         // action is valid, so create an edge
-        m_edges.push_back(std::make_shared<Edge>(action, std::shared_ptr<Node>(this)));
+        m_edges.push_back(std::make_shared<Edge>(action, thisNode));
     }
 
     // no edges were created, so this is a terminal node
@@ -99,8 +112,9 @@ bool Node::doAction(std::shared_ptr<Edge> edge, const CombatSearchParameters & p
 
     if (edge->timesVisited() == Edge::NODE_VISITS_BEFORE_EXPAND - 1)
     {
-        std::shared_ptr<Node> newNode = std::make_shared<Node>(m_state, edge);
-        edge->setChild(newNode);
+        //std::shared_ptr<Node> newNode = std::make_shared<Node>(m_state, edge);
+        //edge->setChild(newNode);
+        edge->setChild(shared_from_this());
     }
 
     return true;
@@ -238,17 +252,22 @@ std::shared_ptr<Edge> Node::getHighestValueChild(const CombatSearchParameters & 
         { 
             if (lhs->getValue() == rhs->getValue())
             {
-                std::shared_ptr<Node> lhsNode(lhs->getChild());
-                std::shared_ptr<Node> rhsNode(rhs->getChild());
-                if (lhsNode == nullptr)
+                if (lhs->getParent()->getNumEdges() == rhs->getParent()->getNumEdges())
                 {
-                    lhsNode = notExpandedChild(lhs, params);
+                    std::shared_ptr<Node> lhsNode(lhs->getChild());
+                    std::shared_ptr<Node> rhsNode(rhs->getChild());
+                    if (lhsNode == nullptr)
+                    {
+                        lhsNode = notExpandedChild(lhs, params);
+                    }
+                    if (rhs->getChild() == nullptr)
+                    {
+                        rhsNode = notExpandedChild(rhs, params);
+                    }
+                    return Eval::StateBetter(rhsNode->getState(), lhsNode->getState());
                 }
-                if (rhs->getChild() == nullptr)
-                {
-                    rhsNode = notExpandedChild(rhs, params);
-                }
-                return Eval::StateBetter(rhsNode->getState(), lhsNode->getState());
+
+                return lhs->getParent()->getNumEdges() < rhs->getParent()->getNumEdges();
             }
         
             return lhs->getValue() < rhs->getValue();

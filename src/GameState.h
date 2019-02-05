@@ -29,13 +29,16 @@ class GameState
     FracType                m_gas;
     NumUnits                m_currentSupply;
     NumUnits                m_maxSupply;
+    NumUnits                m_inProgressSupply;     // the amount of supply that is in construction 
     TimeType                m_currentFrame;
     TimeType                m_previousFrame;
     NumUnits                m_mineralWorkers;
     NumUnits                m_gasWorkers;
     NumUnits                m_buildingWorkers;
     NumUnits                m_numRefineries;
+    NumUnits                m_inProgressRefineries;     // the amount of refineries being built
     NumUnits                m_numDepots;
+    NumUnits                m_inProgressDepots;         // the amount of depots being built
     ActionType              m_lastAction;
     AbilityAction           m_lastAbility;
  
@@ -48,21 +51,18 @@ class GameState
     int                     whenResourcesReady(ActionType action)       const;
     int                     whenBuilderReady(ActionType action)         const;
 
-    void                    addUnitToSpecialVectors(NumUnits unitIndex);
-
     Unit &                  getUnit(NumUnits id) { return m_units[id]; }
     void                    completeUnit(Unit & Unit);
 
   public: 
     GameState();
-    GameState(Vector_Unit & unitVector, RaceID race, FracType minerals, FracType gas,
+    GameState(const std::vector<Unit> & unitVector, RaceID race, FracType minerals, FracType gas,
         NumUnits currentSupply, NumUnits maxSupply, NumUnits mineralWorkers, NumUnits gasWorkers,
         NumUnits builerWorkers, TimeType currentFrame, NumUnits numRefineries, NumUnits numDepots);
 
     int                             whenCanBuild(ActionType action)                         const;
     int                             whenCanCast(ActionType action, NumUnits targetID)       const;
     int                             whenEnergyReady(ActionType action)                      const;
-    int                             getSupplyInProgress()                                   const;
     int                             getNextFinishTime(ActionType type)                      const;
     int                             timeUntilFirstPylonDone()                               const;
 
@@ -95,6 +95,7 @@ class GameState
     int                             getLastActionFinishTime()           const { return m_unitsBeingBuilt.empty() ? getCurrentFrame() : m_units[m_unitsBeingBuilt.front()].getTimeUntilBuilt(); }
     int                             getCurrentSupply()                  const { return m_currentSupply; }
     int                             getMaxSupply()                      const { return m_maxSupply; }
+    int                             getSupplyInProgress()               const { return m_inProgressSupply; }
     int                             getCurrentFrame()                   const { return m_currentFrame; }
     RaceID                          getRace()                           const { return m_race; }
     FracType                        getMinerals()                       const { return m_minerals; }
@@ -107,6 +108,7 @@ class GameState
     ActionType                      getLastAction()                     const { return m_lastAction; }
     const AbilityAction &           getLastAbility()                    const { return m_lastAbility; }
     const Unit &                    getUnit(NumUnits id)                const { return m_units[id]; }
+    const std::vector<NumUnits> &   getUnitsBeingBuilt()                const { return m_unitsBeingBuilt; }
     
     std::string                     toString()                          const;
     void                            printunitsbeingbuilt()              const;

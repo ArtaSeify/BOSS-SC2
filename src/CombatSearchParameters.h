@@ -104,7 +104,7 @@ namespace BOSS
         int m_frameTimeLimit;
         bool m_printNewBest;
         bool m_sortActions;
-        bool m_saveResults;
+        bool m_saveStates;
         FracType m_explorationValue;
         int m_numberOfSimulations;
 
@@ -149,8 +149,8 @@ namespace BOSS
         void setSortActions(bool flag);
         bool getSortActions() const;
 
-        void setSaveResults(bool flag);
-        bool getSaveResults() const;
+        void setSaveStates(bool flag);
+        bool getSaveStates() const;
 
         void setExplorationValue(FracType value);
         FracType getExplorationValue() const;

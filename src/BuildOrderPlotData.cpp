@@ -22,6 +22,7 @@ void BuildOrderPlotData::calculateStartEndTimes()
     GameState state(m_initialState);
 
     //BOSS_ASSERT(_buildOrder.isLegalFromState(state), "Build order isn't legal!");
+    int numInitialUnits = m_initialState.getNumUnits();
 
     for (int i(0); i < m_buildOrder.size(); ++i)
     {
@@ -30,6 +31,7 @@ void BuildOrderPlotData::calculateStartEndTimes()
         if (type.isAbility())
         {
             state.doAbility(type, actionTargetPair.second.targetID);
+            m_chronoBoosts.push_back(i);
         }
         else
         {
@@ -76,7 +78,6 @@ void BuildOrderPlotData::calculateStartEndTimes()
     state.fastForward(state.getCurrentFrame() + latestTimeFinish + 1); // ff far enough so everything is done
 
     // get the finish times
-    int numInitialUnits = m_initialState.getNumUnits();
     const GameState constState = std::as_const(state);
     int abilities = 0;
     m_maxFinishTime = 0;
@@ -105,17 +106,17 @@ void BuildOrderPlotData::calculateStartEndTimes()
 
 void BuildOrderPlotData::calculatePlot()
 {
-    m_layers = std::vector<int>(m_startTimes.size(), -1); 
-    int chronoBoosts = 0;
+    // <index inside unit vector of GameState, layer>
+    m_layers = std::vector<std::pair<int,int>>(m_startTimes.size(), std::make_pair(-1, -1)); 
+
+    int numInitialUnits = m_initialState.getNumUnits();
+    int chronoBoostsSoFar = 0;
 
     // determine the layers for each action
     for (int i(0); i < m_startTimes.size(); ++i)
     {
         int start               = m_startTimes[i];
-#if 0
-        //!!!PROBLEM NOT USED
-        int finish              = m_finishTimes[i];
-#endif        
+
         auto & actionTargetPair = m_buildOrder[i];
         ActionType type = actionTargetPair.first;
 
@@ -127,12 +128,20 @@ void BuildOrderPlotData::calculatePlot()
             // Overlap chronoboost with the unit it was cast on
             if (type.getName() == "ChronoBoost")
             {
-                int numInitialUnits = m_initialState.getNumUnits();
                 AbilityAction action = actionTargetPair.second;
-                m_layers[i] = m_layers[action.targetProductionID - numInitialUnits + chronoBoosts];
-                chronoBoosts++;
-                continue;
+
+                for (int j = 0; j < i; ++j)
+                {
+                    if (m_layers[j].first == action.targetProductionID - numInitialUnits)
+                    {
+                        m_layers[i] = m_layers[j];
+                    }
+                }
+
+                chronoBoostsSoFar++;
             }
+
+            continue;
         }
 
         std::vector<int> layerOverlap;
@@ -142,7 +151,7 @@ void BuildOrderPlotData::calculatePlot()
         {
             if (start < m_finishTimes[j] && !m_buildOrder[j].first.isAbility())
             {
-                layerOverlap.push_back(m_layers[j]);
+                layerOverlap.push_back(m_layers[j].second);
             }
         }
 
@@ -152,7 +161,7 @@ void BuildOrderPlotData::calculatePlot()
         {
             if (std::find(layerOverlap.begin(), layerOverlap.end(), layerTest) == layerOverlap.end())
             {
-                m_layers[i] = layerTest;
+                m_layers[i].second = layerTest;
                 if (layerTest > m_maxLayer)
                 {
                     m_maxLayer = layerTest;
@@ -162,11 +171,13 @@ void BuildOrderPlotData::calculatePlot()
 
             layerTest++;
         }
+
+        m_layers[i].first = i - chronoBoostsSoFar;
     }
 
     for (int i(0); i < m_buildOrder.size(); ++i)
     {
-        Position topLeft(m_startTimes[i], m_layers[i] * (m_boxHeight + m_boxHeightBuffer));
+        Position topLeft(m_startTimes[i], m_layers[i].second * (m_boxHeight + m_boxHeightBuffer));
         Position bottomRight(m_finishTimes[i], topLeft.y() + m_boxHeight);
         m_rectangles.push_back(Rectangle(m_buildOrder[i].first.getName(), topLeft, bottomRight));
     }

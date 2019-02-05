@@ -43,6 +43,7 @@ namespace BOSS
         void pickBestBuildOrder(std::shared_ptr<Node> root, bool useVisitCount);
 
         void test(const GameState & state);
+        void test2(const GameState & state);
 
         void writeResultsToFile(std::shared_ptr<Node> root, int simulationsWritten);
 

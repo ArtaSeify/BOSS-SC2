@@ -65,6 +65,7 @@ namespace BOSS
         ActionType GetRefinery(RaceID raceID);
         ActionType GetResourceDepot(RaceID raceID);
         ActionType GetSpecialAction(RaceID raceID);
+        ActionType GetDetector(RaceID raceID);
         ActionType GetActionType(const std::string & name);
         bool TypeExists(const std::string & name);
 

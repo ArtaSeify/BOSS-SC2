@@ -114,7 +114,7 @@ void BuildOrderPlotter::writeBuildOrderPlot(const std::vector<BuildOrderPlotData
             std::stringstream pos;
 
             pos << "(boxWidthScale * " << rectCenterX << "),";
-            pos << "((boxHeight + boxHeightBuffer) * " << (plots[p].m_layers[i] + currentLayer) << " + boxHeight/2)";
+            pos << "((boxHeight + boxHeightBuffer) * " << (plots[p].m_layers[i].second + currentLayer) << " + boxHeight/2)";
             
             ss << "set object " << (currentObject+i+1) << " rect at ";
             ss << pos.str();
@@ -204,7 +204,7 @@ std::string BuildOrderPlotter::getPlotJSON(const std::vector<BuildOrderPlotData>
             ss << plots[p].m_finishTimes[i] << ", ";
             ss << plots[p].m_minerals[i].first << ", ";
             ss << plots[p].m_gas[i].first << ", ";
-            ss << plots[p].m_layers[i] << ", ";
+            ss << plots[p].m_layers[i].second << ", ";
             
             if (type.isWorker())
             {

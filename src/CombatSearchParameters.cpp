@@ -147,14 +147,14 @@ bool CombatSearchParameters::getSortActions() const
     return m_sortActions;
 }
 
-void CombatSearchParameters::setSaveResults(bool flag)
+void CombatSearchParameters::setSaveStates(bool flag)
 {
-    m_saveResults = flag;
+    m_saveStates = flag;
 }
 
-bool CombatSearchParameters::getSaveResults() const
+bool CombatSearchParameters::getSaveStates() const
 {
-    return m_saveResults;
+    return m_saveStates;
 }
 
 void CombatSearchParameters::setExplorationValue(FracType value)

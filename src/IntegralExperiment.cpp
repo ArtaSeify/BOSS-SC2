@@ -41,8 +41,8 @@ IntegralExperiment::IntegralExperiment(const std::string & experimentName, const
     BOSS_ASSERT(exp.count("SortActions") && exp["SortActions"].is_boolean(), "IntegralSearch must have a SortActions bool");
     m_params.setSortActions(exp["SortActions"]);
 
-    BOSS_ASSERT(exp.count("SaveResults") && exp["SaveResults"].is_boolean(), "IntegralSearch must have a SaveResults bool");
-    m_params.setSaveResults(exp["SaveResults"]);
+    BOSS_ASSERT(exp.count("SaveStates") && exp["SaveStates"].is_boolean(), "IntegralSearch must have a SaveStates bool");
+    m_params.setSaveStates(exp["SaveStates"]);
 
     const std::string & searchType = exp["SearchType"][0].get<std::string>();
     m_searchType = searchType;
@@ -140,30 +140,30 @@ void IntegralExperiment::run(int numberOfRuns)
         std::string outputDir = m_outputDir + "/" + Assert::CurrentDateTime() + "_" + name;
         FileTools::MakeDirectory(outputDir);
 
-        std::shared_ptr<CombatSearch> combatSearch;
+        std::unique_ptr<CombatSearch> combatSearch;
         std::string resultsFile = name;
 
         std::cout << "\n" << stars << "\n* Running Experiment: " << name << " [" << m_searchType << "]\n" << stars << "\n";
 
         if (m_searchType == "Integral")
         {
-            combatSearch = std::shared_ptr<CombatSearch>(new CombatSearch_Integral(m_params));
+            combatSearch = std::unique_ptr<CombatSearch>(new CombatSearch_Integral(m_params));
             //resultsFile += "_Integral";
         }
         else if (m_searchType == "Bucket")
         {
-            combatSearch = std::shared_ptr<CombatSearch>(new CombatSearch_Bucket(m_params));
+            combatSearch = std::unique_ptr<CombatSearch>(new CombatSearch_Bucket(m_params));
             //resultsFile += "_Bucket";
         }
         else if (m_searchType == "BestResponse")
         {
-            combatSearch = std::shared_ptr<CombatSearch>(new CombatSearch_BestResponse(m_params));
+            combatSearch = std::unique_ptr<CombatSearch>(new CombatSearch_BestResponse(m_params));
             //resultsFile += "_BestResponse";
         }
         else if (m_searchType == "IntegralMCTS")
         {
             //resultsFile += "_IntegralMCTS";
-            combatSearch = std::shared_ptr<CombatSearch>(new CombatSearch_IntegralMCTS(m_params, outputDir, resultsFile));
+            combatSearch = std::unique_ptr<CombatSearch>(new CombatSearch_IntegralMCTS(m_params, outputDir, resultsFile));
         }
         else
         {

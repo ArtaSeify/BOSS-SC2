@@ -11,6 +11,7 @@ CombatSearch_IntegralDataFinishedUnits::CombatSearch_IntegralDataFinishedUnits()
     , m_bestIntegralGameState(GameState())
 {
     m_integralStack.push_back(IntegralDataFinishedUnits());
+    m_bestIntegralStack = m_integralStack;
 }
 
 void CombatSearch_IntegralDataFinishedUnits::update(const GameState & state, const BuildOrderAbilities & buildOrder, const CombatSearchParameters & params, Timer & timer)
@@ -71,7 +72,7 @@ void CombatSearch_IntegralDataFinishedUnits::update(const GameState & state, con
         addChronoBoostEntry(cbStartFrame, cbFinishFrame, params);
 
     }
-
+    
     // we have found a new best if:
         // 1. the new army integral is higher than the previous best
         // 2. the new army integral is the same as the old best but the build order is 'better'
@@ -96,7 +97,7 @@ void CombatSearch_IntegralDataFinishedUnits::update(const GameState & state, con
 
 void CombatSearch_IntegralDataFinishedUnits::addUnitEntry(const GameState & state, int unitIndex, TimeType startFrame, TimeType endFrame, const CombatSearchParameters & params)
 {
-    FracType value = (Eval::ArmyResourceUnit(state, unitIndex) / 100) + m_integralStack.back().eval;
+    FracType value = Eval::ArmyResourceUnit(state, unitIndex) + m_integralStack.back().eval;
     TimeType timeElapsed = endFrame - m_integralStack.back().timeFinished;
     FracType valueToAdd = m_integralStack.back().eval * timeElapsed;
     FracType integralToThisPoint = m_integralStack.back().integral_ToThisPoint + valueToAdd;

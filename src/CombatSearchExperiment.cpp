@@ -53,8 +53,8 @@ CombatSearchExperiment::CombatSearchExperiment(const std::string & name, const j
             BOSS_ASSERT(val.count("SortActions") && val["SortActions"].is_boolean(), "IntegralSearch must have a SortActions bool");
             m_params.setSortActions(val["SortActions"]);
 
-            BOSS_ASSERT(val.count("SaveResults") && val["SaveResults"].is_boolean(), "IntegralSearch must have a SaveResults bool");
-            m_params.setSaveResults(val["SaveResults"]);
+            BOSS_ASSERT(val.count("SaveStates") && val["SaveStates"].is_boolean(), "IntegralSearch must have a SaveStates bool");
+            m_params.setSaveStates(val["SaveStates"]);
         }
 
         else if (searchType == "IntegralMCTS")

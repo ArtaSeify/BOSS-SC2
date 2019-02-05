@@ -26,6 +26,8 @@ namespace BOSS
         Edge();
         Edge(const Action & action, std::shared_ptr<Node> parent);
 
+        void cleanUp();
+
         void updateEdge(FracType newActionValue);
         
         const Action & getAction() const { return m_action; }

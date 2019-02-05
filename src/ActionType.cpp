@@ -108,6 +108,7 @@ namespace ActionTypes
     std::vector<ActionType> supplyProviderActionTypes;
     std::vector<ActionType> resourceDepotActionTypes;
     std::vector<ActionType> specialActionTypes;
+    std::vector<ActionType> detectorTypes;
 
     void Init()
     {
@@ -122,6 +123,7 @@ namespace ActionTypes
         supplyProviderActionTypes.push_back(ActionTypes::GetActionType("Pylon"));
         resourceDepotActionTypes.push_back(ActionTypes::GetActionType("Nexus"));
         specialActionTypes.push_back(ActionTypes::GetActionType("ChronoBoost"));
+        detectorTypes.push_back(ActionTypes::GetActionType("Observer"));
 
         workerActionTypes.push_back(ActionTypes::GetActionType("SCV"));
         refineryActionTypes.push_back(ActionTypes::GetActionType("Refinery"));
@@ -132,6 +134,7 @@ namespace ActionTypes
         refineryActionTypes.push_back(ActionTypes::GetActionType("Extractor"));
         supplyProviderActionTypes.push_back(ActionTypes::GetActionType("Overlord"));
         resourceDepotActionTypes.push_back(ActionTypes::GetActionType("Hatchery"));
+        //detectorTypes.push_back(ActionTypes::GetActionType("Overseer"));
 
         // calculate all action prerequisites
         for (size_t i(0); i < allActionTypes.size(); ++i)
@@ -171,6 +174,11 @@ namespace ActionTypes
     ActionType GetSpecialAction(RaceID raceID)
     {
         return specialActionTypes[raceID];
+    }
+
+    ActionType GetDetector(RaceID raceID)
+    {
+        return detectorTypes[raceID];
     }
     
     ActionType GetActionType(const std::string & name)
