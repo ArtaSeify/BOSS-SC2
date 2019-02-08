@@ -10,37 +10,38 @@
 
 namespace BOSS
 {
-    using Vector_Unit = BoundedVector<Unit, 70>;
-    using Vector_BuildingUnits = BoundedVector<NumUnits, 25>;
-    using Vector_FinishedUnits = BoundedVector<NumUnits, 50>;
-    using Vector_AbilityAction = BoundedVector<AbilityAction, 7>;
+    //using Vector_Unit = BoundedVector<Unit, 70>;
+    //using Vector_BuildingUnits = BoundedVector<NumUnits, 25>;
+    //using Vector_FinishedUnits = BoundedVector<NumUnits, 50>;
+    //using Vector_AbilityAction = BoundedVector<AbilityAction, 7>;
 class GameState 
 {
     //Vector_Unit             m_units;
     //Vector_BuildingUnits    m_unitsBeingBuilt;      // indices of m_units which are not completed, sorted descending by finish time
     //Vector_FinishedUnits    m_unitsSortedEndFrame;  // indices of m_units which are completed, in order
     //Vector_AbilityAction    m_chronoBoosts;
-    std::vector<Unit>             m_units;
-    std::vector<NumUnits>    m_unitsBeingBuilt;      // indices of m_units which are not completed, sorted descending by finish time
-    std::vector<NumUnits>    m_unitsSortedEndFrame;  // indices of m_units which are completed, in order
-    std::vector<AbilityAction>    m_chronoBoosts;
-    RaceID                  m_race;
-    FracType                m_minerals;
-    FracType                m_gas;
-    NumUnits                m_currentSupply;
-    NumUnits                m_maxSupply;
-    NumUnits                m_inProgressSupply;     // the amount of supply that is in construction 
-    TimeType                m_currentFrame;
-    TimeType                m_previousFrame;
-    NumUnits                m_mineralWorkers;
-    NumUnits                m_gasWorkers;
-    NumUnits                m_buildingWorkers;
-    NumUnits                m_numRefineries;
-    NumUnits                m_inProgressRefineries;     // the amount of refineries being built
-    NumUnits                m_numDepots;
-    NumUnits                m_inProgressDepots;         // the amount of depots being built
-    ActionType              m_lastAction;
-    AbilityAction           m_lastAbility;
+    std::vector<Unit>           m_units;
+    std::vector<NumUnits>       m_unitsBeingBuilt;      // indices of m_units which are not completed, sorted descending by finish time
+    std::vector<NumUnits>       m_unitsSortedEndFrame;  // indices of m_units which are completed, in order
+    std::vector<AbilityAction>  m_chronoBoosts;
+    std::vector<bool>           m_unitTypes;             // a vector containing all the unit types we have
+    RaceID                      m_race;
+    FracType                    m_minerals;
+    FracType                    m_gas;
+    NumUnits                    m_currentSupply;
+    NumUnits                    m_maxSupply;
+    NumUnits                    m_inProgressSupply;     // the amount of supply that is in construction 
+    TimeType                    m_currentFrame;
+    TimeType                    m_previousFrame;
+    NumUnits                    m_mineralWorkers;
+    NumUnits                    m_gasWorkers;
+    NumUnits                    m_buildingWorkers;
+    NumUnits                    m_numRefineries;
+    NumUnits                    m_inProgressRefineries;     // the amount of refineries being built
+    NumUnits                    m_numDepots;
+    NumUnits                    m_inProgressDepots;         // the amount of depots being built
+    ActionType                  m_lastAction;
+    AbilityAction               m_lastAbility;
  
     int                     getBuilderID(ActionType type)               const;
     bool                    haveBuilder(ActionType type)                const;

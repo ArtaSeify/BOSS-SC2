@@ -1,7 +1,7 @@
 {
     "Experiments" : 
     {    
-        "test" :
+        "MCTSTrueFlag" :
         {
             "Run"               : [ true, 5 ],
             "SearchType"        : [ "IntegralMCTS", 1.0, 100000 ],

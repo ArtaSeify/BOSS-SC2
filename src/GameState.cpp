@@ -39,6 +39,7 @@ GameState::GameState(const std::vector<Unit> & unitVector, RaceID race, FracType
     NumUnits currentSupply, NumUnits maxSupply, NumUnits mineralWorkers, NumUnits gasWorkers,
     NumUnits builerWorkers, TimeType currentFrame, NumUnits numRefineries, NumUnits numDepots)
     : m_units (unitVector)
+    , m_unitTypes(ActionTypes::GetRaceActionCount(race), 0)
     , m_race(race)
     , m_minerals(minerals)
     , m_gas(gas)
@@ -73,6 +74,8 @@ GameState::GameState(const std::vector<Unit> & unitVector, RaceID race, FracType
                 m_inProgressDepots++;
             }
         }
+
+        m_unitTypes[unit.getType().getRaceActionID()] = true;
         std::cout << "name: " << unit.getType().getName() << std::endl;
     }
     std::cout << Races::GetRaceName(m_race) << std::endl;
@@ -302,7 +305,7 @@ void GameState::completeUnit(Unit & unit)
     unit.complete(m_currentFrame);
     m_maxSupply += unit.getType().supplyProvided();
     m_inProgressSupply -= unit.getType().supplyProvided();
-
+       
     // stores units in the order they were finished, except the units we start with
     if (m_units[unit.getID()].getBuilderID() != -1)
     {
@@ -351,6 +354,13 @@ void GameState::addUnit(ActionType type, NumUnits builderID)
     m_units.push_back(unit);
     m_currentSupply += unit.getType().supplyCost();
     m_inProgressSupply += unit.getType().supplyProvided();
+
+    if (m_unitTypes.size() == 0)
+    {
+        m_unitTypes = std::vector<bool>(ActionTypes::GetRaceActionCount(m_race), false);
+    }
+
+    m_unitTypes[unit.getType().getRaceActionID()] = true;
 
     if (type.isDepot())
     {
@@ -660,7 +670,7 @@ int GameState::getBuilderID(ActionType action) const
 bool GameState::haveBuilder(ActionType type) const
 {
     // check if it's built by a worker. Speeds things up
-    if (type.whatBuilds() == ActionTypes::GetWorker(m_race))
+    /*if (type.whatBuilds() == ActionTypes::GetWorker(m_race))
     {
         if (m_mineralWorkers > 0 || m_gasWorkers > 0 || m_buildingWorkers > 0)
         {
@@ -669,15 +679,29 @@ bool GameState::haveBuilder(ActionType type) const
 
         return false;
     }
-
-    return std::any_of(m_units.rbegin(), m_units.rend(), 
+    bool bruteforceresult = false;
+    bruteforceresult = std::any_of(m_units.rbegin(), m_units.rend(),
            [&type](const Unit & u){ return u.whenCanBuild(type) != -1; });
+    */
+
+    return m_unitTypes[type.whatBuilds().getRaceActionID()];
 }
 
 bool GameState::havePrerequisites(ActionType type) const
 {
-    return std::all_of(type.required().begin(), type.required().end(), 
+    /*return std::all_of(type.required().begin(), type.required().end(), 
            [this](ActionType req) { return this->haveType(req); });
+    */
+
+    for (const ActionType & req : type.required())
+    {
+        if (!m_unitTypes[req.getRaceActionID()])
+        {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 int GameState::getNumInProgress(ActionType action) const

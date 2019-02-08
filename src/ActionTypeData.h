@@ -13,6 +13,7 @@ namespace BOSS
         std::string                 name            = "None";
         std::string                 raceName        = "None";
         ActionID                    id              = 0;
+        ActionID                    raceActionID    = 0;
         RaceID                      race            = Races::None;            
         int                         mineralCost     = 0;      
         int                         gasCost         = 0;       
@@ -22,7 +23,7 @@ namespace BOSS
         int                         buildTime       = 0;
         int                         numProduced     = 1;
         int                         startingEnergy  = 0;
-        int                            maxEnergy       = 0;
+        int                         maxEnergy       = 0;
         bool                        isUnit          = false;
         bool                        isUpgrade       = false;
         bool                        isAbility       = false;
@@ -33,6 +34,7 @@ namespace BOSS
         bool                        isDepot         = false;
         bool                        isAddon         = false;
         ActionType                  whatBuilds;
+        std::vector<bool>           whatBuildsVector;           // the size of this vector is the number of actions of this actions' race. 
         uint4                       whatBuildsCount = 1;
         ActionType                  whatBuildsAddon;
         std::string                 whatBuildsStr;
@@ -44,6 +46,7 @@ namespace BOSS
         std::vector<ActionType>     required;
 
         static void Init(const json & filename);
+        static void CreateActionTypeData(const json & actions, RaceID race);
         static const ActionTypeData & GetActionTypeData(const ActionID & action);
         static const ActionTypeData & GetActionTypeData(const std::string & name);
         static const std::vector<ActionTypeData> & GetAllActionTypeData();

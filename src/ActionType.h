@@ -21,6 +21,7 @@ namespace BOSS
         const std::string & getName() const;
 
         ActionID getID()             const;
+        ActionID getRaceActionID()   const;
         RaceID   getRace()           const;
     
         int  buildTime()        const;
@@ -44,6 +45,7 @@ namespace BOSS
         bool isMorphed()        const;
     
         ActionType whatBuilds() const;
+        const std::vector<bool> & whatBuildsVector() const;
         const std::string & whatBuildsStatus() const;
         ActionType whatBuildsAddon() const;
         const std::vector<ActionType> & required() const;
@@ -60,6 +62,7 @@ namespace BOSS
     {
         void Init();
         const std::vector<ActionType> & GetAllActionTypes();
+        int GetRaceActionCount(RaceID raceID);
         ActionType GetWorker(RaceID raceID);
         ActionType GetSupplyProvider(RaceID raceID);
         ActionType GetRefinery(RaceID raceID);

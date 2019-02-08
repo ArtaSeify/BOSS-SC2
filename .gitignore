@@ -29,3 +29,5 @@ emscripten/BOSS.data
 /MCTS Results/parsed data
 /MCTS Results/graphs
 /MCTS Results/big range
+/bin/AverageValue
+/MCTS Results/values

@@ -1,13 +1,22 @@
 import numpy as np
 import pickle
 import os
+
 flags = ["TrueFlag", "FalseFlag"]
+data_files_folder = "values"
 
 original_dir = os.getcwd()
 
 for flag in flags:
-	data_dir = os.path.join(os.path.join(os.getcwd(), "small range"), flag)
-	save_dir = os.path.join(os.getcwd(), "parsed data")
+	data_dir = os.path.join(os.path.join(os.getcwd(), data_files_folder), flag)
+	save_dir = os.path.join(os.path.join(os.getcwd(), "parsed data"), data_files_folder)
+
+	if not os.path.isdir(data_dir):
+		print("data directory doesn't exist!")
+		break
+
+	if not os.path.isdir(save_dir):
+		os.makedirs(save_dir)
 
 	os.chdir(data_dir)
 	directories = os.listdir(os.getcwd())

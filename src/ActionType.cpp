@@ -39,6 +39,7 @@ ActionType & ActionType::operator = (ActionType & rhs)
 #endif
 
 ActionID ActionType::getID()   const { return m_id; }
+ActionID ActionType::getRaceActionID() const { return ActionTypeData::GetActionTypeData(m_id).raceActionID; }
 RaceID   ActionType::getRace() const { return ActionTypeData::GetActionTypeData(m_id).race; }
 const std::string & ActionType::getName() const { return ActionTypeData::GetActionTypeData(m_id).name; }
     
@@ -49,7 +50,7 @@ int  ActionType::supplyCost()        const { return ActionTypeData::GetActionTyp
 int  ActionType::energyCost()        const { return ActionTypeData::GetActionTypeData(m_id).energyCost; }
 int  ActionType::supplyProvided()    const { return ActionTypeData::GetActionTypeData(m_id).supplyProvided; }
 int  ActionType::numProduced()       const { return ActionTypeData::GetActionTypeData(m_id).numProduced; }
-int  ActionType::startingEnergy()     const { return ActionTypeData::GetActionTypeData(m_id).startingEnergy; }
+int  ActionType::startingEnergy()    const { return ActionTypeData::GetActionTypeData(m_id).startingEnergy; }
 int  ActionType::maxEnergy()         const { return ActionTypeData::GetActionTypeData(m_id).maxEnergy; }
 bool ActionType::isAddon()           const { return ActionTypeData::GetActionTypeData(m_id).isAddon; }
 bool ActionType::isRefinery()        const { return ActionTypeData::GetActionTypeData(m_id).isRefinery; }
@@ -65,6 +66,11 @@ bool ActionType::isMorphed()         const { return false; }
 ActionType ActionType::whatBuilds() const
 {
     return ActionTypeData::GetActionTypeData(m_id).whatBuilds;
+}
+
+const std::vector<bool> & ActionType::whatBuildsVector() const
+{
+    return ActionTypeData::GetActionTypeData(m_id).whatBuildsVector;
 }
 
 const std::string & ActionType::whatBuildsStatus() const
@@ -103,6 +109,7 @@ namespace ActionTypes
 {
     std::vector<ActionType> allActionTypes;
     std::map<std::string, ActionType> nameMap;
+    std::vector<int>        raceActionTypesCount = std::vector<int>(3, 0);
     std::vector<ActionType> workerActionTypes;
     std::vector<ActionType> refineryActionTypes;
     std::vector<ActionType> supplyProviderActionTypes;
@@ -116,6 +123,8 @@ namespace ActionTypes
         {
             allActionTypes.push_back(ActionType(i));
             nameMap[allActionTypes[i].getName()] = allActionTypes[i];
+            
+            raceActionTypesCount[allActionTypes[i].getRace()]++;
         }
 
         workerActionTypes.push_back(ActionTypes::GetActionType("Probe"));
@@ -149,6 +158,11 @@ namespace ActionTypes
             CalculateRecursivePrerequisites(recursivePrerequisites, allActionTypes[i]);
             allActionRecursivePrerequisites.push_back(recursivePrerequisites);
         }
+    }
+
+    int GetRaceActionCount(RaceID raceID)
+    {
+        return raceActionTypesCount[raceID];
     }
 
     ActionType GetWorker(RaceID raceID)
