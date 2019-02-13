@@ -10,13 +10,15 @@ namespace BOSS
         FracType m_exploration_parameter;
 
         int m_numSimulations;
-        int m_writeEveryKSimulations;
-        std::stringstream m_ss;
-
+        int m_simulationsPerStep;
+        
         std::mt19937 m_rnggen;
-
-        std::string m_save_dir;
-        std::string m_file_prefix;
+        
+        int m_writeEveryKSimulations;
+        std::string m_resultsSaveDir;
+        std::string m_resultsFilePrefix;
+        std::stringstream m_resultsStream;
+        std::stringstream m_dataStream;
 
         CombatSearch_IntegralDataFinishedUnits m_promisingNodeIntegral;
         BuildOrderAbilities m_promisingNodeBuildOrder;
@@ -50,8 +52,12 @@ namespace BOSS
         virtual void printResults();
 
     public:
-        CombatSearch_IntegralMCTS(const CombatSearchParameters p = CombatSearchParameters(), const std::string & dir = "", const std::string & prefix = "");
+        CombatSearch_IntegralMCTS(const CombatSearchParameters p = CombatSearchParameters(), const std::string & dir = "", 
+                                                                    const std::string & prefix = "", const std::string & name = "");
 
+        ~CombatSearch_IntegralMCTS();
+
+        int getNumSimulations() const { return m_numSimulations; }
     };
 }
 

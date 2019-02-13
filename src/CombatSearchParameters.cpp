@@ -177,6 +177,16 @@ int CombatSearchParameters::getNumberOfSimulations() const
     return m_numberOfSimulations;
 }
 
+void CombatSearchParameters::setSimulationsPerStep(int value)
+{
+    m_simulationsPerStep = value;
+}
+
+int CombatSearchParameters::getSimulationsPerStep() const
+{
+    return m_simulationsPerStep;
+}
+
 void CombatSearchParameters::print()
 {
     printf("\n\nSearch Parameter Information\n\n");

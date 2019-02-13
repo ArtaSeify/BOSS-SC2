@@ -1,19 +1,41 @@
 #include "CombatSearch_IntegralMCTS.h"
+#include "FileTools.h"
 #include <random>
 
 using namespace BOSS;
 
-CombatSearch_IntegralMCTS::CombatSearch_IntegralMCTS(const CombatSearchParameters p, const std::string & dir, const std::string & prefix)
+CombatSearch_IntegralMCTS::CombatSearch_IntegralMCTS(const CombatSearchParameters p, const std::string & dir, 
+                                                        const std::string & prefix, const std::string & name)
     : m_exploration_parameter (p.getExplorationValue())
 {
     m_params = p;
 
+    m_simulationsPerStep = m_params.getSimulationsPerStep();
     m_writeEveryKSimulations = 10;
-    m_save_dir = dir;
-    m_file_prefix = prefix;
+    m_resultsSaveDir = dir;
+    m_resultsFilePrefix = prefix;
 
     std::random_device rd; // obtain a random number from hardware
     m_rnggen.seed(rd());
+
+    if (m_params.getSaveStates())
+    {
+        std::string dataDir = "../bin/data/DataTuples";
+        FileTools::MakeDirectory(dataDir);
+        dataDir += "/" + name + ".csv";
+        
+        m_file.open(dataDir, std::ofstream::out | std::ofstream::app);
+    }
+}
+
+CombatSearch_IntegralMCTS::~CombatSearch_IntegralMCTS()
+{
+    if (m_params.getSaveStates())
+    {
+        m_file << m_dataStream.str();
+        m_dataStream.str(std::string());
+        m_file.close();
+    }
 }
 
 void CombatSearch_IntegralMCTS::recurse(const GameState & state, int depth)
@@ -23,14 +45,34 @@ void CombatSearch_IntegralMCTS::recurse(const GameState & state, int depth)
     int simulationsWritten = 0;
 
     std::shared_ptr<Node> root = std::make_shared<Node>(state);
+    std::shared_ptr<Node> currentRoot = root;
 
     while (!timeLimitReached() && m_numSimulations < m_params.getNumberOfSimulations())
     {
+        // change the root of the tree. Remove all the nodes and edges that are now irrelevant
+        if (m_numSimulations > 0 && m_numSimulations%m_simulationsPerStep == 0)
+        {
+            if (currentRoot->getNumEdges() == 0)
+            {
+                break;
+            }
+            std::shared_ptr<Edge> childEdge = currentRoot->getHighestValueChild(m_params);
+
+            if (m_params.getSaveStates())
+            {
+                currentRoot->getState().writeToSS(m_dataStream);
+                m_dataStream << "," << childEdge->getValue() << std::endl;
+            }
+            
+            currentRoot->removeEdges(childEdge);
+            currentRoot = childEdge->getChild();
+            BOSS_ASSERT(currentRoot != nullptr, "currentRoot has become null");
+        }
         /*if ((m_numSimulations % 1000) == 0)
         {
             std::cout << "have run : " << m_numSimulations << " simulations thus far." << std::endl;
         }*/
-        auto & nodePair = getPromisingNode(root);
+        auto & nodePair = getPromisingNode(currentRoot);
         std::shared_ptr<Node> promisingNode = nodePair.first;
         
         // a node that isn't part of the graph yet. We just simulate from this point
@@ -63,7 +105,7 @@ void CombatSearch_IntegralMCTS::recurse(const GameState & state, int depth)
 
         if (m_numSimulations%m_writeEveryKSimulations == 0)
         {
-            writeResultsToFile(root, ++simulationsWritten);
+            writeResultsToFile(currentRoot, ++simulationsWritten);
         }
     }
     
@@ -272,21 +314,17 @@ void CombatSearch_IntegralMCTS::pickBestBuildOrder(std::shared_ptr<Node> root,  
 
 void CombatSearch_IntegralMCTS::writeResultsToFile(std::shared_ptr<Node> root, int simulationsWritten)
 {
-
-    pickBestBuildOrder(root, true);
-    FracType mostVisitedRoute = m_promisingNodeIntegral.getCurrentStackValue();
-
     pickBestBuildOrder(root, false);
     FracType highestValueRoute = m_promisingNodeIntegral.getCurrentStackValue();
 
-    m_ss << mostVisitedRoute << "," << highestValueRoute << "\n";
+    m_resultsStream << highestValueRoute << ",";
 
     if (simulationsWritten%int(std::floor(m_params.getNumberOfSimulations() / (2 * m_writeEveryKSimulations))) == 0)
     {
-        std::ofstream file(m_save_dir + "/" + m_file_prefix + "_Results.csv", std::ofstream::out | std::ofstream::app);
-        file << m_ss.str();
+        std::ofstream file(m_resultsSaveDir + "/" + m_resultsFilePrefix + "_Results.csv", std::ofstream::out | std::ofstream::app);
+        file << m_resultsStream.str();
         file.close();
-        m_ss.str(std::string());
+        m_resultsStream.str(std::string());
     }
 }
 

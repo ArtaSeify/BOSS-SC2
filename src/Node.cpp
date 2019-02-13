@@ -88,6 +88,22 @@ void Node::createChildrenEdges(ActionSetAbilities & legalActions, const CombatSe
     }
 }
 
+void Node::removeEdges(std::shared_ptr<Edge> edge)
+{
+    for (auto it = m_edges.begin(); it != m_edges.end();)
+    {
+        if ((*it)->getAction() != edge->getAction())
+        {
+            (*it)->cleanUp();
+            it = m_edges.erase(it);
+        }
+        else
+        {
+            ++it;
+        }
+    }
+}
+
 bool Node::doAction(std::shared_ptr<Edge> edge, const CombatSearchParameters & params)
 {
     const Action & action = edge->getAction();
@@ -305,5 +321,5 @@ std::shared_ptr<Edge> Node::getChild(const ActionType & action)
     }
 
     BOSS_ASSERT(false, "Tried to get edge with action %s, but it doesn't exist", action.getName().c_str());
-    return std::make_shared<Edge>();
+    return std::make_shared<Edge>(ActionSetAbilities::ActionTargetPair(ActionTypes::None, 0), nullptr);
 }

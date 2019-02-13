@@ -127,6 +127,12 @@ IntegralExperiment::IntegralExperiment(const std::string & experimentName, const
         BOSS_ASSERT(brVal.count("EnemyBuildOrder") && brVal["EnemyBuildOrder"].is_string(), "BestResponseParams must have a 'EnemyBuildOrder' string");
         m_params.setEnemyBuildOrder(BOSSConfig::Instance().GetBuildOrder(brVal["EnemyBuildOrder"]));
     }
+
+    if (exp.count("SimulationsPerStep"))
+    {
+        BOSS_ASSERT(exp["SimulationsPerStep"].is_number_integer(), "SimulationsPerStep must be an integer");
+        m_params.setSimulationsPerStep(exp["SimulationsPerStep"]);
+    }
 }
 
 void IntegralExperiment::run(int numberOfRuns)
@@ -147,7 +153,7 @@ void IntegralExperiment::run(int numberOfRuns)
 
         if (m_searchType == "Integral")
         {
-            combatSearch = std::unique_ptr<CombatSearch>(new CombatSearch_Integral(m_params));
+            combatSearch = std::unique_ptr<CombatSearch>(new CombatSearch_Integral(m_params, i));
             //resultsFile += "_Integral";
         }
         else if (m_searchType == "Bucket")
@@ -163,7 +169,7 @@ void IntegralExperiment::run(int numberOfRuns)
         else if (m_searchType == "IntegralMCTS")
         {
             //resultsFile += "_IntegralMCTS";
-            combatSearch = std::unique_ptr<CombatSearch>(new CombatSearch_IntegralMCTS(m_params, outputDir, resultsFile));
+            combatSearch = std::unique_ptr<CombatSearch>(new CombatSearch_IntegralMCTS(m_params, outputDir, resultsFile, name));
         }
         else
         {

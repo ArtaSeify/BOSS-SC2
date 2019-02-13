@@ -4,11 +4,14 @@
 
 using namespace BOSS;
 
-CombatSearch_Integral::CombatSearch_Integral(const CombatSearchParameters p)
+CombatSearch_Integral::CombatSearch_Integral(const CombatSearchParameters p, int run)
 {
     m_params = p;
 
-    m_file.open("../bin/data/states.csv", std::ofstream::out | std::ofstream::trunc);
+    if (m_params.getSaveStates())
+    {
+        m_file.open("../bin/data/stateValuePairs_" + std::to_string(run) + ".csv", std::ofstream::out | std::ofstream::app);
+    }
 
     //BOSS_ASSERT(m_params.getInitialState().getRace() != Races::None, "Combat search initial state is invalid");
 }

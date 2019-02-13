@@ -27,7 +27,7 @@ namespace BOSS
 
     public:
     
-        CombatSearch_Integral(const CombatSearchParameters p = CombatSearchParameters());
+        CombatSearch_Integral(const CombatSearchParameters p = CombatSearchParameters(), int run = 0);
         ~CombatSearch_Integral();
     
         FracType CombatSearch_Integral::recurseReturnValue(const GameState & state, int depth);

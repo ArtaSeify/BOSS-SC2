@@ -26,6 +26,9 @@ namespace BOSS
         // from this state
         void createChildrenEdges(ActionSetAbilities & legalActions, const CombatSearchParameters & params);
 
+        // removes all edges except the one passed as a parameter
+        void removeEdges(std::shared_ptr<Edge> edge);
+
         // does action at index of actions. Returns true if the action is sucessful
         // and the state is valid (doesn't go past the time limit). Otherwise returns false
         bool doAction(std::shared_ptr<Edge> edge, const CombatSearchParameters & params);

@@ -1,10 +1,11 @@
 {
     "Experiments" : 
     {    
-        "MCTSTrueFlag" :
+        "test" :
         {
-            "Run"               : [ true, 5 ],
-            "SearchType"        : [ "IntegralMCTS", 1.0, 100000 ],
+            "Run"               : [ true, 20 ],
+            "SearchType"        : [ "IntegralMCTS", 1.0, 10000 ],
+            "SimulationsPerStep": 1000,
             "Race"              : "Protoss",
             "StartingState"     : "Protoss Start State",
             "PrintNewBest"      : false,
@@ -16,7 +17,7 @@
             "AlwaysMakeWorkers" : true,
             "OpeningBuildOrder" : "Empty",
             "SortActions"       : false,
-            "SaveStates"        : false
+            "SaveStates"        : true
         }
     },
 

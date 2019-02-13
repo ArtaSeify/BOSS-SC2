@@ -9,7 +9,7 @@ int Edge::NODE_VISITS_BEFORE_EXPAND = 1;
 Edge::Edge()
     : m_timesVisited(0)
     , m_value(0)
-    , m_action(std::pair<ActionType, NumUnits>(ActionTypes::None, 0))
+    , m_action(Action(ActionTypes::None, 0))
     , m_child()
     , m_parent()
 {

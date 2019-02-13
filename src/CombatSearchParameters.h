@@ -107,6 +107,7 @@ namespace BOSS
         bool m_saveStates;
         FracType m_explorationValue;
         int m_numberOfSimulations;
+        int m_simulationsPerStep;
 
     public:
 
@@ -157,6 +158,9 @@ namespace BOSS
 
         void setNumberOfSimulations(int value);
         int getNumberOfSimulations() const;
+
+        void setSimulationsPerStep(int value);
+        int getSimulationsPerStep() const;
     
         void print();
     };

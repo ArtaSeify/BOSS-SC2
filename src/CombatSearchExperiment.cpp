@@ -151,7 +151,7 @@ void CombatSearchExperiment::run()
 
         if (m_searchTypes[i] == "Integral")
         {
-            combatSearch = std::shared_ptr<CombatSearch>(new CombatSearch_Integral(m_params));
+            combatSearch = std::shared_ptr<CombatSearch>(new CombatSearch_Integral(m_params, i));
             resultsFile += "_Integral"; 
         }
         else if (m_searchTypes[i] == "Bucket")
@@ -167,7 +167,7 @@ void CombatSearchExperiment::run()
         else if (m_searchTypes[i] == "IntegralMCTS")
         {
             resultsFile += "_IntegralMCTS";
-            combatSearch = std::shared_ptr<CombatSearch>(new CombatSearch_IntegralMCTS(m_params, m_outputDir, resultsFile));
+            combatSearch = std::shared_ptr<CombatSearch>(new CombatSearch_IntegralMCTS(m_params, m_outputDir, resultsFile, m_name));
         }
         else
         {
