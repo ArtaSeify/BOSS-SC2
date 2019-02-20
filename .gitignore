@@ -22,7 +22,6 @@ emscripten/BOSS.data
 *.o
 /bin/WTF.txt
 /vs/x64
-/bin/data
 /bin/results2
 /bin/test
 /MCTS Results/small range
@@ -37,3 +36,7 @@ emscripten/BOSS.data
 /bin/asd.py
 /bin/test2.py
 /bin/boost_python36-vc141-mt-x64-1_69.dll
+/bin/data/model_accuracy
+/bin/data/models
+/bin/data/logs
+/bin/data/DataTuples/SearchData
