@@ -3,8 +3,8 @@
     {    
         "test" :
         {
-            "Run"               : [ true, 20 ],
-            "SearchType"        : [ "IntegralMCTS", 1.0, 10000 ],
+            "Run"               : [ true, 1 ],
+            "SearchType"        : [ "IntegralMCTS", 1.0, 1000000 ],
             "SimulationsPerStep": 1000,
             "Race"              : "Protoss",
             "StartingState"     : "Protoss Start State",
@@ -17,7 +17,8 @@
             "AlwaysMakeWorkers" : true,
             "OpeningBuildOrder" : "Empty",
             "SortActions"       : false,
-            "SaveStates"        : true
+            "SaveStates"        : true,
+            "UseNetwork"        : false
         }
     },
 

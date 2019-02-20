@@ -44,6 +44,9 @@ IntegralExperiment::IntegralExperiment(const std::string & experimentName, const
     BOSS_ASSERT(exp.count("SaveStates") && exp["SaveStates"].is_boolean(), "IntegralSearch must have a SaveStates bool");
     m_params.setSaveStates(exp["SaveStates"]);
 
+    BOSS_ASSERT(exp.count("UseNetwork") && exp["UseNetwork"].is_boolean(), "IntegralSearch must have a UseNetwork bool");
+    m_params.setNetworkEvaluation(exp["UseNetwork"]);
+
     const std::string & searchType = exp["SearchType"][0].get<std::string>();
     m_searchType = searchType;
 
@@ -169,7 +172,7 @@ void IntegralExperiment::run(int numberOfRuns)
         else if (m_searchType == "IntegralMCTS")
         {
             //resultsFile += "_IntegralMCTS";
-            combatSearch = std::unique_ptr<CombatSearch>(new CombatSearch_IntegralMCTS(m_params, outputDir, resultsFile, name));
+            combatSearch = std::unique_ptr<CombatSearch>(new CombatSearch_IntegralMCTS(m_params, outputDir, resultsFile, m_name));
         }
         else
         {

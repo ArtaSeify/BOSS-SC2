@@ -20,11 +20,16 @@ CombatSearch_IntegralMCTS::CombatSearch_IntegralMCTS(const CombatSearchParameter
 
     if (m_params.getSaveStates())
     {
-        std::string dataDir = "../bin/data/DataTuples";
+        std::string dataDir = "../bin/data/DataTuples/SearchData";
         FileTools::MakeDirectory(dataDir);
-        dataDir += "/" + name + ".csv";
+        dataDir += "/SearchData.csv";
         
         m_file.open(dataDir, std::ofstream::out | std::ofstream::app);
+    }
+
+    if (m_params.useNetworkEvaluation())
+    {
+        FileTools::MakeDirectory("../bin/data/DataTuples/PredictionData");
     }
 }
 
@@ -32,7 +37,7 @@ CombatSearch_IntegralMCTS::~CombatSearch_IntegralMCTS()
 {
     if (m_params.getSaveStates())
     {
-        m_file << m_dataStream.str();
+        m_file << m_dataStream.rdbuf();
         m_dataStream.str(std::string());
         m_file.close();
     }
@@ -52,21 +57,21 @@ void CombatSearch_IntegralMCTS::recurse(const GameState & state, int depth)
         // change the root of the tree. Remove all the nodes and edges that are now irrelevant
         if (m_numSimulations > 0 && m_numSimulations%m_simulationsPerStep == 0)
         {
+            std::shared_ptr<Edge> childEdge = currentRoot->getHighestValueChild(m_params);
+            
+            // we have made a choice, so we need to update the integral and build order permanently
+            updateBOIntegral(*(childEdge->getChild()), childEdge->getAction(), currentRoot->getState(), true);
+
+            currentRoot->removeEdges(childEdge);
+            currentRoot = childEdge->getChild();
+
+            BOSS_ASSERT(currentRoot != nullptr, "currentRoot has become null");      
+
+            // search is over
             if (currentRoot->getNumEdges() == 0)
             {
                 break;
             }
-            std::shared_ptr<Edge> childEdge = currentRoot->getHighestValueChild(m_params);
-
-            if (m_params.getSaveStates())
-            {
-                currentRoot->getState().writeToSS(m_dataStream);
-                m_dataStream << "," << childEdge->getValue() << std::endl;
-            }
-            
-            currentRoot->removeEdges(childEdge);
-            currentRoot = childEdge->getChild();
-            BOSS_ASSERT(currentRoot != nullptr, "currentRoot has become null");
         }
         /*if ((m_numSimulations % 1000) == 0)
         {
@@ -93,8 +98,8 @@ void CombatSearch_IntegralMCTS::recurse(const GameState & state, int depth)
                 // there might be no action possible, so createChildrenEdges creates 0 edges
                 if (promisingNode->getNumEdges() > 0)
                 {
-                    // get a random child node
-                    promisingNode = promisingNode->notExpandedChild(promisingNode->getRandomEdge(), m_params);
+                    // get a child based on highest network value
+                    promisingNode = promisingNode->notExpandedChild(promisingNode->getHighestValueChild(m_params), m_params);
                 }
                 randomPlayout(*promisingNode);
             }
@@ -108,10 +113,25 @@ void CombatSearch_IntegralMCTS::recurse(const GameState & state, int depth)
             writeResultsToFile(currentRoot, ++simulationsWritten);
         }
     }
-    
-    pickBestBuildOrder(root, false);
-    m_buildOrder = m_promisingNodeBuildOrder;
-    m_integral = m_promisingNodeIntegral;
+
+    // write state data
+    if (m_params.getSaveStates())
+    {
+        std::shared_ptr<Node> currentNode = root;
+
+        int depth = 0;
+        while (currentNode != currentRoot)
+        {
+            currentNode->getState().writeToSS(m_dataStream);
+            m_dataStream << "," << m_integral.getCurrentStackValue() << "\n";
+
+            currentNode = currentNode->getHighestValueChild(m_params)->getChild();
+
+            depth++;
+        }
+        currentNode->getState().writeToSS(m_dataStream);
+        m_dataStream << "," << m_integral.getCurrentStackValue() << "\n";
+    }
 
     root->cleanUp();
 }
@@ -182,7 +202,7 @@ std::pair<std::shared_ptr<Node>, bool> CombatSearch_IntegralMCTS::getPromisingNo
         if (edge->getChild() == nullptr)
         {
             returnNode = returnNode->notExpandedChild(edge, m_params);
-            updateBOIntegral(*returnNode, edge->getAction(), prevStateNode);
+            updateBOIntegral(*returnNode, edge->getAction(), prevStateNode, false);
             return std::pair<std::shared_ptr<Node>, bool>(returnNode, true);
         }
 
@@ -191,7 +211,7 @@ std::pair<std::shared_ptr<Node>, bool> CombatSearch_IntegralMCTS::getPromisingNo
         returnNode = edge->getChild();
 
         // update build order and integral
-        updateBOIntegral(*returnNode, edge->getAction(), prevStateNode);
+        updateBOIntegral(*returnNode, edge->getAction(), prevStateNode, false);
     }
 
     return std::pair<std::shared_ptr<Node>, bool>(returnNode, false);
@@ -223,13 +243,13 @@ void CombatSearch_IntegralMCTS::doRandomAction(Node & node, const GameState & pr
     const Action & action = legalActions[distribution(m_rnggen)];
     node.doAction(action, m_params);
 
-    updateBOIntegral(node, action, prevGameState);    
+    updateBOIntegral(node, ActionAbilityPair(action.first, node.getState().getLastAbility()), prevGameState, false);    
 }
 
-void CombatSearch_IntegralMCTS::updateBOIntegral(const Node & node, const Action & action, const GameState & prevGameState)
+void CombatSearch_IntegralMCTS::updateBOIntegral(const Node & node, const ActionAbilityPair & action, const GameState & prevGameState, bool permanantUpdate)
 {
-    // if the node is terminal, we don't consider its action, instead we fastforward
-    // to the end of the timelimit and update the integrals.
+    // if the node is terminal, it means it doesn't have any children. we add the action
+    // that took us to this node, fast forward to the frame limit, and update the integral
     if (isTerminalNode(node))
     {
         GameState stateCopy(prevGameState);
@@ -237,14 +257,31 @@ void CombatSearch_IntegralMCTS::updateBOIntegral(const Node & node, const Action
         stateCopy.fastForward(m_params.getFrameTimeLimit());
 
         // update the integral. since no action is done, we don't need to update the build order
-        m_promisingNodeIntegral.update(stateCopy, m_promisingNodeBuildOrder, m_params, m_searchTimer);
+        if (permanantUpdate)
+        {
+            m_buildOrder.add(action);
+            m_integral.update(stateCopy, m_buildOrder, m_params, m_searchTimer);
+        }
+        else
+        {
+            m_promisingNodeBuildOrder.add(action);
+            m_promisingNodeIntegral.update(stateCopy, m_promisingNodeBuildOrder, m_params, m_searchTimer);
+        }
     }
 
     // add the action and calculate the integral
     else
     {
-        m_promisingNodeBuildOrder.add(action.first, action.second);
-        m_promisingNodeIntegral.update(node.getState(), m_promisingNodeBuildOrder, m_params, m_searchTimer);
+        if (permanantUpdate)
+        {
+            m_buildOrder.add(action);
+            m_integral.update(node.getState(), m_buildOrder, m_params, m_searchTimer);
+        }
+        else
+        {
+            m_promisingNodeBuildOrder.add(action);
+            m_promisingNodeIntegral.update(node.getState(), m_promisingNodeBuildOrder, m_params, m_searchTimer);
+        }
     }
 }
 
@@ -292,16 +329,10 @@ void CombatSearch_IntegralMCTS::pickBestBuildOrder(std::shared_ptr<Node> root,  
         {
             bestNode = bestNode->notExpandedChild(bestEdge, m_params);
         }
-        const Action & action = bestEdge->getAction();
+        const ActionAbilityPair & action = bestEdge->getAction();
 
-        if (action.first.isAbility())
-        {
-            m_promisingNodeBuildOrder.add(action.first, bestNode->getState().getLastAbility());
-        }
-        else
-        {
-            m_promisingNodeBuildOrder.add(action.first);
-        }
+        m_promisingNodeBuildOrder.add(action);
+
         m_promisingNodeIntegral.update(bestNode->getState(), m_promisingNodeBuildOrder, m_params, m_searchTimer);
     }
 
@@ -322,7 +353,7 @@ void CombatSearch_IntegralMCTS::writeResultsToFile(std::shared_ptr<Node> root, i
     if (simulationsWritten%int(std::floor(m_params.getNumberOfSimulations() / (2 * m_writeEveryKSimulations))) == 0)
     {
         std::ofstream file(m_resultsSaveDir + "/" + m_resultsFilePrefix + "_Results.csv", std::ofstream::out | std::ofstream::app);
-        file << m_resultsStream.str();
+        file << m_resultsStream.rdbuf();
         file.close();
         m_resultsStream.str(std::string());
     }

@@ -142,7 +142,7 @@ void CombatSearchExperiment::run()
     FileTools::MakeDirectory(m_outputDir);
 
     static std::string stars = "************************************************";
-    for (size_t i(0); i < m_searchTypes.size(); ++i)
+    for (int i(0); i < m_searchTypes.size(); ++i)
     {
         std::shared_ptr<CombatSearch> combatSearch;
         std::string resultsFile = m_name;

@@ -31,6 +31,8 @@ namespace BOSS
         void pop_back();
         void sortByPrerequisites();
 
+        void print() const;
+
         int size() const { return int(m_buildOrder.size()); }
         int getTypeCount(ActionType type) const;
         bool empty() const { return size() == 0; }

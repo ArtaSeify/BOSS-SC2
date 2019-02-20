@@ -51,6 +51,15 @@ void BuildOrderAbilities::clear()
     m_typeCount.clear();
 }
 
+void BuildOrderAbilities::print() const
+{
+    for (int index = 0; index < m_buildOrder.size(); ++index)
+    {
+        auto & pair = m_buildOrder[index];
+        std::cout << index << " " << pair.first.getName() << ", " << pair.second.targetID << std::endl;
+    }
+}
+
 int BuildOrderAbilities::getTypeCount(ActionType type) const
 {
     if (empty())

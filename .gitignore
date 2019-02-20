@@ -33,3 +33,7 @@ emscripten/BOSS.data
 /MCTS Results/values
 /bin/changingroot
 /bin/IntegralDFS/06-02-2019_12-56-04_testDFSRun0
+/bin/__pycache__
+/bin/asd.py
+/bin/test2.py
+/bin/boost_python36-vc141-mt-x64-1_69.dll

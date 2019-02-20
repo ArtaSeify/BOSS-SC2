@@ -36,7 +36,7 @@ namespace BOSS
         void doRandomAction(Node & node, const GameState & prevGameState);
     
         // updates both m_promisingNodeIntegral and m_promisingNodeBuildOrder
-        void updateBOIntegral(const Node & node, const Action & action, const GameState & prevGameState);
+        void updateBOIntegral(const Node & node, const ActionAbilityPair & action, const GameState & prevGameState, bool permanantUpdate);
 
         // updates values of the nodes explored in this iteration
         void backPropogation(std::shared_ptr<Node> node);

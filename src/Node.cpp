@@ -1,3 +1,4 @@
+#include <boost/python.hpp>
 #include "Node.h"
 #include "Eval.h"
 
@@ -41,6 +42,7 @@ void Node::createChildrenEdges(ActionSetAbilities & legalActions, const CombatSe
         return;
     }
 
+    std::stringstream outputStream;
     std::shared_ptr<Node> thisNode = shared_from_this();
     for (int index = 0; index < legalActions.size(); ++index)
     {
@@ -78,13 +80,61 @@ void Node::createChildrenEdges(ActionSetAbilities & legalActions, const CombatSe
         }
 
         // action is valid, so create an edge
-        m_edges.push_back(std::make_shared<Edge>(action, thisNode));
+        if (action.first.isAbility())
+        {
+            m_edges.push_back(std::make_shared<Edge>(ActionAbilityPair(action.first, testState.getLastAbility()), thisNode));
+        }
+        else
+        {
+            m_edges.push_back(std::make_shared<Edge>(ActionAbilityPair(action.first, AbilityAction()), thisNode));
+        }
+        
+
+        if (params.useNetworkEvaluation())
+        {
+            if (index > 0)
+            {
+                outputStream << std::endl;
+            }
+            testState.writeToSS(outputStream);
+        }
     }
 
     // no edges were created, so this is a terminal node
     if (m_edges.size() == 0)
     {
         isTerminalNode = true;
+        return;
+    }
+
+    // evaluate all the newly created edges using the network
+    if (params.useNetworkEvaluation())
+    {
+        // write all state data to file
+        std::ofstream outputFile("../bin/data/DataTuples/PredictionData/CurrentStateData.csv", std::ofstream::out | std::ofstream::trunc);
+        outputFile << outputStream.rdbuf();
+
+        // evaluate the states. the results will be stored in file
+        //something.evaluate()
+        
+        std::ifstream inputFile("../bin/data/DataTuples/PredictionData/current_state_evaluated.csv", std::ifstream::in);
+        std::stringstream allEvaluations;
+        allEvaluations << inputFile.rdbuf();
+
+        // split the evaluations
+        std::vector<FracType> values;
+        std::string value;
+        while (std::getline(allEvaluations, value, ','))
+        {
+            values.push_back(FracType(std::stof(value)));
+        }
+
+        // update the edge values
+        BOSS_ASSERT(values.size() == m_edges.size(), "number of values from network does not match the number of edges");
+        for (int index = 0; index < values.size(); ++index)
+        {
+            m_edges[index]->setNetworkValue(values[index]);
+        }
     }
 }
 
@@ -92,11 +142,19 @@ void Node::removeEdges(std::shared_ptr<Edge> edge)
 {
     for (auto it = m_edges.begin(); it != m_edges.end();)
     {
-        if ((*it)->getAction() != edge->getAction())
+        // check if action are the same
+        if ((*it)->getAction().first != edge->getAction().first)
         {
             (*it)->cleanUp();
             it = m_edges.erase(it);
         }
+        // check if targets of ability are the same
+        else if ((*it)->getAction().second.targetID != edge->getAction().second.targetID)
+        {
+            (*it)->cleanUp();
+            it = m_edges.erase(it);
+        }
+        // it equals edge, so we skip it
         else
         {
             ++it;
@@ -106,17 +164,15 @@ void Node::removeEdges(std::shared_ptr<Edge> edge)
 
 bool Node::doAction(std::shared_ptr<Edge> edge, const CombatSearchParameters & params)
 {
-    const Action & action = edge->getAction();
-    ActionType actionType = action.first;
-    NumUnits actionTarget = action.second;
+    const ActionAbilityPair & action = edge->getAction();
 
-    if (actionType.isAbility())
+    if (action.first.isAbility())
     {
-        m_state.doAbility(actionType, actionTarget);
+        m_state.doAbility(action.first, action.second.targetID);
     }
     else
     {
-        m_state.doAction(actionType);
+        m_state.doAction(action.first);
     }
 
     // if we go over the frame time limit, this node is invalid
@@ -321,5 +377,5 @@ std::shared_ptr<Edge> Node::getChild(const ActionType & action)
     }
 
     BOSS_ASSERT(false, "Tried to get edge with action %s, but it doesn't exist", action.getName().c_str());
-    return std::make_shared<Edge>(ActionSetAbilities::ActionTargetPair(ActionTypes::None, 0), nullptr);
+    return std::make_shared<Edge>(ActionAbilityPair(ActionTypes::None, AbilityAction()), nullptr);
 }

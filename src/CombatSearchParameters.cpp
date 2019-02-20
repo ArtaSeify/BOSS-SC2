@@ -187,6 +187,16 @@ int CombatSearchParameters::getSimulationsPerStep() const
     return m_simulationsPerStep;
 }
 
+void CombatSearchParameters::setNetworkEvaluation(bool value)
+{
+    m_useNetworkEvaluation = value;
+}
+
+bool CombatSearchParameters::useNetworkEvaluation() const
+{
+    return m_useNetworkEvaluation;
+}
+
 void CombatSearchParameters::print()
 {
     printf("\n\nSearch Parameter Information\n\n");
