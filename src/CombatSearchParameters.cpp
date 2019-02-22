@@ -187,14 +187,14 @@ int CombatSearchParameters::getSimulationsPerStep() const
     return m_simulationsPerStep;
 }
 
-void CombatSearchParameters::setNetworkEvaluation(bool value)
+void CombatSearchParameters::setNetworkPrediction(bool value)
 {
-    m_useNetworkEvaluation = value;
+    m_useNetworkPrediction = value;
 }
 
-bool CombatSearchParameters::useNetworkEvaluation() const
+bool CombatSearchParameters::useNetworkPrediction() const
 {
-    return m_useNetworkEvaluation;
+    return m_useNetworkPrediction;
 }
 
 void CombatSearchParameters::print()

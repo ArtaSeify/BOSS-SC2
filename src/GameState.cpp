@@ -1,6 +1,7 @@
 /* -*- c-basic-offset: 4 -*- */
 
 #include "GameState.h"
+#include "CombatSearchParameters.h"
 #include <numeric>
 #include <iomanip>
 
@@ -914,7 +915,7 @@ void GameState::printUnits() const
     std::cout << std::endl;
 }
 
-void GameState::writeToSS(std::stringstream & ss) const
+void GameState::writeToSS(std::stringstream & ss, const CombatSearchParameters & params) const
 {    
     ss << "[";
     for (int index = 0; index < m_units.size(); ++index)
@@ -967,6 +968,7 @@ void GameState::writeToSS(std::stringstream & ss) const
     ss << m_maxSupply << ",";
     ss << m_currentFrame << ",";
     ss << m_previousFrame << ",";
+    ss << params.getFrameTimeLimit() << ",";
     ss << m_mineralWorkers << ",";
     ss << m_gasWorkers << ",";
     ss << m_buildingWorkers << ",";

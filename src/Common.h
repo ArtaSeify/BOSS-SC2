@@ -2,9 +2,9 @@
 
 #pragma once
 
+#include <boost/python/object/function.hpp>
 #include <cstdio>
 #include <cmath>
-#include <fstream>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -58,6 +58,8 @@ namespace BOSS
         static FracType HRPF;                // health regen per frame
         static FracType SRPF;                // shield regen per frame
         static NumUnits WorkersPerRefinery;  // number of workers per refinery
+        static boost::python::object Predictor; // reference to module that contains the network used for evaluations
+        static std::string ExecutablePath;      // path to this executable
     };
 
     namespace Races

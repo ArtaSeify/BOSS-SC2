@@ -14,18 +14,18 @@ CombatSearch_IntegralDataFinishedUnits::CombatSearch_IntegralDataFinishedUnits()
     m_bestIntegralStack = m_integralStack;
 }
 
-void CombatSearch_IntegralDataFinishedUnits::update(const GameState & state, const BuildOrderAbilities & buildOrder, const CombatSearchParameters & params, Timer & timer)
+void CombatSearch_IntegralDataFinishedUnits::update(const GameState & state, const BuildOrderAbilities & buildOrder, const CombatSearchParameters & params, Timer & timer, bool useTieBreaker)
 {
     auto & finishedUnits = state.getFinishedUnits();
     int new_units = int(finishedUnits.size() - (m_integralStack.size() - (m_chronoBoostEntries + 1)));
 
     BOSS_ASSERT(new_units >= 0, "negative new units? %d", new_units);
 
-    // no new units or chronoboosts
-    if (new_units == 0 && m_chronoBoostEntries == state.getNumberChronoBoostsCast())
-    {
-        return;
-    }
+    //// no new units or chronoboosts
+    //if (new_units == 0 && m_chronoBoostEntries == state.getNumberChronoBoostsCast())
+    //{
+    //    return;
+    //}
 
     auto & chronoboosts = state.getChronoBoostTargets();
 
@@ -70,14 +70,13 @@ void CombatSearch_IntegralDataFinishedUnits::update(const GameState & state, con
         TimeType cbFinishFrame = chronoboosts[m_chronoBoostEntries].frameCast;
 
         addChronoBoostEntry(cbStartFrame, cbFinishFrame, params);
-
     }
     
     // we have found a new best if:
         // 1. the new army integral is higher than the previous best
         // 2. the new army integral is the same as the old best but the build order is 'better'
-    if ((m_integralStack.back().integral_UntilFrameLimit > m_bestIntegralValue)
-        || ((m_integralStack.back().integral_UntilFrameLimit == m_bestIntegralValue) && Eval::StateBetter(state, m_bestIntegralGameState)))
+    if ((!useTieBreaker && (m_integralStack.back().integral_UntilFrameLimit >= m_bestIntegralValue))
+        || (useTieBreaker && (m_integralStack.back().integral_UntilFrameLimit == m_bestIntegralValue) && Eval::StateBetter(state, m_bestIntegralGameState)))
     {
         m_bestIntegralValue = m_integralStack.back().integral_UntilFrameLimit;
         m_bestIntegralStack = m_integralStack;

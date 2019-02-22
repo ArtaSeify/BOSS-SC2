@@ -71,7 +71,7 @@ namespace BOSS
     public:
         CombatSearch_IntegralDataFinishedUnits();
 
-        void update(const GameState & state, const BuildOrderAbilities & buildOrder, const CombatSearchParameters & params, Timer & timer);
+        void update(const GameState & state, const BuildOrderAbilities & buildOrder, const CombatSearchParameters & params, Timer & timer, bool useTieBreaker=true);
         void addUnitEntry(const GameState & state, int unitIndex, TimeType startFrame, TimeType endFrame, const CombatSearchParameters & params);
         void addChronoBoostEntry(TimeType startFrame, TimeType endFrame, const CombatSearchParameters & params);
         

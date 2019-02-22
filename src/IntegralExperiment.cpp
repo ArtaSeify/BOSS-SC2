@@ -45,7 +45,7 @@ IntegralExperiment::IntegralExperiment(const std::string & experimentName, const
     m_params.setSaveStates(exp["SaveStates"]);
 
     BOSS_ASSERT(exp.count("UseNetwork") && exp["UseNetwork"].is_boolean(), "IntegralSearch must have a UseNetwork bool");
-    m_params.setNetworkEvaluation(exp["UseNetwork"]);
+    m_params.setNetworkPrediction(exp["UseNetwork"]);
 
     const std::string & searchType = exp["SearchType"][0].get<std::string>();
     m_searchType = searchType;
@@ -143,6 +143,13 @@ void IntegralExperiment::run(int numberOfRuns)
     FileTools::MakeDirectory(m_outputDir);
 
     static std::string stars = "************************************************";
+
+    if (m_params.getSaveStates())
+    {
+        FileTools::MakeDirectory(CONSTANTS::ExecutablePath + "/data/DataTuples");
+        FileTools::MakeDirectory(CONSTANTS::ExecutablePath + "/data/DataTuples/SearchData");
+    }
+
     for (int i(0); i < numberOfRuns; ++i)
     {
         std::string name = m_name + "Run" + std::to_string(i);

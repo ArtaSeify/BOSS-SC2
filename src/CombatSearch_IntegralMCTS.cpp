@@ -20,16 +20,8 @@ CombatSearch_IntegralMCTS::CombatSearch_IntegralMCTS(const CombatSearchParameter
 
     if (m_params.getSaveStates())
     {
-        std::string dataDir = "../bin/data/DataTuples/SearchData";
-        FileTools::MakeDirectory(dataDir);
-        dataDir += "/SearchData.csv";
-        
+        std::string dataDir = CONSTANTS::ExecutablePath + "/data/DataTuples/SearchData/SearchData.csv";
         m_file.open(dataDir, std::ofstream::out | std::ofstream::app);
-    }
-
-    if (m_params.useNetworkEvaluation())
-    {
-        FileTools::MakeDirectory("../bin/data/DataTuples/PredictionData");
     }
 }
 
@@ -52,7 +44,7 @@ void CombatSearch_IntegralMCTS::recurse(const GameState & state, int depth)
     std::shared_ptr<Node> root = std::make_shared<Node>(state);
     std::shared_ptr<Node> currentRoot = root;
 
-    while (!timeLimitReached() && m_numSimulations < m_params.getNumberOfSimulations())
+    while (!timeLimitReached() && m_numSimulations <= m_params.getNumberOfSimulations())
     {
         // change the root of the tree. Remove all the nodes and edges that are now irrelevant
         if (m_numSimulations > 0 && m_numSimulations%m_simulationsPerStep == 0)
@@ -68,7 +60,7 @@ void CombatSearch_IntegralMCTS::recurse(const GameState & state, int depth)
             BOSS_ASSERT(currentRoot != nullptr, "currentRoot has become null");      
 
             // search is over
-            if (currentRoot->getNumEdges() == 0)
+            if (currentRoot->getNumEdges() == 0 || m_numSimulations == m_params.getNumberOfSimulations())
             {
                 break;
             }
@@ -119,17 +111,14 @@ void CombatSearch_IntegralMCTS::recurse(const GameState & state, int depth)
     {
         std::shared_ptr<Node> currentNode = root;
 
-        int depth = 0;
         while (currentNode != currentRoot)
         {
-            currentNode->getState().writeToSS(m_dataStream);
+            currentNode->getState().writeToSS(m_dataStream, m_params);
             m_dataStream << "," << m_integral.getCurrentStackValue() << "\n";
 
             currentNode = currentNode->getHighestValueChild(m_params)->getChild();
-
-            depth++;
         }
-        currentNode->getState().writeToSS(m_dataStream);
+        currentNode->getState().writeToSS(m_dataStream, m_params);
         m_dataStream << "," << m_integral.getCurrentStackValue() << "\n";
     }
 
@@ -260,12 +249,12 @@ void CombatSearch_IntegralMCTS::updateBOIntegral(const Node & node, const Action
         if (permanantUpdate)
         {
             m_buildOrder.add(action);
-            m_integral.update(stateCopy, m_buildOrder, m_params, m_searchTimer);
+            m_integral.update(stateCopy, m_buildOrder, m_params, m_searchTimer, false);
         }
         else
         {
             m_promisingNodeBuildOrder.add(action);
-            m_promisingNodeIntegral.update(stateCopy, m_promisingNodeBuildOrder, m_params, m_searchTimer);
+            m_promisingNodeIntegral.update(stateCopy, m_promisingNodeBuildOrder, m_params, m_searchTimer, false);
         }
     }
 
@@ -275,14 +264,16 @@ void CombatSearch_IntegralMCTS::updateBOIntegral(const Node & node, const Action
         if (permanantUpdate)
         {
             m_buildOrder.add(action);
-            m_integral.update(node.getState(), m_buildOrder, m_params, m_searchTimer);
+            m_integral.update(node.getState(), m_buildOrder, m_params, m_searchTimer, false);
         }
         else
         {
             m_promisingNodeBuildOrder.add(action);
-            m_promisingNodeIntegral.update(node.getState(), m_promisingNodeBuildOrder, m_params, m_searchTimer);
+            m_promisingNodeIntegral.update(node.getState(), m_promisingNodeBuildOrder, m_params, m_searchTimer, false);
         }
     }
+
+    
 }
 
 void CombatSearch_IntegralMCTS::backPropogation(std::shared_ptr<Node> node)
@@ -333,14 +324,14 @@ void CombatSearch_IntegralMCTS::pickBestBuildOrder(std::shared_ptr<Node> root,  
 
         m_promisingNodeBuildOrder.add(action);
 
-        m_promisingNodeIntegral.update(bestNode->getState(), m_promisingNodeBuildOrder, m_params, m_searchTimer);
+        m_promisingNodeIntegral.update(bestNode->getState(), m_promisingNodeBuildOrder, m_params, m_searchTimer, false);
     }
 
     // there are no more actions, but we still need to fast forward to the time
     // limit to properly calculate the integral
     GameState finalState(bestNode->getState());
     finalState.fastForward(m_params.getFrameTimeLimit());
-    m_promisingNodeIntegral.update(finalState, m_promisingNodeBuildOrder, m_params, m_searchTimer);
+    m_promisingNodeIntegral.update(finalState, m_promisingNodeBuildOrder, m_params, m_searchTimer, false);
 }
 
 void CombatSearch_IntegralMCTS::writeResultsToFile(std::shared_ptr<Node> root, int simulationsWritten)

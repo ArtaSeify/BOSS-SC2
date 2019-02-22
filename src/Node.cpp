@@ -1,8 +1,11 @@
-#include <boost/python.hpp>
+#include <boost/python/list.hpp>
+#include <boost/python/extract.hpp>
+#include <boost/python/object_attributes.hpp>
 #include "Node.h"
 #include "Eval.h"
 
 using namespace BOSS;
+namespace python = boost::python;
 
 Node::Node(const GameState & state)
     : m_parentEdge()
@@ -90,13 +93,13 @@ void Node::createChildrenEdges(ActionSetAbilities & legalActions, const CombatSe
         }
         
 
-        if (params.useNetworkEvaluation())
+        if (params.useNetworkPrediction())
         {
             if (index > 0)
             {
-                outputStream << std::endl;
+                outputStream << "\n";
             }
-            testState.writeToSS(outputStream);
+            testState.writeToSS(outputStream, params);
         }
     }
 
@@ -108,32 +111,17 @@ void Node::createChildrenEdges(ActionSetAbilities & legalActions, const CombatSe
     }
 
     // evaluate all the newly created edges using the network
-    if (params.useNetworkEvaluation())
+    if (params.useNetworkPrediction())
     {
-        // write all state data to file
-        std::ofstream outputFile("../bin/data/DataTuples/PredictionData/CurrentStateData.csv", std::ofstream::out | std::ofstream::trunc);
-        outputFile << outputStream.rdbuf();
-
-        // evaluate the states. the results will be stored in file
-        //something.evaluate()
-        
-        std::ifstream inputFile("../bin/data/DataTuples/PredictionData/current_state_evaluated.csv", std::ifstream::in);
-        std::stringstream allEvaluations;
-        allEvaluations << inputFile.rdbuf();
-
-        // split the evaluations
-        std::vector<FracType> values;
-        std::string value;
-        while (std::getline(allEvaluations, value, ','))
-        {
-            values.push_back(FracType(std::stof(value)));
-        }
+        // evaluate the states. the results will be returned as string
+        python::object values = CONSTANTS::Predictor.attr("predict")(outputStream.str().c_str());
 
         // update the edge values
-        BOSS_ASSERT(values.size() == m_edges.size(), "number of values from network does not match the number of edges");
-        for (int index = 0; index < values.size(); ++index)
+        BOSS_ASSERT(python::len(values) == m_edges.size(), "number of values from network does not match the number of edges");
+        for (int index = 0; index < python::len(values); ++index)
         {
-            m_edges[index]->setNetworkValue(values[index]);
+            //std::cout << python::extract<FracType>(values[index]) << std::endl;
+            m_edges[index]->setNetworkValue(python::extract<FracType>(values[index]));
         }
     }
 }

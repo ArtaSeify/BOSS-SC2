@@ -2,219 +2,58 @@
 //
 //#define _CRT_NO_VA_START_VALIDATION
 //
+#include <Python.h>
+#include <boost/filesystem/operations.hpp>
+#include <boost/filesystem/path.hpp>
+#include <boost/python/import.hpp>
 #include "BOSS.h"
 #include "GameState.h"
 #include "BOSSExperiments.h"
 #include "Experiments.h"
 #include <chrono>
 #include <thread>
-//#include "CImg/CImg.h"
+#include <string>
 
 using namespace BOSS;
-////using namespace cimg_library;
-//
-////#ifdef WIN32
-////
-////#include <Windows.h>
-////
-////bool GetKey(char key)
-////{
-////    return GetKeyState(key) & 0x8000;
-////}
-//
-////void cls( HANDLE hConsole )
-////{
-////   COORD coordScreen = { 0, 0 };    // home for the cursor 
-////   DWORD cCharsWritten;
-////   CONSOLE_SCREEN_BUFFER_INFO csbi; 
-////   DWORD dwConSize;
-////
-////    // Get the number of character cells in the current buffer. 
-////
-////   if( !GetConsoleScreenBufferInfo( hConsole, &csbi ))
-////      return;
-////   dwConSize = csbi.dwSize.X * csbi.dwSize.Y;
-////
-////   // Fill the entire screen with blanks.
-////
-////   if( !FillConsoleOutputCharacter( hConsole, (TCHAR) ' ',
-////      dwConSize, coordScreen, &cCharsWritten ))
-////      return;
-////
-////   // Get the current text attribute.
-////
-////   if( !GetConsoleScreenBufferInfo( hConsole, &csbi ))
-////      return;
-////
-////   // Set the buffer's attributes accordingly.
-////
-////   if( !FillConsoleOutputAttribute( hConsole, csbi.wAttributes,
-////      dwConSize, coordScreen, &cCharsWritten ))
-////      return;
-////
-////   // Put the cursor at its home coordinates.
-////
-////   SetConsoleCursorPosition( hConsole, coordScreen );
-////}
-////
-////void testBuildOrder()
-////{
-////    HANDLE hStdout;
-////    hStdout = GetStdHandle(STD_OUTPUT_HANDLE);
-////
-////    GameState state;
-////    state.addUnit(ActionTypes::GetActionType("Nexus"));
-////    state.addUnit(ActionTypes::GetActionType("Probe"));
-////    state.addUnit(ActionTypes::GetActionType("Probe"));
-////    state.addUnit(ActionTypes::GetActionType("Probe"));
-////    state.addUnit(ActionTypes::GetActionType("Probe"));
-////    state.setMinerals(50.0f);
-////
-////    std::vector<std::string> bos = 
-////        {"Probe", "Probe", "Probe", "Probe", "Pylon", "Pylon", "Pylon", "Probe", "Probe", "Gateway", "Probe",
-////        "Assimilator", "Probe", "Probe", "CyberneticsCore", "Probe", "Pylon", "Probe", "Gateway", 
-////        "Dragoon", "Gateway", "Dragoon", "Dragoon", "Probe", "Gateway", "Pylon", "Probe", "Dragoon", "Dragoon", "Dragoon"};
-////
-////    std::vector<ActionType> buildOrder;
-////
-////    for (auto & str : bos)
-////    {
-////        buildOrder.push_back(ActionTypes::GetActionType(str));
-////    }
-////
-////    size_t buildOrderIndex = 0;
-////    bool progress = true;
-////
-////    CImg<> image;
-////    CImgList<> font_full = CImgList<>::font(17, false);
-////    //font_full.remove(0,255);
-////    unsigned char color[3] = {222, 222, 222};
-////    //image.draw_text(0, 0, state.toString().c_str(), &color, 0, 1, font_full); 
-////    CImgDisplay main_disp(image,"Click a point");
-////
-////    std::vector<GameState> states;
-////
-////    while(true)
-////    {
-////        if (progress || GetKey('D')) 
-////        { 
-////            state.fastForward(state.getCurrentFrame() + 4); 
-////            states.push_back(state);
-////        }
-////        else if (!progress && GetKey('A'))
-////        {
-////            if (states.size() > 1)
-////            {
-////                state = states.back();
-////                states.pop_back();
-////            }
-////        }
-////
-////
-////
-////        CImg<unsigned char> image2;
-////        image2.draw_text(0, 0, state.toString().c_str(), color, 0, 1, font_full); 
-////        main_disp.display(image2);
-////        main_disp.resize(image2);
-////        
-////        if (GetKey('S') && progress) { progress = false; }
-////        if (GetKey('W') && !progress) { progress = true; }
-////
-////        if (buildOrderIndex < buildOrder.size())
-////        {
-////            if (state.canBuildNow(buildOrder[buildOrderIndex]))
-////            {
-////                state.doAction(buildOrder[buildOrderIndex]);
-////                buildOrderIndex++;
-////            }
-////        }
-////
-////        std::this_thread::sleep_for(std::chrono::milliseconds(0));
-////    }
-////
-////}
-////
-////#else
-////void testBuildOrder() {}
-////#endif
-////
-////#include "json/json.hpp"
-////
-////void testjson()
-////{
-////
-////}
-//
-int main(int /*!!! PROBLEM UNUSED argc*/, char * /*!!! PROBLEM UNUSED argv*/ [])
+namespace python = boost::python;
+namespace fs = boost::filesystem;
+
+int main(int argc, char * argv[])
 {
+    // get path of this executable
+    fs::path full_path(fs::initial_path<fs::path>());
+    full_path = fs::system_complete(fs::path(argv[0]));
+    std::string parent_path = full_path.parent_path().string();
+    std::replace(parent_path.begin(), parent_path.end(), '\\', '/');
+    std::string path_string = parent_path + "/data";
+
+    BOSS::CONSTANTS::ExecutablePath = parent_path;
+
+    if (argc > 1)
+    {
+        BOSS_ASSERT(argc == 3, "number of arguments must be 2, but got %i", argc);
+        std::string command = "import sys\nsys.path.append(\"" + path_string + "\")\n";
+
+        Py_Initialize();
+        
+        PyRun_SimpleString(command.c_str());
+        //if (!strcmp(argv[1], "python"))
+        try
+        {
+            BOSS::CONSTANTS::Predictor = python::import("predictor").attr("Network")(std::string(argv[1]));
+        }
+        catch (const python::error_already_set&)
+        {
+            PyErr_Print();
+            BOSS_ASSERT(false, "error in evaluating states in Python");
+        }
+    }
+
     // Initialize all the BOSS internal data
-    //BOSS::Init("../bin/BWData.json");
+    BOSS::Init(parent_path + "/SC2Data.json");
 
-    // Read in the config parameters that will be used for experiments
-    //BOSS::BOSSConfig::Instance().ParseConfig("../bin/BOSS_Config.txt");
-
-    //BOSS::Experiments::RunExperiments("../bin/BOSS_Config.txt");
-
-    //testBuildOrder();
+    BOSS::BOSSConfig::Instance().ParseConfig(parent_path + "/Experiments.txt");
+    BOSS::ExperimentsArta::RunExperiments(parent_path + "/Experiments.txt");
     
-    // Initialize all the BOSS internal data
-    BOSS::Init("../bin/SC2Data.json");
-
-    // Read in the config parameters that will be used for experiments
-    //BOSS::BOSSConfig::Instance().ParseConfig("../bin/BOSS_SC2_Config.txt");
-    //BOSS::Experiments::RunExperiments("../bin/BOSS_SC2_Config.txt");
-
-    BOSS::BOSSConfig::Instance().ParseConfig("../bin/Experiments.txt");
-    BOSS::ExperimentsArta::RunExperiments("../bin/Experiments.txt");
-
-    //std::string exit = "";
-    //while (exit == "")
-    //{
-    //    std::cin >> exit;
-    //}
-    //return 0;
+    return 0;
 }
-//
-////#include "BoundedVector.h"
-///*int main()
-//{
-//    BoundedVector<int, 20> units1;
-//
-//    for (int i = 0; i < 20; ++i)
-//    {
-//        units1.push_back(0);
-//    }
-//
-//    BoundedVector<int, 20> units2(units1);
-//
-//    return 0;
-//}*/
-
-//#include <boost/python.hpp>
-//#include <boost/python.hpp>
-//#include <cstdlib>
-//#include <iostream>
-//int main()
-//{
-//    Py_Initialize();
-//
-//    namespace python = boost::python;
-//    try
-//    {
-//        python::object python_module = python::import("asd");
-//        python_module.attr("temp")();
-//    }
-//    catch (const python::error_already_set&)
-//    {
-//        PyErr_Print();
-//        return 1;
-//    }
-//
-//    std::string wait = "";
-//    while (wait != "q")
-//    {
-//        std::cin >> wait;
-//    }
-//
-//    return 0;
-//}

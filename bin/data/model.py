@@ -7,9 +7,14 @@ class Model():
 		return
 
 class IntegralValueNN(Model):
-	def __init__(self, input_shape, output_shape, model_name, batch_size, learning_rate=1e-3):
+	def __init__(self, input_shape, output_shape, model_name, batch_size, learning_rate=1e-3, create_network=True):
+		if create_network:
+			self.create(input_shape, output_shape, model_name, batch_size, learning_rate)
+		else:
+			self.tensorboard = tf.keras.callbacks.TensorBoard(log_dir=os.path.join(os.getcwd(), os.path.join("logs", model_name))
+														, write_graph=False, batch_size=batch_size)
 
-		# creating network
+	def create(self, input_shape, output_shape, model_name, batch_size, learning_rate=1e-3):
 		inputs = tf.keras.Input(shape=(input_shape, ))
 		layer = layers.Dense(2048, activation='elu')(inputs)
 		layer = layers.Dense(1024, activation='elu')(layer)
@@ -34,12 +39,14 @@ class IntegralValueNN(Model):
 	def evaluate(self, iterator, steps, verbose):
 		return self.model.evaluate(iterator, steps=steps, verbose=verbose)
 
-	def predict(self, nn_input, steps, verbose):
-		print(nn_input)
-		return self.model.predict(nn_input, steps=steps, verbose=verbose)
+	def predict(self, nn_input, batch_size=None, steps=1, verbose=0):
+		return self.model.predict(nn_input, batch_size=batch_size, steps=steps, verbose=verbose)
 
-	def save(self, file_name):
-		tf.keras.models.save_model(self.model, os.path.join(os.getcwd(), os.path.join("models", file_name)))
+	def predict_on_batch(self, nn_input):
+		return self.model.predict_on_batch(nn_input)
 
-	def load(self, file_name):
-		self.model = tf.keras.models.load_model(os.path.join(os.getcwd(), os.path.join("models", file_name)))
+	def save(self, path):
+		tf.keras.models.save_model(self.model, path)
+
+	def load(self, path):
+		self.model = tf.keras.models.load_model(path)

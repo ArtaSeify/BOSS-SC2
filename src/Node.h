@@ -20,10 +20,10 @@ namespace BOSS
         Node(const GameState & state);
         Node(const GameState & state, std::shared_ptr<Edge> parentEdge);
 
+        // cleans up the entire search tree
         void cleanUp();
 
-        // creates edges pointing to the states we can get to 
-        // from this state
+        // creates edges pointing to the states we can get to from this state
         void createChildrenEdges(ActionSetAbilities & legalActions, const CombatSearchParameters & params);
 
         // removes all edges except the one passed as a parameter

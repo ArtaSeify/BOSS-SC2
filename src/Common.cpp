@@ -5,12 +5,14 @@
 using namespace BOSS;
 
 // defining static variables
-FracType   CONSTANTS::MPWPF;
-FracType   CONSTANTS::GPWPF;
-FracType   CONSTANTS::ERPF;
-FracType   CONSTANTS::HRPF;
-FracType   CONSTANTS::SRPF;
-NumUnits   CONSTANTS::WorkersPerRefinery;
+FracType                CONSTANTS::MPWPF;
+FracType                CONSTANTS::GPWPF;
+FracType                CONSTANTS::ERPF;
+FracType                CONSTANTS::HRPF;
+FracType                CONSTANTS::SRPF;
+NumUnits                CONSTANTS::WorkersPerRefinery;
+boost::python::object   CONSTANTS::Predictor;
+std::string             CONSTANTS::ExecutablePath;
 
 RaceID Races::GetRaceID(const std::string & race)
 {

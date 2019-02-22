@@ -108,7 +108,7 @@ namespace BOSS
         FracType m_explorationValue;
         int m_numberOfSimulations;
         int m_simulationsPerStep;
-        bool m_useNetworkEvaluation;
+        bool m_useNetworkPrediction;
 
     public:
 
@@ -163,8 +163,8 @@ namespace BOSS
         void setSimulationsPerStep(int value);
         int getSimulationsPerStep() const;
 
-        void setNetworkEvaluation(bool value);
-        bool useNetworkEvaluation() const;
+        void setNetworkPrediction(bool value);
+        bool useNetworkPrediction() const;
     
         void print();
     };

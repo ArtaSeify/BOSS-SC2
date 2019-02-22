@@ -1,7 +1,7 @@
 import tensorflow as tf
 
 class DataLoader():
-	def __init__(self, feat_shape, pred_shape, batch_size=32, workers=4):
+	def __init__(self, feat_shape, pred_shape, shuffle=True, batch_size=32, workers=4):
 		self.file_list = tf.keras.backend.placeholder(dtype=tf.string, shape=[None])
 		self.feat_shape = feat_shape
 		self.pred_shape = pred_shape
@@ -9,7 +9,8 @@ class DataLoader():
 
 		self.dataset = tf.data.TextLineDataset(self.file_list)
 		self.dataset = self.dataset.map(self._parse_fn, num_parallel_calls=workers)
-		self.dataset = self.dataset.shuffle(buffer_size=5000)
+		if shuffle:
+			self.dataset = self.dataset.shuffle(buffer_size=5000)
 		self.dataset = self.dataset.prefetch(self.batch_size*100)
 		self.dataset = self.dataset.batch(self.batch_size)
 		self.dataset = self.dataset.repeat()

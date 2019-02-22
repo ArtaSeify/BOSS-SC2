@@ -10,7 +10,7 @@ CombatSearch_Integral::CombatSearch_Integral(const CombatSearchParameters p, int
 
     if (m_params.getSaveStates())
     {
-        m_file.open("../bin/data/stateValuePairs_" + std::to_string(run) + ".csv", std::ofstream::out | std::ofstream::app);
+        m_file.open(CONSTANTS::ExecutablePath + "/data/stateValuePairs_" + std::to_string(run) + ".csv", std::ofstream::out | std::ofstream::app);
     }
 
     //BOSS_ASSERT(m_params.getInitialState().getRace() != Races::None, "Combat search initial state is invalid");
@@ -124,8 +124,8 @@ FracType CombatSearch_Integral::recurseReturnValue(const GameState & state, int 
 
     if (m_params.getSaveStates())
     {
-        state.writeToSS(m_ss);
-        m_ss << ", " << nodeIntegralValue - nodeIntegralToThisPoint << "\n";
+        state.writeToSS(m_ss, m_params);
+        m_ss << "," << nodeIntegralValue - nodeIntegralToThisPoint << "\n";
     }
 
     //std::cout << "Value to this point: " << nodeIntegralToThisPoint << ". Total value: " << nodeIntegralValue << std::endl;

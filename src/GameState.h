@@ -114,6 +114,6 @@ class GameState
     std::string                     toString()                          const;
     void                            printunitsbeingbuilt()              const;
     void                            printUnits()                        const;
-    void                            writeToSS(std::stringstream & ss)   const;
+    void                            writeToSS(std::stringstream & ss, const CombatSearchParameters & params)   const;
 };
 }

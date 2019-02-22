@@ -17,7 +17,7 @@ namespace BOSS
         std::map<std::string, GameState>            m_stateMap;
         std::map<std::string, BuildOrderAbilities>  m_buildOrderMap;
         std::map<std::string, BuildOrderSearchGoal> m_buildOrderSearchGoalMap;
-    
+        
         BOSSConfig();
 
     public:

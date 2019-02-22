@@ -20,7 +20,6 @@ bin/results
 *.js
 emscripten/BOSS.data
 *.o
-/bin/WTF.txt
 /vs/x64
 /bin/results2
 /bin/test
@@ -36,7 +35,10 @@ emscripten/BOSS.data
 /bin/asd.py
 /bin/test2.py
 /bin/boost_python36-vc141-mt-x64-1_69.dll
-/bin/data/model_accuracy
 /bin/data/models
+/bin/data/DataTuples
+/bin/data/tf
 /bin/data/logs
-/bin/data/DataTuples/SearchData
+/bin/data/parsed_iteration_0.csv
+/bin/data/iteration_0.csv
+/bin/dataruns
