@@ -15,6 +15,11 @@ class IntegralValueNN(Model):
 														, write_graph=False, batch_size=batch_size)
 
 	def create(self, input_shape, output_shape, model_name, batch_size, learning_rate=1e-3):
+		def percent_error(y_true, y_pred):
+			if y_true == 0:
+				return tf.math.divide(tf.keras.backend.abs(tf.math.subtract(y_true, y_pred)), 1)
+			return tf.math.divide(tf.keras.backend.abs(tf.math.subtract(y_true, y_pred)), y_true)
+
 		inputs = tf.keras.Input(shape=(input_shape, ))
 		layer = layers.Dense(2048, activation='elu')(inputs)
 		layer = layers.Dense(1024, activation='elu')(layer)
@@ -31,7 +36,7 @@ class IntegralValueNN(Model):
 
 		self.model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate),
               	loss='mse',
-              	metrics=['mae'])
+              	metrics=['mae', 'MAPE', percent_error])
 
 	def train(self, iterator, epochs, steps_per_epoch, verbose):
 		return self.model.fit(iterator, epochs=epochs, steps_per_epoch=steps_per_epoch, verbose=verbose, callbacks=[self.tensorboard])

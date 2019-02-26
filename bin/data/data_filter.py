@@ -12,6 +12,7 @@ parser.add_argument("output_folder", help="Folder to put files in")
 parser.add_argument("--move_name", help="Changes the name of file once finished")
 parser.add_argument("--move_folder", help="Changes the folder of file once finished")
 parser.add_argument("--delete_file", help="Delete the file once finished parsing")
+parser.add_argument("--shuffle", help="Whether to shuffle the lines")
 args = parser.parse_args()
 
 input_file_name = os.path.join(os.path.join(os.path.join(os.getcwd(), "DataTuples"), args.input_folder), args.input_file_name)
@@ -28,6 +29,9 @@ data_file = open(input_file_name, 'r')
 parsed_file = open(output_file_name, 'w')
 
 lines = data_file.readlines()
+if args.shuffle:
+	shuffle(lines)
+	
 for index,line in enumerate(lines):
 	parseLine(line, unit_dict, mins_per_worker_per_sec, gas_per_worker_per_sec, 0, parsed_file)
 

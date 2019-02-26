@@ -8,6 +8,7 @@ import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument("save_name", help="Name of model to save")
+parser.add_argument("data_file", help="Path to datafile to use for training")
 parser.add_argument("--load_model", help="Name of model to load")
 args = parser.parse_args()
 
@@ -15,9 +16,7 @@ sess = tf.Session()
 tf.keras.backend.set_session(sess)
 
 # constants
-num_runs = 2
 cpu_workers = 4
-
 feature_shape = 332
 prediction_shape = 1
 learning_rate = 1e-4
@@ -25,11 +24,9 @@ epochs = 50
 verbose = 1
 batch_size = 16
 
-data_file = "C:\\School Work\\BOSS\\bin\\data\\DataTuples\\ParsedSearchData\\ParsedSearchData.csv"
-
 dataset = DataLoader(feature_shape, prediction_shape, True, batch_size, cpu_workers)
-train_iterator = dataset.make_iterator(sess, [data_file])
-trainset_samples = sum(1 for line in open(data_file))
+train_iterator = dataset.make_iterator(sess, [args.data_file])
+trainset_samples = sum(1 for line in open(args.data_file))
 
 network = model.IntegralValueNN(feature_shape, prediction_shape, args.save_name, batch_size, learning_rate, True if args.load_model is None else False)
 if args.load_model:
