@@ -161,20 +161,10 @@ void IntegralExperiment::run(int numberOfRuns)
 
         std::cout << "\n" << stars << "\n* Running Experiment: " << name << " [" << m_searchType << "]\n" << stars << "\n";
 
-        if (m_searchType == "Integral")
+        if (m_searchType == "IntegralDFS")
         {
             combatSearch = std::unique_ptr<CombatSearch>(new CombatSearch_Integral(m_params, i));
             //resultsFile += "_Integral";
-        }
-        else if (m_searchType == "Bucket")
-        {
-            combatSearch = std::unique_ptr<CombatSearch>(new CombatSearch_Bucket(m_params));
-            //resultsFile += "_Bucket";
-        }
-        else if (m_searchType == "BestResponse")
-        {
-            combatSearch = std::unique_ptr<CombatSearch>(new CombatSearch_BestResponse(m_params));
-            //resultsFile += "_BestResponse";
         }
         else if (m_searchType == "IntegralMCTS")
         {
@@ -190,9 +180,5 @@ void IntegralExperiment::run(int numberOfRuns)
         combatSearch->printResults();
         combatSearch->writeResultsFile(outputDir, resultsFile);
         const CombatSearchResults & results = combatSearch->getResults();
-        if (m_searchType != "IntegralMCTS")
-        {
-            std::cout << "\nSearched " << results.nodesExpanded << " nodes in " << results.timeElapsed << "ms @ " << (1000.0*results.nodesExpanded / results.timeElapsed) << " nodes/sec\n\n";
-        }
     }
 }

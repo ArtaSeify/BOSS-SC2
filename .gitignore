@@ -42,3 +42,5 @@ emscripten/BOSS.data
 /bin/data/parsed_iteration_0.csv
 /bin/data/iteration_0.csv
 /bin/dataruns
+/bin/DFS
+/MCTS Results/DFSvsMCTS

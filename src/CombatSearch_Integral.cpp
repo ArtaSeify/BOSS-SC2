@@ -52,40 +52,33 @@ FracType CombatSearch_Integral::recurseReturnValue(const GameState & state, int 
 
     for (int a(0); a < legalActions.size(); ++a)
     {
-        const int index = legalActions.size() - (a + 1);
+        const int index = a;
         GameState child(state);
 
-        const ActionSetAbilities::ActionTargetPair & actionTargetPair = legalActions[index];
-
-        ActionType action = actionTargetPair.first;
-        NumUnits actionTarget = actionTargetPair.second;
+        auto action = legalActions[index];
 
         // if it's the plain CB without a target, we need to get the targets for the ability
-        if (action == ActionTypes::GetSpecialAction(state.getRace()) && actionTarget == -1)
+        if (action.first.isAbility() && action.second == -1)
         {
-            int sizeBefore = legalActions.size();
-
-            state.getSpecialAbilityTargets(legalActions, index);
-
-            // the new target 
-            actionTarget = legalActions.getAbilityTarget(index + (legalActions.size() - sizeBefore));
-
+            child.getSpecialAbilityTargets(legalActions, index);
             // the ability is no longer valid, skip
-            if (actionTarget == -1)
+            if (legalActions[index].second == -1)
             {
                 continue;
             }
         }
 
-        if (action.isAbility())
+        action = legalActions[index];
+
+        if (action.first.isAbility())
         {
-            child.doAbility(action, actionTarget);
-            m_buildOrder.add(action, child.getLastAbility());
+            child.doAbility(action.first, action.second);
+            m_buildOrder.add(action.first, child.getLastAbility());
         } 
         else
         {
-            child.doAction(action);
-            m_buildOrder.add(action);
+            child.doAction(action.first);
+            m_buildOrder.add(action.first);
         }
 
         // can't go over the time limit
@@ -107,7 +100,7 @@ FracType CombatSearch_Integral::recurseReturnValue(const GameState & state, int 
         else
         {
             m_buildOrder.pop_back();
-            if (!ffCalculated)
+            //if (!ffCalculated)
             {
                 GameState child_framelimit(state);
                 child_framelimit.fastForward(m_params.getFrameTimeLimit());
@@ -137,6 +130,7 @@ FracType CombatSearch_Integral::recurseReturnValue(const GameState & state, int 
 void CombatSearch_Integral::printResults()
 {
     m_integral.print();
+    std::cout << "\nSearched " << m_results.nodesExpanded << " nodes in " << m_results.timeElapsed << "ms @ " << (1000.0*m_results.nodesExpanded / m_results.timeElapsed) << " nodes/sec\n\n";
 }
 
 void CombatSearch_Integral::setBestBuildOrder()
@@ -154,4 +148,7 @@ void CombatSearch_Integral::writeResultsFile(const std::string & dir, const std:
     plot.doPlots();
 
     m_integral.writeToFile(dir, filename);
+
+    std::ofstream file(dir + "/" + filename + "_BuildOrder.txt", std::ofstream::out | std::ofstream::app);
+    file << "\nSearched " << m_results.nodesExpanded << " nodes in " << m_results.timeElapsed << "ms @ " << (1000.0*m_results.nodesExpanded / m_results.timeElapsed) << " nodes/sec";
 }

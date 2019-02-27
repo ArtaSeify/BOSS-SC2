@@ -75,7 +75,8 @@ void CombatSearch_IntegralDataFinishedUnits::update(const GameState & state, con
     // we have found a new best if:
         // 1. the new army integral is higher than the previous best
         // 2. the new army integral is the same as the old best but the build order is 'better'
-    if ((!useTieBreaker && (m_integralStack.back().integral_UntilFrameLimit >= m_bestIntegralValue))
+    if ((m_integralStack.back().integral_UntilFrameLimit > m_bestIntegralValue) ||
+        (!useTieBreaker && (m_integralStack.back().integral_UntilFrameLimit >= m_bestIntegralValue))
         || (useTieBreaker && (m_integralStack.back().integral_UntilFrameLimit == m_bestIntegralValue) && Eval::StateBetter(state, m_bestIntegralGameState)))
     {
         m_bestIntegralValue = m_integralStack.back().integral_UntilFrameLimit;

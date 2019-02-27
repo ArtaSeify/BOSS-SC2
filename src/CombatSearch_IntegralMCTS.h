@@ -51,6 +51,8 @@ namespace BOSS
 
         virtual void printResults();
 
+        virtual void writeResultsFile(const std::string & dir, const std::string & filename);
+
     public:
         CombatSearch_IntegralMCTS(const CombatSearchParameters p = CombatSearchParameters(), const std::string & dir = "", 
                                                                     const std::string & prefix = "", const std::string & name = "");

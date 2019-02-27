@@ -356,3 +356,16 @@ void CombatSearch_IntegralMCTS::printResults()
     std::cout << "\nRan " << m_numSimulations << " simulations in " << m_results.timeElapsed << "ms @ " << (1000*m_numSimulations / m_results.timeElapsed) << " simulations/sec\n\n";
 }
 
+#include "BuildOrderPlotter.h"
+void CombatSearch_IntegralMCTS::writeResultsFile(const std::string & dir, const std::string & filename)
+{
+    BuildOrderPlotter plot;
+    plot.setOutputDir(dir);
+    plot.addPlot(filename, m_params.getInitialState(), m_integral.getBestBuildOrder());
+    plot.doPlots();
+
+    m_integral.writeToFile(dir, filename);
+
+    std::ofstream file(dir + "/" + filename + "_BuildOrder.txt", std::ofstream::out | std::ofstream::app);
+    file << "\nRan " << m_numSimulations << " simulations in " << m_results.timeElapsed << "ms @ " << (1000 * m_numSimulations / m_results.timeElapsed) << " simulations/sec";
+}
