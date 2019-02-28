@@ -47,8 +47,14 @@ void CombatSearch_IntegralMCTS::recurse(const GameState & state, int depth)
     while (!timeLimitReached() && m_numSimulations <= m_params.getNumberOfSimulations())
     {
         // change the root of the tree. Remove all the nodes and edges that are now irrelevant
-        if (m_numSimulations > 0 && m_numSimulations%m_simulationsPerStep == 0)
+        if (m_numSimulations > 0 && (m_simulationsPerStep == 1 || m_numSimulations%m_simulationsPerStep == 0))
         {
+            // search is over
+            if (isTerminalNode(*currentRoot))
+            {
+                break;
+            }
+
             std::shared_ptr<Edge> childEdge = currentRoot->getHighestValueChild(m_params);
             
             // we have made a choice, so we need to update the integral and build order permanently
@@ -60,7 +66,7 @@ void CombatSearch_IntegralMCTS::recurse(const GameState & state, int depth)
             BOSS_ASSERT(currentRoot != nullptr, "currentRoot has become null");      
 
             // search is over
-            if (currentRoot->getNumEdges() == 0 || m_numSimulations == m_params.getNumberOfSimulations())
+            if (isTerminalNode(*currentRoot) || m_numSimulations >= m_params.getNumberOfSimulations())
             {
                 break;
             }

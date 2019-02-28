@@ -10,7 +10,7 @@ class DataLoader():
 		self.dataset = tf.data.TextLineDataset(self.file_list)
 		self.dataset = self.dataset.map(self._parse_fn, num_parallel_calls=workers)
 		if shuffle:
-			self.dataset = self.dataset.shuffle(buffer_size=50000)
+			self.dataset = self.dataset.shuffle(buffer_size=300000)
 		self.dataset = self.dataset.prefetch(self.batch_size*100)
 		self.dataset = self.dataset.batch(self.batch_size)
 		self.dataset = self.dataset.repeat()

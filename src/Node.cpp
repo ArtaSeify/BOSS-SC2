@@ -46,6 +46,7 @@ void Node::createChildrenEdges(ActionSetAbilities & legalActions, const CombatSe
     }
 
     std::stringstream outputStream;
+    int outputStreamWritten = 0;
     std::shared_ptr<Node> thisNode = shared_from_this();
     for (int index = 0; index < legalActions.size(); ++index)
     {
@@ -95,11 +96,12 @@ void Node::createChildrenEdges(ActionSetAbilities & legalActions, const CombatSe
 
         if (params.useNetworkPrediction())
         {
-            if (index > 0)
+            if (outputStreamWritten > 0)
             {
                 outputStream << "\n";
             }
             testState.writeToSS(outputStream, params);
+            outputStreamWritten++;
         }
     }
 
@@ -114,7 +116,7 @@ void Node::createChildrenEdges(ActionSetAbilities & legalActions, const CombatSe
     if (params.useNetworkPrediction())
     {
         // evaluate the states. the results will be returned as string
-        python::object values = CONSTANTS::Predictor.attr("predict")(outputStream.str().c_str());
+        python::object values = CONSTANTS::Predictor.attr("predict")(outputStream.str());
 
         // update the edge values
         BOSS_ASSERT(python::len(values) == m_edges.size(), "number of values from network does not match the number of edges");

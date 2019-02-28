@@ -153,6 +153,11 @@ void ActionTypeData::Init(const json & j)
     // the unit that produces this unit
     for (auto & data : AllActionTypeData)
     {
+        if (data.id == (ActionTypes::None).getID())
+        {
+            continue;
+        }
+
         data.whatBuildsVector = std::vector<bool>(numUnitsEachRace[data.race], false);
 
         if (data.whatBuildsStr.size() > 0)

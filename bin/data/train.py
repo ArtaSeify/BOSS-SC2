@@ -28,7 +28,7 @@ dataset = DataLoader(feature_shape, prediction_shape, True, batch_size, cpu_work
 train_iterator = dataset.make_iterator(sess, [args.data_file])
 trainset_samples = sum(1 for line in open(args.data_file))
 
-network = model.IntegralValueNN(feature_shape, prediction_shape, args.save_name, batch_size, learning_rate, True if args.load_model is None else False)
+network = model.IntegralValueNN(feature_shape, prediction_shape, args.save_name, batch_size, learning_rate, "C:\\School Work\\BOSS\\bin\\data\\models\\" + args.save_name + ".h5", True if args.load_model is None else False)
 if args.load_model:
 	network.load("C:\\School Work\\BOSS\\bin\\data\\models\\" + args.load_model + ".h5")
 
@@ -36,4 +36,4 @@ if args.load_model:
 network.train(train_iterator, epochs, floor(trainset_samples/batch_size), verbose)
 
 # save data
-network.save("C:\\School Work\\BOSS\\bin\\data\\models\\" + args.save_name + ".h5")
+#network.save("C:\\School Work\\BOSS\\bin\\data\\models\\" + args.save_name + ".h5")

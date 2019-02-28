@@ -5,7 +5,7 @@ using namespace BOSS;
 
 FracType Edge::CURRENT_HIGHEST_VALUE = 1.f;
 int Edge::NODE_VISITS_BEFORE_EXPAND = 1;
-FracType Edge::MIXING_PARAMETER = 0.5f;
+FracType Edge::MIXING_PARAMETER = 1.0f;
 
 Edge::Edge()
     : m_timesVisited(0)

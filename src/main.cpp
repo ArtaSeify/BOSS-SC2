@@ -31,7 +31,9 @@ int main(int argc, char * argv[])
 
     if (argc > 1)
     {
-        BOSS_ASSERT(argc == 3, "number of arguments must be 2, but got %i", argc);
+        int expectedArguments = 1;
+
+        BOSS_ASSERT(argc == expectedArguments+1, "must provide %i argument, but got %i", expectedArguments, argc);
         std::string command = "import sys\nsys.path.append(\"" + path_string + "\")\n";
 
         Py_Initialize();
