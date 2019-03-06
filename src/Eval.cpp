@@ -10,7 +10,7 @@ FracType Eval::ArmyInProgressResourceSum(const GameState & state)
 
     for (auto unitIndex : state.getUnitsBeingBuilt())
     {
-        auto & type = state.getUnit(unitIndex).getType();
+        auto type = state.getUnit(unitIndex).getType();
 
         if (!type.isBuilding() && !type.isWorker() && !type.isSupplyProvider() && type != ActionTypes::GetDetector(state.getRace()))
         {
@@ -28,7 +28,7 @@ FracType Eval::ArmyTotalResourceSum(const GameState & state)
         
     for (int unitIndex = 0; unitIndex < state.getNumUnits(); ++unitIndex)
     {
-        auto & type = state.getUnit(unitIndex).getType();
+        auto type = state.getUnit(unitIndex).getType();
 
         if (!type.isBuilding() && !type.isWorker() && !type.isSupplyProvider() && type != ActionTypes::GetDetector(state.getRace()))
         {

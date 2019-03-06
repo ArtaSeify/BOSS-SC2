@@ -16,6 +16,7 @@ namespace BOSS
         static FracType CURRENT_HIGHEST_VALUE;
         static int NODE_VISITS_BEFORE_EXPAND;
         static FracType MIXING_PARAMETER;
+        static bool USE_MAX_VALUE;
         
     private:
         int m_timesVisited;
@@ -35,7 +36,7 @@ namespace BOSS
 
         void cleanUp();
 
-        void updateEdge(FracType newActionValue);
+        void updateEdge(FracType simulationValue);
         void setNetworkValue(FracType newValue) { m_valueNetwork = newValue; setNewEdgeValue(); }
         
         const ActionAbilityPair & getAction() const { return m_action; }

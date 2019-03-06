@@ -39,8 +39,8 @@ class IntegralValueNN(Model):
 		self.model = tf.keras.Model(inputs=inputs, outputs=prediction)
 
 		self.model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate),
-              	loss='msle',
-              	metrics=['mae', 'MAPE'])
+              	loss='mape',
+              	metrics=['mae', 'MAPE', 'msle'])
 
 	def train(self, iterator, epochs, steps_per_epoch, verbose):
 		return self.model.fit(iterator, epochs=epochs, steps_per_epoch=steps_per_epoch, verbose=verbose, callbacks=[self.tensorboard, self.checkpoint])

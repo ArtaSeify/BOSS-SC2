@@ -30,8 +30,9 @@ void ExperimentsArta::RunExperiments(const std::string & experimentFilename)
             BOSS_ASSERT(val["SearchType"].is_array() && val["SearchType"][0].is_string(), "SearchType must be an array, and first element must be a string");
             if (val["SearchType"] == "IntegralMCTS")
             {
-                BOSS_ASSERT(val["SearchType"].size() == 3 && val["SearchType"][1].is_number_float()
-                                && val["SearchType"][2].is_number_integer(), "Format for MCTS search is: [MCTS, explorationValue, numSimulations]");
+                BOSS_ASSERT(val["SearchType"].size() == 4 && val["SearchType"][1].is_number_float()
+                                && val["SearchType"][2].is_number_integer() && val["SearchType"][3].is_boolean(), 
+                                "Format for MCTS search is: [MCTS, explorationValue, numSimulations]");
             }
             const std::string & searchType = val["SearchType"][0].get<std::string>();
 

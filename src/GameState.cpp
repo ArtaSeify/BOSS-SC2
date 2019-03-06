@@ -130,7 +130,7 @@ bool GameState::isLegal(ActionType action) const
 
     const int numDepots = m_numDepots + m_inProgressDepots;
     // don't build more refineries than depots
-    if (action.isRefinery() && (numRefineries >= 2 * numDepots)) { return false; }
+    if (action.isRefinery() && (numRefineries >= 2 * m_numDepots)) { return false; }
 
     // we can Chrono Boost as long as we have a Nexus
     if (action.isAbility() && m_race == Races::Protoss && numDepots == 0) { return false; }

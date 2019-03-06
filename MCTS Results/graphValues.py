@@ -55,7 +55,7 @@ for flag in flags:
 		plt.errorbar(simulations, average_highestValue[value_type], std_highestValue[value_type], 
 					errorevery=errorevery, label="value calculation: " + str(value_type))
 
-		plt.legend(loc="upper left")
+	plt.legend(loc="upper left")
 
 	plt.gca().set_ylim([0, 300000])
 	#plt.show()

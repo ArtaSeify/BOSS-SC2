@@ -47,7 +47,7 @@ namespace BOSS
         void test(const GameState & state);
         void test2(const GameState & state);
 
-        void writeResultsToFile(std::shared_ptr<Node> root, int simulationsWritten);
+        void writeResultsToFile(std::shared_ptr<Node> root);
 
         virtual void printResults();
 

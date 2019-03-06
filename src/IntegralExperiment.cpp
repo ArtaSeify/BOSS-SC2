@@ -7,6 +7,7 @@
 #include "CombatSearch_BestResponse.h"
 #include "CombatSearch_IntegralMCTS.h"
 #include "FileTools.h"
+#include <thread>
 
 using namespace BOSS;
 
@@ -54,6 +55,7 @@ IntegralExperiment::IntegralExperiment(const std::string & experimentName, const
     {
         m_params.setExplorationValue(exp["SearchType"][1]);
         m_params.setNumberOfSimulations(exp["SearchType"][2]);
+        m_params.setUseMaxValue(exp["SearchType"][3]);
 
         std::stringstream ss;
         ss << std::fixed << std::setprecision(2) << m_params.getExplorationValue();
@@ -133,37 +135,33 @@ IntegralExperiment::IntegralExperiment(const std::string & experimentName, const
 
     if (exp.count("SimulationsPerStep"))
     {
-        BOSS_ASSERT(exp["SimulationsPerStep"].is_number_integer(), "SimulationsPerStep must be an integer");
-        m_params.setSimulationsPerStep(exp["SimulationsPerStep"]);
+        BOSS_ASSERT(exp["SimulationsPerStep"].is_array() && exp["SimulationsPerStep"].size() == 2, "SimulationsPerStep must be an array of size 2");
+        m_params.setChangingRoot(exp["SimulationsPerStep"][0]);
+        m_params.setSimulationsPerStep(exp["SimulationsPerStep"][1]);
     }
 }
 
-void IntegralExperiment::run(int numberOfRuns)
+void IntegralExperiment::runExperimentThread(int thread, int runPerThread)
 {
-    FileTools::MakeDirectory(m_outputDir);
-
     static std::string stars = "************************************************";
 
-    if (m_params.getSaveStates())
+    for (int i(0); i < runPerThread; ++i)
     {
-        FileTools::MakeDirectory(CONSTANTS::ExecutablePath + "/data/DataTuples");
-        FileTools::MakeDirectory(CONSTANTS::ExecutablePath + "/data/DataTuples/SearchData");
-    }
+        int index = i + (thread * runPerThread);
 
-    for (int i(0); i < numberOfRuns; ++i)
-    {
-        std::string name = m_name + "Run" + std::to_string(i);
+        std::string name = m_name + "Run" + std::to_string(index);
         std::string outputDir = m_outputDir + "/" + Assert::CurrentDateTime() + "_" + name;
         FileTools::MakeDirectory(outputDir);
 
-        std::unique_ptr<CombatSearch> combatSearch;
         std::string resultsFile = name;
 
         std::cout << "\n" << stars << "\n* Running Experiment: " << name << " [" << m_searchType << "]\n" << stars << "\n";
 
+        std::unique_ptr<CombatSearch> combatSearch;
+
         if (m_searchType == "IntegralDFS")
         {
-            combatSearch = std::unique_ptr<CombatSearch>(new CombatSearch_Integral(m_params, i));
+            combatSearch = std::unique_ptr<CombatSearch>(new CombatSearch_Integral(m_params, index, outputDir, resultsFile, m_name));
             //resultsFile += "_Integral";
         }
         else if (m_searchType == "IntegralMCTS")
@@ -180,5 +178,30 @@ void IntegralExperiment::run(int numberOfRuns)
         combatSearch->printResults();
         combatSearch->writeResultsFile(outputDir, resultsFile);
         const CombatSearchResults & results = combatSearch->getResults();
+    }
+}
+
+void IntegralExperiment::run(int numberOfRuns)
+{
+    FileTools::MakeDirectory(m_outputDir);
+
+    if (m_params.getSaveStates())
+    {
+        FileTools::MakeDirectory(CONSTANTS::ExecutablePath + "/data/DataTuples");
+        FileTools::MakeDirectory(CONSTANTS::ExecutablePath + "/data/DataTuples/SearchData");
+    }
+
+    int numThreads = 5;
+    int runPerThread = int(numberOfRuns / numThreads);
+    std::vector<std::thread> threads(numThreads);
+
+    for (int thread = 0; thread < numThreads; ++thread)
+    {
+        threads[thread] = std::thread(&IntegralExperiment::runExperimentThread, this, thread, runPerThread);
+    }
+
+    for (int thread = 0; thread < numThreads; ++thread)
+    {
+        threads[thread].join();
     }
 }

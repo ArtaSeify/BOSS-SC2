@@ -22,15 +22,20 @@ namespace BOSS
     protected:
         //CombatSearch_IntegralData   m_integral;
         CombatSearch_IntegralDataFinishedUnits  m_integral;
-        std::ofstream                           m_file;
-        std::stringstream                       m_ss;
+        std::ofstream                           m_fileStates;
+        std::stringstream                       m_ssStates;
+
+        std::ofstream                           m_fileHighestValue;
+        std::stringstream                       m_ssHighestValue;
 
     public:
-    
-        CombatSearch_Integral(const CombatSearchParameters p = CombatSearchParameters(), int run = 0);
+        static FracType highestValueThusFar;
+
+        CombatSearch_Integral(const CombatSearchParameters p = CombatSearchParameters(), int run = 0,
+            const std::string & dir = "", const std::string & prefix = "", const std::string & name = "");
         ~CombatSearch_Integral();
     
-        FracType CombatSearch_Integral::recurseReturnValue(const GameState & state, int depth);
+        FracType recurseReturnValue(const GameState & state, int depth);
 
         virtual void printResults();
         virtual void setBestBuildOrder();

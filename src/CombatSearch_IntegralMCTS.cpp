@@ -9,11 +9,13 @@ CombatSearch_IntegralMCTS::CombatSearch_IntegralMCTS(const CombatSearchParameter
     : m_exploration_parameter (p.getExplorationValue())
 {
     m_params = p;
+    Edge::USE_MAX_VALUE = m_params.getUseMaxValue();
 
     m_simulationsPerStep = m_params.getSimulationsPerStep();
     m_writeEveryKSimulations = 10;
     m_resultsSaveDir = dir;
     m_resultsFilePrefix = prefix;
+    m_resultsStream << "0,";
 
     std::random_device rd; // obtain a random number from hardware
     m_rnggen.seed(rd());
@@ -21,7 +23,16 @@ CombatSearch_IntegralMCTS::CombatSearch_IntegralMCTS(const CombatSearchParameter
     if (m_params.getSaveStates())
     {
         std::string dataDir = CONSTANTS::ExecutablePath + "/data/DataTuples/SearchData/SearchData.csv";
-        m_file.open(dataDir, std::ofstream::out | std::ofstream::app);
+        m_fileStates.open(dataDir, std::ofstream::out | std::ofstream::app);
+    }
+
+    if (m_params.useNetworkPrediction())
+    {
+        Edge::MIXING_PARAMETER = 0.5f;
+    }
+    else
+    {
+        Edge::MIXING_PARAMETER = 0.0f;
     }
 }
 
@@ -29,9 +40,9 @@ CombatSearch_IntegralMCTS::~CombatSearch_IntegralMCTS()
 {
     if (m_params.getSaveStates())
     {
-        m_file << m_dataStream.rdbuf();
+        m_fileStates << m_dataStream.rdbuf();
         m_dataStream.str(std::string());
-        m_file.close();
+        m_fileStates.close();
     }
 }
 
@@ -44,17 +55,11 @@ void CombatSearch_IntegralMCTS::recurse(const GameState & state, int depth)
     std::shared_ptr<Node> root = std::make_shared<Node>(state);
     std::shared_ptr<Node> currentRoot = root;
 
-    while (!timeLimitReached() && m_numSimulations <= m_params.getNumberOfSimulations())
+    while (!timeLimitReached() && m_numSimulations < m_params.getNumberOfSimulations())
     {
         // change the root of the tree. Remove all the nodes and edges that are now irrelevant
-        if (m_numSimulations > 0 && (m_simulationsPerStep == 1 || m_numSimulations%m_simulationsPerStep == 0))
+        if (m_params.getChangingRoot() && m_numSimulations > 0 && (m_simulationsPerStep == 1 || m_numSimulations%m_simulationsPerStep == 0))
         {
-            // search is over
-            if (isTerminalNode(*currentRoot))
-            {
-                break;
-            }
-
             std::shared_ptr<Edge> childEdge = currentRoot->getHighestValueChild(m_params);
             
             // we have made a choice, so we need to update the integral and build order permanently
@@ -75,7 +80,7 @@ void CombatSearch_IntegralMCTS::recurse(const GameState & state, int depth)
         {
             std::cout << "have run : " << m_numSimulations << " simulations thus far." << std::endl;
         }*/
-        auto & nodePair = getPromisingNode(currentRoot);
+        auto nodePair = getPromisingNode(currentRoot);
         std::shared_ptr<Node> promisingNode = nodePair.first;
         
         // a node that isn't part of the graph yet. We just simulate from this point
@@ -108,9 +113,22 @@ void CombatSearch_IntegralMCTS::recurse(const GameState & state, int depth)
 
         if (m_numSimulations%m_writeEveryKSimulations == 0)
         {
-            writeResultsToFile(currentRoot, ++simulationsWritten);
+            writeResultsToFile(currentRoot);
         }
     }
+
+    if (!m_params.getChangingRoot())
+    {
+        pickBestBuildOrder(root, false);
+        m_integral = m_promisingNodeIntegral;
+        m_buildOrder = m_promisingNodeBuildOrder;
+    }
+
+    // Write search data to file to file so we can graph it
+    std::ofstream file(m_resultsSaveDir + "/" + m_resultsFilePrefix + "_Results.csv", std::ofstream::out | std::ofstream::app);
+    file << m_resultsStream.rdbuf();
+    file.close();
+    m_resultsStream.str(std::string());
 
     // write state data
     if (m_params.getSaveStates())
@@ -291,7 +309,7 @@ void CombatSearch_IntegralMCTS::backPropogation(std::shared_ptr<Node> node)
 
     while (parent_edge != nullptr)
     {
-        parent_edge->updateEdge(m_promisingNodeIntegral.getBestStackValue());
+        parent_edge->updateEdge(m_promisingNodeIntegral.getCurrentStackValue());
 
         //std::cout << "value of " << current_node->getAction().first.getName() << " changed to: " << current_node->getValue() << std::endl;
         //std::cout << std::endl;
@@ -321,15 +339,13 @@ void CombatSearch_IntegralMCTS::pickBestBuildOrder(std::shared_ptr<Node> root,  
         {
             bestEdge = bestNode->getHighestValueChild(m_params);
         }
-        bestNode = bestEdge->getChild();
-        if (bestNode == nullptr)
+        if (bestEdge->getChild() == nullptr)
         {
-            bestNode = bestNode->notExpandedChild(bestEdge, m_params);
+            break;
         }
-        const ActionAbilityPair & action = bestEdge->getAction();
+        bestNode = bestEdge->getChild();
 
-        m_promisingNodeBuildOrder.add(action);
-
+        m_promisingNodeBuildOrder.add(bestEdge->getAction());
         m_promisingNodeIntegral.update(bestNode->getState(), m_promisingNodeBuildOrder, m_params, m_searchTimer, false);
     }
 
@@ -340,20 +356,12 @@ void CombatSearch_IntegralMCTS::pickBestBuildOrder(std::shared_ptr<Node> root,  
     m_promisingNodeIntegral.update(finalState, m_promisingNodeBuildOrder, m_params, m_searchTimer, false);
 }
 
-void CombatSearch_IntegralMCTS::writeResultsToFile(std::shared_ptr<Node> root, int simulationsWritten)
+void CombatSearch_IntegralMCTS::writeResultsToFile(std::shared_ptr<Node> root)
 {
     pickBestBuildOrder(root, false);
     FracType highestValueRoute = m_promisingNodeIntegral.getCurrentStackValue();
 
     m_resultsStream << highestValueRoute << ",";
-
-    if (simulationsWritten%int(std::floor(m_params.getNumberOfSimulations() / (2 * m_writeEveryKSimulations))) == 0)
-    {
-        std::ofstream file(m_resultsSaveDir + "/" + m_resultsFilePrefix + "_Results.csv", std::ofstream::out | std::ofstream::app);
-        file << m_resultsStream.rdbuf();
-        file.close();
-        m_resultsStream.str(std::string());
-    }
 }
 
 void CombatSearch_IntegralMCTS::printResults()

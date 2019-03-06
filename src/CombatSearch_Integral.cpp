@@ -1,26 +1,37 @@
 /* -*- c-basic-offset: 4 -*- */
 
 #include "CombatSearch_Integral.h"
+#include "FileTools.h"
 
 using namespace BOSS;
 
-CombatSearch_Integral::CombatSearch_Integral(const CombatSearchParameters p, int run)
+FracType CombatSearch_Integral::highestValueThusFar = 0;
+
+CombatSearch_Integral::CombatSearch_Integral(const CombatSearchParameters p, int run,
+    const std::string & dir, const std::string & prefix, const std::string & name)
 {
     m_params = p;
 
     if (m_params.getSaveStates())
     {
-        m_file.open(CONSTANTS::ExecutablePath + "/data/stateValuePairs_" + std::to_string(run) + ".csv", std::ofstream::out | std::ofstream::app);
+        m_fileStates.open(CONSTANTS::ExecutablePath + "/data/stateValuePairs_" + std::to_string(run) + ".csv", std::ofstream::out | std::ofstream::app);
     }
+
+    m_fileHighestValue.open(dir + "/" + prefix + "_HighestValueOrdering.txt", std::ofstream::out | std::ofstream::trunc);
+    m_ssHighestValue << "0\n";
 
     //BOSS_ASSERT(m_params.getInitialState().getRace() != Races::None, "Combat search initial state is invalid");
 }
 
 CombatSearch_Integral::~CombatSearch_Integral()
 {
-    m_file << m_ss.rdbuf();
-    m_ss.str(std::string());
-    m_file.close();
+    m_fileStates << m_ssStates.rdbuf();
+    m_ssStates.str(std::string());
+    m_fileStates.close();
+
+    m_fileHighestValue << m_ssHighestValue.rdbuf();
+    m_ssHighestValue.str(std::string());
+    m_fileHighestValue.close();
 }
 
 void CombatSearch_Integral::recurse(const GameState & state, int depth)
@@ -39,8 +50,8 @@ FracType CombatSearch_Integral::recurseReturnValue(const GameState & state, int 
 
     if (m_params.getSaveStates() && m_results.nodesExpanded % 100000 == 0)
     {
-        m_file << m_ss.rdbuf();
-        m_ss.str(std::string());
+        m_fileStates << m_ssStates.rdbuf();
+        m_ssStates.str(std::string());
     }
 
     FracType nodeIntegralValue = 0;
@@ -74,7 +85,7 @@ FracType CombatSearch_Integral::recurseReturnValue(const GameState & state, int 
         {
             child.doAbility(action.first, action.second);
             m_buildOrder.add(action.first, child.getLastAbility());
-        } 
+        }
         else
         {
             child.doAction(action.first);
@@ -87,7 +98,7 @@ FracType CombatSearch_Integral::recurseReturnValue(const GameState & state, int 
             //std::cout << "action added: " << action.getName() << std::endl;
             //std::cout << "target of action added: " << actionTarget << std::endl;
             //std::cout << "frame of action added: " << child.getCurrentFrame() << std::endl;
-            
+
             m_integral.update(child, m_buildOrder, m_params, m_searchTimer);
 
             nodeIntegralValue = std::max(nodeIntegralValue, recurseReturnValue(child, depth + 1));
@@ -117,8 +128,14 @@ FracType CombatSearch_Integral::recurseReturnValue(const GameState & state, int 
 
     if (m_params.getSaveStates())
     {
-        state.writeToSS(m_ss, m_params);
-        m_ss << "," << nodeIntegralValue - nodeIntegralToThisPoint << "\n";
+        state.writeToSS(m_ssStates, m_params);
+        m_ssStates << "," << nodeIntegralValue - nodeIntegralToThisPoint << "\n";
+    }
+
+    if (nodeIntegralValue > highestValueThusFar)
+    {
+        highestValueThusFar = nodeIntegralValue;
+        m_ssHighestValue << highestValueThusFar << "\n";
     }
 
     //std::cout << "Value to this point: " << nodeIntegralToThisPoint << ". Total value: " << nodeIntegralValue << std::endl;

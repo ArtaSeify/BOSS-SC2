@@ -44,3 +44,13 @@ emscripten/BOSS.data
 /bin/dataruns
 /bin/DFS
 /MCTS Results/DFSvsMCTS
+/MCTS Results/SRMV2
+/MCTS Results/SRMV
+/MCTS Results/SRAV2
+/MCTS Results/SRAV
+/MCTS Results/CRMV
+/MCTS Results/CRAV
+/bin/SRMV_0
+/bin/DFS_0/05-03-2019_19-34-39_DFS_0DFSRun0
+/bin/Experiment_00.txt
+/bin/Experiment_0.txt

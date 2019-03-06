@@ -20,6 +20,8 @@ namespace fs = boost::filesystem;
 
 int main(int argc, char * argv[])
 {
+    BOSS_ASSERT(argc >= 2, "Missing experiment file name?");
+
     // get path of this executable
     fs::path full_path(fs::initial_path<fs::path>());
     full_path = fs::system_complete(fs::path(argv[0]));
@@ -29,9 +31,9 @@ int main(int argc, char * argv[])
 
     BOSS::CONSTANTS::ExecutablePath = parent_path;
 
-    if (argc > 1)
+    if (argc > 2)
     {
-        int expectedArguments = 1;
+        int expectedArguments = 2;
 
         BOSS_ASSERT(argc == expectedArguments+1, "must provide %i argument, but got %i", expectedArguments, argc);
         std::string command = "import sys\nsys.path.append(\"" + path_string + "\")\n";
@@ -42,7 +44,7 @@ int main(int argc, char * argv[])
         //if (!strcmp(argv[1], "python"))
         try
         {
-            BOSS::CONSTANTS::Predictor = python::import("predictor").attr("Network")(std::string(argv[1]));
+            BOSS::CONSTANTS::Predictor = python::import("predictor").attr("Network")(std::string(argv[2]));
         }
         catch (const python::error_already_set&)
         {
@@ -54,8 +56,8 @@ int main(int argc, char * argv[])
     // Initialize all the BOSS internal data
     BOSS::Init(parent_path + "/SC2Data.json");
 
-    BOSS::BOSSConfig::Instance().ParseConfig(parent_path + "/Experiments.txt");
-    BOSS::ExperimentsArta::RunExperiments(parent_path + "/Experiments.txt");
+    BOSS::BOSSConfig::Instance().ParseConfig(parent_path + "/" + argv[1] + ".txt");
+    BOSS::ExperimentsArta::RunExperiments(parent_path + "/" + argv[1] + ".txt");
     
     return 0;
 }

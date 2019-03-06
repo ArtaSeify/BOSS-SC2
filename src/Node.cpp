@@ -45,8 +45,6 @@ void Node::createChildrenEdges(ActionSetAbilities & legalActions, const CombatSe
         return;
     }
 
-    std::stringstream outputStream;
-    int outputStreamWritten = 0;
     std::shared_ptr<Node> thisNode = shared_from_this();
     for (int index = 0; index < legalActions.size(); ++index)
     {
@@ -92,17 +90,6 @@ void Node::createChildrenEdges(ActionSetAbilities & legalActions, const CombatSe
         {
             m_edges.push_back(std::make_shared<Edge>(ActionAbilityPair(action.first, AbilityAction()), thisNode));
         }
-        
-
-        if (params.useNetworkPrediction())
-        {
-            if (outputStreamWritten > 0)
-            {
-                outputStream << "\n";
-            }
-            testState.writeToSS(outputStream, params);
-            outputStreamWritten++;
-        }
     }
 
     // no edges were created, so this is a terminal node
@@ -110,21 +97,6 @@ void Node::createChildrenEdges(ActionSetAbilities & legalActions, const CombatSe
     {
         isTerminalNode = true;
         return;
-    }
-
-    // evaluate all the newly created edges using the network
-    if (params.useNetworkPrediction())
-    {
-        // evaluate the states. the results will be returned as string
-        python::object values = CONSTANTS::Predictor.attr("predict")(outputStream.str());
-
-        // update the edge values
-        BOSS_ASSERT(python::len(values) == m_edges.size(), "number of values from network does not match the number of edges");
-        for (int index = 0; index < python::len(values); ++index)
-        {
-            //std::cout << python::extract<FracType>(values[index]) << std::endl;
-            m_edges[index]->setNetworkValue(python::extract<FracType>(values[index]));
-        }
     }
 }
 
@@ -177,6 +149,20 @@ bool Node::doAction(std::shared_ptr<Edge> edge, const CombatSearchParameters & p
         //std::shared_ptr<Node> newNode = std::make_shared<Node>(m_state, edge);
         //edge->setChild(newNode);
         edge->setChild(shared_from_this());
+
+        // evaluate the newly created state using the network and store the value in the edge
+        std::stringstream ss;
+        if (params.useNetworkPrediction())
+        {
+            m_state.writeToSS(ss, params);
+
+            // evaluate the states. the results will be returned as string
+            python::object value = CONSTANTS::Predictor.attr("predict")(ss.str());
+
+            // update the edge values
+            //std::cout << python::extract<FracType>(value[0]) << std::endl;
+            edge->setNetworkValue(python::extract<FracType>(value[0]));
+        }
     }
 
     return true;
@@ -266,7 +252,7 @@ std::shared_ptr<Edge> Node::selectChildEdge(FracType exploration_param, const Co
     }
 
     float UCBValue = exploration_param * policyValue *
-        static_cast<float>(std::sqrt(totalChildVisits));
+        static_cast<FracType>(std::sqrt(totalChildVisits));
 
     float maxActionValue = 0;
     int maxIndex = 0;

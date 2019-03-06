@@ -106,6 +106,8 @@ namespace BOSS
         bool m_sortActions;
         bool m_saveStates;
         FracType m_explorationValue;
+        bool m_changingRoot;
+        bool m_useMaxValue;
         int m_numberOfSimulations;
         int m_simulationsPerStep;
         bool m_useNetworkPrediction;
@@ -156,6 +158,12 @@ namespace BOSS
 
         void setExplorationValue(FracType value);
         FracType getExplorationValue() const;
+
+        void setChangingRoot(bool value);
+        bool getChangingRoot() const;
+
+        void setUseMaxValue(bool value);
+        bool getUseMaxValue() const;
 
         void setNumberOfSimulations(int value);
         int getNumberOfSimulations() const;

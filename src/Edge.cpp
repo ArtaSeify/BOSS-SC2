@@ -4,8 +4,9 @@
 using namespace BOSS;
 
 FracType Edge::CURRENT_HIGHEST_VALUE = 1.f;
-int Edge::NODE_VISITS_BEFORE_EXPAND = 1;
-FracType Edge::MIXING_PARAMETER = 1.0f;
+int Edge::NODE_VISITS_BEFORE_EXPAND = 2;
+bool Edge::USE_MAX_VALUE = true;
+FracType Edge::MIXING_PARAMETER = 0.0f;
 
 Edge::Edge()
     : m_timesVisited(0)
@@ -45,20 +46,25 @@ void Edge::cleanUp()
     m_parent.reset();
 }
 
-void Edge::updateEdge(FracType newActionValue)
+void Edge::updateEdge(FracType simulationValue)
 {
     //std::cout << m_action.first.getName() << " node updated" << std::endl;
 
     m_timesVisited++;
-    //m_value = m_value + ((1.f / m_timesVisited) * (newActionValue - m_value));
-    m_valueSimulations = std::max(m_valueSimulations, newActionValue);
 
-    if (m_valueSimulations > CURRENT_HIGHEST_VALUE)
+    if (!USE_MAX_VALUE)
     {
-        CURRENT_HIGHEST_VALUE = m_valueSimulations;
+        m_valueSimulations = m_valueSimulations + ((1.f / m_timesVisited) * (simulationValue - m_valueSimulations));
+        setNewEdgeValue();
     }
-
-    setNewEdgeValue();
+    else
+    {
+        if (simulationValue > m_valueSimulations)
+        {
+            m_valueSimulations = simulationValue;
+            setNewEdgeValue();
+        }
+    }
 }
 
 void Edge::setChild(std::shared_ptr<Node> node) 
@@ -69,6 +75,11 @@ void Edge::setChild(std::shared_ptr<Node> node)
 void Edge::setNewEdgeValue()
 {
     m_value = (MIXING_PARAMETER * m_valueNetwork) + ((1 - MIXING_PARAMETER)*m_valueSimulations);
+
+    if (m_value > CURRENT_HIGHEST_VALUE)
+    {
+        CURRENT_HIGHEST_VALUE = m_value;
+    }
 }
 
 void Edge::printValues() const

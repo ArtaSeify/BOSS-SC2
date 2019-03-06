@@ -167,6 +167,26 @@ FracType CombatSearchParameters::getExplorationValue() const
     return m_explorationValue;
 }
 
+void CombatSearchParameters::setChangingRoot(bool value)
+{
+    m_changingRoot = value;
+}
+
+bool CombatSearchParameters::getChangingRoot() const
+{
+    return m_changingRoot;
+}
+
+void CombatSearchParameters::setUseMaxValue(bool value)
+{
+    m_useMaxValue = value;
+}
+
+bool CombatSearchParameters::getUseMaxValue() const
+{
+    return m_useMaxValue;
+}
+
 void CombatSearchParameters::setNumberOfSimulations(int value)
 {
     m_numberOfSimulations = value;

@@ -1,0 +1,1 @@
+g++ -std=c++17 -L/../libs -I/../include *.cpp -o ../bin/BOSS_main
