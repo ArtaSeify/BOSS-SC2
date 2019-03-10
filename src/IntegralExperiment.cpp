@@ -48,15 +48,36 @@ IntegralExperiment::IntegralExperiment(const std::string & experimentName, const
     BOSS_ASSERT(exp.count("UseNetwork") && exp["UseNetwork"].is_boolean(), "IntegralSearch must have a UseNetwork bool");
     m_params.setNetworkPrediction(exp["UseNetwork"]);
 
+    BOSS_ASSERT(exp.count("Threads") && exp["Threads"].is_number_integer(), "Integral Search must have a Threads int");
+    m_params.setThreadsForExperiment(exp["Threads"]);
+
     const std::string & searchType = exp["SearchType"][0].get<std::string>();
     m_searchType = searchType;
 
     if (searchType == "IntegralMCTS")
     {
-        m_params.setExplorationValue(exp["SearchType"][1]);
-        m_params.setNumberOfSimulations(exp["SearchType"][2]);
-        m_params.setUseMaxValue(exp["SearchType"][3]);
+        auto & searchParameters = exp["SearchParameters"];
+        m_params.setExplorationValue(searchParameters["ExplorationConstant"]);
+        m_params.setUseMaxValue(searchParameters["UseMax"]);
 
+        if (searchParameters.count("Simulations"))
+        {
+            m_params.setNumberOfSimulations(searchParameters["Simulations"]);
+        }
+        else
+        {
+            m_params.setNumberOfSimulations(std::numeric_limits<int>::max());
+        }
+
+        if (searchParameters.count("Nodes"))
+        {
+            m_params.setNumberOfNodes(searchParameters["Nodes"]);
+        }
+        else
+        {
+            m_params.setNumberOfNodes(std::numeric_limits<int>::max());
+        }
+       
         std::stringstream ss;
         ss << std::fixed << std::setprecision(2) << m_params.getExplorationValue();
         m_name += "C" + ss.str();
@@ -141,13 +162,13 @@ IntegralExperiment::IntegralExperiment(const std::string & experimentName, const
     }
 }
 
-void IntegralExperiment::runExperimentThread(int thread, int runPerThread)
+void IntegralExperiment::runExperimentThread(int thread, int runForThread)
 {
     static std::string stars = "************************************************";
 
-    for (int i(0); i < runPerThread; ++i)
+    for (int i(0); i < runForThread; ++i)
     {
-        int index = i + (thread * runPerThread);
+        int index = i + (thread * runForThread);
 
         std::string name = m_name + "Run" + std::to_string(index);
         std::string outputDir = m_outputDir + "/" + Assert::CurrentDateTime() + "_" + name;
@@ -191,17 +212,28 @@ void IntegralExperiment::run(int numberOfRuns)
         FileTools::MakeDirectory(CONSTANTS::ExecutablePath + "/data/DataTuples/SearchData");
     }
 
-    int numThreads = 5;
-    int runPerThread = int(numberOfRuns / numThreads);
+    
+    int runPerThread = 0;
+    int numThreads = m_params.getThreadsForExperiment();
+
+    while (runPerThread == 0)
+    {
+       runPerThread = int(numberOfRuns / numThreads);
+       if (runPerThread == 0)
+       {
+           numThreads--;
+       }
+    }
     std::vector<std::thread> threads(numThreads);
 
     for (int thread = 0; thread < numThreads; ++thread)
     {
         threads[thread] = std::thread(&IntegralExperiment::runExperimentThread, this, thread, runPerThread);
+        std::this_thread::sleep_for(std::chrono::milliseconds(250));
     }
 
-    for (int thread = 0; thread < numThreads; ++thread)
+    for (auto & thread : threads)
     {
-        threads[thread].join();
+        thread.join();
     }
 }

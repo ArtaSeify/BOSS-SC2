@@ -4,6 +4,7 @@
 #include "IntegralExperiment.h"
 #include "BuildOrderPlotter.h"
 #include "FileTools.h"
+#include <thread>
 
 using namespace BOSS;
 
@@ -14,12 +15,35 @@ void ExperimentsArta::RunExperiments(const std::string & experimentFilename)
     file >> j;
 
     BOSS_ASSERT(j.count("Experiments"), "No 'Experiments' member found");
+    BOSS_ASSERT(j.count("ExperimentsInParallel") && j["ExperimentsInParallel"].is_number_integer(), "Need integer 'ExperimentsInParallel'");
+    std::vector<int> experimentsPerThread = threadSplit(int(j["Experiments"].size()), j["ExperimentsInParallel"]);
 
-    for (auto it = j["Experiments"].begin(); it != j["Experiments"].end(); ++it)
+    std::vector<std::thread> threads(j["ExperimentsInParallel"].get<int>());
+    for (int thread = 0; thread < threads.size(); ++thread)
     {
+        threads[thread] = std::thread(runExperimentsThread, j, thread, experimentsPerThread[thread]);
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    }
+    
+    for (auto & thread : threads)
+    {
+        thread.join();
+    }
+
+    std::cout << "\n\n";
+}
+
+void ExperimentsArta::runExperimentsThread(const json & j, int thread, int experimentsForThread)
+{
+    for (int index = 0; index < experimentsForThread; ++index)
+    {
+        // move iterator forward
+        auto it = j["Experiments"].begin();
+        std::advance(it, index + (thread * experimentsForThread));
+
         const std::string &         experimentName = it.key();
         const json &                val = it.value();
-
+        
         //std::cout << "Found Experiment:   " << name << std::endl;
         BOSS_ASSERT(val.count("Run"), "Experiment has no Run value");
         BOSS_ASSERT(val["Run"].is_array() && val["Run"][0].is_boolean() && val["Run"][1].is_number_integer(), "Run must be a <bool, int> array");
@@ -27,13 +51,15 @@ void ExperimentsArta::RunExperiments(const std::string & experimentFilename)
         if (val["Run"][0] == true)
         {
             BOSS_ASSERT(val.count("SearchType"), "Experiment has no SearchType value");
-            BOSS_ASSERT(val["SearchType"].is_array() && val["SearchType"][0].is_string(), "SearchType must be an array, and first element must be a string");
+            BOSS_ASSERT(val["SearchType"].is_array() && val["SearchType"][0].is_string(), "SearchType must an array with first element a string");
             if (val["SearchType"] == "IntegralMCTS")
             {
-                BOSS_ASSERT(val["SearchType"].size() == 4 && val["SearchType"][1].is_number_float()
-                                && val["SearchType"][2].is_number_integer() && val["SearchType"][3].is_boolean(), 
-                                "Format for MCTS search is: [MCTS, explorationValue, numSimulations]");
+                auto & searchParameters = val["SearchParameters"];
+                BOSS_ASSERT(searchParameters.count("ExplorationConstant") && searchParameters["ExplorationConstant"].is_number_float(), "There must be a float ExplorationConstant");
+                BOSS_ASSERT((searchParameters.count("Nodes") && searchParameters["Nodes"].is_number_integer()) || (searchParameters.count("Simulations") && searchParameters["Simulations"].is_number_integer()), "There must be an int Nodes or Simulations");
+                BOSS_ASSERT(searchParameters.count("UseMax") && searchParameters["UseMax"].is_boolean(), "There must be a bool UseMax");
             }
+
             const std::string & searchType = val["SearchType"][0].get<std::string>();
 
             if (searchType == "IntegralDFS")
@@ -50,8 +76,29 @@ void ExperimentsArta::RunExperiments(const std::string & experimentFilename)
             }
         }
     }
+}
 
-    std::cout << "\n\n";
+std::vector<int> ExperimentsArta::threadSplit(int numExperiments, int experimentsInParallel)
+{
+    std::vector<int> experimentsPerThread(experimentsInParallel);
+    int expsPerThread = numExperiments / experimentsInParallel;
+
+    for (int i = 0; i < experimentsInParallel; ++i)
+    {
+        experimentsPerThread[i] = expsPerThread;
+    }
+
+    // can't evenly divide the experiments
+    if (numExperiments % experimentsInParallel != 0)
+    {
+        int experimentsLeft = numExperiments - (expsPerThread * experimentsInParallel);
+        for (int i = 0; i < experimentsLeft; ++i)
+        {
+            experimentsPerThread[i]++;
+        }
+    }
+
+    return experimentsPerThread;
 }
 
 void ExperimentsArta::RunDFSExperiment(const std::string & experimentName, const json & exp, int numberOfRuns)

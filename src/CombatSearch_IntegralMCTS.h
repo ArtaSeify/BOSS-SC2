@@ -12,11 +12,15 @@ namespace BOSS
         int m_numSimulations;
         int m_simulationsPerStep;
         
+        CombatSearch_IntegralDataFinishedUnits  m_bestIntegralFound;
+        BuildOrderAbilities                     m_bestBuilderOrderFound;
+        bool                                    m_needToWriteBestValue;
+        
         std::mt19937 m_rnggen;
         
         int m_writeEveryKSimulations;
-        std::string m_resultsSaveDir;
-        std::string m_resultsFilePrefix;
+        std::string m_dir;
+        std::string m_name;
         std::stringstream m_resultsStream;
         std::stringstream m_dataStream;
 
@@ -46,6 +50,8 @@ namespace BOSS
 
         void test(const GameState & state);
         void test2(const GameState & state);
+
+        void updateNodeVisits(bool nodeExpanded, bool isTerminal);
 
         void writeResultsToFile(std::shared_ptr<Node> root);
 

@@ -197,6 +197,15 @@ int CombatSearchParameters::getNumberOfSimulations() const
     return m_numberOfSimulations;
 }
 
+void CombatSearchParameters::setNumberOfNodes(int value)
+{
+    m_numberOfNodes = value;
+}
+int CombatSearchParameters::getNumberOfNodes() const
+{
+    return m_numberOfNodes;
+}
+
 void CombatSearchParameters::setSimulationsPerStep(int value)
 {
     m_simulationsPerStep = value;
@@ -215,6 +224,16 @@ void CombatSearchParameters::setNetworkPrediction(bool value)
 bool CombatSearchParameters::useNetworkPrediction() const
 {
     return m_useNetworkPrediction;
+}
+
+void CombatSearchParameters::setThreadsForExperiment(int threads)
+{
+    m_threadsForExperiment = threads;
+}
+
+int CombatSearchParameters::getThreadsForExperiment() const
+{
+    return m_threadsForExperiment;
 }
 
 void CombatSearchParameters::print()

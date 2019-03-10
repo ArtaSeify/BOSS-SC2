@@ -12,10 +12,10 @@ CombatSearch_IntegralMCTS::CombatSearch_IntegralMCTS(const CombatSearchParameter
     Edge::USE_MAX_VALUE = m_params.getUseMaxValue();
 
     m_simulationsPerStep = m_params.getSimulationsPerStep();
-    m_writeEveryKSimulations = 10;
-    m_resultsSaveDir = dir;
-    m_resultsFilePrefix = prefix;
-    m_resultsStream << "0,";
+    m_writeEveryKSimulations = 1;
+    m_dir = dir;
+    m_name = prefix;
+    m_resultsStream << "0,0,0,0,0\n";
 
     std::random_device rd; // obtain a random number from hardware
     m_rnggen.seed(rd());
@@ -55,7 +55,7 @@ void CombatSearch_IntegralMCTS::recurse(const GameState & state, int depth)
     std::shared_ptr<Node> root = std::make_shared<Node>(state);
     std::shared_ptr<Node> currentRoot = root;
 
-    while (!timeLimitReached() && m_numSimulations < m_params.getNumberOfSimulations())
+    while (!timeLimitReached() && m_numSimulations < m_params.getNumberOfSimulations() && m_results.nodeVisits < m_params.getNumberOfNodes())
     {
         // change the root of the tree. Remove all the nodes and edges that are now irrelevant
         if (m_params.getChangingRoot() && m_numSimulations > 0 && (m_simulationsPerStep == 1 || m_numSimulations%m_simulationsPerStep == 0))
@@ -67,6 +67,7 @@ void CombatSearch_IntegralMCTS::recurse(const GameState & state, int depth)
 
             currentRoot->removeEdges(childEdge);
             currentRoot = childEdge->getChild();
+            updateNodeVisits(false, isTerminalNode(*currentRoot));
 
             BOSS_ASSERT(currentRoot != nullptr, "currentRoot has become null");      
 
@@ -81,6 +82,11 @@ void CombatSearch_IntegralMCTS::recurse(const GameState & state, int depth)
             std::cout << "have run : " << m_numSimulations << " simulations thus far." << std::endl;
         }*/
         auto nodePair = getPromisingNode(currentRoot);
+        // we have reached node limit 
+        if (m_results.nodeVisits >= m_params.getNumberOfNodes())
+        {
+            break;
+        }
         std::shared_ptr<Node> promisingNode = nodePair.first;
         
         // a node that isn't part of the graph yet. We just simulate from this point
@@ -99,36 +105,47 @@ void CombatSearch_IntegralMCTS::recurse(const GameState & state, int depth)
                 promisingNode->createChildrenEdges(legalActions, m_params);
 
                 // there might be no action possible, so createChildrenEdges creates 0 edges
-                if (promisingNode->getNumEdges() > 0)
+                if (isTerminalNode(*promisingNode))
+                {
+                    m_results.leafNodesExpanded++;
+                    m_results.leafNodesVisited++;
+                }
+                else
                 {
                     // get a child based on highest network value
-                    promisingNode = promisingNode->notExpandedChild(promisingNode->getHighestValueChild(m_params), m_params);
+                    if (m_params.useNetworkPrediction())
+                    {
+                        promisingNode = promisingNode->notExpandedChild(promisingNode->getHighestValueChild(m_params), m_params);
+                    }
+                    else
+                    {
+                        promisingNode = promisingNode->notExpandedChild(promisingNode->getRandomEdge(), m_params);
+                    }
+                    
+                    updateNodeVisits(Edge::NODE_VISITS_BEFORE_EXPAND == 1, isTerminalNode(*promisingNode));
                 }
                 randomPlayout(*promisingNode);
             }
         }
-        backPropogation(promisingNode);
 
-        m_numSimulations++;
-
-        if (m_numSimulations%m_writeEveryKSimulations == 0)
+        if (m_results.nodeVisits < m_params.getNumberOfNodes())
         {
-            writeResultsToFile(currentRoot);
+            backPropogation(promisingNode);
+
+            m_numSimulations++;
+
+            if (m_needToWriteBestValue)
+            {
+                writeResultsToFile(currentRoot);
+            }
         }
     }
 
     if (!m_params.getChangingRoot())
     {
-        pickBestBuildOrder(root, false);
-        m_integral = m_promisingNodeIntegral;
-        m_buildOrder = m_promisingNodeBuildOrder;
+        m_integral = m_bestIntegralFound;
+        m_buildOrder = m_bestBuilderOrderFound;
     }
-
-    // Write search data to file to file so we can graph it
-    std::ofstream file(m_resultsSaveDir + "/" + m_resultsFilePrefix + "_Results.csv", std::ofstream::out | std::ofstream::app);
-    file << m_resultsStream.rdbuf();
-    file.close();
-    m_resultsStream.str(std::string());
 
     // write state data
     if (m_params.getSaveStates())
@@ -145,6 +162,9 @@ void CombatSearch_IntegralMCTS::recurse(const GameState & state, int depth)
         currentNode->getState().writeToSS(m_dataStream, m_params);
         m_dataStream << "," << m_integral.getCurrentStackValue() << "\n";
     }
+
+    m_results.buildOrder = m_buildOrder;
+    m_results.highestEval = m_integral.getCurrentStackValue();
 
     root->cleanUp();
 }
@@ -204,17 +224,18 @@ std::pair<std::shared_ptr<Node>, bool> CombatSearch_IntegralMCTS::getPromisingNo
     std::shared_ptr<Node> returnNode = node;
     std::shared_ptr<Edge> edge;
 
-    while(returnNode->getNumEdges() > 0)
+    while(returnNode->getNumEdges() > 0 && m_results.nodeVisits < m_params.getNumberOfNodes())
     {
         const GameState & prevStateNode = returnNode->getState();
 
         // select the edge with the highest UCT value
         edge = returnNode->selectChildEdge(m_exploration_parameter, m_params);
 
-        // the node doesn't exist, so we return this edge
+        // the node doesn't exist in memory
         if (edge->getChild() == nullptr)
         {
             returnNode = returnNode->notExpandedChild(edge, m_params);
+            updateNodeVisits(edge->getChild() != nullptr, isTerminalNode(*returnNode));
             updateBOIntegral(*returnNode, edge->getAction(), prevStateNode, false);
             return std::pair<std::shared_ptr<Node>, bool>(returnNode, true);
         }
@@ -222,6 +243,7 @@ std::pair<std::shared_ptr<Node>, bool> CombatSearch_IntegralMCTS::getPromisingNo
         // the node exists and is pointed to by the edge
         // get the next child
         returnNode = edge->getChild();
+        updateNodeVisits(false, isTerminalNode(*returnNode));
 
         // update build order and integral
         updateBOIntegral(*returnNode, edge->getAction(), prevStateNode, false);
@@ -238,7 +260,7 @@ bool CombatSearch_IntegralMCTS::isTerminalNode(const Node & node) const
 void CombatSearch_IntegralMCTS::randomPlayout(Node node)
 {
     // do a rollout until we reach a terminal state
-    while (!isTerminalNode(node))
+    while (!isTerminalNode(node) && m_results.nodeVisits < m_params.getNumberOfNodes())
     {
         GameState prevGameState(node.getState());
         doRandomAction(node, prevGameState);
@@ -255,6 +277,7 @@ void CombatSearch_IntegralMCTS::doRandomAction(Node & node, const GameState & pr
     std::uniform_int_distribution<> distribution(0, legalActions.size()-1);
     const Action & action = legalActions[distribution(m_rnggen)];
     node.doAction(action, m_params);
+    updateNodeVisits(false, isTerminalNode(node));
 
     updateBOIntegral(node, ActionAbilityPair(action.first, node.getState().getLastAbility()), prevGameState, false);    
 }
@@ -304,6 +327,13 @@ void CombatSearch_IntegralMCTS::backPropogation(std::shared_ptr<Node> node)
 {
     std::shared_ptr<Node> current_node = node;
     std::shared_ptr<Edge> parent_edge = current_node->getParentEdge();
+
+    if (m_promisingNodeIntegral.getCurrentStackValue() >= m_bestIntegralFound.getCurrentStackValue())
+    {
+        m_bestIntegralFound = m_promisingNodeIntegral;
+        m_bestBuilderOrderFound = m_promisingNodeBuildOrder;
+        m_needToWriteBestValue = true;
+    }
 
     //std::cout << "\nvalue of search: " << m_promisingNodeIntegral.getIntegralValue() << std::endl;
 
@@ -356,18 +386,37 @@ void CombatSearch_IntegralMCTS::pickBestBuildOrder(std::shared_ptr<Node> root,  
     m_promisingNodeIntegral.update(finalState, m_promisingNodeBuildOrder, m_params, m_searchTimer, false);
 }
 
+void CombatSearch_IntegralMCTS::updateNodeVisits(bool nodeExpanded, bool isTerminal)
+{
+    m_results.nodeVisits++;
+    if (nodeExpanded)
+    {
+        m_results.nodesExpanded++;
+    }  
+    if (isTerminal)
+    {
+        m_results.leafNodesVisited++;
+    }
+}
+
 void CombatSearch_IntegralMCTS::writeResultsToFile(std::shared_ptr<Node> root)
 {
-    pickBestBuildOrder(root, false);
-    FracType highestValueRoute = m_promisingNodeIntegral.getCurrentStackValue();
+    //pickBestBuildOrder(root, false);
+    //FracType highestValueRoute = m_promisingNodeIntegral.getCurrentStackValue();
 
-    m_resultsStream << highestValueRoute << ",";
+    m_resultsStream << m_results.nodesExpanded << "," << m_results.nodeVisits << ","
+        << m_results.leafNodesExpanded << "," << m_results.leafNodesVisited << ","
+        << m_results.searchTimer.getElapsedTimeInMilliSec() / 1000 << "," << m_numSimulations << ","
+        << m_bestBuilderOrderFound.getNameString() << m_bestIntegralFound.getCurrentStackValue() << "\n";
+    
+    m_needToWriteBestValue = false;
 }
 
 void CombatSearch_IntegralMCTS::printResults()
 {
     m_integral.print();
-    std::cout << "\nRan " << m_numSimulations << " simulations in " << m_results.timeElapsed << "ms @ " << (1000*m_numSimulations / m_results.timeElapsed) << " simulations/sec\n\n";
+    std::cout << "\nRan " << m_numSimulations << " simulations in " << m_results.timeElapsed << "ms @ " << (1000*m_numSimulations / m_results.timeElapsed) << " simulations/sec\n";
+    std::cout << "Nodes expanded: " << m_results.nodesExpanded << ". Total nodes visited: " << m_results.nodeVisits << ", at a rate of " << (1000 * m_results.nodeVisits / m_results.timeElapsed) << " nodes/sec\n";
 }
 
 #include "BuildOrderPlotter.h"
@@ -380,6 +429,24 @@ void CombatSearch_IntegralMCTS::writeResultsFile(const std::string & dir, const 
 
     m_integral.writeToFile(dir, filename);
 
-    std::ofstream file(dir + "/" + filename + "_BuildOrder.txt", std::ofstream::out | std::ofstream::app);
-    file << "\nRan " << m_numSimulations << " simulations in " << m_results.timeElapsed << "ms @ " << (1000 * m_numSimulations / m_results.timeElapsed) << " simulations/sec";
+    std::ofstream boFile(dir + "/" + filename + "_BuildOrder.txt", std::ofstream::out | std::ofstream::app);
+    boFile << "\nRan " << m_numSimulations << " simulations in " << m_results.timeElapsed << "ms @ " << (1000 * m_numSimulations / m_results.timeElapsed) << " simulations/sec" << std::endl;
+    boFile << "Nodes expanded: " << m_results.nodesExpanded << ". Total nodes visited: " << m_results.nodeVisits << ", at a rate of " << (1000 * m_results.nodeVisits / m_results.timeElapsed) << " nodes/sec\n";
+
+    // Write search data to file 
+    std::ofstream file(m_dir + "/" + m_name + "_Results.csv", std::ofstream::out | std::ofstream::app);
+    file << m_resultsStream.rdbuf();
+    file.close();
+    m_resultsStream.str(std::string());
+
+    std::ofstream searchData(m_dir + "/" + m_name + "_SearchData.txt", std::ofstream::out | std::ofstream::app);
+    searchData << "Max value found: " << m_bestIntegralFound.getCurrentStackValue() << "\n";
+    searchData << "Best build order: " << m_bestBuilderOrderFound.getNameString() << std::endl;
+    searchData << "Nodes expanded: " << m_results.nodesExpanded << "\n";
+    searchData << "Nodes traversed: " << m_results.nodeVisits << "\n";
+    searchData << "Leaf nodes expanded: " << m_results.leafNodesExpanded << "\n";
+    searchData << "Leaf nodes traversed: " << m_results.leafNodesVisited << "\n";
+    searchData << "Search time in ms: " << m_results.timeElapsed << "\n";
+    searchData << "Simulations: " << m_numSimulations;
+    searchData.close();
 }

@@ -96,7 +96,6 @@ void Node::createChildrenEdges(ActionSetAbilities & legalActions, const CombatSe
     if (m_edges.size() == 0)
     {
         isTerminalNode = true;
-        return;
     }
 }
 
@@ -250,9 +249,12 @@ std::shared_ptr<Edge> Node::selectChildEdge(FracType exploration_param, const Co
     {
         totalChildVisits += edge->timesVisited();
     }
-
+/*
     float UCBValue = exploration_param * policyValue *
         static_cast<FracType>(std::sqrt(totalChildVisits));
+*/
+    float UCBValue = exploration_param *
+            static_cast<FracType>(std::sqrt(totalChildVisits));
 
     float maxActionValue = 0;
     int maxIndex = 0;
@@ -265,7 +267,10 @@ std::shared_ptr<Edge> Node::selectChildEdge(FracType exploration_param, const Co
         // we normalize the action value to a range of [0, 1] using the highest
         // value of the search thus far. 
         float childUCBValue = UCBValue / (1 + edge->timesVisited());
+        //std::cout << "UCB Value: " << childUCBValue << std::endl;
+
         float actionValue = (edge->getValue() / Edge::CURRENT_HIGHEST_VALUE) + childUCBValue;
+        //std::cout << "action value: " << actionValue << std::endl;
 
         //std::cout << "edge value: " << edge->getValue() / Edge::CURRENT_HIGHEST_VALUE << ". UCT value: " << childUCBValue << std::endl;
 

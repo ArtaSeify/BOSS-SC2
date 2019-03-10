@@ -22,11 +22,13 @@ namespace BOSS
     protected:
         //CombatSearch_IntegralData   m_integral;
         CombatSearch_IntegralDataFinishedUnits  m_integral;
+        FracType                                m_highestValueFound;
         std::ofstream                           m_fileStates;
         std::stringstream                       m_ssStates;
-
-        std::ofstream                           m_fileHighestValue;
         std::stringstream                       m_ssHighestValue;
+
+        std::string m_dir;
+        std::string m_prefix;
 
     public:
         static FracType highestValueThusFar;
@@ -38,7 +40,6 @@ namespace BOSS
         FracType recurseReturnValue(const GameState & state, int depth);
 
         virtual void printResults();
-        virtual void setBestBuildOrder();
         virtual void writeResultsFile(const std::string & dir, const std::string & filename);
     };
 }

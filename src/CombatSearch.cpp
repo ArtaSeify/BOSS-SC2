@@ -32,17 +32,6 @@ void CombatSearch::search()
     }
 
     m_results.timeElapsed = m_searchTimer.getElapsedTimeInMilliSec();
-    setBestBuildOrder();
-}
-
-void CombatSearch::continueSearch()
-{
-
-}
-
-void CombatSearch::setBestBuildOrder()
-{
-
 }
 
 // This function generates the legal actions from a GameState based on the input search parameters

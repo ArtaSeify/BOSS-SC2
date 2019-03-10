@@ -40,8 +40,6 @@ namespace BOSS
     public:
 
         virtual void search();
-        virtual void continueSearch();
-        virtual void setBestBuildOrder();
         virtual void finishSearch();
         virtual void printResults();
         virtual void writeResultsFile(const std::string & dir, const std::string & prefix);

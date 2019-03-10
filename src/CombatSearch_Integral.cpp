@@ -9,6 +9,7 @@ FracType CombatSearch_Integral::highestValueThusFar = 0;
 
 CombatSearch_Integral::CombatSearch_Integral(const CombatSearchParameters p, int run,
     const std::string & dir, const std::string & prefix, const std::string & name)
+    : m_highestValueFound(0)
 {
     m_params = p;
 
@@ -17,8 +18,9 @@ CombatSearch_Integral::CombatSearch_Integral(const CombatSearchParameters p, int
         m_fileStates.open(CONSTANTS::ExecutablePath + "/data/stateValuePairs_" + std::to_string(run) + ".csv", std::ofstream::out | std::ofstream::app);
     }
 
-    m_fileHighestValue.open(dir + "/" + prefix + "_HighestValueOrdering.txt", std::ofstream::out | std::ofstream::trunc);
-    m_ssHighestValue << "0\n";
+    m_dir = dir;
+    m_prefix = prefix;
+    m_ssHighestValue << "0,0\n";
 
     //BOSS_ASSERT(m_params.getInitialState().getRace() != Races::None, "Combat search initial state is invalid");
 }
@@ -29,14 +31,16 @@ CombatSearch_Integral::~CombatSearch_Integral()
     m_ssStates.str(std::string());
     m_fileStates.close();
 
-    m_fileHighestValue << m_ssHighestValue.rdbuf();
+    std::ofstream fileHighestValue(m_dir + "/" + m_prefix + "_HighestValueOrdering.txt", std::ofstream::out | std::ofstream::trunc);
+    fileHighestValue << m_ssHighestValue.rdbuf();
     m_ssHighestValue.str(std::string());
-    m_fileHighestValue.close();
+    fileHighestValue.close();
 }
 
 void CombatSearch_Integral::recurse(const GameState & state, int depth)
 {
-    FracType highestValueFound = recurseReturnValue(state, depth);
+    m_highestValueFound = recurseReturnValue(state, depth);
+    m_results.buildOrder = m_integral.getBestBuildOrder();
 }
 
 FracType CombatSearch_Integral::recurseReturnValue(const GameState & state, int depth)
@@ -57,6 +61,7 @@ FracType CombatSearch_Integral::recurseReturnValue(const GameState & state, int 
     FracType nodeIntegralValue = 0;
     FracType nodeIntegralToThisPoint = m_integral.getValueToThisPoint();
     bool ffCalculated = false;
+    bool isLeafNode = true;
 
     ActionSetAbilities legalActions;
     generateLegalActions(state, legalActions, m_params);
@@ -100,6 +105,7 @@ FracType CombatSearch_Integral::recurseReturnValue(const GameState & state, int 
             //std::cout << "frame of action added: " << child.getCurrentFrame() << std::endl;
 
             m_integral.update(child, m_buildOrder, m_params, m_searchTimer);
+            isLeafNode = false;
 
             nodeIntegralValue = std::max(nodeIntegralValue, recurseReturnValue(child, depth + 1));
 
@@ -111,7 +117,7 @@ FracType CombatSearch_Integral::recurseReturnValue(const GameState & state, int 
         else
         {
             m_buildOrder.pop_back();
-            //if (!ffCalculated)
+            if (!ffCalculated)
             {
                 GameState child_framelimit(state);
                 child_framelimit.fastForward(m_params.getFrameTimeLimit());
@@ -135,7 +141,12 @@ FracType CombatSearch_Integral::recurseReturnValue(const GameState & state, int 
     if (nodeIntegralValue > highestValueThusFar)
     {
         highestValueThusFar = nodeIntegralValue;
-        m_ssHighestValue << highestValueThusFar << "\n";
+        m_ssHighestValue << m_results.nodesExpanded << "," << highestValueThusFar << "\n";
+    }
+
+    if (isLeafNode)
+    {
+        m_results.leafNodesExpanded++;
     }
 
     //std::cout << "Value to this point: " << nodeIntegralToThisPoint << ". Total value: " << nodeIntegralValue << std::endl;
@@ -150,12 +161,6 @@ void CombatSearch_Integral::printResults()
     std::cout << "\nSearched " << m_results.nodesExpanded << " nodes in " << m_results.timeElapsed << "ms @ " << (1000.0*m_results.nodesExpanded / m_results.timeElapsed) << " nodes/sec\n\n";
 }
 
-void CombatSearch_Integral::setBestBuildOrder()
-{
-    m_results.buildOrder = m_integral.getBestBuildOrder();
-}
-
-
 #include "BuildOrderPlotter.h"
 void CombatSearch_Integral::writeResultsFile(const std::string & dir, const std::string & filename)
 {
@@ -168,4 +173,15 @@ void CombatSearch_Integral::writeResultsFile(const std::string & dir, const std:
 
     std::ofstream file(dir + "/" + filename + "_BuildOrder.txt", std::ofstream::out | std::ofstream::app);
     file << "\nSearched " << m_results.nodesExpanded << " nodes in " << m_results.timeElapsed << "ms @ " << (1000.0*m_results.nodesExpanded / m_results.timeElapsed) << " nodes/sec";
+    file.close();
+
+    std::ofstream searchData(dir + "/" + filename + "_SearchData.txt", std::ofstream::out | std::ofstream::app);
+    searchData << "Max value found: " << m_highestValueFound << "\n";
+    searchData << "Best build order: " << m_integral.getBestBuildOrder().getNameString() << std::endl;
+    searchData << "Nodes expanded: " << m_results.nodesExpanded << "\n";
+    searchData << "Nodes traversed: " << m_results.nodesExpanded << "\n";
+    searchData << "Leaf nodes expanded: " << m_results.leafNodesExpanded << "\n";
+    searchData << "Leaf nodes traversed: " << m_results.leafNodesExpanded << "\n";
+    searchData << "Search time in ms: " << m_results.timeElapsed;
+    searchData.close();
 }

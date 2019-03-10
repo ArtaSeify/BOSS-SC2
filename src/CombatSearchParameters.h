@@ -109,8 +109,10 @@ namespace BOSS
         bool m_changingRoot;
         bool m_useMaxValue;
         int m_numberOfSimulations;
+        int m_numberOfNodes;
         int m_simulationsPerStep;
         bool m_useNetworkPrediction;
+        int m_threadsForExperiment;
 
     public:
 
@@ -168,11 +170,17 @@ namespace BOSS
         void setNumberOfSimulations(int value);
         int getNumberOfSimulations() const;
 
+        void setNumberOfNodes(int value);
+        int getNumberOfNodes() const;
+
         void setSimulationsPerStep(int value);
         int getSimulationsPerStep() const;
 
         void setNetworkPrediction(bool value);
         bool useNetworkPrediction() const;
+
+        void setThreadsForExperiment(int threads);
+        int getThreadsForExperiment() const;
     
         void print();
     };
