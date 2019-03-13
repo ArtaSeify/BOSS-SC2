@@ -7,6 +7,8 @@ using namespace BOSS;
 CombatSearch_IntegralMCTS::CombatSearch_IntegralMCTS(const CombatSearchParameters p, const std::string & dir, 
                                                         const std::string & prefix, const std::string & name)
     : m_exploration_parameter (p.getExplorationValue())
+    , m_bestIntegralFound(CombatSearch_IntegralDataFinishedUnits())
+    , m_bestBuildOrderFound(BuildOrderAbilities())
 {
     m_params = p;
     Edge::USE_MAX_VALUE = m_params.getUseMaxValue();
@@ -15,7 +17,7 @@ CombatSearch_IntegralMCTS::CombatSearch_IntegralMCTS(const CombatSearchParameter
     m_writeEveryKSimulations = 1;
     m_dir = dir;
     m_name = prefix;
-    m_resultsStream << "0,0,0,0,0\n";
+    m_resultsStream << "0,0,0,0,0,0, ,0\n";
 
     std::random_device rd; // obtain a random number from hardware
     m_rnggen.seed(rd());
@@ -61,6 +63,9 @@ void CombatSearch_IntegralMCTS::recurse(const GameState & state, int depth)
         if (m_params.getChangingRoot() && m_numSimulations > 0 && (m_simulationsPerStep == 1 || m_numSimulations%m_simulationsPerStep == 0))
         {
             std::shared_ptr<Edge> childEdge = currentRoot->getHighestValueChild(m_params);
+
+            // TODO: DONT CRASH, CREATE NODE INSTEAD
+            BOSS_ASSERT(childEdge->getChild() != nullptr, "currentRoot has become null");
             
             // we have made a choice, so we need to update the integral and build order permanently
             updateBOIntegral(*(childEdge->getChild()), childEdge->getAction(), currentRoot->getState(), true);
@@ -68,8 +73,6 @@ void CombatSearch_IntegralMCTS::recurse(const GameState & state, int depth)
             currentRoot->removeEdges(childEdge);
             currentRoot = childEdge->getChild();
             updateNodeVisits(false, isTerminalNode(*currentRoot));
-
-            BOSS_ASSERT(currentRoot != nullptr, "currentRoot has become null");      
 
             // search is over
             if (isTerminalNode(*currentRoot) || m_numSimulations >= m_params.getNumberOfSimulations())
@@ -115,11 +118,18 @@ void CombatSearch_IntegralMCTS::recurse(const GameState & state, int depth)
                     // get a child based on highest network value
                     if (m_params.useNetworkPrediction())
                     {
-                        promisingNode = promisingNode->notExpandedChild(promisingNode->getHighestValueChild(m_params), m_params);
+                        const GameState & prevNodeState = promisingNode->getState();
+                        std::shared_ptr<Edge> action = promisingNode->getHighestValueChild(m_params);
+                        promisingNode = promisingNode->notExpandedChild(action, m_params);
+                        updateBOIntegral(*promisingNode, action->getAction(), prevNodeState, false);
                     }
+                    // pick a child at random
                     else
                     {
-                        promisingNode = promisingNode->notExpandedChild(promisingNode->getRandomEdge(), m_params);
+                        const GameState & prevNodeState = promisingNode->getState();
+                        std::shared_ptr<Edge> action = promisingNode->getRandomEdge();
+                        promisingNode = promisingNode->notExpandedChild(action, m_params);
+                        updateBOIntegral(*promisingNode, action->getAction(), prevNodeState, false);
                     }
                     
                     updateNodeVisits(Edge::NODE_VISITS_BEFORE_EXPAND == 1, isTerminalNode(*promisingNode));
@@ -141,11 +151,62 @@ void CombatSearch_IntegralMCTS::recurse(const GameState & state, int depth)
         }
     }
 
-    if (!m_params.getChangingRoot())
+    m_integral = m_bestIntegralFound;
+    m_buildOrder = m_bestBuildOrderFound;
+
+    // create a build order based only on the units that finished
+    const GameState bestState(m_bestIntegralFound.getState());
+    int numInitialUnits = m_params.getInitialState().getNumUnits();
+    int numTotalUnits = bestState.getNumUnits();
+    auto & chronoboosts = bestState.getChronoBoostTargets();
+    int chronoboostIndex = 0;
+    TimeType nextCBTime = 0;
+    if (chronoboosts.size() > 0)
     {
-        m_integral = m_bestIntegralFound;
-        m_buildOrder = m_bestBuilderOrderFound;
+        nextCBTime = chronoboosts[chronoboostIndex].frameCast;
     }
+
+    BuildOrderAbilities finishedUnitsBuildOrder;
+    for (int index = 0; index < numTotalUnits - numInitialUnits; ++index)
+    {
+        auto & unit = bestState.getUnit(index + numInitialUnits);
+        if (unit.getFinishFrame() == -1)
+        {
+            continue;
+        }
+        if (chronoboostIndex < chronoboosts.size())
+        {
+            while (nextCBTime < unit.getStartFrame())
+            {
+                const AbilityAction & cb = chronoboosts[chronoboostIndex];
+                if (bestState.getUnit(cb.targetProductionID).getFinishFrame() != -1)
+                {
+                    finishedUnitsBuildOrder.add(cb.type, cb);
+                }
+                chronoboostIndex++;
+                if (chronoboostIndex == chronoboosts.size())
+                {
+                    break;
+                }
+                nextCBTime = chronoboosts[chronoboostIndex].frameCast;
+            }
+        }
+
+        finishedUnitsBuildOrder.add(unit.getType());
+    }
+    while (chronoboostIndex < chronoboosts.size())
+    {
+        const AbilityAction & cb = chronoboosts[chronoboostIndex];
+        if (bestState.getUnit(cb.targetProductionID).getFinishFrame() != -1)
+        {
+            finishedUnitsBuildOrder.add(cb.type, cb);
+        }
+        chronoboostIndex++;
+    }
+
+    m_results.highestEval = m_integral.getCurrentStackValue();
+    m_results.buildOrder = m_bestBuildOrderFound;
+    m_results.finishedUnitsBuildOrder = finishedUnitsBuildOrder;
 
     // write state data
     if (m_params.getSaveStates())
@@ -162,9 +223,6 @@ void CombatSearch_IntegralMCTS::recurse(const GameState & state, int depth)
         currentNode->getState().writeToSS(m_dataStream, m_params);
         m_dataStream << "," << m_integral.getCurrentStackValue() << "\n";
     }
-
-    m_results.buildOrder = m_buildOrder;
-    m_results.highestEval = m_integral.getCurrentStackValue();
 
     root->cleanUp();
 }
@@ -273,13 +331,70 @@ void CombatSearch_IntegralMCTS::doRandomAction(Node & node, const GameState & pr
     ActionSetAbilities legalActions;
     generateLegalActions(node.getState(), legalActions, m_params);
 
-    // do an action at random
-    std::uniform_int_distribution<> distribution(0, legalActions.size()-1);
-    const Action & action = legalActions[distribution(m_rnggen)];
-    node.doAction(action, m_params);
-    updateNodeVisits(false, isTerminalNode(node));
+    // the placeholder Chronoboost is expanded into a Chronoboost for each target.
+    // this gives each chrono boostable target a fair chance at getting picked
+    int chronoBoostIndex = -1;
+    for (auto it = legalActions.begin(); it != legalActions.end(); ++it)
+    {
+        if (it->first.isAbility())
+        {
+            chronoBoostIndex = int(it - legalActions.begin());
+            node.getState().getSpecialAbilityTargets(legalActions, chronoBoostIndex);
+            break;
+        }
+        
+    }
+    // chronoboost is an invalid action
+    if (chronoBoostIndex != -1 && legalActions[chronoBoostIndex].second == -1)
+    {
+        legalActions.remove(legalActions[chronoBoostIndex].first, chronoBoostIndex);
+    }
 
-    updateBOIntegral(node, ActionAbilityPair(action.first, node.getState().getLastAbility()), prevGameState, false);    
+    // do an action at random
+    if (legalActions.size() > 0)
+    {
+        std::uniform_int_distribution<> distribution(0, legalActions.size() - 1);
+        int index = distribution(m_rnggen);
+        Action action = legalActions[index];
+
+        while (!node.doAction(action, m_params))
+        {
+            legalActions.remove(action.first, index);
+            if (legalActions.size() == 0)
+            {
+                updateIntegralTerminal(node, prevGameState);
+                node.setTerminal();
+                m_results.leafNodesVisited++;
+                return;
+            }
+            else if (legalActions.size() == 1)
+            {
+                index = 0;
+                action = legalActions[index];
+            }
+            else
+            {
+                std::uniform_int_distribution<> distribution(0, legalActions.size() - 1);
+                index = distribution(m_rnggen);
+                action = legalActions[index];
+            }
+        }
+        updateBOIntegral(node, ActionAbilityPair(action.first, node.getState().getLastAbility()), prevGameState, false);
+    }
+    else
+    {
+        updateIntegralTerminal(node, prevGameState);
+        node.setTerminal();
+    }
+
+    updateNodeVisits(false, isTerminalNode(node));
+}
+
+void CombatSearch_IntegralMCTS::updateIntegralTerminal(const Node & node, const GameState & prevGameState)
+{
+    GameState stateCopy(prevGameState);
+    stateCopy.fastForward(m_params.getFrameTimeLimit());
+    m_promisingNodeIntegral.update(stateCopy, m_promisingNodeBuildOrder, m_params, m_searchTimer, false);
 }
 
 void CombatSearch_IntegralMCTS::updateBOIntegral(const Node & node, const ActionAbilityPair & action, const GameState & prevGameState, bool permanantUpdate)
@@ -319,8 +434,6 @@ void CombatSearch_IntegralMCTS::updateBOIntegral(const Node & node, const Action
             m_promisingNodeIntegral.update(node.getState(), m_promisingNodeBuildOrder, m_params, m_searchTimer, false);
         }
     }
-
-    
 }
 
 void CombatSearch_IntegralMCTS::backPropogation(std::shared_ptr<Node> node)
@@ -328,10 +441,11 @@ void CombatSearch_IntegralMCTS::backPropogation(std::shared_ptr<Node> node)
     std::shared_ptr<Node> current_node = node;
     std::shared_ptr<Edge> parent_edge = current_node->getParentEdge();
 
-    if (m_promisingNodeIntegral.getCurrentStackValue() >= m_bestIntegralFound.getCurrentStackValue())
+    if (m_promisingNodeIntegral.getCurrentStackValue() > m_bestIntegralFound.getCurrentStackValue() || 
+        ((m_promisingNodeIntegral.getCurrentStackValue() == m_bestIntegralFound.getCurrentStackValue()) && Eval::StateBetter(m_promisingNodeIntegral.getState(), m_bestIntegralFound.getState())))
     {
         m_bestIntegralFound = m_promisingNodeIntegral;
-        m_bestBuilderOrderFound = m_promisingNodeBuildOrder;
+        m_bestBuildOrderFound = m_promisingNodeBuildOrder;
         m_needToWriteBestValue = true;
     }
 
@@ -407,14 +521,14 @@ void CombatSearch_IntegralMCTS::writeResultsToFile(std::shared_ptr<Node> root)
     m_resultsStream << m_results.nodesExpanded << "," << m_results.nodeVisits << ","
         << m_results.leafNodesExpanded << "," << m_results.leafNodesVisited << ","
         << m_results.searchTimer.getElapsedTimeInMilliSec() / 1000 << "," << m_numSimulations << ","
-        << m_bestBuilderOrderFound.getNameString() << m_bestIntegralFound.getCurrentStackValue() << "\n";
+        << m_bestBuildOrderFound.getNameString() << "," << m_bestIntegralFound.getCurrentStackValue() << "\n";
     
     m_needToWriteBestValue = false;
 }
 
 void CombatSearch_IntegralMCTS::printResults()
 {
-    m_integral.print();
+    m_bestIntegralFound.print(m_bestBuildOrderFound);
     std::cout << "\nRan " << m_numSimulations << " simulations in " << m_results.timeElapsed << "ms @ " << (1000*m_numSimulations / m_results.timeElapsed) << " simulations/sec\n";
     std::cout << "Nodes expanded: " << m_results.nodesExpanded << ". Total nodes visited: " << m_results.nodeVisits << ", at a rate of " << (1000 * m_results.nodeVisits / m_results.timeElapsed) << " nodes/sec\n";
 }
@@ -424,10 +538,10 @@ void CombatSearch_IntegralMCTS::writeResultsFile(const std::string & dir, const 
 {
     BuildOrderPlotter plot;
     plot.setOutputDir(dir);
-    plot.addPlot(filename, m_params.getInitialState(), m_integral.getBestBuildOrder());
+    plot.addPlot(filename, m_params.getInitialState(), m_bestBuildOrderFound);
     plot.doPlots();
 
-    m_integral.writeToFile(dir, filename);
+    m_bestIntegralFound.writeToFile(dir, filename);
 
     std::ofstream boFile(dir + "/" + filename + "_BuildOrder.txt", std::ofstream::out | std::ofstream::app);
     boFile << "\nRan " << m_numSimulations << " simulations in " << m_results.timeElapsed << "ms @ " << (1000 * m_numSimulations / m_results.timeElapsed) << " simulations/sec" << std::endl;
@@ -439,9 +553,11 @@ void CombatSearch_IntegralMCTS::writeResultsFile(const std::string & dir, const 
     file.close();
     m_resultsStream.str(std::string());
 
+
     std::ofstream searchData(m_dir + "/" + m_name + "_SearchData.txt", std::ofstream::out | std::ofstream::app);
     searchData << "Max value found: " << m_bestIntegralFound.getCurrentStackValue() << "\n";
-    searchData << "Best build order: " << m_bestBuilderOrderFound.getNameString() << std::endl;
+    searchData << "Best build order (all): " << m_bestBuildOrderFound.getNameString() << std::endl;
+    searchData << "Best build order (finished): " << m_results.finishedUnitsBuildOrder.getNameString(0, -1, true) << std::endl;
     searchData << "Nodes expanded: " << m_results.nodesExpanded << "\n";
     searchData << "Nodes traversed: " << m_results.nodeVisits << "\n";
     searchData << "Leaf nodes expanded: " << m_results.leafNodesExpanded << "\n";

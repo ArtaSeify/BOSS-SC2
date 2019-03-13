@@ -2,7 +2,14 @@
 //
 //#define _CRT_NO_VA_START_VALIDATION
 //
-#include <Python.h>
+#define BOOST_PYTHON_STATIC_LIB
+#ifdef _DEBUG
+    #undef _DEBUG
+    #include <Python.h>
+    #define _DEBUG
+#else
+    #include <Python.h>
+#endif
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/python/import.hpp>
@@ -41,7 +48,6 @@ int main(int argc, char * argv[])
         Py_Initialize();
         
         PyRun_SimpleString(command.c_str());
-        //if (!strcmp(argv[1], "python"))
         try
         {
             BOSS::CONSTANTS::Predictor = python::import("predictor").attr("Network")(std::string(argv[2]));

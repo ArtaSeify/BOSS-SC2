@@ -462,14 +462,27 @@ void Tools::DoBuildOrder(GameState & state, const BuildOrder & buildOrder)
     }
 }
 
-void Tools::DoBuildOrder(GameState & state, const BuildOrderAbilities & buildOrder)
+void Tools::DoBuildOrder(GameState & state, BuildOrderAbilities & buildOrder)
 {
-    for (const auto &x : buildOrder)
+    for (auto & x : buildOrder)
     {
         ActionType type = x.first;
         if (type.isAbility())
         {
-            state.doAbility(type, x.second.targetID);
+            ActionType targetType = x.second.targetType;
+            ActionType targetProductionType = x.second.targetProductionType;
+            for (int index = 0; index < state.getNumUnits(); ++index)
+            {
+                auto unit = static_cast<const GameState>(state).getUnit(index);
+                if (unit.getType() == targetType && unit.getBuildType() == targetProductionType)
+                {
+                    state.doAbility(type, index);
+                    x.second.targetID = unit.getID();
+                    x.second.targetProductionID = unit.getBuildID();
+                    x.second.frameCast = state.getCurrentFrame();
+                    break;
+                }
+            }
         }
         else
         {

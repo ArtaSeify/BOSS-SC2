@@ -14,17 +14,17 @@ void BuildOrderAbilities::add(ActionType type)
 {
     BOSS_ASSERT((m_buildOrder.size() == 0) || (type.getRace() == m_buildOrder.back().first.getRace()), "Cannot have a build order with multiple races");
 
-    m_buildOrder.emplace_back(type, AbilityAction());
+    m_buildOrder.push_back(std::make_pair(type, AbilityAction()));
     m_typeCount[type.getID()]++;
 }
 
 void BuildOrderAbilities::add(ActionType type, const AbilityAction & ability)
 {
-    m_buildOrder.emplace_back(type, ability);
+    m_buildOrder.push_back(std::make_pair(type, ability));
     m_typeCount[type.getID()]++;
 }
 
-void BuildOrderAbilities::add(const ActionTargetPair & pair)
+void BuildOrderAbilities::add(const ActionAbilityPair & pair)
 {
     m_buildOrder.push_back(pair);
     m_typeCount[pair.first.getID()]++;
@@ -78,17 +78,17 @@ void BuildOrderAbilities::pop_back()
     m_buildOrder.pop_back();
 }
 
-const BuildOrderAbilities::ActionTargetPair & BuildOrderAbilities::operator [] (int i) const
+const BuildOrderAbilities::ActionAbilityPair & BuildOrderAbilities::operator [] (int i) const
 {
     return m_buildOrder[i];
 }
 
-BuildOrderAbilities::ActionTargetPair & BuildOrderAbilities::operator [] (int i)
+BuildOrderAbilities::ActionAbilityPair & BuildOrderAbilities::operator [] (int i)
 {
     return m_buildOrder[i];
 }
 
-const BuildOrderAbilities::ActionTargetPair & BuildOrderAbilities::back() const
+const BuildOrderAbilities::ActionAbilityPair & BuildOrderAbilities::back() const
 {
     return m_buildOrder.back();
 }
@@ -173,23 +173,36 @@ std::string BuildOrderAbilities::getNameString(int charactersPerName, int printU
             if (charactersPerName == 0)
             {
                 name += "_" + m_buildOrder[i].second.targetType.getName();
+                name += "_" + m_buildOrder[i].second.targetProductionType.getName();
             }
             else
             {
                 name += "_" + m_buildOrder[i].second.targetType.getName().substr(0, charactersPerName);
+                name += "_" + m_buildOrder[i].second.targetProductionType.getName().substr(0, charactersPerName);
             }
         }
 
+        if (withComma)
+        {
+            ss << "\"";
+        }
         ss << name;
 
         if (withComma)
         {
-            ss << ",";
+            ss << "\"";
+            if (i != printUpToIndex - 1)
+            {
+                ss << ",";
+            }
         }
 
         else
         {
-            ss << " ";
+            if (i < printUpToIndex - 1)
+            {
+                ss << " ";
+            }
         }
     }
 

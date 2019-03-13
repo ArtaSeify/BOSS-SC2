@@ -1,7 +1,7 @@
 /* -*- c-basic-offset: 4 -*- */
 
 #pragma once
-
+#define BOOST_PYTHON_STATIC_LIB
 #include <boost/python/object/function.hpp>
 #include <cstdio>
 #include <cmath>

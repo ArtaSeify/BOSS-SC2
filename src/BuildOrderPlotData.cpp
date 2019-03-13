@@ -66,7 +66,7 @@ void BuildOrderPlotData::calculateStartEndTimes()
 
     
     int latestTimeFinish = 0;
-    const GameState stateLatestFinish = std::as_const(state);
+    const GameState stateLatestFinish(state);
     for (int i = 0; i < stateLatestFinish.getNumUnits(); ++i)
     {
         int timeUntilBuilt = stateLatestFinish.getUnit(i).getTimeUntilBuilt();
@@ -78,7 +78,7 @@ void BuildOrderPlotData::calculateStartEndTimes()
     state.fastForward(state.getCurrentFrame() + latestTimeFinish + 1); // ff far enough so everything is done
 
     // get the finish times
-    const GameState constState = std::as_const(state);
+    const GameState constState(state);
     int abilities = 0;
     m_maxFinishTime = 0;
 

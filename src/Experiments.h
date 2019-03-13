@@ -11,7 +11,7 @@ namespace BOSS
     {
         void RunExperiments(const std::string & experimentFilename);
         std::vector<int> threadSplit(int numExperiments, int experimentsInParallel);
-        void runExperimentsThread(const json & j, int thread, int experimentsForThread);
+        void runExperimentsThread(const json & j, int thread, int experimentsPrevThread, int startingIndex);
         void RunDFSExperiment(const std::string & experimentName, const json & exp, int numberOfRuns);
         void RunMCTSExperiment(const std::string & experimentName, const json & exp, int numberOfRuns);
     }

@@ -61,6 +61,7 @@ void CombatSearch::generateLegalActions(const GameState & state, ActionSetAbilit
 
     // if we enabled the always make workers flag, and workers are legal
     ActionType worker = ActionTypes::GetWorker(state.getRace());
+    ActionSetAbilities illegalActions;
     if (m_params.getAlwaysMakeWorkers() && legalActions.contains(worker))
     {
         bool actionLegalBeforeWorker = false;
@@ -68,8 +69,12 @@ void CombatSearch::generateLegalActions(const GameState & state, ActionSetAbilit
         // when can we make a worker
         int workerReady = state.whenCanBuild(worker);
 
+        if (workerReady > params.getFrameTimeLimit())
+        {
+            illegalActions.add(worker);
+        }
         // if we can make a worker in the next couple of frames, do it
-        if (workerReady <= state.getCurrentFrame() + 2)
+        else if (workerReady <= state.getCurrentFrame() + 2)
         {
             legalActions.clear();
             legalActions.add(worker);
@@ -77,34 +82,66 @@ void CombatSearch::generateLegalActions(const GameState & state, ActionSetAbilit
         }
 
         // figure out if anything can be made before a worker
-        for (const auto & actionAndTarget : legalActions)
+        for (auto it = legalActions.begin(); it != legalActions.end(); ++it)
         {
-            ActionType actionType = actionAndTarget.first;
-            // considering abilities will break this heuristic
-            if (!actionType.isAbility())
-            {
-                int whenCanPerformAction = state.whenCanBuild(actionType);
+            ActionType actionType = it->first;
 
-                if (whenCanPerformAction < workerReady)
-                {
-                    actionLegalBeforeWorker = true;
-                    break;
-                }
+            int whenCanPerformAction = state.whenCanBuild(actionType);
+
+            // if action goes past the time limit, it is illegal
+            if (whenCanPerformAction > params.getFrameTimeLimit())
+            {
+                illegalActions.add(actionType);
             }
+
+            if (!actionType.isAbility() && whenCanPerformAction < workerReady)
+            {
+                actionLegalBeforeWorker = true;
+            }
+        }
+
+        // no legal action
+        if (illegalActions.size() == legalActions.size())
+        {
+            legalActions.clear();
+            return;
         }
 
         // if something can be made before a worker, then don't consider workers
         if (actionLegalBeforeWorker)
         {
-            legalActions.remove(worker);
+            // remove illegal actions, which now includes worker
+            illegalActions.add(worker);
+            legalActions.remove(illegalActions);
         }
         // otherwise we can make a worker next so don't consider anything else
         else
         {
             legalActions.clear();
-            legalActions.add(worker);
-            //legalActions.add(ActionTypes::GetSpecialAction(state.getRace()));
+            if (workerReady <= params.getFrameTimeLimit())
+            {
+                legalActions.add(worker);
+            }
         }
+    }
+
+    else
+    {
+        // figure out if any action goes past the time limit
+        for (auto it = legalActions.begin(); it != legalActions.end(); ++it)
+        {
+            ActionType actionType = it->first;
+            int whenCanPerformAction = state.whenCanBuild(actionType);
+
+            // if action goes past the time limit, it is illegal
+            if (whenCanPerformAction > params.getFrameTimeLimit())
+            {
+                illegalActions.add(actionType);
+            }
+        }
+
+        // remove illegal actions
+        legalActions.remove(illegalActions);
     }
 
     // sort the actions

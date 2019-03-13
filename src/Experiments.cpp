@@ -18,11 +18,18 @@ void ExperimentsArta::RunExperiments(const std::string & experimentFilename)
     BOSS_ASSERT(j.count("ExperimentsInParallel") && j["ExperimentsInParallel"].is_number_integer(), "Need integer 'ExperimentsInParallel'");
     std::vector<int> experimentsPerThread = threadSplit(int(j["Experiments"].size()), j["ExperimentsInParallel"]);
 
+    /*for (int threadRun : experimentsPerThread)
+    {
+        std::cout << threadRun << std::endl;
+    }*/
+
     std::vector<std::thread> threads(j["ExperimentsInParallel"].get<int>());
+    int startingIndex = 0;
     for (int thread = 0; thread < threads.size(); ++thread)
     {
-        threads[thread] = std::thread(runExperimentsThread, j, thread, experimentsPerThread[thread]);
+        threads[thread] = std::thread(runExperimentsThread, j, thread, experimentsPerThread[thread], startingIndex);
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        startingIndex += experimentsPerThread[thread];
     }
     
     for (auto & thread : threads)
@@ -33,13 +40,13 @@ void ExperimentsArta::RunExperiments(const std::string & experimentFilename)
     std::cout << "\n\n";
 }
 
-void ExperimentsArta::runExperimentsThread(const json & j, int thread, int experimentsForThread)
+void ExperimentsArta::runExperimentsThread(const json & j, int thread, int experimentsForThread, int startingIndex)
 {
     for (int index = 0; index < experimentsForThread; ++index)
     {
         // move iterator forward
         auto it = j["Experiments"].begin();
-        std::advance(it, index + (thread * experimentsForThread));
+        std::advance(it, index + startingIndex);
 
         const std::string &         experimentName = it.key();
         const json &                val = it.value();

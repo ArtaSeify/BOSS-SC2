@@ -1,3 +1,4 @@
+#define BOOST_PYTHON_STATIC_LIB
 #include <boost/python/list.hpp>
 #include <boost/python/extract.hpp>
 #include <boost/python/object_attributes.hpp>
@@ -65,27 +66,17 @@ void Node::createChildrenEdges(ActionSetAbilities & legalActions, const CombatSe
         // test the action to see if it's valid. if it's valid, we create the edge.
         // if it's not valid, we don't create the edge
         action = legalActions[index];
-        GameState testState(m_state);
         if (action.first.isAbility())
         {
+            GameState testState(m_state);
             testState.doAbility(action.first, action.second);
-        }
-
-        else
-        {
-            testState.doAction(action.first);
-        }
-
-        if (testState.getCurrentFrame() > params.getFrameTimeLimit())
-        {
-            continue;
+            if (testState.getCurrentFrame() <= params.getFrameTimeLimit())
+            {
+                m_edges.push_back(std::make_shared<Edge>(ActionAbilityPair(action.first, testState.getLastAbility()), thisNode));
+            }
         }
 
         // action is valid, so create an edge
-        if (action.first.isAbility())
-        {
-            m_edges.push_back(std::make_shared<Edge>(ActionAbilityPair(action.first, testState.getLastAbility()), thisNode));
-        }
         else
         {
             m_edges.push_back(std::make_shared<Edge>(ActionAbilityPair(action.first, AbilityAction()), thisNode));
@@ -175,45 +166,23 @@ bool Node::doAction(const Action & action, const CombatSearchParameters & params
     // Chronoboost place holder action. Need to find all valid targets, then we pick a target at random
     if (actionType == ActionTypes::GetSpecialAction(m_state.getRace()) && actionTarget == -1)
     {
-        ActionSetAbilities legalActions;
-        legalActions.add(action.first, action.second);
-        m_state.getSpecialAbilityTargets(legalActions, 0);
-        // Chronoboost is no longer a legal action
-        if (legalActions[0].second == -1)
-        {
-            return false;
-        }
-
-        // if only one target, set that to be the target
-        if (legalActions.size() == 1)
-        {
-            actionTarget = legalActions[0].second;
-        }
-
-        // otherwise randomly choose between the targets
-        else
-        {
-            std::random_device rd;
-            std::mt19937 gen(rd());
-            std::uniform_int_distribution<> dis(0, legalActions.size() - 1);
-            actionTarget = legalActions[dis(gen)].second;
-        }
+        BOSS_ASSERT(false, "Non targetted ability action should not be passed to doAction");
     }
     
     if (actionType.isAbility())
     {
+        GameState copyState(m_state);
+        copyState.doAbility(actionType, actionTarget);
+        if (copyState.getCurrentFrame() > params.getFrameTimeLimit())
+        {
+            return false;
+        }
         m_state.doAbility(actionType, actionTarget);
     }
     else
     {
         m_state.doAction(actionType);
-    }
-
-    // if we go over the frame time limit, this node is invalid
-    if (m_state.getCurrentFrame() > params.getFrameTimeLimit())
-    {
-        isTerminalNode = true;
-        return false;
+        BOSS_ASSERT(m_state.getCurrentFrame() <= params.getFrameTimeLimit(), "frame limit passed");
     }
 
     return true;
@@ -293,7 +262,7 @@ std::shared_ptr<Node> Node::notExpandedChild(std::shared_ptr<Edge> edge, const C
 {
     // create a temporary node
     std::shared_ptr<Node> node = std::make_shared<Node>(m_state, edge);
-    node->doAction(edge, params);
+    BOSS_ASSERT(node->doAction(edge, params), "notExpandedChild should only be called with legal edge");
     return node;
 }
 

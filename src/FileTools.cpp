@@ -47,23 +47,25 @@ void FileTools::MakeDirectory(const std::string & dir)
         dir_name += chr;
         if (chr == '/' && !dirExists(dir_name))
         {
-#ifdef WIN32
-            nError = _mkdir(dir_name.c_str()); // can be used on Windows
-#else 
-            mode_t nMode = 0733; // UNIX style permissions
-            nError = mkdir(dir.c_str(), nMode); // can be used on non-Windows
-#endif
+            fs::create_directory(dir_name);
+//#ifdef WIN32
+//            nError = _mkdir(dir_name.c_str()); // can be used on Windows
+//#else 
+//            mode_t nMode = 0733; // UNIX style permissions
+//            nError = mkdir(dir.c_str(), nMode); // can be used on non-Windows
+//#endif
         }
     }
 
     if (!dirExists(dir))
     {
-#ifdef WIN32
-        nError = _mkdir(dir_name.c_str()); // can be used on Windows
-#else 
-        mode_t nMode = 0733; // UNIX style permissions
-        nError = mkdir(dir.c_str(), nMode); // can be used on non-Windows
-#endif
+        fs::create_directory(dir_name);
+//#ifdef WIN32
+//        nError = _mkdir(dir_name.c_str()); // can be used on Windows
+//#else 
+//        mode_t nMode = 0733; // UNIX style permissions
+//        nError = mkdir(dir.c_str(), nMode); // can be used on non-Windows
+//#endif
     }
 
     if (nError != 0) {

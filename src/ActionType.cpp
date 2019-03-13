@@ -124,7 +124,10 @@ namespace ActionTypes
             allActionTypes.push_back(ActionType(i));
             nameMap[allActionTypes[i].getName()] = allActionTypes[i];
             
-            raceActionTypesCount[allActionTypes[i].getRace()]++;
+            if (allActionTypes[i].getRace() != Races::None)
+            {
+                raceActionTypesCount[allActionTypes[i].getRace()]++;
+            }
         }
 
         workerActionTypes.push_back(ActionTypes::GetActionType("Probe"));

@@ -13,7 +13,7 @@ namespace BOSS
         int m_simulationsPerStep;
         
         CombatSearch_IntegralDataFinishedUnits  m_bestIntegralFound;
-        BuildOrderAbilities                     m_bestBuilderOrderFound;
+        BuildOrderAbilities                     m_bestBuildOrderFound;
         bool                                    m_needToWriteBestValue;
         
         std::mt19937 m_rnggen;
@@ -38,6 +38,8 @@ namespace BOSS
         
         // does a random action
         void doRandomAction(Node & node, const GameState & prevGameState);
+
+        void updateIntegralTerminal(const Node & node, const GameState & prevGameState);
     
         // updates both m_promisingNodeIntegral and m_promisingNodeBuildOrder
         void updateBOIntegral(const Node & node, const ActionAbilityPair & action, const GameState & prevGameState, bool permanantUpdate);

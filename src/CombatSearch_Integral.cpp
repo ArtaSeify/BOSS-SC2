@@ -104,7 +104,7 @@ FracType CombatSearch_Integral::recurseReturnValue(const GameState & state, int 
             //std::cout << "target of action added: " << actionTarget << std::endl;
             //std::cout << "frame of action added: " << child.getCurrentFrame() << std::endl;
 
-            m_integral.update(child, m_buildOrder, m_params, m_searchTimer);
+            m_integral.update(child, m_buildOrder, m_params, m_searchTimer, true);
             isLeafNode = false;
 
             nodeIntegralValue = std::max(nodeIntegralValue, recurseReturnValue(child, depth + 1));
@@ -122,7 +122,7 @@ FracType CombatSearch_Integral::recurseReturnValue(const GameState & state, int 
                 GameState child_framelimit(state);
                 child_framelimit.fastForward(m_params.getFrameTimeLimit());
 
-                m_integral.update(child_framelimit, m_buildOrder, m_params, m_searchTimer);
+                m_integral.update(child_framelimit, m_buildOrder, m_params, m_searchTimer, true);
                 nodeIntegralValue = std::max(nodeIntegralValue, m_integral.getCurrentStackValue());
 
                 m_integral.popFinishedLastOrder(state, child_framelimit);

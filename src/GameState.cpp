@@ -24,7 +24,7 @@ GameState::GameState()
     , m_numDepots(0)
     , m_inProgressDepots(0)
     , m_lastAction(ActionTypes::None)
-    , m_lastAbility()
+    , m_lastAbility(AbilityAction())
 {
     //using Vector_Unit = BoundedVector<Unit, 70>;
     //using Vector_NumUnits = BoundedVector<NumUnits, 35>;
@@ -57,7 +57,7 @@ GameState::GameState(const std::vector<Unit> & unitVector, RaceID race, FracType
     , m_numDepots(numDepots)
     , m_inProgressDepots(0)
     , m_lastAction(ActionTypes::None)
-    , m_lastAbility()
+    , m_lastAbility(AbilityAction())
 {
     for (auto & unit : m_units)
     {
@@ -104,7 +104,7 @@ void GameState::getLegalActions(std::vector<ActionType> & legalActions) const
 bool GameState::isLegal(ActionType action) const
 {
     // if the race can't do the action
-    if (action.getRace() != m_race) { return false; }    
+    if (action.getRace() != m_race) { return false; }
 
     // if we have no gas income we can't make a gas unit
     if ((m_gas < action.gasPrice()) && (m_gasWorkers == 0)) { return false; }
@@ -123,7 +123,6 @@ bool GameState::isLegal(ActionType action) const
     // rules for buildings which are built by workers
     if (action.isBuilding() && !action.isMorphed() && !action.isAddon() && (mineralWorkers == 0)) { return false; }
 
-
     const int numRefineries = m_numRefineries + m_inProgressRefineries;
     // don't build a refinery if we don't have enough mineral workers to transfer over
     if (action.isRefinery() && (mineralWorkers <= (CONSTANTS::WorkersPerRefinery * (numRefineries + 1)))) { return false; }
@@ -136,19 +135,20 @@ bool GameState::isLegal(ActionType action) const
     if (action.isAbility() && m_race == Races::Protoss && numDepots == 0) { return false; }
 
 
-    const NumUnits totalSupply = m_maxSupply + m_inProgressSupply;
+    const NumUnits totalSupply = std::min(m_maxSupply + m_inProgressSupply, 200);
+
     // if it's a unit and we are out of supply and aren't making a supply providing unit, it's not legal
     if (!action.isMorphed() && !action.isSupplyProvider() && ((m_currentSupply + action.supplyCost()) > totalSupply)) { return false; }  
 
     // we don't need to go over the maximum supply limit with supply providers
-    if (action.isSupplyProvider() && (totalSupply > 400)) { return false; }
+    if (ActionTypes::GetSupplyProvider(m_race) == action && (totalSupply > 200)) { return false; }
 
     // need to have at least 1 Pylon to build Protoss buildings, except if it's an Assimilator
     if (m_race == Races::Protoss && action.isBuilding() && !action.isSupplyProvider() && !action.isRefinery() 
            && totalSupply%ActionTypes::GetResourceDepot(m_race).supplyProvided() == 0) { return false; }
 
     // Don't build a supply depot if we have 16 or over free supply
-    if (m_race == Races::Protoss && action == ActionTypes::GetSupplyProvider(m_race) && totalSupply - m_currentSupply >= 16) { return false; }
+    //if (m_race == Races::Protoss && action == ActionTypes::GetSupplyProvider(m_race) && totalSupply - m_currentSupply >= 16) { return false; }
 
     // TODO: can only build one of a tech type
     // TODO: check to see if an addon can ever be built
@@ -213,7 +213,7 @@ void GameState::doAbility(ActionType type, NumUnits targetID)
 
     if (m_race == Races::Protoss)
     {
-        AbilityAction abilityAction(type, m_currentFrame, targetID, getUnit(targetID).getBuildID(), getUnit(targetID).getType());
+        AbilityAction abilityAction(type, m_currentFrame, targetID, getUnit(targetID).getBuildID(), getUnit(targetID).getType(), getUnit(targetID).getBuildType());
         m_lastAbility = abilityAction;
 
         // cast chronoboost
@@ -552,7 +552,11 @@ int GameState::whenSupplyReady(ActionType action) const
             return m_currentFrame + unit.getTimeUntilBuilt();
         }
     }
-
+    std::cout << "Max supply: " << m_maxSupply << std::endl;
+    std::cout << "Supply in progress: " << m_inProgressSupply << std::endl;
+    std::cout << "Current supply: " << m_currentSupply << std::endl;
+    std::cout << "num depots: " << m_numDepots << ", in progress: " << m_inProgressDepots << std::endl;
+    std::cout << "num pylons: " << getNumCompleted(ActionTypes::GetActionType("Pylon")) << ", in progress: " << getNumInProgress(ActionTypes::GetActionType("Pylon")) << std::endl;
     BOSS_ASSERT(false, "Didn't find any supply in progress to build %s", action.getName().c_str());
     return m_currentFrame;
 }

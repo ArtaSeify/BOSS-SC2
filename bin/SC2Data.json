@@ -1,8 +1,8 @@
 {
     "Game" : "StarCraft 2",
     "WorkersPerRefinery" : 3,
-    "MineralsPerWorkerPerFrame" : 0.045,
-    "GasPerWorkerPerFrame" : 0.07,
+    "MineralsPerWorkerPerFrame" : 0.025,
+    "GasPerWorkerPerFrame" : 0.028,
     "EnergyRegenPerFrame" : 0.031,
     "HealthRegenPerFrame" : 0.0155,
     "ShieldRegenPerFrame" : 0.027125,

@@ -81,7 +81,11 @@ void CombatSearch_IntegralDataFinishedUnits::update(const GameState & state, con
     {
         m_bestIntegralValue = m_integralStack.back().integral_UntilFrameLimit;
         m_bestIntegralStack = m_integralStack;
-        m_bestIntegralBuildOrder = buildOrder;
+        // save build order only during integral search
+        if (useTieBreaker)
+        {
+            m_bestIntegralBuildOrder = buildOrder;
+        }
         m_bestIntegralGameState = state;
 
         // print the newly found best to console
@@ -121,9 +125,16 @@ void CombatSearch_IntegralDataFinishedUnits::addChronoBoostEntry(TimeType startF
     m_chronoBoostEntries++;
 }
 
-void CombatSearch_IntegralDataFinishedUnits::print() const
+void CombatSearch_IntegralDataFinishedUnits::print(const BuildOrderAbilities & buildOrder) const
 {
-    print(m_bestIntegralStack, m_bestIntegralGameState, m_bestIntegralBuildOrder);
+    if (buildOrder.size() == 0)
+    {
+        print(m_bestIntegralStack, m_bestIntegralGameState, m_bestIntegralBuildOrder);
+    }
+    else
+    {
+        print(m_bestIntegralStack, m_bestIntegralGameState, buildOrder);
+    }
 }
 
 void CombatSearch_IntegralDataFinishedUnits::printIntegralData(const int index, const std::vector<IntegralDataFinishedUnits> & integral_stack, const GameState & /*!!! PROBLEM UNUSED state */, const BuildOrderAbilities & buildOrder) const
@@ -148,12 +159,19 @@ void CombatSearch_IntegralDataFinishedUnits::print(const std::vector<IntegralDat
     }
 }
 
-void CombatSearch_IntegralDataFinishedUnits::writeToFile(const std::string & dir, const std::string & filename)
+void CombatSearch_IntegralDataFinishedUnits::writeToFile(const std::string & dir, const std::string & filename, const BuildOrderAbilities & buildOrder)
 {
     std::stringstream ss;
 
     // build order sorted by start times
-    ss << m_bestIntegralBuildOrder.getNameString(2) << "\n";
+    if (buildOrder.size() == 0)
+    {
+        ss << m_bestIntegralBuildOrder.getNameString(2) << "\n";
+    }
+    else
+    {
+        ss << buildOrder.getNameString(2) << "\n";
+    }
 
     // build order sorted by end times
     BuildOrderAbilities BOEndTimes = createBuildOrderEndTimes(m_bestIntegralStack, m_bestIntegralGameState);
@@ -170,7 +188,7 @@ void CombatSearch_IntegralDataFinishedUnits::writeToFile(const std::string & dir
             ss << BOEndTimes[i - 1].first.getName();
             if (BOEndTimes[i - 1].first.getName() == "ChronoBoost")
             {
-                ss << "_" << BOEndTimes[i - 1].second.targetType.getName();
+                ss << "_" << BOEndTimes[i - 1].second.targetType.getName() << "_" << BOEndTimes[i - 1].second.targetProductionType.getName();
             }
         }
 
@@ -212,6 +230,11 @@ void CombatSearch_IntegralDataFinishedUnits::popFinishedLastOrder(const GameStat
     {
         pop_back();
     }
+}
+
+BuildOrderAbilities CombatSearch_IntegralDataFinishedUnits::createBuildOrderEndTimes() const
+{
+    return createBuildOrderEndTimes(m_integralStack, m_bestIntegralGameState);
 }
 
 // creates a build order based on the unit finished times

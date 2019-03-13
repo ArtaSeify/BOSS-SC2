@@ -85,14 +85,20 @@ BuildOrderAbilities JSONTools::GetBuildOrder(const json & j)
 
     for (auto & entry : j)
     {
-        if (entry.is_array())
+        std::string entry_str = entry.get<std::string>();
+
+        if (entry_str.find("_") != std::string::npos)
         {
-            BOSS_ASSERT(entry[0].is_string(), "Build order item is not a string");
-            BOSS_ASSERT(entry[1].is_string(), "Target of ability type is not a string");
-            BOSS_ASSERT(entry[2].is_number_integer(), "Target of ability is not an integer");
-            
-            AbilityAction ability(ActionTypes::GetActionType(entry[0]), 0, entry[2], -1, ActionTypes::GetActionType(entry[1]));
-            buildOrder.add(ActionTypes::GetActionType(entry[0]), ability);
+            std::stringstream ss(entry_str);
+            std::string sub_string;
+            std::vector<std::string> splittedStrings;
+            while (std::getline(ss, sub_string, '_'))
+            {
+                splittedStrings.push_back(sub_string);
+            }
+
+            AbilityAction ability(ActionTypes::GetActionType(splittedStrings[0]), 0, -1, -1, ActionTypes::GetActionType(splittedStrings[1]), ActionTypes::GetActionType(splittedStrings[2]));
+            buildOrder.add(ActionTypes::GetActionType(splittedStrings[0]), ability);
         }
 
         else

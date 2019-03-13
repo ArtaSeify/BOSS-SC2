@@ -49,9 +49,11 @@ namespace BOSS
         using iterator = Actions::iterator;
         using const_iterator = Actions::const_iterator;
         iterator begin() { return m_actionsAndTargets.begin(); }
-        const_iterator begin() const { return m_actionsAndTargets.begin(); }
+        const_iterator begin() const { return m_actionsAndTargets.cbegin(); }
         iterator end() { return m_actionsAndTargets.end(); }
-        const_iterator end() const { return m_actionsAndTargets.end(); }
+        const_iterator end() const { return m_actionsAndTargets.cend(); }
+        iterator erase(iterator position) { return m_actionsAndTargets.erase(position); }
+
 
         // index
         ActionTargetPair & operator[] (int index) { return m_actionsAndTargets[index]; }

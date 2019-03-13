@@ -153,14 +153,13 @@ int ActionSetAbilities::getAbilityTarget(int index) const
 }
 
 //  incorrect implementation
-/*void ActionSetAbilities::remove(const ActionSetAbilities & set)
+void ActionSetAbilities::remove(const ActionSetAbilities & set)
 {
-    for (const auto & val : set.m_actions)
+    for (auto & action : set)
     {
-        add(val);
+        remove(action.first);
     }
 }
-*/
 
 const ActionSetAbilities::ActionTargetPair & ActionSetAbilities::getRandomElement() const
 {

@@ -162,13 +162,13 @@ IntegralExperiment::IntegralExperiment(const std::string & experimentName, const
     }
 }
 
-void IntegralExperiment::runExperimentThread(int thread, int runForThread)
+void IntegralExperiment::runExperimentThread(int thread, int runForThread, int startingIndex)
 {
     static std::string stars = "************************************************";
 
     for (int i(0); i < runForThread; ++i)
     {
-        int index = i + (thread * runForThread);
+        int index = i + (startingIndex);
 
         std::string name = m_name + "Run" + std::to_string(index);
         std::string outputDir = m_outputDir + "/" + Assert::CurrentDateTime() + "_" + name;
@@ -225,11 +225,12 @@ void IntegralExperiment::run(int numberOfRuns)
        }
     }
     std::vector<std::thread> threads(numThreads);
-
+    int startingIndex = 0;
     for (int thread = 0; thread < numThreads; ++thread)
     {
-        threads[thread] = std::thread(&IntegralExperiment::runExperimentThread, this, thread, runPerThread);
+        threads[thread] = std::thread(&IntegralExperiment::runExperimentThread, this, thread, runPerThread, startingIndex);
         std::this_thread::sleep_for(std::chrono::milliseconds(250));
+        startingIndex += runPerThread;
     }
 
     for (auto & thread : threads)

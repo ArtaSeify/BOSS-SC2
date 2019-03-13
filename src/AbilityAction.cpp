@@ -11,5 +11,6 @@ void AbilityAction::writeToSS(std::stringstream & ss) const
     ss << frameCast << ",";
     ss << targetID << ",";
     ss << targetProductionID << ",";
-    ss << targetType.getID() << "]";
+    ss << targetType.getID() << ",";
+    ss << targetProductionType.getID() << "]";
 }

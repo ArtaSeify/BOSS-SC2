@@ -65,6 +65,7 @@ namespace BOSS
         std::shared_ptr<Node> getParent() { return m_parentEdge->getParent(); }
         int getNumEdges() const { return int(m_edges.size()); }
         bool isTerminal() const { return isTerminalNode; }
+        void setTerminal() { isTerminalNode = true; }
 
         void clearChildren() { m_edges.clear(); }
     };
