@@ -14,6 +14,7 @@ namespace BOSS
         void runExperimentsThread(const json & j, int thread, int experimentsPrevThread, int startingIndex);
         void RunDFSExperiment(const std::string & experimentName, const json & exp, int numberOfRuns);
         void RunMCTSExperiment(const std::string & experimentName, const json & exp, int numberOfRuns);
+        void RunNMCSExperiment(const std::string & experimentName, const json & exp, int numberOfRuns);
     }
 
 }

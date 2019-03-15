@@ -6,6 +6,7 @@
 #include "CombatSearch_Bucket.h"
 #include "CombatSearch_BestResponse.h"
 #include "CombatSearch_IntegralMCTS.h"
+#include "NMCS.h"
 #include "FileTools.h"
 #include <thread>
 
@@ -81,6 +82,13 @@ IntegralExperiment::IntegralExperiment(const std::string & experimentName, const
         std::stringstream ss;
         ss << std::fixed << std::setprecision(2) << m_params.getExplorationValue();
         m_name += "C" + ss.str();
+    }
+
+    else if (searchType == "IntegralNMCS")
+    {
+        auto & searchParameters = exp["SearchParameters"];
+        m_params.setNumPlayouts(searchParameters["Playouts"]);
+        m_params.setLevel(searchParameters["Level"]);
     }
 
     if (searchType == "IntegralDFS")
@@ -189,6 +197,10 @@ void IntegralExperiment::runExperimentThread(int thread, int runForThread, int s
         {
             //resultsFile += "_IntegralMCTS";
             combatSearch = std::unique_ptr<CombatSearch>(new CombatSearch_IntegralMCTS(m_params, outputDir, resultsFile, m_name));
+        }
+        else if (m_searchType == "IntegralNMCS")
+        {
+            combatSearch = std::unique_ptr<CombatSearch>(new NMCS(m_params, outputDir, resultsFile, m_name));
         }
         else
         {

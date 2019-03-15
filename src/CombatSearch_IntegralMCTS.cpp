@@ -9,6 +9,7 @@ CombatSearch_IntegralMCTS::CombatSearch_IntegralMCTS(const CombatSearchParameter
     : m_exploration_parameter (p.getExplorationValue())
     , m_bestIntegralFound(CombatSearch_IntegralDataFinishedUnits())
     , m_bestBuildOrderFound(BuildOrderAbilities())
+    , m_numSimulations(0)
 {
     m_params = p;
     Edge::USE_MAX_VALUE = m_params.getUseMaxValue();
@@ -154,55 +155,7 @@ void CombatSearch_IntegralMCTS::recurse(const GameState & state, int depth)
     m_integral = m_bestIntegralFound;
     m_buildOrder = m_bestBuildOrderFound;
 
-    // create a build order based only on the units that finished
-    const GameState bestState(m_bestIntegralFound.getState());
-    int numInitialUnits = m_params.getInitialState().getNumUnits();
-    int numTotalUnits = bestState.getNumUnits();
-    auto & chronoboosts = bestState.getChronoBoostTargets();
-    int chronoboostIndex = 0;
-    TimeType nextCBTime = 0;
-    if (chronoboosts.size() > 0)
-    {
-        nextCBTime = chronoboosts[chronoboostIndex].frameCast;
-    }
-
-    BuildOrderAbilities finishedUnitsBuildOrder;
-    for (int index = 0; index < numTotalUnits - numInitialUnits; ++index)
-    {
-        auto & unit = bestState.getUnit(index + numInitialUnits);
-        if (unit.getFinishFrame() == -1)
-        {
-            continue;
-        }
-        if (chronoboostIndex < chronoboosts.size())
-        {
-            while (nextCBTime < unit.getStartFrame())
-            {
-                const AbilityAction & cb = chronoboosts[chronoboostIndex];
-                if (bestState.getUnit(cb.targetProductionID).getFinishFrame() != -1)
-                {
-                    finishedUnitsBuildOrder.add(cb.type, cb);
-                }
-                chronoboostIndex++;
-                if (chronoboostIndex == chronoboosts.size())
-                {
-                    break;
-                }
-                nextCBTime = chronoboosts[chronoboostIndex].frameCast;
-            }
-        }
-
-        finishedUnitsBuildOrder.add(unit.getType());
-    }
-    while (chronoboostIndex < chronoboosts.size())
-    {
-        const AbilityAction & cb = chronoboosts[chronoboostIndex];
-        if (bestState.getUnit(cb.targetProductionID).getFinishFrame() != -1)
-        {
-            finishedUnitsBuildOrder.add(cb.type, cb);
-        }
-        chronoboostIndex++;
-    }
+    BuildOrderAbilities finishedUnitsBuildOrder = createFinishedUnitsBuildOrder(m_bestIntegralFound);
 
     m_results.highestEval = m_integral.getCurrentStackValue();
     m_results.buildOrder = m_bestBuildOrderFound;
@@ -333,22 +286,7 @@ void CombatSearch_IntegralMCTS::doRandomAction(Node & node, const GameState & pr
 
     // the placeholder Chronoboost is expanded into a Chronoboost for each target.
     // this gives each chrono boostable target a fair chance at getting picked
-    int chronoBoostIndex = -1;
-    for (auto it = legalActions.begin(); it != legalActions.end(); ++it)
-    {
-        if (it->first.isAbility())
-        {
-            chronoBoostIndex = int(it - legalActions.begin());
-            node.getState().getSpecialAbilityTargets(legalActions, chronoBoostIndex);
-            break;
-        }
-        
-    }
-    // chronoboost is an invalid action
-    if (chronoBoostIndex != -1 && legalActions[chronoBoostIndex].second == -1)
-    {
-        legalActions.remove(legalActions[chronoBoostIndex].first, chronoBoostIndex);
-    }
+    getChronoBoostTargets(node, legalActions);
 
     // do an action at random
     if (legalActions.size() > 0)
@@ -388,6 +326,26 @@ void CombatSearch_IntegralMCTS::doRandomAction(Node & node, const GameState & pr
     }
 
     updateNodeVisits(false, isTerminalNode(node));
+}
+
+void CombatSearch_IntegralMCTS::getChronoBoostTargets(const Node & node, ActionSetAbilities & legalActions)
+{
+    int chronoBoostIndex = -1;
+    for (auto it = legalActions.begin(); it != legalActions.end(); ++it)
+    {
+        if (it->first.isAbility())
+        {
+            chronoBoostIndex = int(it - legalActions.begin());
+            node.getState().getSpecialAbilityTargets(legalActions, chronoBoostIndex);
+            break;
+        }
+
+    }
+    // chronoboost is an invalid action
+    if (chronoBoostIndex != -1 && legalActions[chronoBoostIndex].second == -1)
+    {
+        legalActions.remove(legalActions[chronoBoostIndex].first, chronoBoostIndex);
+    }
 }
 
 void CombatSearch_IntegralMCTS::updateIntegralTerminal(const Node & node, const GameState & prevGameState)
@@ -498,6 +456,61 @@ void CombatSearch_IntegralMCTS::pickBestBuildOrder(std::shared_ptr<Node> root,  
     GameState finalState(bestNode->getState());
     finalState.fastForward(m_params.getFrameTimeLimit());
     m_promisingNodeIntegral.update(finalState, m_promisingNodeBuildOrder, m_params, m_searchTimer, false);
+}
+
+BuildOrderAbilities CombatSearch_IntegralMCTS::createFinishedUnitsBuildOrder(const CombatSearch_IntegralDataFinishedUnits & integral) const
+{
+    // create a build order based only on the units that finished
+    const GameState bestState(integral.getState());
+    int numInitialUnits = m_params.getInitialState().getNumUnits();
+    int numTotalUnits = bestState.getNumUnits();
+    auto & chronoboosts = bestState.getChronoBoostTargets();
+    int chronoboostIndex = 0;
+    TimeType nextCBTime = 0;
+    if (chronoboosts.size() > 0)
+    {
+        nextCBTime = chronoboosts[chronoboostIndex].frameCast;
+    }
+
+    BuildOrderAbilities finishedUnitsBuildOrder;
+    for (int index = 0; index < numTotalUnits - numInitialUnits; ++index)
+    {
+        auto & unit = bestState.getUnit(index + numInitialUnits);
+        if (unit.getFinishFrame() == -1)
+        {
+            continue;
+        }
+        if (chronoboostIndex < chronoboosts.size())
+        {
+            while (nextCBTime < unit.getStartFrame())
+            {
+                const AbilityAction & cb = chronoboosts[chronoboostIndex];
+                if (bestState.getUnit(cb.targetProductionID).getFinishFrame() != -1)
+                {
+                    finishedUnitsBuildOrder.add(cb.type, cb);
+                }
+                chronoboostIndex++;
+                if (chronoboostIndex == chronoboosts.size())
+                {
+                    break;
+                }
+                nextCBTime = chronoboosts[chronoboostIndex].frameCast;
+            }
+        }
+
+        finishedUnitsBuildOrder.add(unit.getType());
+    }
+    while (chronoboostIndex < chronoboosts.size())
+    {
+        const AbilityAction & cb = chronoboosts[chronoboostIndex];
+        if (bestState.getUnit(cb.targetProductionID).getFinishFrame() != -1)
+        {
+            finishedUnitsBuildOrder.add(cb.type, cb);
+        }
+        chronoboostIndex++;
+    }
+
+    return finishedUnitsBuildOrder;
 }
 
 void CombatSearch_IntegralMCTS::updateNodeVisits(bool nodeExpanded, bool isTerminal)

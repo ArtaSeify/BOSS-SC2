@@ -33,6 +33,7 @@ namespace BOSS
         bool                        isSupplyProvider= false;
         bool                        isDepot         = false;
         bool                        isAddon         = false;
+        bool                        isMorphed       = false;
         ActionType                  whatBuilds;
         std::vector<bool>           whatBuildsVector;           // the size of this vector is the number of actions of this actions' race. 
         uint4                       whatBuildsCount = 1;

@@ -109,6 +109,9 @@
     <ClCompile Include="..\src\Edge.cpp">
       <Filter>search\CombatSearch\Integral\MCTS2</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\NMCS.cpp">
+      <Filter>search\CombatSearch\Integral\NMCS</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\ActionType.h" />
@@ -225,6 +228,9 @@
     <ClInclude Include="..\src\Edge.h">
       <Filter>search\CombatSearch\Integral\MCTS2</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\NMCS.h">
+      <Filter>search\CombatSearch\Integral\NMCS</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="BuildOrder">
@@ -260,11 +266,11 @@
     <Filter Include="search\CombatSearch\Integral">
       <UniqueIdentifier>{841059ad-587a-41f4-9642-a83478d31d49}</UniqueIdentifier>
     </Filter>
-    <Filter Include="search\CombatSearch\Integral\MCTS">
-      <UniqueIdentifier>{117c0c5b-8945-40cb-ab9d-a69dc5b223b0}</UniqueIdentifier>
-    </Filter>
     <Filter Include="search\CombatSearch\Integral\MCTS2">
       <UniqueIdentifier>{d4bca63e-59b7-4207-848f-9cc0d95f7013}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="search\CombatSearch\Integral\NMCS">
+      <UniqueIdentifier>{117c0c5b-8945-40cb-ab9d-a69dc5b223b0}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

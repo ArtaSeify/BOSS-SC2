@@ -39,6 +39,9 @@ namespace BOSS
     {
         BOSS_ASSERT(j.count("WorkersPerRefinery"), "No 'WorkersPerRefinery' member");
         BOSS_ASSERT(j["WorkersPerRefinery"].is_number_integer(), "WorkersPerRefinery must be an integer");
+        
+        BOSS_ASSERT(j.count("WorkersPerDepot"), "No 'WorkersPerDepot' member");
+        BOSS_ASSERT(j["WorkersPerDepot"].is_number_integer(), "WorkersPerDepot must be an integer");
 
         BOSS_ASSERT(j.count("MineralsPerWorkerPerFrame"), "No 'MineralsPerWorkerPerFrame' member");
         BOSS_ASSERT(j["MineralsPerWorkerPerFrame"].is_number_float(), "MineralsPerWorkerPerFrame must be a float");
@@ -57,6 +60,7 @@ namespace BOSS
 
         
         CONSTANTS::WorkersPerRefinery = j["WorkersPerRefinery"];
+        CONSTANTS::WorkersPerDepot = j["WorkersPerDepot"];
         CONSTANTS::MPWPF = j["MineralsPerWorkerPerFrame"];
         CONSTANTS::GPWPF = j["GasPerWorkerPerFrame"];
         CONSTANTS::ERPF = j["EnergyRegenPerFrame"];

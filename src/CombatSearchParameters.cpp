@@ -33,6 +33,8 @@ CombatSearchParameters::CombatSearchParameters()
     , m_simulationsPerStep(0)
     , m_useNetworkPrediction(0)
     , m_threadsForExperiment(1)
+    , m_numPlayouts(0)
+    , m_level(0)
 {
     
 }
@@ -244,6 +246,24 @@ void CombatSearchParameters::setThreadsForExperiment(int threads)
 int CombatSearchParameters::getThreadsForExperiment() const
 {
     return m_threadsForExperiment;
+}
+
+void CombatSearchParameters::setNumPlayouts(int value)
+{
+    m_numPlayouts = value;
+}
+int CombatSearchParameters::getNumPlayouts() const
+{
+    return m_numPlayouts;
+}
+
+void CombatSearchParameters::setLevel(int value)
+{
+    m_level = value;
+}
+int CombatSearchParameters::getLevel() const
+{
+    return m_level;
 }
 
 void CombatSearchParameters::print()

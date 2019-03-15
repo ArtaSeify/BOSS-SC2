@@ -113,6 +113,8 @@ namespace BOSS
         int m_simulationsPerStep;
         bool m_useNetworkPrediction;
         int m_threadsForExperiment;
+        int m_numPlayouts;
+        int m_level;
 
     public:
 
@@ -181,6 +183,12 @@ namespace BOSS
 
         void setThreadsForExperiment(int threads);
         int getThreadsForExperiment() const;
+
+        void setNumPlayouts(int value);
+        int getNumPlayouts() const;
+
+        void setLevel(int value);
+        int getLevel() const;
     
         void print();
     };

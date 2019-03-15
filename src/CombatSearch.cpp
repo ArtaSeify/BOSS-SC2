@@ -148,7 +148,7 @@ void CombatSearch::generateLegalActions(const GameState & state, ActionSetAbilit
     if (params.getSortActions())
     {
         legalActions.sort(state, m_params);
-    }    
+    }   
 }
 
 const CombatSearchResults & CombatSearch::getResults() const

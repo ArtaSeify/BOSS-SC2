@@ -1,4 +1,5 @@
 #pragma once
+#include "Common.h"
 #include "CombatSearch_Integral.h"
 #include "Node.h"
 #include <random>
@@ -9,16 +10,18 @@ namespace BOSS
     {
         FracType m_exploration_parameter;
 
-        int m_numSimulations;
         int m_simulationsPerStep;
-        
+        int m_writeEveryKSimulations;
+
+        std::mt19937 m_rnggen;
+     
+    protected:
+        int m_numSimulations;
+
         CombatSearch_IntegralDataFinishedUnits  m_bestIntegralFound;
         BuildOrderAbilities                     m_bestBuildOrderFound;
         bool                                    m_needToWriteBestValue;
-        
-        std::mt19937 m_rnggen;
-        
-        int m_writeEveryKSimulations;
+
         std::string m_dir;
         std::string m_name;
         std::stringstream m_resultsStream;
@@ -26,7 +29,7 @@ namespace BOSS
 
         CombatSearch_IntegralDataFinishedUnits m_promisingNodeIntegral;
         BuildOrderAbilities m_promisingNodeBuildOrder;
-
+    
         void recurse(const GameState & state, int depth);
         
         // returns the node and isNodeJustCreated 
@@ -39,6 +42,8 @@ namespace BOSS
         // does a random action
         void doRandomAction(Node & node, const GameState & prevGameState);
 
+        void getChronoBoostTargets(const Node & node, ActionSetAbilities & legalActions);
+
         void updateIntegralTerminal(const Node & node, const GameState & prevGameState);
     
         // updates both m_promisingNodeIntegral and m_promisingNodeBuildOrder
@@ -49,6 +54,8 @@ namespace BOSS
 
         // sets the class variables to the best build order found during search
         void pickBestBuildOrder(std::shared_ptr<Node> root, bool useVisitCount);
+
+        BuildOrderAbilities createFinishedUnitsBuildOrder(const CombatSearch_IntegralDataFinishedUnits & integral) const;
 
         void test(const GameState & state);
         void test2(const GameState & state);

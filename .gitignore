@@ -63,3 +63,8 @@ emscripten/BOSS.data
 /bin/ToUseInGame10000
 /bin/DFS Experiments
 /bin/0
+/bin/withupgrades
+/bin/temp
+/bin/NMCS
+/bin/MCTS
+/bin/limitworkers

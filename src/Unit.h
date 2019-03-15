@@ -31,6 +31,7 @@ class Unit
     //int1        m_numLarva;         // number of larva this building currently has (Hatch only)
     FracType    m_maxEnergyAllowed; // maximum energy allowed for this building
     FracType    m_energy;            // energy of the building
+    bool        m_morphed;           // has the building been morphed. if true, this unit is no longer used for anything, but we keep it around as a placeholder
 
 public:
     Unit();
@@ -49,6 +50,7 @@ public:
     ActionType  getType()                   const   { return m_type; }
     ActionType  getAddon()                  const   { return m_addon; }
     ActionType  getBuildType()              const   { return m_buildType; }
+    bool        getMorphed()                const   { return m_morphed; }
 
     void        setTimeUntilBuilt(TimeType time)    { m_timeUntilBuilt = time; }
     void        setTimeUntilFree(TimeType time)     { m_timeUntilFree = time; }
@@ -59,6 +61,7 @@ public:
     void        castAbility(ActionType type, Unit & abilityTarget, Unit & abilityTargetProduction);
     void        complete(TimeType frameFinished);
     void        startBuilding(Unit & Unit);
+    //void        morph(ActionType newType);
     void        fastForward(TimeType frames);
     int         whenCanBuild(ActionType type) const;
 

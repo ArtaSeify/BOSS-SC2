@@ -68,6 +68,10 @@ void ActionTypeData::CreateActionTypeData(const json & actions, RaceID race)
             data.whatBuildsStr = whatBuilds[0].get<std::string>();
             data.whatBuildsCount = std::stoul(whatBuilds[1].get<std::string>());
             data.whatBuildsStatus = whatBuilds[2].get<std::string>();
+            if (data.whatBuildsStatus == "Morphed")
+            {
+                data.isMorphed = true;
+            }
             if (whatBuilds.size() == 4) { data.whatBuildsAddonStr = whatBuilds[3].get<std::string>(); }
 
             BOSS_ASSERT(actions[index].count("required"), "no 'required' member");

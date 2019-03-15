@@ -10,6 +10,8 @@ all_runs_dir = os.path.join(current_dir, args.runs_folder)
 all_runs = os.listdir(all_runs_dir)
 
 max_value_found = 0
+best_build_order = ""
+best_folder_name = ""
 
 os.chdir(all_runs_dir)
 for fold in all_runs:

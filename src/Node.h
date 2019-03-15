@@ -52,6 +52,7 @@ namespace BOSS
         std::shared_ptr<Edge> getRandomEdge();
 
         // returns the child node that is the result of action
+        std::shared_ptr<Edge> getEdge(int index) { return m_edges[index]; }
         std::shared_ptr<Edge> getChild(const ActionType & action);
         Node & getChild(int index) 
         { 

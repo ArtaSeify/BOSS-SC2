@@ -116,6 +116,12 @@ bool GameState::isLegal(ActionType action) const
     // if we have no mineral income we'll never have a minerla unit
     if ((m_minerals < action.mineralPrice()) && (mineralWorkers == 0)) { return false; }
 
+    // the number of mineral workers allowed is determined by WorkersPerDepot
+    if (action.isWorker() && m_mineralWorkers >= m_numDepots * CONSTANTS::WorkersPerDepot) { return false; }
+
+    // can only have one of each upgrade
+    if (action.isUpgrade() && m_unitTypes[action.getRaceActionID()]) { return false; }
+
     // only one Mothership is allowed
     if (action.supplyCost() == 8 && haveType(action)) { return false; }
 
@@ -363,13 +369,34 @@ void GameState::addUnit(ActionType type, NumUnits builderID)
 
     m_unitTypes[unit.getType().getRaceActionID()] = true;
 
-    if (type.isDepot())
+    if (type.isMorphed() && builderID != -1)
     {
-        m_inProgressDepots++;
+        ActionType beforeMorphType = getUnit(builderID).getType();
+        bool haveNotMorphed = false;
+        Unit & morphingUnit = getUnit(builderID);
+        for (auto & unit : m_units)
+        {
+            if (unit.getType() == beforeMorphType && !unit.getMorphed() && unit.getID() != morphingUnit.getID())
+            {
+                haveNotMorphed = true;
+            }
+        }
+        if (!haveNotMorphed)
+        {
+            m_unitTypes[getUnit(builderID).getType().getRaceActionID()] = false;
+        }
     }
-    else if (type.isRefinery())
+    
+    else
     {
-        m_inProgressRefineries++;
+        if (type.isDepot())
+        {
+            m_inProgressDepots++;
+        }
+        else if (type.isRefinery())
+        {
+            m_inProgressRefineries++;
+        }
     }
     
     // if we have a valid builder for this object, add it to the Units being built
@@ -379,6 +406,7 @@ void GameState::addUnit(ActionType type, NumUnits builderID)
 
         // add the Unit ID being built and sort the list
         m_unitsBeingBuilt.push_back(unit.getID());
+        
 
         // we know the list is already sorted when we add this unit, so we just swap it from the end until it's in the right place
         for (int i = (int)m_unitsBeingBuilt.size() - 1; i > 0; i--)
@@ -794,6 +822,9 @@ int GameState::storeChronoBoostTargets(ActionSetAbilities & actionSet, int index
 // minimum criteria that a unit must meet in order to be Chronoboostable
 bool GameState::chronoBoostableTarget(const Unit & unit) const
 {
+    // can't cast on a morphed unit as they are just a placeholder
+    if (unit.getMorphed()) { return false; }
+
     // can only be used on buildings
     if (!unit.getType().isBuilding()) { return false; }
 

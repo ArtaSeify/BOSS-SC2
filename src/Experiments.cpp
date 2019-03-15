@@ -67,6 +67,13 @@ void ExperimentsArta::runExperimentsThread(const json & j, int thread, int exper
                 BOSS_ASSERT(searchParameters.count("UseMax") && searchParameters["UseMax"].is_boolean(), "There must be a bool UseMax");
             }
 
+            else if (val["SearchType"] == "IntegralNMCS")
+            {
+                auto & searchParameters = val["SearchParameters"];
+                BOSS_ASSERT(searchParameters.count("Playouts") && searchParameters["Playouts"].is_number_integer(), "There must be an int Playouts");
+                BOSS_ASSERT(searchParameters.count("Level") && searchParameters["Level"].is_number_integer(), "There must be an int Level");
+            }
+
             const std::string & searchType = val["SearchType"][0].get<std::string>();
 
             if (searchType == "IntegralDFS")
@@ -76,6 +83,10 @@ void ExperimentsArta::runExperimentsThread(const json & j, int thread, int exper
             else if (searchType == "IntegralMCTS")
             {
                 RunMCTSExperiment(experimentName, val, val["Run"][1]);
+            }
+            else if (searchType == "IntegralNMCS")
+            {
+                RunNMCSExperiment(experimentName, val, val["Run"][1]);
             }
             else
             {
@@ -121,6 +132,16 @@ void ExperimentsArta::RunDFSExperiment(const std::string & experimentName, const
 void ExperimentsArta::RunMCTSExperiment(const std::string & experimentName, const json & exp, int numberOfRuns)
 {
     std::cout << "MCTS Search Experiment - " << experimentName << std::endl;
+
+    IntegralExperiment intexp(experimentName, exp);
+    intexp.run(numberOfRuns);
+
+    std::cout << "    " << experimentName << " completed" << std::endl;
+}
+
+void ExperimentsArta::RunNMCSExperiment(const std::string & experimentName, const json & exp, int numberOfRuns)
+{
+    std::cout << "NMCS Search Experiment - " << experimentName << std::endl;
 
     IntegralExperiment intexp(experimentName, exp);
     intexp.run(numberOfRuns);
