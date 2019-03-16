@@ -7,19 +7,15 @@ using namespace BOSS;
 
 FracType CombatSearch_Integral::highestValueThusFar = 0;
 
-CombatSearch_Integral::CombatSearch_Integral(const CombatSearchParameters p, int run,
+CombatSearch_Integral::CombatSearch_Integral(const CombatSearchParameters p,
     const std::string & dir, const std::string & prefix, const std::string & name)
     : m_highestValueFound(0)
 {
     m_params = p;
 
-    if (m_params.getSaveStates())
-    {
-        m_fileStates.open(CONSTANTS::ExecutablePath + "/data/stateValuePairs_" + std::to_string(run) + ".csv", std::ofstream::out | std::ofstream::app);
-    }
-
     m_dir = dir;
     m_prefix = prefix;
+    m_name = name;
     m_ssHighestValue << "0,0\n";
 
     //BOSS_ASSERT(m_params.getInitialState().getRace() != Races::None, "Combat search initial state is invalid");
@@ -41,6 +37,14 @@ void CombatSearch_Integral::recurse(const GameState & state, int depth)
 {
     m_highestValueFound = recurseReturnValue(state, depth);
     m_results.buildOrder = m_integral.getBestBuildOrder();
+
+    if (m_params.getSaveStates())
+    {
+        FileTools::MakeDirectory(CONSTANTS::ExecutablePath + "/SavedStates");
+        std::ofstream m_fileStates(CONSTANTS::ExecutablePath + "/SavedStates/" + m_name + ".csv", std::ofstream::out | std::ofstream::app);
+        m_fileStates << m_ssStates.rdbuf();
+        m_ssStates.str(std::string());
+    }
 }
 
 FracType CombatSearch_Integral::recurseReturnValue(const GameState & state, int depth)
@@ -51,12 +55,6 @@ FracType CombatSearch_Integral::recurseReturnValue(const GameState & state, int 
     }
 
     updateResults(state);
-
-    if (m_params.getSaveStates() && m_results.nodesExpanded % 100000 == 0)
-    {
-        m_fileStates << m_ssStates.rdbuf();
-        m_ssStates.str(std::string());
-    }
 
     FracType nodeIntegralValue = 0;
     FracType nodeIntegralToThisPoint = m_integral.getValueToThisPoint();

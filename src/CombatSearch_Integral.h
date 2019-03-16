@@ -29,11 +29,12 @@ namespace BOSS
 
         std::string m_dir;
         std::string m_prefix;
+        std::string m_name;
 
     public:
         static FracType highestValueThusFar;
 
-        CombatSearch_Integral(const CombatSearchParameters p = CombatSearchParameters(), int run = 0,
+        CombatSearch_Integral(const CombatSearchParameters p = CombatSearchParameters(),
             const std::string & dir = "", const std::string & prefix = "", const std::string & name = "");
         ~CombatSearch_Integral();
     

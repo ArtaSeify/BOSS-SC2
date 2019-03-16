@@ -22,8 +22,6 @@ namespace BOSS
         BuildOrderAbilities                     m_bestBuildOrderFound;
         bool                                    m_needToWriteBestValue;
 
-        std::string m_dir;
-        std::string m_name;
         std::stringstream m_resultsStream;
         std::stringstream m_dataStream;
 

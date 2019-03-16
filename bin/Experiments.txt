@@ -3,20 +3,20 @@
 
     "Experiments" : 
     {   
-        "NMCS" :
+        "DFS" :
         {
             "Run"               : [ true, 1 ],
-            "SearchType"        : [ "IntegralNMCS" ],
+            "SearchType"        : [ "IntegralDFS" ],
             "SearchParameters"  : { "Playouts" : 250, "Level" : 1 },
             "SimulationsPerStep": [ true, 2000 ],
             "Threads"           : 4,
             "Race"              : "Protoss",
             "StartingState"     : "Protoss Start State",
             "PrintNewBest"      : false,
-            "OutputDir"         : "./NMCS",
-            "SearchTimeLimitMS" : 2000,
-            "FrameTimeLimit"    : 10000,
-            "RelevantActions"   : ["Colossus", "Nexus", "Pylon", "Assimilator", "Gateway", "Forge", "FleetBeacon", "TwilightCouncil", "PhotonCannon", "Stargate", "TemplarArchive", "DarkShrine", "RoboticsBay", "RoboticsFacility", "CyberneticsCore", "ZealotWarped", "Zealot", "StalkerWarped", "Stalker", "HighTemplarWarped", "HighTemplar", "DarkTemplarWarped", "DarkTemplar", "SentryWarped", "Sentry", "Phoenix", "Carrier", "VoidRay", "WarpPrism", "Observer", "Immortal", "Probe", "Interceptor", "WarpGate", "ChronoBoost", "AdeptWarped", "Adept", "Oracle", "Tempest", "Disruptor", "WarpGateResearch"],
+            "OutputDir"         : "./test",
+            "SearchTimeLimitMS" : 20000000,
+            "FrameTimeLimit"    : 3000,
+            "RelevantActions"   : ["Nexus", "Pylon", "Gateway", "CyberneticsCore", "Zealot", "Stalker", "Probe"],
             "MaxActions"        : [ ["CyberneticsCore", 1], ["FleetBeacon", 1], ["TwilightCouncil", 1], ["TemplarArchive", 1], ["DarkShrine", 1], ["RoboticsBay", 1] ],
             "AlwaysMakeWorkers" : true,
             "OpeningBuildOrder" : "Empty",

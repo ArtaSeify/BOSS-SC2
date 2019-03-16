@@ -151,7 +151,7 @@ void CombatSearchExperiment::run()
 
         if (m_searchTypes[i] == "Integral")
         {
-            combatSearch = std::shared_ptr<CombatSearch>(new CombatSearch_Integral(m_params, i));
+            combatSearch = std::shared_ptr<CombatSearch>(new CombatSearch_Integral(m_params));
             resultsFile += "_Integral"; 
         }
         else if (m_searchTypes[i] == "Bucket")

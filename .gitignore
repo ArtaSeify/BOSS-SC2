@@ -68,3 +68,4 @@ emscripten/BOSS.data
 /bin/NMCS
 /bin/MCTS
 /bin/limitworkers
+/bin/SavedStates

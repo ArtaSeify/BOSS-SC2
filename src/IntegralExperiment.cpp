@@ -91,10 +91,10 @@ IntegralExperiment::IntegralExperiment(const std::string & experimentName, const
         m_params.setLevel(searchParameters["Level"]);
     }
 
-    if (searchType == "IntegralDFS")
+    /*if (searchType == "IntegralDFS")
     {
         m_name += "DFS";
-    }
+    }*/
 
     if (exp.count("MaxActions"))
     {
@@ -190,7 +190,7 @@ void IntegralExperiment::runExperimentThread(int thread, int runForThread, int s
 
         if (m_searchType == "IntegralDFS")
         {
-            combatSearch = std::unique_ptr<CombatSearch>(new CombatSearch_Integral(m_params, index, outputDir, resultsFile, m_name));
+            combatSearch = std::unique_ptr<CombatSearch>(new CombatSearch_Integral(m_params, outputDir, resultsFile, m_name));
             //resultsFile += "_Integral";
         }
         else if (m_searchType == "IntegralMCTS")

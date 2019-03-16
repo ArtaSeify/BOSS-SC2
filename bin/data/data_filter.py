@@ -15,8 +15,8 @@ parser.add_argument("--delete_file", help="Delete the file once finished parsing
 parser.add_argument("--shuffle", help="Whether to shuffle the lines")
 args = parser.parse_args()
 
-input_file_name = os.path.join(os.path.join(os.path.join(os.getcwd(), "DataTuples"), args.input_folder), args.input_file_name)
-output_file_name = os.path.join(os.path.join(os.path.join(os.getcwd(), "DataTuples"), args.output_folder), args.output_file_name)
+input_file_name = os.path.join(args.input_folder, args.input_file_name)
+output_file_name = os.path.join(args.output_folder, args.output_file_name)
 mins_per_worker_per_sec = "0.045"
 gas_per_worker_per_sec = "0.07"
 unit_dict = createUnitDict("C:\\School Work\\BOSS\\bin\\data\\ActionData.txt")

@@ -22,7 +22,7 @@ prediction_shape = 1
 learning_rate = 1e-4
 epochs = 50
 verbose = 1
-batch_size = 16
+batch_size = 32
 
 dataset = DataLoader(feature_shape, prediction_shape, True, batch_size, cpu_workers)
 train_iterator = dataset.make_iterator(sess, [args.data_file])
