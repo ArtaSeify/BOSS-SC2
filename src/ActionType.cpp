@@ -119,6 +119,7 @@ namespace ActionTypes
 
     void Init()
     {
+        std::ofstream actionTypesFile(CONSTANTS::ExecutablePath + "/data/ActionData.txt");
         for (ActionID i(0); i < ActionTypeData::GetAllActionTypeData().size(); ++i)
         {
             allActionTypes.push_back(ActionType(i));
@@ -128,6 +129,7 @@ namespace ActionTypes
             {
                 raceActionTypesCount[allActionTypes[i].getRace()]++;
             }
+            actionTypesFile << i << "," << allActionTypes[i].getName() << std::endl;
         }
 
         workerActionTypes.push_back(ActionTypes::GetActionType("Probe"));

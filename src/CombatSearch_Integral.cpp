@@ -10,6 +10,8 @@ FracType CombatSearch_Integral::highestValueThusFar = 0;
 CombatSearch_Integral::CombatSearch_Integral(const CombatSearchParameters p,
     const std::string & dir, const std::string & prefix, const std::string & name)
     : m_highestValueFound(0)
+    , m_filesWritten(0)
+    , m_statesWritten(0)
 {
     m_params = p;
 
@@ -23,28 +25,22 @@ CombatSearch_Integral::CombatSearch_Integral(const CombatSearchParameters p,
 
 CombatSearch_Integral::~CombatSearch_Integral()
 {
-    m_fileStates << m_ssStates.rdbuf();
+    FileTools::MakeDirectory(CONSTANTS::ExecutablePath + "/SavedStates");
+    //std::ofstream fileStates(CONSTANTS::ExecutablePath + "/SavedStates/" + m_name + "_" + std::to_string(m_filesWritten) + ".csv", std::ofstream::out | std::ofstream::app | std::ofstream::binary);
+    std::ofstream fileStates(CONSTANTS::ExecutablePath + "/SavedStates/" + m_name + ".csv", std::ofstream::out | std::ofstream::app | std::ofstream::binary);
+    fileStates << m_ssStates.rdbuf();
     m_ssStates.str(std::string());
-    m_fileStates.close();
 
     std::ofstream fileHighestValue(m_dir + "/" + m_prefix + "_HighestValueOrdering.txt", std::ofstream::out | std::ofstream::trunc);
     fileHighestValue << m_ssHighestValue.rdbuf();
-    m_ssHighestValue.str(std::string());
     fileHighestValue.close();
+    m_ssHighestValue.str(std::string());
 }
 
 void CombatSearch_Integral::recurse(const GameState & state, int depth)
 {
     m_highestValueFound = recurseReturnValue(state, depth);
     m_results.buildOrder = m_integral.getBestBuildOrder();
-
-    if (m_params.getSaveStates())
-    {
-        FileTools::MakeDirectory(CONSTANTS::ExecutablePath + "/SavedStates");
-        std::ofstream m_fileStates(CONSTANTS::ExecutablePath + "/SavedStates/" + m_name + ".csv", std::ofstream::out | std::ofstream::app);
-        m_fileStates << m_ssStates.rdbuf();
-        m_ssStates.str(std::string());
-    }
 }
 
 FracType CombatSearch_Integral::recurseReturnValue(const GameState & state, int depth)
@@ -56,8 +52,8 @@ FracType CombatSearch_Integral::recurseReturnValue(const GameState & state, int 
 
     updateResults(state);
 
-    FracType nodeIntegralValue = 0;
-    FracType nodeIntegralToThisPoint = m_integral.getValueToThisPoint();
+    FracType nodeIntegralToThisPoint = m_integral.getCurrentStackValue();
+    FracType nodeIntegralValue = nodeIntegralToThisPoint;
     bool ffCalculated = false;
     bool isLeafNode = true;
 
@@ -70,19 +66,6 @@ FracType CombatSearch_Integral::recurseReturnValue(const GameState & state, int 
         GameState child(state);
 
         auto action = legalActions[index];
-
-        // if it's the plain CB without a target, we need to get the targets for the ability
-        if (action.first.isAbility() && action.second == -1)
-        {
-            child.getSpecialAbilityTargets(legalActions, index);
-            // the ability is no longer valid, skip
-            if (legalActions[index].second == -1)
-            {
-                continue;
-            }
-        }
-
-        action = legalActions[index];
 
         if (action.first.isAbility())
         {
@@ -134,7 +117,27 @@ FracType CombatSearch_Integral::recurseReturnValue(const GameState & state, int 
     {
         state.writeToSS(m_ssStates, m_params);
         m_ssStates << "," << nodeIntegralValue - nodeIntegralToThisPoint << "\n";
+        //json stateValuePair;
+        //stateValuePair["State"] = state.writeToJson(m_params);
+        //stateValuePair["Value"] = nodeIntegralValue - nodeIntegralToThisPoint;
+        //std::vector<std::uint8_t> v_msgpack = json::to_msgpack(stateValuePair);
+        //m_jStates.insert(m_jStates.end(), v_msgpack.begin(), v_msgpack.end());
+        m_statesWritten++;
+
+        if (m_statesWritten%1000000 == 0)
+        {
+            FileTools::MakeDirectory(CONSTANTS::ExecutablePath + "/SavedStates");
+            //std::ofstream fileStates(CONSTANTS::ExecutablePath + "/SavedStates/" + m_name + "_" + std::to_string(m_filesWritten) + ".csv", std::ofstream::out | std::ofstream::app | std::ofstream::binary);
+            std::ofstream fileStates(CONSTANTS::ExecutablePath + "/SavedStates/" + m_name + ".csv", std::ofstream::out | std::ofstream::app | std::ofstream::binary);
+            fileStates << m_ssStates.rdbuf();
+            m_ssStates.str(std::string());
+            m_ssStates.clear();
+            //fileStates.write(reinterpret_cast<const char*>(m_jStates.data()), m_jStates.size());
+            //m_jStates.clear();
+            m_filesWritten++;
+        }
     }
+
 
     if (nodeIntegralValue > highestValueThusFar)
     {

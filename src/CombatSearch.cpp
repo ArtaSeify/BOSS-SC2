@@ -39,9 +39,9 @@ void CombatSearch::generateLegalActions(const GameState & state, ActionSetAbilit
 {
     // prune actions we have too many of already
     const ActionSetAbilities & allActions = params.getRelevantActions();
-    for (const auto & actionAndTarget : allActions)
+    for (auto it = allActions.begin(); it != allActions.end(); ++it)
     {
-        ActionType action = actionAndTarget.first;
+        ActionType action = it->first;
 
         bool isLegal = state.isLegal(action);
 
@@ -57,7 +57,13 @@ void CombatSearch::generateLegalActions(const GameState & state, ActionSetAbilit
         }
 
         legalActions.add(action);
+
+        if (action.isAbility())
+        {
+            state.getSpecialAbilityTargets(legalActions, legalActions.size()-1);
+        }
     }
+    //std::cout << legalActions.toString() << std::endl;
 
     // if we enabled the always make workers flag, and workers are legal
     ActionType worker = ActionTypes::GetWorker(state.getRace());

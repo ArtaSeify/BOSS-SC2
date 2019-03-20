@@ -40,7 +40,7 @@ namespace BOSS
         // does a random action
         void doRandomAction(Node & node, const GameState & prevGameState);
 
-        void getChronoBoostTargets(const Node & node, ActionSetAbilities & legalActions);
+        //void getChronoBoostTargets(const Node & node, ActionSetAbilities & legalActions);
 
         void updateIntegralTerminal(const Node & node, const GameState & prevGameState);
     

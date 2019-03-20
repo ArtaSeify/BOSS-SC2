@@ -17,7 +17,7 @@ namespace BOSS
 
     class CombatSearch_Integral : public CombatSearch
     {
-        virtual void recurse(const GameState & s, int depth);
+        virtual void recurse(const GameState & state, int depth);
 
     protected:
         //CombatSearch_IntegralData   m_integral;
@@ -25,11 +25,18 @@ namespace BOSS
         FracType                                m_highestValueFound;
         std::ofstream                           m_fileStates;
         std::stringstream                       m_ssStates;
+        std::vector<std::uint8_t>               m_jStates;
         std::stringstream                       m_ssHighestValue;
+
+        int m_filesWritten;
+        int m_statesWritten;
 
         std::string m_dir;
         std::string m_prefix;
         std::string m_name;
+
+    protected:
+        FracType recurseReturnValue(const GameState & state, int depth);
 
     public:
         static FracType highestValueThusFar;
@@ -38,8 +45,6 @@ namespace BOSS
             const std::string & dir = "", const std::string & prefix = "", const std::string & name = "");
         ~CombatSearch_Integral();
     
-        FracType recurseReturnValue(const GameState & state, int depth);
-
         virtual void printResults();
         virtual void writeResultsFile(const std::string & dir, const std::string & filename);
     };

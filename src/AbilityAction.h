@@ -39,6 +39,20 @@ namespace BOSS
         }
 
         void writeToSS(std::stringstream & ss) const;
+        json writeToJson() const;
+    };
+
+    struct ActionValue
+    {
+        std::pair<ActionType, NumUnits> action;
+        FracType evaluation;
+
+        ActionValue() 
+        : action(ActionTypes::None, 0)
+        , evaluation(-1) 
+        { 
+        
+        }
     };
 }
 

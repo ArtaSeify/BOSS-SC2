@@ -112,6 +112,9 @@
     <ClCompile Include="..\src\NMCS.cpp">
       <Filter>search\CombatSearch\Integral\NMCS</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\DFSNetwork.cpp">
+      <Filter>search\CombatSearch\Integral</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\ActionType.h" />
@@ -230,6 +233,9 @@
     </ClInclude>
     <ClInclude Include="..\src\NMCS.h">
       <Filter>search\CombatSearch\Integral\NMCS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\DFSNetwork.h">
+      <Filter>search\CombatSearch\Integral</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

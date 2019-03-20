@@ -67,6 +67,7 @@ public:
 
     // writes the data of a unit in CSV format to a ss
     void        writeToSS(std::stringstream & ss) const;
+    json        writeToJson() const;
 };
 
 }

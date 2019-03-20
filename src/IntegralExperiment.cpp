@@ -6,6 +6,7 @@
 #include "CombatSearch_Bucket.h"
 #include "CombatSearch_BestResponse.h"
 #include "CombatSearch_IntegralMCTS.h"
+#include "DFSNetwork.h"
 #include "NMCS.h"
 #include "FileTools.h"
 #include <thread>
@@ -177,8 +178,11 @@ void IntegralExperiment::runExperimentThread(int thread, int runForThread, int s
     for (int i(0); i < runForThread; ++i)
     {
         int index = i + (startingIndex);
-
-        std::string name = m_name + "Run" + std::to_string(index);
+        std::string name = m_name;
+        if (m_searchType != "IntegralDFS")
+        {
+            name += "Run" + std::to_string(index);
+        }
         std::string outputDir = m_outputDir + "/" + Assert::CurrentDateTime() + "_" + name;
         FileTools::MakeDirectory(outputDir);
 
@@ -190,7 +194,15 @@ void IntegralExperiment::runExperimentThread(int thread, int runForThread, int s
 
         if (m_searchType == "IntegralDFS")
         {
-            combatSearch = std::unique_ptr<CombatSearch>(new CombatSearch_Integral(m_params, outputDir, resultsFile, m_name));
+            if (m_params.useNetworkPrediction())
+            {
+                combatSearch = std::unique_ptr<CombatSearch>(new DFSNetwork(m_params, outputDir, resultsFile, m_name));
+            }
+            else
+            {
+                combatSearch = std::unique_ptr<CombatSearch>(new CombatSearch_Integral(m_params, outputDir, resultsFile, m_name));
+            }
+            
             //resultsFile += "_Integral";
         }
         else if (m_searchType == "IntegralMCTS")

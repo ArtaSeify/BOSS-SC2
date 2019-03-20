@@ -115,5 +115,6 @@ class GameState
     void                            printunitsbeingbuilt()              const;
     void                            printUnits()                        const;
     void                            writeToSS(std::stringstream & ss, const CombatSearchParameters & params)   const;
+    json                            writeToJson(const CombatSearchParameters & params)               const;
 };
 }

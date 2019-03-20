@@ -286,7 +286,7 @@ void CombatSearch_IntegralMCTS::doRandomAction(Node & node, const GameState & pr
 
     // the placeholder Chronoboost is expanded into a Chronoboost for each target.
     // this gives each chrono boostable target a fair chance at getting picked
-    getChronoBoostTargets(node, legalActions);
+    //getChronoBoostTargets(node, legalActions);
 
     // do an action at random
     if (legalActions.size() > 0)
@@ -328,25 +328,25 @@ void CombatSearch_IntegralMCTS::doRandomAction(Node & node, const GameState & pr
     updateNodeVisits(false, isTerminalNode(node));
 }
 
-void CombatSearch_IntegralMCTS::getChronoBoostTargets(const Node & node, ActionSetAbilities & legalActions)
-{
-    int chronoBoostIndex = -1;
-    for (auto it = legalActions.begin(); it != legalActions.end(); ++it)
-    {
-        if (it->first.isAbility())
-        {
-            chronoBoostIndex = int(it - legalActions.begin());
-            node.getState().getSpecialAbilityTargets(legalActions, chronoBoostIndex);
-            break;
-        }
-
-    }
-    // chronoboost is an invalid action
-    if (chronoBoostIndex != -1 && legalActions[chronoBoostIndex].second == -1)
-    {
-        legalActions.remove(legalActions[chronoBoostIndex].first, chronoBoostIndex);
-    }
-}
+//void CombatSearch_IntegralMCTS::getChronoBoostTargets(const Node & node, ActionSetAbilities & legalActions)
+//{
+//    int chronoBoostIndex = -1;
+//    for (auto it = legalActions.begin(); it != legalActions.end(); ++it)
+//    {
+//        if (it->first.isAbility())
+//        {
+//            chronoBoostIndex = int(it - legalActions.begin());
+//            node.getState().getSpecialAbilityTargets(legalActions, chronoBoostIndex);
+//            break;
+//        }
+//
+//    }
+//    // chronoboost is an invalid action
+//    if (chronoBoostIndex != -1 && legalActions[chronoBoostIndex].second == -1)
+//    {
+//        legalActions.remove(legalActions[chronoBoostIndex].first, chronoBoostIndex);
+//    }
+//}
 
 void CombatSearch_IntegralMCTS::updateIntegralTerminal(const Node & node, const GameState & prevGameState)
 {

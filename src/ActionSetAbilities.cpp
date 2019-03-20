@@ -3,6 +3,7 @@
 #include "ActionSetAbilities.h"
 #include "ActionType.h"
 #include "CombatSearchParameters.h"
+#include "AbilityAction.h"
 
 using namespace BOSS;
 
@@ -73,7 +74,7 @@ void ActionSetAbilities::sort(const GameState & state, const CombatSearchParamet
     ActionSetAbilities sortedSet;
 
     const int totalSupply = state.getCurrentSupply() + state.getSupplyInProgress();
-    
+
     // if we have little supply free, give priority to supply providing units
     // ie. pylon/supply depot/overlord and nexus/command center/hatchery
     if (state.getMaxSupply() - totalSupply <= SupplyHeuristic)

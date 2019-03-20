@@ -9,13 +9,16 @@ def createUnitDict(filename):
 	return unit_info
 
 def getUnitData(units, unit_info):
+	NUM_PROTOSS_ACTIONS = 68;
+
 	unit_list = units.split("]")
 	# remove the empty character at the end of the list
-	unit_list = unit_list[0 : len(unit_list)-1]
+	unit_list = unit_list[: len(unit_list)-1]
 
-	unit_types = [0 for i in range(len(unit_info))]
-	units_free = [0 for i in range(len(unit_info))]
-	units_being_built = [0 for i in range(len(unit_info))]
+	unit_types = [0 for i in range(NUM_PROTOSS_ACTIONS)]
+	units_free = [0 for i in range(NUM_PROTOSS_ACTIONS)]
+	units_being_built = [0 for i in range(NUM_PROTOSS_ACTIONS)]
+	units_building = [0 for i in range(NUM_PROTOSS_ACTIONS)]
 	canChronoBoost = 0
 
 	for unit in unit_list:
@@ -26,9 +29,9 @@ def getUnitData(units, unit_info):
 		frame_started = int(csv_unit[1])
 		frame_finished = int(csv_unit[2])
 		builder_id = int(csv_unit[3])
-		type_id = int(csv_unit[4])
-		addon_id = int(csv_unit[5])
-		buildtype_id = int(csv_unit[6])
+		type_id = int(csv_unit[4]) - 1
+		addon_id = int(csv_unit[5]) - 1
+		buildtype_id = int(csv_unit[6]) - 1
 		build_id = int(csv_unit[7])
 		job_id = int(csv_unit[8])
 		time_until_built = int(csv_unit[9])
@@ -44,12 +47,14 @@ def getUnitData(units, unit_info):
 			units_free[type_id] += 1
 		if time_until_built > 0:
 			units_being_built[type_id] += 1
+		if time_until_built == 0 and time_until_free > 0:
+			units_building[type_id] += 1
 
 		# Nexus can use chronoboost
 		if type_id == unit_info["Nexus"] and energy >= 50.0:
 			canChronoBoost = 1
 
-	return [unit_types, units_free, units_being_built], canChronoBoost
+	return [unit_types, units_free, units_being_built, units_building], canChronoBoost
 
 
 """
@@ -119,12 +124,12 @@ def parseLine(line, unit_dict, mins_per_worker_per_sec, gas_per_worker_per_sec,
 		parsed_file.write(mineral_workers + ",")
 		parsed_file.write(gas_workers + ",")
 		parsed_file.write(frame_limit + ",")
-		parsed_file.write(mins_per_worker_per_sec + ",")
+		parsed_file.write(str(mins_per_worker_per_sec) + ",")
 
 		if y_value == "":
-			parsed_file.write(gas_per_worker_per_sec)
+			parsed_file.write(str(gas_per_worker_per_sec))
 		else:
-			parsed_file.write(gas_per_worker_per_sec + ",")
+			parsed_file.write(str(gas_per_worker_per_sec) + ",")
 
 			# y value
 			parsed_file.write(y_value)
@@ -146,12 +151,12 @@ def parseLine(line, unit_dict, mins_per_worker_per_sec, gas_per_worker_per_sec,
 		output += (mineral_workers + ",")
 		output += (gas_workers + ",")
 		output += (frame_limit + ",")
-		output += (mins_per_worker_per_sec + ",")
+		output += (str(mins_per_worker_per_sec) + ",")
 
 		if y_value == "":
-			output += (gas_per_worker_per_sec)
+			output += (str(gas_per_worker_per_sec))
 		else:
-			output += (gas_per_worker_per_sec + ",")
+			output += (str(gas_per_worker_per_sec) + ",")
 
 			# y value
 			output += (y_value)

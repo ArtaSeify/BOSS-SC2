@@ -16,6 +16,7 @@
 #include "json/json.hpp"
 
 using json = nlohmann::json;
+namespace python = boost::python;
 
 #include "BOSSAssert.h"
 

@@ -266,3 +266,26 @@ void Unit::writeToSS(std::stringstream & ss) const
     ss << m_maxEnergyAllowed << ",";
     ss << m_energy << "]";
 }
+
+json Unit::writeToJson() const
+{
+    json data;
+
+    data["ID"] = m_id;
+    data["FrameStarted"] = m_frameStarted;
+    data["FrameFinished"] = m_frameFinished;
+    data["BuilderID"] = m_builderID;
+    data["TypeID"] = m_type.getID();
+    data["AddonID"] = m_addon.getID();
+    data["BuildTypeID"] = m_buildType.getID();
+    data["BuildID"] = m_buildID;
+    data["Job"] = m_job;
+    data["TimeUntilBuilt"] = m_timeUntilBuilt;
+    data["TimeUntilFree"] = m_timeUntilFree;
+    data["TimeChronoBoost"] = m_timeChronoBoost;
+    data["TimeChronoBoostAgain"] = m_timeChronoBoostAgain;
+    data["MaxEnergyAllowed"] = m_maxEnergyAllowed;
+    data["Energy"] = m_energy;
+
+    return data;
+}

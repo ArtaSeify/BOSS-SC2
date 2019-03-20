@@ -77,9 +77,9 @@ GameState::GameState(const std::vector<Unit> & unitVector, RaceID race, FracType
         }
 
         m_unitTypes[unit.getType().getRaceActionID()] = true;
-        std::cout << "name: " << unit.getType().getName() << std::endl;
+        //std::cout << "name: " << unit.getType().getName() << std::endl;
     }
-    std::cout << Races::GetRaceName(m_race) << std::endl;
+    /*std::cout << Races::GetRaceName(m_race) << std::endl;
     std::cout << m_minerals << std::endl;
     std::cout << m_gas << std::endl;
     std::cout << m_currentSupply << std::endl;
@@ -89,7 +89,7 @@ GameState::GameState(const std::vector<Unit> & unitVector, RaceID race, FracType
     std::cout << m_gasWorkers << std::endl;
     std::cout << m_buildingWorkers << std::endl;
     std::cout << m_numRefineries << std::endl;
-    std::cout << m_numDepots << std::endl;
+    std::cout << m_numDepots << std::endl;*/
 }
 
 void GameState::getLegalActions(std::vector<ActionType> & legalActions) const
@@ -775,10 +775,8 @@ void GameState::getSpecialAbilityTargets(ActionSetAbilities & actionSet, int ind
     {
         // if there are any chronoboostable targets, we remove the placeholder CB
         // action with target -1. Otherwise, we keep it in
-        if (storeChronoBoostTargets(actionSet, index) != 0)
-        {
-            actionSet.remove(ActionTypes::GetSpecialAction(m_race), index);
-        }
+        storeChronoBoostTargets(actionSet, index);
+        actionSet.remove(ActionTypes::GetSpecialAction(m_race), index);
     }
 }
 
@@ -1011,4 +1009,53 @@ void GameState::writeToSS(std::stringstream & ss, const CombatSearchParameters &
     ss << m_numDepots << ",";
     ss << m_lastAction.getID() << ",";
     m_lastAbility.writeToSS(ss);
+}
+
+json GameState::writeToJson(const CombatSearchParameters & params) const
+{
+    json j;
+    //j["State"]["Units"] = json::array();
+    for (int index = 0; index < m_units.size(); ++index)
+    {
+        j["Units"].push_back(m_units[index].writeToJson());
+    }
+
+    //j["State"]["UnitsBeingBuilt"] = json::array();
+    for (int index = 0; index < m_unitsBeingBuilt.size(); ++index)
+    {
+        j["UnitsBeingBuilt"].push_back(m_unitsBeingBuilt[index]);
+    }
+
+    //j["State"]["UnitsSortedEndFrame"] = json::array();
+    for (int index = 0; index < m_unitsSortedEndFrame.size(); ++index)
+    {
+        j["UnitsSortedEndFrame"].push_back(m_unitsSortedEndFrame[index]);
+    }
+
+    //j["State"]["ChronoBoosts"] = json::array();
+    for (int index = 0; index < m_chronoBoosts.size(); ++index)
+    {
+        j["ChronoBoosts"].push_back(m_chronoBoosts[index].writeToJson());
+    }
+
+    j["Race"] = int(m_race);
+    j["Minerals"] = m_minerals;
+    j["Gas"] = m_gas;
+    j["CurrentSupply"] = m_currentSupply;
+    j["SupplyInProgress"] = m_inProgressSupply;
+    j["MaxSupply"] = m_maxSupply;
+    j["CurrentFrame"] = m_currentFrame;
+    j["PreviousFrame"] = m_previousFrame;
+    j["FrameTimeLimit"] = params.getFrameTimeLimit();
+    j["MineralWorkers"] = m_mineralWorkers;
+    j["GasWorkers"] = m_gasWorkers;
+    j["BuildingWorkers"] = m_buildingWorkers;
+    j["NumRefineries"] = m_numRefineries;
+    j["RefinesInProgress"] = m_inProgressRefineries;
+    j["NumDepots"] = m_numDepots;
+    j["DepotsInProgress"] = m_inProgressDepots;
+    j["LastAction"] = m_lastAction.getID();
+    j["LastAbility"] = m_lastAbility.writeToJson();    
+
+    return j;
 }

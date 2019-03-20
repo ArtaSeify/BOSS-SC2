@@ -54,7 +54,7 @@ std::pair<CombatSearch_IntegralDataFinishedUnits, BuildOrderAbilities> NMCS::exe
 
         ActionSetAbilities legalActions;
         generateLegalActions(node.getState(), legalActions, m_params);
-        getChronoBoostTargets(node, legalActions);
+        //getChronoBoostTargets(node, legalActions);
 
         if (legalActions.size() == 0)
         {
@@ -88,7 +88,7 @@ std::pair<CombatSearch_IntegralDataFinishedUnits, BuildOrderAbilities> NMCS::exe
             updateBOIntegral(nextNode, ActionAbilityPair(action.first, nextNode.getState().getLastAbility()), node.getState(), true);
             updateNodeVisits(true, nextNode.isTerminal());
 
-            auto & integralBOPair = executeSearch(nextNode, level - 1, depth + 1);
+            auto integralBOPair = executeSearch(nextNode, level - 1, depth + 1);
 
             m_integral = prevIntegral;
             m_buildOrder = prevBO;                  

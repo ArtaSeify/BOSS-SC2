@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Common.h"
+//#include "AbilityAction.h"
 //#include "ActionType.h"
 //#include "CombatSearchParameters.h"
 
@@ -10,11 +11,12 @@ namespace BOSS
 {
     class ActionType;
     class CombatSearchParameters;
+    struct ActionValue;
     class ActionSetAbilities
     {
     public:
         typedef std::pair<ActionType, NumUnits> ActionTargetPair;
-        typedef std::vector<ActionTargetPair> Actions;
+        typedef std::vector<ActionTargetPair> Actions;        
 
     private:
         Actions m_actionsAndTargets;
