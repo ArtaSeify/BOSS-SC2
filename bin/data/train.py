@@ -5,6 +5,7 @@ import model
 from math import floor
 import os
 import argparse
+import json
 
 parser = argparse.ArgumentParser()
 parser.add_argument("save_name", help="Name of model to save")
@@ -25,13 +26,14 @@ else:
 tf.keras.backend.set_session(sess)
 
 # constants
-# NUM_PROTOSS_UNITS = 68
+NUM_PROTOSS_UNITS = 69
 MAX_NUM_UNITS = 35
 cpu_workers = 12
-feature_shape = (MAX_NUM_UNITS * 15) + 13
-prediction_shape = 1
+feature_shape = (MAX_NUM_UNITS * 15) + 12 + NUM_PROTOSS_UNITS
+policy_shape = NUM_PROTOSS_UNITS
+value_shape = 1
 learning_rate = 1e-4
-epochs = 30
+epochs = 15
 verbose = 1
 batch_size = 32
 shuffle = True
@@ -41,21 +43,20 @@ testset_samples = sum(1 for line in open(args.testset_file))
 # trainset_samples = 10000
 # testset_samples = 1000
 
-train_dataset = DataLoader(feature_shape, prediction_shape, trainset_samples, testset_samples, shuffle, batch_size, cpu_workers)
+train_dataset = DataLoader(feature_shape, policy_shape, value_shape, trainset_samples, testset_samples, shuffle, batch_size, cpu_workers)
 train_iterator = train_dataset.make_iterator(sess, [args.trainset_file])
 
-test_dataset = DataLoader(feature_shape, prediction_shape, trainset_samples, testset_samples, shuffle, batch_size, cpu_workers)
+test_dataset = DataLoader(feature_shape, policy_shape, value_shape, trainset_samples, testset_samples, shuffle, batch_size, cpu_workers)
 test_iterator = test_dataset.make_iterator(sess, [args.testset_file])
 
-
-network = model.IntegralValueNN(feature_shape, prediction_shape, args.save_name, batch_size, learning_rate, "C:\\School Work\\BOSS\\bin\\data\\models\\" + args.save_name + ".h5", True if args.load_model is None else False)
+network = model.PolicyNetwork(feature_shape, policy_shape, args.save_name, batch_size, learning_rate, "models/" + args.save_name + ".h5", True if args.load_model is None else False)
 if args.load_model:
-	network.load("C:\\School Work\\BOSS\\bin\\data\\models\\" + args.load_model + ".h5")
+	network.load("models/" + args.load_model + ".h5")
 
 evaluations = []
 # train and evaluate
-network.train(train_iterator, epochs, floor(trainset_samples/batch_size), verbose)	
-evaluations.append(network.evaluate(test_iterator, floor(testset_samples/batch_size), verbose))
+network.train(train_iterator, epochs, int(floor(trainset_samples/batch_size)), verbose)	
+evaluations.append(network.evaluate(test_iterator, int(floor(testset_samples/batch_size)), verbose))
 # network.train(train_iterator, epochs, None, verbose)	
 # evaluations.append(network.evaluate(test_iterator, None, verbose))
 
@@ -64,9 +65,9 @@ evaluations.append(network.evaluate(test_iterator, floor(testset_samples/batch_s
 	# evaluations.append(network.evaluate(test_iterator, 100, verbose))
 
 print(evaluations)
-if not os.path.isdir(os.path.join(os.getcwd(), "logs\\evaluations\\")):
-	os.makedirs(os.path.join(os.getcwd(), "logs\\evaluations\\"))
-with open(os.path.join(os.getcwd(), "logs\\evaluations\\" + args.save_name + ".txt"), 'w') as outputFile:
+if not os.path.isdir(os.path.join(os.getcwd(), "logs/evaluations/")):
+	os.makedirs(os.path.join(os.getcwd(), "logs/evaluations/"))
+with open(os.path.join(os.getcwd(), "logs/evaluations/" + args.save_name + ".txt"), 'w') as outputFile:
 	for val in evaluations:
 		outputFile.write(str(val))
 		outputFile.write("\n")

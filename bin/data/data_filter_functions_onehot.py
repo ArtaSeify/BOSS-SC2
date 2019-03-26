@@ -9,7 +9,7 @@ def createUnitDict(filename):
     return unit_info
 
 def splitArrayData(data):
-    #NUM_PROTOSS_ACTIONS = 68;
+    NUM_PROTOSS_ACTIONS = 69;
 
     data = data.split("]")
     # remove the empty character at the end of the list
@@ -19,8 +19,49 @@ def splitArrayData(data):
     for unit in data:
         unit = unit.split("[")[1]
         csv_unit = unit.split(",")
+
+        unit_id = (csv_unit[0])
+        frame_started = (csv_unit[1])
+        frame_finished = (csv_unit[2])
+        builder_id = (csv_unit[3])
+        type_id = (csv_unit[4])
+        addon_id = (csv_unit[5])
+        buildtype_id = (csv_unit[6])
+        build_id = (csv_unit[7])
+        job_id = (csv_unit[8])
+        time_until_built = (csv_unit[9])
+        time_until_free = (csv_unit[10])
+        time_chronoboost = (csv_unit[11])
+        time_chronoboost_again = (csv_unit[12])
+        max_energy = (csv_unit[13])
+        energy = (csv_unit[14])
+
+        type_id_onehot = [0 for i in range(NUM_PROTOSS_ACTIONS)]
+        type_id_onehot[int(type_id)] = 1
+
+        buildtype_id_onehot = [0 for i in range(NUM_PROTOSS_ACTIONS)]
+        buildtype_id_onehot[int(buildtype_id)] = 1
+
+        unit_data = ""
+        unit_data += unit_id + ","
+        unit_data += frame_started + ","
+        unit_data += frame_finished + ","
+        unit_data += builder_id + ","
+        for d in type_id_onehot:
+            unit_data += str(d) + ","
+        unit_data += addon_id + ","
+        for d in buildtype_id_onehot:
+            unit_data += str(d) + ","
+        unit_data += build_id + ","
+        unit_data += job_id + ","
+        unit_data += time_until_built + ","
+        unit_data += time_until_free + ","
+        unit_data += time_chronoboost + ","
+        unit_data += time_chronoboost_again + ","
+        unit_data += max_energy + ","
+        unit_data += energy
         
-        all_units.append(csv_unit)
+        all_units.append(unit_data)
         
     return all_units
 
@@ -30,6 +71,8 @@ def splitArrayData(data):
 """
 def parseLine(line, unit_dict, mins_per_worker_per_sec, gas_per_worker_per_sec,
                     MAX_NUM_UNITS, output_type, parsed_file=None):
+    NUM_UNIT_FEATURES = 69*2 + 13
+
     units_finish = line.find("]]")
     units = line[line.find("[[")+1:units_finish+1]
     all_units = splitArrayData(units)
@@ -82,12 +125,15 @@ def parseLine(line, unit_dict, mins_per_worker_per_sec, gas_per_worker_per_sec,
 
     if output_type == 0:
         # unit info
-        for unit in all_units:
-            for value in unit:
-                parsed_file.write(str(value) + ",")
+        for unit_data in all_units:
+            parsed_file.write(str(unit_data) + ",")
+
+        empty_unit = ""
+        for i in range(NUM_UNIT_FEATURES-1):
+            empty_unit += "0,"
+        empty_unit += "0"
         for units_missing in range(MAX_NUM_UNITS - len(all_units)):
-            for value_missing in range(len(all_units[0])):
-                parsed_file.write("0,")
+            parsed_file.write(empty_unit + ",")
 
         # for i in being_built:
         #     print(i)
@@ -96,9 +142,9 @@ def parseLine(line, unit_dict, mins_per_worker_per_sec, gas_per_worker_per_sec,
         # for i in finished:
         #     parsed_file.write(str(i) + ",")
 
-        for chronoBoost in chronoboosts:
-            for value in chronoBoost:
-                parsed_file.write(str(value) + ",")
+        # for chronoBoost in chronoboosts:
+        #     for value in chronoBoost:
+        #         parsed_file.write(str(value) + ",")
 
         # state info
         parsed_file.write(race + ",")
@@ -107,8 +153,7 @@ def parseLine(line, unit_dict, mins_per_worker_per_sec, gas_per_worker_per_sec,
         parsed_file.write(current_supply + ",")
         parsed_file.write(max_supply + ",")
         parsed_file.write(current_frame + ",")
-        parsed_file.write(previous_frame + ",")
-        parsed_file.write(frame_limit + ",")
+        parsed_file.write(str(int(frame_limit)-int(current_frame)) + ",")
         parsed_file.write(mineral_workers + ",")
         parsed_file.write(gas_workers + ",")
         parsed_file.write(building_workers + ",")
@@ -125,12 +170,15 @@ def parseLine(line, unit_dict, mins_per_worker_per_sec, gas_per_worker_per_sec,
     elif output_type == 1:
         output = ""
         # unit info
-        for unit in all_units:
-            for value in unit:
-                output += str(value) + ","
+        for unit_data in all_units:
+            output += (str(unit_data) + ",")
+
+        empty_unit = ""
+        for i in range(NUM_UNIT_FEATURES-1):
+            empty_unit += "0,"
+        empty_unit += "0"
         for units_missing in range(MAX_NUM_UNITS - len(all_units)):
-            for value_missing in range(len(all_units[0])):
-                output += "0,"
+            output += (empty_unit) + ","
 
         # for i in being_built:
         #     print(i)
@@ -139,9 +187,9 @@ def parseLine(line, unit_dict, mins_per_worker_per_sec, gas_per_worker_per_sec,
         # for i in finished:
         #     output += str(i) + ","
 
-        for chronoBoost in chronoboosts:
-            for value in chronoBoost:
-                output += str(value) + ","
+        # for chronoBoost in chronoboosts:
+        #     for value in chronoBoost:
+        #         output += str(value) + ","
 
         # state info
         output += race + ","
@@ -150,8 +198,7 @@ def parseLine(line, unit_dict, mins_per_worker_per_sec, gas_per_worker_per_sec,
         output += current_supply + ","
         output += max_supply + ","
         output += current_frame + ","
-        output += previous_frame + ","
-        output += frame_limit + ","
+        output += str(int(frame_limit)-int(current_frame)) + ","
         output += mineral_workers + ","
         output += gas_workers + ","
         output += building_workers + ","

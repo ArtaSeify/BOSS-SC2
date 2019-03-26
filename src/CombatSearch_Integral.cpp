@@ -54,7 +54,7 @@ FracType CombatSearch_Integral::recurseReturnValue(const GameState & state, int 
 
     FracType nodeIntegralToThisPoint = m_integral.getCurrentStackValue();
     FracType nodeIntegralValue = nodeIntegralToThisPoint;
-    bool ffCalculated = false;
+    std::vector<ActionValue> actionValues;
     bool isLeafNode = true;
 
     ActionSetAbilities legalActions;
@@ -78,66 +78,78 @@ FracType CombatSearch_Integral::recurseReturnValue(const GameState & state, int 
             m_buildOrder.add(action.first);
         }
 
-        // can't go over the time limit
-        if (child.getCurrentFrame() <= m_params.getFrameTimeLimit())
-        {
-            //std::cout << "action added: " << action.getName() << std::endl;
-            //std::cout << "target of action added: " << actionTarget << std::endl;
-            //std::cout << "frame of action added: " << child.getCurrentFrame() << std::endl;
+        //std::cout << "action added: " << action.getName() << std::endl;
+        //std::cout << "target of action added: " << actionTarget << std::endl;
+        //std::cout << "frame of action added: " << child.getCurrentFrame() << std::endl;
 
-            m_integral.update(child, m_buildOrder, m_params, m_searchTimer, true);
-            isLeafNode = false;
+        m_integral.update(child, m_buildOrder, m_params, m_searchTimer, true);
+        isLeafNode = false;
 
-            nodeIntegralValue = std::max(nodeIntegralValue, recurseReturnValue(child, depth + 1));
+        FracType actionValue = recurseReturnValue(child, depth + 1);
+        ActionValue av;
+        av.action = action;
+        av.evaluation = actionValue;
+        actionValues.push_back(av);
+        nodeIntegralValue = std::max(nodeIntegralValue, actionValue);
 
-            m_buildOrder.pop_back();
-            m_integral.popFinishedLastOrder(state, child);
-        }
-
-        // go upto the time limit and update the integral stack
-        else
-        {
-            m_buildOrder.pop_back();
-            if (!ffCalculated)
-            {
-                GameState child_framelimit(state);
-                child_framelimit.fastForward(m_params.getFrameTimeLimit());
-
-                m_integral.update(child_framelimit, m_buildOrder, m_params, m_searchTimer, true);
-                nodeIntegralValue = std::max(nodeIntegralValue, m_integral.getCurrentStackValue());
-
-                m_integral.popFinishedLastOrder(state, child_framelimit);
-
-                ffCalculated = true;
-            }
-        }
+        m_buildOrder.pop_back();
+        m_integral.popFinishedLastOrder(state, child);
     }
 
     if (m_params.getSaveStates())
     {
-        state.writeToSS(m_ssStates, m_params);
-        m_ssStates << "," << nodeIntegralValue - nodeIntegralToThisPoint << "\n";
-        //json stateValuePair;
-        //stateValuePair["State"] = state.writeToJson(m_params);
-        //stateValuePair["Value"] = nodeIntegralValue - nodeIntegralToThisPoint;
-        //std::vector<std::uint8_t> v_msgpack = json::to_msgpack(stateValuePair);
-        //m_jStates.insert(m_jStates.end(), v_msgpack.begin(), v_msgpack.end());
-        m_statesWritten++;
-
-        if (m_statesWritten%1000000 == 0)
+        if (nodeIntegralValue - nodeIntegralToThisPoint > 0)
         {
-            FileTools::MakeDirectory(CONSTANTS::ExecutablePath + "/SavedStates");
-            //std::ofstream fileStates(CONSTANTS::ExecutablePath + "/SavedStates/" + m_name + "_" + std::to_string(m_filesWritten) + ".csv", std::ofstream::out | std::ofstream::app | std::ofstream::binary);
-            std::ofstream fileStates(CONSTANTS::ExecutablePath + "/SavedStates/" + m_name + ".csv", std::ofstream::out | std::ofstream::app | std::ofstream::binary);
-            fileStates << m_ssStates.rdbuf();
-            m_ssStates.str(std::string());
-            m_ssStates.clear();
-            //fileStates.write(reinterpret_cast<const char*>(m_jStates.data()), m_jStates.size());
-            //m_jStates.clear();
-            m_filesWritten++;
+            ActionValue bestAction;
+            bestAction.evaluation = -1;
+            for (auto & av : actionValues)
+            {
+                if (av.evaluation >= bestAction.evaluation)
+                {
+                    bestAction = av;
+                }
+            }
+
+            std::vector<ActionValue> tiedActionValues;
+            for (auto & av : actionValues)
+            {
+                if (av.evaluation == bestAction.evaluation)
+                {
+                    tiedActionValues.push_back(av);
+                }
+            }
+
+            state.writeToSS(m_ssStates, m_params);
+
+            m_ssStates << ",";
+            for (int index = 0; index < tiedActionValues.size(); ++index)
+            {
+                m_ssStates << tiedActionValues[index].action.first.getID() << "," << tiedActionValues[index].evaluation - nodeIntegralToThisPoint << ",";
+            }
+            m_ssStates << nodeIntegralValue - nodeIntegralToThisPoint << "\n";
+
+            //std::cout << m_ssStates.str() << std::endl;
+            //json stateValuePair;
+            //stateValuePair["State"] = state.writeToJson(m_params);
+            //stateValuePair["Value"] = nodeIntegralValue - nodeIntegralToThisPoint;
+            //std::vector<std::uint8_t> v_msgpack = json::to_msgpack(stateValuePair);
+            //m_jStates.insert(m_jStates.end(), v_msgpack.begin(), v_msgpack.end());
+            m_statesWritten++;
+
+            if (m_statesWritten % 1000000 == 0)
+            {
+                FileTools::MakeDirectory(CONSTANTS::ExecutablePath + "/SavedStates");
+                //std::ofstream fileStates(CONSTANTS::ExecutablePath + "/SavedStates/" + m_name + "_" + std::to_string(m_filesWritten) + ".csv", std::ofstream::out | std::ofstream::app | std::ofstream::binary);
+                std::ofstream fileStates(CONSTANTS::ExecutablePath + "/SavedStates/" + m_name + ".csv", std::ofstream::out | std::ofstream::app | std::ofstream::binary);
+                fileStates << m_ssStates.rdbuf();
+                m_ssStates.str(std::string());
+                m_ssStates.clear();
+                //fileStates.write(reinterpret_cast<const char*>(m_jStates.data()), m_jStates.size());
+                //m_jStates.clear();
+                m_filesWritten++;
+            }
         }
     }
-
 
     if (nodeIntegralValue > highestValueThusFar)
     {

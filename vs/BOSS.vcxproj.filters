@@ -115,6 +115,9 @@
     <ClCompile Include="..\src\DFSNetwork.cpp">
       <Filter>search\CombatSearch\Integral</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\DFSPolicy.cpp">
+      <Filter>search\CombatSearch\Integral</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\ActionType.h" />
@@ -235,6 +238,9 @@
       <Filter>search\CombatSearch\Integral\NMCS</Filter>
     </ClInclude>
     <ClInclude Include="..\src\DFSNetwork.h">
+      <Filter>search\CombatSearch\Integral</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\DFSPolicy.h">
       <Filter>search\CombatSearch\Integral</Filter>
     </ClInclude>
   </ItemGroup>

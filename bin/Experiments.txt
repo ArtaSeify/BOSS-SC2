@@ -3,17 +3,17 @@
 
     "Experiments" : 
     {   
-        "DFS3000" :
+        "test" :
         {
             "Run"               : [ true, 1 ],
-            "SearchType"        : [ "IntegralDFS" ],
+            "SearchType"        : [ "IntegralDFSPN" ],
             "SearchParameters"  : { "ExplorationConstant" : 0.15, "UseMax" : true, "Simulations" : 150000, "Level" : 1 },
             "SimulationsPerStep": [ false, 2000 ],
             "Threads"           : 4,
             "Race"              : "Protoss",
             "StartingState"     : "Protoss Start State",
             "PrintNewBest"      : true,
-            "OutputDir"         : "./test",
+            "OutputDir"         : "../bin/test",
             "SearchTimeLimitMS" : 20000000,
             "FrameTimeLimit"    : 3000,
             "RelevantActions"   : ["Nexus", "Pylon", "Gateway", "CyberneticsCore", "Zealot", "Stalker", "Probe"],
@@ -30,7 +30,8 @@
     {
         "Protoss Start State"   : { "race" : "Protoss", "minerals" : 50, "gas" : 0, "units" : [ ["Probe", 12], ["Nexus", 1] ] },
         "Zerg Start State"      : { "race" : "Zerg",    "minerals" : 50, "gas" : 0, "units" : [ ["Drone", 12], ["Hatchery", 1], ["Overlord", 1] ] },
-        "Terran Start State"    : { "race" : "Terran",  "minerals" : 50, "gas" : 0, "units" : [ ["SCV", 12], ["CommandCenter", 1] ] }
+        "Terran Start State"    : { "race" : "Terran",  "minerals" : 50, "gas" : 0, "units" : [ ["SCV", 12], ["CommandCenter", 1] ] },
+        "Protoss 0": { "race": "Protoss", "units": [ ["Nexus",2],["Probe",23],["Pylon",2],["Gateway",1],["Assimilator",2],["CyberneticsCore",1] ],"minerals": 225,"gas": 128}
     },
     
     "Build Orders" :

@@ -76,7 +76,7 @@ void ExperimentsArta::runExperimentsThread(const json & j, int thread, int exper
 
             const std::string & searchType = val["SearchType"][0].get<std::string>();
 
-            if (searchType == "IntegralDFS")
+            if (searchType == "IntegralDFS" || searchType == "IntegralDFSVN" || searchType == "IntegralDFSPN")
             {
                 RunDFSExperiment(experimentName, val, val["Run"][1]);
             }

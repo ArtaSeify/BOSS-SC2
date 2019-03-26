@@ -58,39 +58,17 @@ FracType DFSNetwork::recurseReturnValue(const GameState & state, int depth)
             m_buildOrder.add(action.first);
         }
 
-        // can't go over the time limit
-        if (child.getCurrentFrame() <= m_params.getFrameTimeLimit())
-        {
-            //std::cout << "action added: " << action.getName() << std::endl;
-            //std::cout << "target of action added: " << actionTarget << std::endl;
-            //std::cout << "frame of action added: " << child.getCurrentFrame() << std::endl;
+        //std::cout << "action added: " << action.getName() << std::endl;
+        //std::cout << "target of action added: " << actionTarget << std::endl;
+        //std::cout << "frame of action added: " << child.getCurrentFrame() << std::endl;
 
-            m_integral.update(child, m_buildOrder, m_params, m_searchTimer, true);
-            isLeafNode = false;
+        m_integral.update(child, m_buildOrder, m_params, m_searchTimer, true);
+        isLeafNode = false;
 
-            nodeIntegralValue = std::max(nodeIntegralValue, recurseReturnValue(child, depth + 1));
+        nodeIntegralValue = std::max(nodeIntegralValue, recurseReturnValue(child, depth + 1));
 
-            m_buildOrder.pop_back();
-            m_integral.popFinishedLastOrder(state, child);
-        }
-
-        // go upto the time limit and update the integral stack
-        else
-        {
-            m_buildOrder.pop_back();
-            if (!ffCalculated)
-            {
-                GameState child_framelimit(state);
-                child_framelimit.fastForward(m_params.getFrameTimeLimit());
-
-                m_integral.update(child_framelimit, m_buildOrder, m_params, m_searchTimer, true);
-                nodeIntegralValue = std::max(nodeIntegralValue, m_integral.getCurrentStackValue());
-
-                m_integral.popFinishedLastOrder(state, child_framelimit);
-
-                ffCalculated = true;
-            }
-        }
+        m_buildOrder.pop_back();
+        m_integral.popFinishedLastOrder(state, child);
     }
 
     if (m_params.getSaveStates())
@@ -141,6 +119,10 @@ std::vector<ActionValue> DFSNetwork::evaluateStates(const GameState & state, Act
     std::stringstream ss;
     std::vector<ActionValue> actionValues;
 
+    bool printNewBest = m_params.getPrintNewBest();
+    m_params.setPrintNewBest(false);
+    CombatSearch_IntegralDataFinishedUnits tempIntegral(m_integral);
+
     for (int index = 0; index < legalActions.size(); ++index)
     {
         GameState stateCopy(state);
@@ -155,9 +137,14 @@ std::vector<ActionValue> DFSNetwork::evaluateStates(const GameState & state, Act
             stateCopy.doAction(action.first);
         }
 
+        tempIntegral.update(stateCopy, m_buildOrder, m_params, m_searchTimer, false);
+
         ActionValue actionValue;
         actionValue.action = action;
+        actionValue.evaluation = tempIntegral.getCurrentStackValue();
         actionValues.push_back(actionValue);
+
+        tempIntegral.popFinishedLastOrder(state, stateCopy);
 
         stateCopy.writeToSS(ss, m_params);
         if (index < legalActions.size() - 1)
@@ -165,6 +152,8 @@ std::vector<ActionValue> DFSNetwork::evaluateStates(const GameState & state, Act
             ss << "\n";
         }
     }
+
+    m_params.setPrintNewBest(printNewBest);
 
     //std::cout << legalActions.toString() << std::endl;
     //std::cout << ss.str() << std::endl;
@@ -174,16 +163,19 @@ std::vector<ActionValue> DFSNetwork::evaluateStates(const GameState & state, Act
         // evaluate the states. the results will be returned as a list of FracTypes
         python::object values = CONSTANTS::Predictor.attr("predict")(ss.str().c_str());
 
-        //std::cout << std::endl;
+        BOSS_ASSERT(len(values) == legalActions.size(), "size of values %i does not match the size of legalActions %i", len(values), legalActions.size());
+
+        std::cout << std::endl;
+        std::cout << "current frame: " << state.getCurrentFrame() << std::endl;
         for (int i = 0; i < legalActions.size(); ++i)
         {
-            actionValues[i].evaluation = python::extract<FracType>(values[i]);
-            //std::cout << legalActions[i].first.getName() << ", " << actionValues[i].evaluation << std::endl;
+            FracType network_pred = python::extract<FracType>(values[i]);
+            actionValues[i].evaluation += network_pred;
+            std::cout << legalActions[i].first.getName() << ": network: " << network_pred << ", total: " << actionValues[i].evaluation << std::endl;
         }
-        //std::cout << std::endl;
+        std::cout << std::endl;
 
-        BOSS_ASSERT(legalActions.size() == actionValues.size(), "size of legalActions %i does not match the size of action values %i", legalActions.size(), actionValues.size());
-    }
+        }
 
     return actionValues;
 }
