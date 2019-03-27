@@ -8,6 +8,7 @@
 #include "CombatSearch_IntegralMCTS.h"
 #include "DFSNetwork.h"
 #include "NMCS.h"
+#include "NMCTS.h"
 #include "FileTools.h"
 #include <thread>
 
@@ -90,6 +91,14 @@ IntegralExperiment::IntegralExperiment(const std::string & experimentName, const
         auto & searchParameters = exp["SearchParameters"];
         m_params.setNumPlayouts(searchParameters["Playouts"]);
         m_params.setLevel(searchParameters["Level"]);
+    }
+
+    else if (searchType == "IntegralNMCTS")
+    {
+        auto & searchParameters = exp["SearchParameters"];
+        m_params.setNumPlayouts(searchParameters["Playouts"]);
+        m_params.setLevel(searchParameters["Level"]);
+        m_params.setUseMaxValue(searchParameters["UseMax"]);
     }
 
     /*if (searchType == "IntegralDFS")
@@ -213,6 +222,10 @@ void IntegralExperiment::runExperimentThread(int thread, int runForThread, int s
         else if (m_searchType == "IntegralNMCS")
         {
             combatSearch = std::unique_ptr<CombatSearch>(new NMCS(m_params, outputDir, resultsFile, m_name));
+        }
+        else if (m_searchType == "IntegralNMCTS")
+        {
+            combatSearch = std::unique_ptr<CombatSearch>(new NMCTS(m_params, outputDir, resultsFile, m_name));
         }
         else
         {

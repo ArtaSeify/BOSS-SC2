@@ -1,0 +1,17 @@
+
+Pr Pr Py Pr Pr Ga Ga Ze Cy Ze Ga Ze
+0 272 0 0 0 Probe
+299 571 0 0 0 Probe
+201 601 0 0 0 Pylon
+663 935 0 0 0 Probe
+1003 1275 0 0 0 Probe
+601 1641 0 0 0 Gateway
+921 1961 0 0 0 Gateway
+1641 2249 1 0 751 Zealot
+1641 2441 1 192 751 CyberneticsCore
+1961 2569 2 320 1182 Zealot
+1641 2681 2 544 1182 Gateway
+2249 2857 3 896 1325 Zealot
+
+Ran 10010 simulations in 3999.9ms @ 2502.56 simulations/sec
+Nodes expanded: 1990. Total nodes visited: 106159, at a rate of 26540.4 nodes/sec

@@ -1,0 +1,9 @@
+Max value found: 1433
+Best build order (all): 
+Best build order (finished): "Probe","Pylon","Probe","Gateway","Probe","Gateway","Probe","Gateway","Probe","Pylon","Zealot","Zealot","Zealot","Zealot","Pylon"
+Nodes expanded: 9413
+Nodes traversed: 1079823
+Leaf nodes expanded: 119
+Leaf nodes traversed: 100000
+Search time in ms: 44858.2
+Simulations: 100010
