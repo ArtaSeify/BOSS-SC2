@@ -7,6 +7,7 @@
 #include "CombatSearch_BestResponse.h"
 #include "CombatSearch_IntegralMCTS.h"
 #include "DFSNetwork.h"
+#include "DFSPolicy.h"
 #include "NMCS.h"
 #include "NMCTS.h"
 #include "FileTools.h"
@@ -56,6 +57,9 @@ IntegralExperiment::IntegralExperiment(const std::string & experimentName, const
 
     const std::string & searchType = exp["SearchType"][0].get<std::string>();
     m_searchType = searchType;
+
+    BOSS_ASSERT(searchType == "IntegralDFS" && !m_params.useNetworkPrediction() || 
+                ((searchType == "IntegralDFSVN" || searchType == "IntegralDFSPN") && m_params.useNetworkPrediction()), "Turn off UseNetwork flag for standard DFS search");
 
     if (searchType == "IntegralMCTS")
     {
@@ -203,16 +207,15 @@ void IntegralExperiment::runExperimentThread(int thread, int runForThread, int s
 
         if (m_searchType == "IntegralDFS")
         {
-            if (m_params.useNetworkPrediction())
-            {
-                combatSearch = std::unique_ptr<CombatSearch>(new DFSNetwork(m_params, outputDir, resultsFile, m_name));
-            }
-            else
-            {
-                combatSearch = std::unique_ptr<CombatSearch>(new CombatSearch_Integral(m_params, outputDir, resultsFile, m_name));
-            }
-            
-            //resultsFile += "_Integral";
+            combatSearch = std::unique_ptr<CombatSearch>(new CombatSearch_Integral(m_params, outputDir, resultsFile, m_name));
+        }
+        else if (m_searchType == "IntegralDFSVN")
+        {
+            combatSearch = std::unique_ptr<CombatSearch>(new DFSNetwork(m_params, outputDir, resultsFile, m_name));
+        }
+        else if (m_searchType == "IntegralDFSPN")
+        {
+            combatSearch = std::unique_ptr<CombatSearch>(new DFSPolicy(m_params, outputDir, resultsFile, m_name));
         }
         else if (m_searchType == "IntegralMCTS")
         {
@@ -242,13 +245,6 @@ void IntegralExperiment::runExperimentThread(int thread, int runForThread, int s
 void IntegralExperiment::run(int numberOfRuns)
 {
     FileTools::MakeDirectory(m_outputDir);
-
-    if (m_params.getSaveStates())
-    {
-        FileTools::MakeDirectory(CONSTANTS::ExecutablePath + "/data/DataTuples");
-        FileTools::MakeDirectory(CONSTANTS::ExecutablePath + "/data/DataTuples/SearchData");
-    }
-
     
     int runPerThread = 0;
     int numThreads = m_params.getThreadsForExperiment();

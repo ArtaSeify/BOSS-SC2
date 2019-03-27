@@ -50,7 +50,7 @@ int main(int argc, char * argv[])
         PyRun_SimpleString(command.c_str());
         try
         {
-            BOSS::CONSTANTS::Predictor = python::import("predictor").attr("Network")(std::string(argv[2]));
+            BOSS::CONSTANTS::Predictor = python::import("predictor").attr("Network")(std::string(argv[2]), true);
         }
         catch (const python::error_already_set&)
         {

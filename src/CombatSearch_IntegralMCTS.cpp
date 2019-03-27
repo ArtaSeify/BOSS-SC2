@@ -25,7 +25,7 @@ CombatSearch_IntegralMCTS::CombatSearch_IntegralMCTS(const CombatSearchParameter
 
     if (m_params.getSaveStates())
     {
-        std::string dataDir = CONSTANTS::ExecutablePath + "/data/DataTuples/SearchData/SearchData.csv";
+        std::string dataDir = CONSTANTS::ExecutablePath + "/SavedStates/" + m_name + ".csv";
         m_fileStates.open(dataDir, std::ofstream::out | std::ofstream::app);
     }
 

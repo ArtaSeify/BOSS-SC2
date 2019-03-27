@@ -115,8 +115,8 @@
     <ClCompile Include="..\src\DFSNetwork.cpp">
       <Filter>search\CombatSearch\Integral</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\NMCTS.cpp">
-      <Filter>search\CombatSearch\Integral\NMCTS</Filter>
+    <ClCompile Include="..\src\DFSPolicy.cpp">
+      <Filter>search\CombatSearch\Integral</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -240,8 +240,8 @@
     <ClInclude Include="..\src\DFSNetwork.h">
       <Filter>search\CombatSearch\Integral</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\NMCTS.h">
-      <Filter>search\CombatSearch\Integral\NMCTS</Filter>
+    <ClInclude Include="..\src\DFSPolicy.h">
+      <Filter>search\CombatSearch\Integral</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -283,9 +283,6 @@
     </Filter>
     <Filter Include="search\CombatSearch\Integral\NMCS">
       <UniqueIdentifier>{117c0c5b-8945-40cb-ab9d-a69dc5b223b0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="search\CombatSearch\Integral\NMCTS">
-      <UniqueIdentifier>{edfae48a-9e60-454a-b074-b7f1afecd6da}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

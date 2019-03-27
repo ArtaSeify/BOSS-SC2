@@ -3,8 +3,7 @@ import os
 from random import shuffle
 from math import ceil, floor
 #from data_filter_functions import parseLine, createUnitDict
-from data_filter_functions import createUnitDict
-from data_filter_all_functions import parseLine
+from data_filter_all_function import parseLine, createUnitDict
 import json
 
 parser = argparse.ArgumentParser()
@@ -16,6 +15,7 @@ parser.add_argument("testset_size", help="size of the test set")
 parser.add_argument("--move_name", help="Changes the name of file once finished")
 parser.add_argument("--move_folder", help="Changes the folder of file once finished")
 parser.add_argument("--delete_file", help="Delete the file once finished parsing")
+parser.add_argument("--lines", help="Number of lines to parse")
 args = parser.parse_args()
 
 input_file_name = os.path.join(args.input_folder, args.input_file_name)
@@ -40,25 +40,35 @@ shuffle(lines)
 testset = lines[0:floor(len(lines) * float(args.testset_size))]
 trainset = lines[floor(len(lines) * float(args.testset_size)):]
 
-MAX_NUM_UNITS = 0
+MAX_NUM_UNITS = 35
 
-for line in lines:
-    units_finish = line.find("]]")
-    units = line[line.find("[[")+1:units_finish+1]
-    units = units.split("]")
-    # remove the empty character at the end of the list
-    units = units[: len(units)-1]
-    unit_count = int(units[len(units)-1].split("[")[1].split(",")[0]) + 1
+# for line in lines:
+#     units_finish = line.find("]]")
+#     units = line[line.find("[[")+1:units_finish+1]
+#     units = units.split("]")
+#     # remove the empty character at the end of the list
+#     units = units[: len(units)-1]
+#     unit_count = int(units[len(units)-1].split("[")[1].split(",")[0]) + 1
 
-    if unit_count > MAX_NUM_UNITS:
-        MAX_NUM_UNITS = unit_count
+#     if unit_count > MAX_NUM_UNITS:
+#         MAX_NUM_UNITS = unit_count
 
 print(MAX_NUM_UNITS)
 
+ZEROES_TO_KEEP = 50000
+zeros = 0
 for index,line in enumerate(trainset):
+    if args.lines and index == int(args.lines):
+        break
+    # if int(line.split(",")[-1].split("\n")[0]) == 0:
+    #     zeros += 1
+    #     if zeros >= ZEROES_TO_KEEP:
+    #         continue
     parseLine(line, unit_dict, mins_per_worker_per_sec, gas_per_worker_per_sec, MAX_NUM_UNITS, 0, trainset_file)
 
 for index,line in enumerate(testset):
+    if args.lines and index == floor(int(args.lines) * float(args.testset_size)):
+        break
     parseLine(line, unit_dict, mins_per_worker_per_sec, gas_per_worker_per_sec, MAX_NUM_UNITS, 0, testset_file)
 
 data_file.close()

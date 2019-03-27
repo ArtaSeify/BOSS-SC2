@@ -15,7 +15,7 @@ args = parser.parse_args()
 
 # sess = tf.Session()
 # tf.keras.backend.set_session(sess)
-use_gpu = False
+use_gpu = True
 if not use_gpu:
     config = tf.ConfigProto(
     device_count = {'GPU': 0}
@@ -29,10 +29,10 @@ tf.keras.backend.set_session(sess)
 NUM_PROTOSS_UNITS = 68
 MAX_NUM_UNITS = 35
 cpu_workers = 2
-feature_shape = (MAX_NUM_UNITS * 15) + 13
+feature_shape = (MAX_NUM_UNITS * 15) + 12
 prediction_shape = 1
 verbose = 1
-batch_size = 16
+batch_size = 32
 shuffle = True
 
 testset_samples = sum(1 for line in open(args.testset_file))

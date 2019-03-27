@@ -29,9 +29,9 @@ def getUnitData(units, unit_info):
 		frame_started = int(csv_unit[1])
 		frame_finished = int(csv_unit[2])
 		builder_id = int(csv_unit[3])
-		type_id = int(csv_unit[4]) - 1
-		addon_id = int(csv_unit[5]) - 1
-		buildtype_id = int(csv_unit[6]) - 1
+		type_id = int(csv_unit[4])
+		addon_id = int(csv_unit[5])
+		buildtype_id = int(csv_unit[6])
 		build_id = int(csv_unit[7])
 		job_id = int(csv_unit[8])
 		time_until_built = int(csv_unit[9])

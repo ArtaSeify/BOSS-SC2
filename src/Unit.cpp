@@ -264,7 +264,9 @@ void Unit::writeToSS(std::stringstream & ss) const
     ss << m_timeChronoBoostAgain << ",";
     //ss << m_numLarva << ", ";
     ss << m_maxEnergyAllowed << ",";
-    ss << m_energy << "]";
+    ss << m_energy;
+    //ss << m_morphed << "]";
+    ss << "]";
 }
 
 json Unit::writeToJson() const
@@ -286,6 +288,7 @@ json Unit::writeToJson() const
     data["TimeChronoBoostAgain"] = m_timeChronoBoostAgain;
     data["MaxEnergyAllowed"] = m_maxEnergyAllowed;
     data["Energy"] = m_energy;
+    data["Morphed"] = m_morphed;
 
     return data;
 }
