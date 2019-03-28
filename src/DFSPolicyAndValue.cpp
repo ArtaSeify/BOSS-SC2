@@ -2,26 +2,26 @@
 #include <boost/python/list.hpp>
 #include <boost/python/extract.hpp>
 #include <boost/python/object_attributes.hpp>
-#include "DFSNetwork.h"
+#include "DFSPolicyAndValue.h"
 #include "FileTools.h"
 
 using namespace BOSS;
 namespace python = boost::python;
 
-DFSNetwork::DFSNetwork(const CombatSearchParameters p,
+DFSPolicyAndValue::DFSPolicyAndValue(const CombatSearchParameters p,
     const std::string & dir, const std::string & prefix, const std::string & name)
     : CombatSearch_Integral(p, dir, prefix, name)
 {
 
 }
 
-void DFSNetwork::recurse(const GameState & state, int depth)
+void DFSPolicyAndValue::recurse(const GameState & state, int depth)
 {
     m_highestValueFound = recurseReturnValue(state, depth);
     m_results.buildOrder = m_integral.getBestBuildOrder();
 }
 
-FracType DFSNetwork::recurseReturnValue(const GameState & state, int depth)
+FracType DFSPolicyAndValue::recurseReturnValue(const GameState & state, int depth)
 {
     if (timeLimitReached())
     {
@@ -114,7 +114,7 @@ FracType DFSNetwork::recurseReturnValue(const GameState & state, int depth)
     return nodeIntegralValue;
 }
 
-std::vector<ActionValue> DFSNetwork::evaluateStates(const GameState & state, ActionSetAbilities & legalActions)
+std::vector<ActionValue> DFSPolicyAndValue::evaluateStates(const GameState & state, ActionSetAbilities & legalActions)
 {
     std::stringstream ss;
     std::vector<ActionValue> actionValues;
@@ -163,19 +163,18 @@ std::vector<ActionValue> DFSNetwork::evaluateStates(const GameState & state, Act
         // evaluate the states. the results will be returned as a list of FracTypes
         python::object values = CONSTANTS::Predictor.attr("predict")(ss.str().c_str());
 
-        BOSS_ASSERT(len(values) == legalActions.size(), "size of values %i does not match the size of legalActions %i", len(values), legalActions.size());
+        BOSS_ASSERT(len(values[1]) == legalActions.size(), "size of values %i does not match the size of legalActions %i", len(values[1]), legalActions.size());
 
         std::cout << std::endl;
         std::cout << "current frame: " << state.getCurrentFrame() << std::endl;
         for (int i = 0; i < legalActions.size(); ++i)
         {
-            FracType network_pred = python::extract<FracType>(values[i]);
-            actionValues[i].evaluation += network_pred;
+            FracType network_pred = python::extract<FracType>(values[1][i]);
+            actionValues[i].evaluation += network_pred * python::extract<FracType>(values[0][i][legalActions[i].first.getID()]);
             std::cout << legalActions[i].first.getName() << ": network: " << network_pred << ", total: " << actionValues[i].evaluation << std::endl;
         }
         std::cout << std::endl;
-
-        }
+    }
 
     return actionValues;
 }

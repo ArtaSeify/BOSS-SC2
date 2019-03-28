@@ -37,19 +37,21 @@ epochs = 15
 verbose = 1
 batch_size = 32
 shuffle = True
+twoHeads = True
 
 trainset_samples = sum(1 for line in open(args.trainset_file))
 testset_samples = sum(1 for line in open(args.testset_file))
 # trainset_samples = 10000
 # testset_samples = 1000
 
-train_dataset = DataLoader(feature_shape, policy_shape, value_shape, trainset_samples, testset_samples, shuffle, batch_size, cpu_workers)
+train_dataset = DataLoader(feature_shape, policy_shape, value_shape, trainset_samples, testset_samples, twoHeads, shuffle, batch_size, cpu_workers)
 train_iterator = train_dataset.make_iterator(sess, [args.trainset_file])
 
-test_dataset = DataLoader(feature_shape, policy_shape, value_shape, trainset_samples, testset_samples, shuffle, batch_size, cpu_workers)
+test_dataset = DataLoader(feature_shape, policy_shape, value_shape, trainset_samples, testset_samples, twoHeads, shuffle, batch_size, cpu_workers)
 test_iterator = test_dataset.make_iterator(sess, [args.testset_file])
 
-network = model.PolicyNetwork(feature_shape, policy_shape, args.save_name, batch_size, learning_rate, "models/" + args.save_name + ".h5", True if args.load_model is None else False)
+# network = model.PolicyNetwork(feature_shape, policy_shape, args.save_name, batch_size, learning_rate, "models/" + args.save_name + ".h5", True if args.load_model is None else False)
+network = model.PolicyAndValueNetwork(feature_shape, policy_shape, value_shape, args.save_name, batch_size, learning_rate, "models/" + args.save_name + ".h5", True if args.load_model is None else False)
 if args.load_model:
 	network.load("models/" + args.load_model + ".h5")
 

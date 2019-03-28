@@ -3,12 +3,13 @@ from data_filter_functions import createUnitDict
 import json
 
 class DataLoader():
-    def __init__(self, feat_shape, policy_shape, value_shape, train_samples, test_samples, shuffle=True, batch_size=32, workers=4):
+    def __init__(self, feat_shape, policy_shape, value_shape, train_samples, test_samples, policy_and_value=False, shuffle=True, batch_size=32, workers=4):
         self.file_list = tf.keras.backend.placeholder(dtype=tf.string, shape=[None])
         self.feat_shape = feat_shape
         self.policy_shape = policy_shape
         self.value_shape = value_shape
         self.batch_size = batch_size
+        self.twoHeads = policy_and_value
 
         self.train_samples = train_samples
         self.test_samples = test_samples
@@ -27,7 +28,6 @@ class DataLoader():
             self.dataset = self.dataset.shuffle(buffer_size=min(max(train_samples, test_samples), 100000))
         self.dataset = self.dataset.prefetch(self.batch_size*100)
         self.dataset = self.dataset.batch(self.batch_size)
-        
 
     def _parse_fn(self, csv_string):
         split_string = tf.string_split(tf.expand_dims(csv_string, axis=0), ",")
@@ -37,7 +37,11 @@ class DataLoader():
         x.set_shape(self.feat_shape,)
         policy.set_shape(self.policy_shape,)
         value.set_shape(self.value_shape,)
-        return x, policy#, value
+
+        if self.twoHeads:
+            return x, (policy, value)
+        else:
+            return x, policy       
 
     def make_iterator(self, sess, file_list):
         # if "test" in file_list[0]:
