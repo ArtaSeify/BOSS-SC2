@@ -5,7 +5,7 @@
 
 namespace BOSS
 {
-    class DFSNetwork : public CombatSearch_Integral
+    class DFSPolicyAndValue : public CombatSearch_Integral
     {
     private:
         std::vector<ActionValue> evaluateStates(const GameState & state, ActionSetAbilities & legalActions);
@@ -15,7 +15,7 @@ namespace BOSS
         FracType recurseReturnValue(const GameState & state, int depth);
     
     public:
-        DFSNetwork(const CombatSearchParameters p = CombatSearchParameters(),
+        DFSPolicyAndValue(const CombatSearchParameters p = CombatSearchParameters(),
             const std::string & dir = "", const std::string & prefix = "", const std::string & name = "");
 
         virtual void recurse(const GameState & state, int depth);

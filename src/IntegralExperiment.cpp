@@ -6,9 +6,10 @@
 #include "CombatSearch_Bucket.h"
 #include "CombatSearch_BestResponse.h"
 #include "CombatSearch_IntegralMCTS.h"
-#include "DFSNetwork.h"
-#include "DFSPolicy.h"
 #include "NMCS.h"
+#include "DFSPolicy.h"
+#include "DFSValue.h"
+#include "DFSPolicyAndValue.h"
 #include "FileTools.h"
 #include <thread>
 
@@ -57,8 +58,11 @@ IntegralExperiment::IntegralExperiment(const std::string & experimentName, const
     const std::string & searchType = exp["SearchType"][0].get<std::string>();
     m_searchType = searchType;
 
-    BOSS_ASSERT(searchType == "IntegralDFS" && !m_params.useNetworkPrediction() || 
-                ((searchType == "IntegralDFSVN" || searchType == "IntegralDFSPN") && m_params.useNetworkPrediction()), "Turn off UseNetwork flag for standard DFS search");
+    if (searchType == "IntegralDFS" || searchType == "IntegralDFSVN" || searchType == "IntegralDFSPN" || searchType == "IntegralDFSPVN")
+    {
+        BOSS_ASSERT(searchType == "IntegralDFS" && !m_params.useNetworkPrediction() ||
+            ((searchType == "IntegralDFSVN" || searchType == "IntegralDFSPN" || searchType == "IntegralDFSPVN") && m_params.useNetworkPrediction()), "Turn off UseNetwork flag for standard DFS search");
+    }
 
     if (searchType == "IntegralMCTS")
     {
@@ -202,11 +206,15 @@ void IntegralExperiment::runExperimentThread(int thread, int runForThread, int s
         }
         else if (m_searchType == "IntegralDFSVN")
         {
-            combatSearch = std::unique_ptr<CombatSearch>(new DFSNetwork(m_params, outputDir, resultsFile, m_name));
+            combatSearch = std::unique_ptr<CombatSearch>(new DFSValue(m_params, outputDir, resultsFile, m_name));
         }
         else if (m_searchType == "IntegralDFSPN")
         {
             combatSearch = std::unique_ptr<CombatSearch>(new DFSPolicy(m_params, outputDir, resultsFile, m_name));
+        }
+        else if (m_searchType == "IntegralDFSPVN")
+        {
+            combatSearch = std::unique_ptr<CombatSearch>(new DFSPolicyAndValue(m_params, outputDir, resultsFile, m_name));
         }
         else if (m_searchType == "IntegralMCTS")
         {

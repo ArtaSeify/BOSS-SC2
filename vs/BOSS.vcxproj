@@ -47,8 +47,9 @@
     <ClCompile Include="..\src\DFBB_BuildOrderSearchSaveState.cpp" />
     <ClCompile Include="..\src\DFBB_BuildOrderSmartSearch.cpp" />
     <ClCompile Include="..\src\DFBB_BuildOrderStackSearch.cpp" />
-    <ClCompile Include="..\src\DFSNetwork.cpp" />
+    <ClCompile Include="..\src\DFSPolicyAndValue.cpp" />
     <ClCompile Include="..\src\DFSPolicy.cpp" />
+    <ClCompile Include="..\src\DFSValue.cpp" />
     <ClCompile Include="..\src\Edge.cpp" />
     <ClCompile Include="..\src\Eval.cpp" />
     <ClCompile Include="..\src\ExternalInterface.cpp" />
@@ -95,8 +96,9 @@
     <ClInclude Include="..\src\DFBB_BuildOrderSearchSaveState.h" />
     <ClInclude Include="..\src\DFBB_BuildOrderSmartSearch.h" />
     <ClInclude Include="..\src\DFBB_BuildOrderStackSearch.h" />
-    <ClInclude Include="..\src\DFSNetwork.h" />
+    <ClInclude Include="..\src\DFSPolicyAndValue.h" />
     <ClInclude Include="..\src\DFSPolicy.h" />
+    <ClInclude Include="..\src\DFSValue.h" />
     <ClInclude Include="..\src\Edge.h" />
     <ClInclude Include="..\src\Eval.h" />
     <ClInclude Include="..\src\FileTools.h" />

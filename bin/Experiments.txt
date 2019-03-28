@@ -6,23 +6,28 @@
         "test" :
         {
             "Run"               : [ true, 1 ],
-            "SearchType"        : [ "IntegralDFSPN" ],
+            "SearchType"        : [ "IntegralMCTS" ],
             "SearchParameters"  : { "ExplorationConstant" : 0.15, "UseMax" : true, "Simulations" : 150000, "Level" : 1 },
             "SimulationsPerStep": [ false, 2000 ],
             "Threads"           : 4,
             "Race"              : "Protoss",
             "StartingState"     : "Protoss Start State",
-            "PrintNewBest"      : true,
+            "PrintNewBest"      : false,
             "OutputDir"         : "../bin/test",
             "SearchTimeLimitMS" : 20000000,
             "FrameTimeLimit"    : 3000,
-            "RelevantActions"   : ["Nexus", "Pylon", "Gateway", "CyberneticsCore", "Zealot", "Stalker", "Probe"],
+            "RelevantActions"   : ["Probe", "Pylon", "Nexus", "Assimilator", "Gateway", "CyberneticsCore", "Stalker",
+        "Zealot", "ChronoBoost", "Colossus", "Forge", "FleetBeacon", "TwilightCouncil", "Stargate", "TemplarArchive", 
+        "DarkShrine", "RoboticsBay", "RoboticsFacility", "ZealotWarped", "Zealot", "StalkerWarped", "Stalker", 
+        "HighTemplarWarped", "HighTemplar", "DarkTemplarWarped", "DarkTemplar", "SentryWarped", "Sentry", 
+        "Phoenix", "Carrier", "VoidRay", "WarpPrism", "Observer", "Immortal", "Probe", "Interceptor", 
+        "WarpGate", "ChronoBoost", "AdeptWarped", "Adept", "Oracle", "Tempest", "Disruptor", "WarpGateResearch"],
             "MaxActions"        : [ ["CyberneticsCore", 1], ["FleetBeacon", 1], ["TwilightCouncil", 1], ["TemplarArchive", 1], ["DarkShrine", 1], ["RoboticsBay", 1] ],
             "AlwaysMakeWorkers" : true,
             "OpeningBuildOrder" : "Empty",
             "SortActions"       : false,
             "SaveStates"        : false,
-            "UseNetwork"        : true
+            "UseNetwork"        : false
         }
     },
 
