@@ -60,6 +60,7 @@
     <ClCompile Include="..\src\JSONTools.cpp" />
     <ClCompile Include="..\src\NaiveBuildOrderSearch.cpp" />
     <ClCompile Include="..\src\NMCS.cpp" />
+    <ClCompile Include="..\src\NMCTS.cpp" />
     <ClCompile Include="..\src\Node.cpp" />
     <ClCompile Include="..\src\Tools.cpp" />
     <ClCompile Include="..\src\Unit.cpp" />
@@ -107,6 +108,7 @@
     <ClInclude Include="..\src\json\json.hpp" />
     <ClInclude Include="..\src\NaiveBuildOrderSearch.h" />
     <ClInclude Include="..\src\NMCS.h" />
+    <ClInclude Include="..\src\NMCTS.h" />
     <ClInclude Include="..\src\Node.h" />
     <ClInclude Include="..\src\Timer.hpp" />
     <ClInclude Include="..\src\Tools.h" />
