@@ -35,6 +35,7 @@ class Unit
 
 public:
     Unit();
+    Unit(ActionType type);
     Unit(ActionType type, NumUnits id, NumUnits builderID, TimeType frameStarted);
     //void        initializeUnit(ActionType type, ActionID id, NumUnits builderID, TimeType frameStarted);
 
