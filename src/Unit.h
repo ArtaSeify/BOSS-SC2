@@ -55,6 +55,7 @@ public:
     void        setTimeUntilBuilt(TimeType time)    { m_timeUntilBuilt = time; }
     void        setTimeUntilFree(TimeType time)     { m_timeUntilFree = time; }
     void        setBuilderID(NumUnits id)           { m_builderID = id; }
+    void        setEnergy(FracType energy)          { m_energy = energy; }
     void        reduceEnergy(FracType energy)       { m_energy -= energy; }
 
     void        applyChronoBoost(TimeType time, Unit & unitBeingProduced);

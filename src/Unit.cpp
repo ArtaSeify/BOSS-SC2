@@ -243,6 +243,7 @@ void Unit::applyChronoBoost(TimeType time, Unit & unitBeingProduced)
     if (!m_type.isMorphed())
     {
         unitBeingProduced.setTimeUntilBuilt(m_timeUntilFree);
+        unitBeingProduced.setTimeUntilFree(m_timeUntilFree);
     }
 }
 

@@ -121,6 +121,7 @@
     <ClCompile Include="..\src\DFSPolicyAndValue.cpp">
       <Filter>search\CombatSearch\Integral\Network</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\NMCTS.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\ActionType.h" />
@@ -249,6 +250,7 @@
     <ClInclude Include="..\src\DFSPolicyAndValue.h">
       <Filter>search\CombatSearch\Integral\Network</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\NMCTS.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="BuildOrder">

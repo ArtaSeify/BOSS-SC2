@@ -23,7 +23,7 @@ void NMCS::recurse(const GameState & state, int depth)
 
     auto searchResult = executeSearch(*root, m_params.getLevel(), depth);
 
-    BuildOrderAbilities finishedUnitsBuildOrder = createFinishedUnitsBuildOrder(searchResult.first);
+    BuildOrderAbilities finishedUnitsBuildOrder = createFinishedUnitsBuildOrder(searchResult.second);
 
     m_bestIntegralFound = searchResult.first;
     m_bestBuildOrderFound = searchResult.second;

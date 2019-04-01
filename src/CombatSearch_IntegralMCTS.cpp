@@ -155,7 +155,7 @@ void CombatSearch_IntegralMCTS::recurse(const GameState & state, int depth)
     m_integral = m_bestIntegralFound;
     m_buildOrder = m_bestBuildOrderFound;
 
-    BuildOrderAbilities finishedUnitsBuildOrder = createFinishedUnitsBuildOrder(m_bestIntegralFound);
+    BuildOrderAbilities finishedUnitsBuildOrder = createFinishedUnitsBuildOrder(m_bestBuildOrderFound);
 
     m_results.highestEval = m_integral.getCurrentStackValue();
     m_results.buildOrder = m_bestBuildOrderFound;
@@ -458,10 +458,35 @@ void CombatSearch_IntegralMCTS::pickBestBuildOrder(std::shared_ptr<Node> root,  
     m_promisingNodeIntegral.update(finalState, m_promisingNodeBuildOrder, m_params, m_searchTimer, false);
 }
 
-BuildOrderAbilities CombatSearch_IntegralMCTS::createFinishedUnitsBuildOrder(const CombatSearch_IntegralDataFinishedUnits & integral) const
+BuildOrderAbilities CombatSearch_IntegralMCTS::createFinishedUnitsBuildOrder(const BuildOrderAbilities & buildOrder) const
 {
     // create a build order based only on the units that finished
-    const GameState bestState(integral.getState());
+    BuildOrderAbilities completeBuildOrder;
+
+    GameState state(m_params.getInitialState());
+    for (auto & action : buildOrder)
+    {
+        ActionType type = action.first;
+        if (type.isAbility())
+        {
+            state.doAbility(type, action.second.targetID);
+        }
+        else
+        {
+            state.doAction(type);
+        }
+
+        if (state.getCurrentFrame() > m_params.getFrameTimeLimit())
+        {
+            break;
+        }
+
+        completeBuildOrder.add(action);
+    }
+
+    return completeBuildOrder;
+
+    /*const GameState bestState(integral.getState());
     int numInitialUnits = m_params.getInitialState().getNumUnits();
     int numTotalUnits = bestState.getNumUnits();
     auto & chronoboosts = bestState.getChronoBoostTargets();
@@ -510,7 +535,7 @@ BuildOrderAbilities CombatSearch_IntegralMCTS::createFinishedUnitsBuildOrder(con
         chronoboostIndex++;
     }
 
-    return finishedUnitsBuildOrder;
+    return finishedUnitsBuildOrder;*/
 }
 
 void CombatSearch_IntegralMCTS::updateNodeVisits(bool nodeExpanded, bool isTerminal)
