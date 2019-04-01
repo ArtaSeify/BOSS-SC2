@@ -23,6 +23,7 @@ namespace BOSS
         //CombatSearch_IntegralData   m_integral;
         CombatSearch_IntegralDataFinishedUnits  m_integral;
         FracType                                m_highestValueFound;
+
         std::ofstream                           m_fileStates;
         std::stringstream                       m_ssStates;
         std::vector<std::uint8_t>               m_jStates;

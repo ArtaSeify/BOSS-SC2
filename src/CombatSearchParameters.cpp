@@ -104,6 +104,16 @@ const BuildOrderAbilities & CombatSearchParameters::getEnemyBuildOrder() const
     return m_enemyBuildOrder;
 }
 
+void CombatSearchParameters::setEnemyUnits(const std::vector<Unit> & units)
+{
+    m_enemyUnits = units;
+}
+
+const std::vector<Unit> & CombatSearchParameters::getEnemyUnits() const
+{
+    return m_enemyUnits;
+}
+
 void CombatSearchParameters::setRepetitions(ActionType a,int repetitions)
 { 
     m_repetitionValues[a.getID()] = repetitions; 

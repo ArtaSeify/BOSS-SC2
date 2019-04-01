@@ -7,6 +7,7 @@
 #include "CombatSearch_BestResponse.h"
 #include "CombatSearch_IntegralMCTS.h"
 #include "NMCS.h"
+#include "NMCTS.h"
 #include "DFSPolicy.h"
 #include "DFSValue.h"
 #include "DFSPolicyAndValue.h"
@@ -99,6 +100,14 @@ IntegralExperiment::IntegralExperiment(const std::string & experimentName, const
         m_params.setNumPlayouts(searchParameters["Playouts"]);
         m_params.setLevel(searchParameters["Level"]);
     }
+    
+    else if (searchType == "IntegralNMCTS")
+    {
+        auto & searchParameters = exp["SearchParameters"];
+        m_params.setNumPlayouts(searchParameters["Playouts"]);
+        m_params.setLevel(searchParameters["Level"]);
+        m_params.setUseMaxValue(searchParameters["UseMax"]);
+    }
 
     /*if (searchType == "IntegralDFS")
     {
@@ -177,6 +186,25 @@ IntegralExperiment::IntegralExperiment(const std::string & experimentName, const
         m_params.setChangingRoot(exp["SimulationsPerStep"][0]);
         m_params.setSimulationsPerStep(exp["SimulationsPerStep"][1]);
     }
+
+    if (exp.count("OpponentUnits"))
+    {
+        BOSS_ASSERT(exp["OpponentUnits"].is_array(), "OpponentUnits must be an array");
+        std::vector<Unit> enemyUnits;
+        for (auto & units : exp["OpponentUnits"])
+        {
+            BOSS_ASSERT(units.is_array() && units.size() == 2, "Unit vector inside OpponentUnits must be an array of size 2");
+            BOSS_ASSERT(units[0].is_string(), "First index of unit must be a string corresponding to name");
+            BOSS_ASSERT(units[1].is_number_integer(), "Second index of unit must be an integer corresponding to the number of units");
+        
+            for (int i = 0; i < units[1]; ++i)
+            {
+                enemyUnits.push_back(ActionTypes::GetActionType(units[0]));
+            }
+        }
+
+        m_params.setEnemyUnits(enemyUnits);
+    }
 }
 
 void IntegralExperiment::runExperimentThread(int thread, int runForThread, int startingIndex)
@@ -224,6 +252,10 @@ void IntegralExperiment::runExperimentThread(int thread, int runForThread, int s
         else if (m_searchType == "IntegralNMCS")
         {
             combatSearch = std::unique_ptr<CombatSearch>(new NMCS(m_params, outputDir, resultsFile, m_name));
+        }
+        else if (m_searchType == "IntegralNMCTS")
+        {
+            combatSearch = std::unique_ptr<CombatSearch>(new NMCTS(m_params, outputDir, resultsFile, m_name));
         }
         else
         {

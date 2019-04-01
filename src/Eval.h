@@ -10,10 +10,13 @@ namespace BOSS
 {
     namespace Eval
     {
+        static FracType GASWORTH;
+
         //double ArmyCompletedResourceSum(const GameState & state);
         FracType ArmyInProgressResourceSum(const GameState & state);
         FracType ArmyTotalResourceSum(const GameState & state);
-        FracType ArmyResourceUnit(const GameState & state, int unitIndex);
+        FracType UnitValue(const GameState & state, ActionType type);
+        FracType UnitValueWithOpponent(const GameState & state, ActionType type, const CombatSearchParameters & params);
 
         bool BuildOrderBetter(const BuildOrderAbilities & buildOrder, const BuildOrderAbilities & compareTo);
         bool StateBetter(const GameState & state, const GameState & compareTo);

@@ -23,6 +23,7 @@
         "Phoenix", "Carrier", "VoidRay", "WarpPrism", "Observer", "Immortal", "Probe", "Interceptor", 
         "WarpGate", "ChronoBoost", "AdeptWarped", "Adept", "Oracle", "Tempest", "Disruptor", "WarpGateResearch"],
             "MaxActions"        : [ ["CyberneticsCore", 1], ["FleetBeacon", 1], ["TwilightCouncil", 1], ["TemplarArchive", 1], ["DarkShrine", 1], ["RoboticsBay", 1] ],
+            "OpponentUnits"     : [ ["Probe", 8], ["Gateway", 1] ],
             "AlwaysMakeWorkers" : true,
             "OpeningBuildOrder" : "Test1",
             "SortActions"       : false,

@@ -4,6 +4,8 @@
 
 using namespace BOSS;
 
+FracType Eval::GASWORTH = 1.5;
+
 FracType Eval::ArmyInProgressResourceSum(const GameState & state)
 {
     FracType sum(0);
@@ -15,7 +17,7 @@ FracType Eval::ArmyInProgressResourceSum(const GameState & state)
         if (!type.isBuilding() && !type.isWorker() && !type.isSupplyProvider() && type != ActionTypes::GetDetector(state.getRace()))
         {
             sum += type.mineralPrice();
-            sum += FracType(1.5 * type.gasPrice());
+            sum += FracType(GASWORTH * type.gasPrice());
         }
     }
 
@@ -33,22 +35,35 @@ FracType Eval::ArmyTotalResourceSum(const GameState & state)
         if (!type.isBuilding() && !type.isWorker() && !type.isSupplyProvider() && type != ActionTypes::GetDetector(state.getRace()))
         {
             sum += type.mineralPrice();
-            sum += FracType(1.5 * type.gasPrice());
+            sum += FracType(GASWORTH * type.gasPrice());
         }
     }
 
     return sum / 100;
 }
 
-FracType Eval::ArmyResourceUnit(const GameState & state, int unitIndex)
+FracType Eval::UnitValue(const GameState & state, ActionType type)
 {
     FracType sum = 0;
 
-    ActionType type = state.getUnit(unitIndex).getType();
     if (!type.isBuilding() && !type.isWorker() && !type.isSupplyProvider() && type != ActionTypes::GetDetector(state.getRace()))
     {
         sum += type.mineralPrice();
-        sum += FracType(1.5 * type.gasPrice());
+        sum += FracType(GASWORTH * type.gasPrice());
+    }
+
+    return sum / 100;
+}
+
+
+FracType Eval::UnitValueWithOpponent(const GameState & state, ActionType type, const CombatSearchParameters & params)
+{
+    FracType sum = 0;
+
+    if (!type.isBuilding() && !type.isWorker() && !type.isSupplyProvider() && type != ActionTypes::GetDetector(state.getRace()))
+    {
+        sum += type.mineralPrice();
+        sum += FracType(GASWORTH * type.gasPrice());
     }
 
     return sum / 100;

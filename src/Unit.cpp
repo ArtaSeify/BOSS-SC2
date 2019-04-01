@@ -25,6 +25,27 @@ Unit::Unit()
 {
 }
 
+Unit::Unit(ActionType type)
+    : m_id(-1)
+    , m_frameStarted(-1)
+    , m_frameFinished(-1)
+    , m_builderID(-1)
+    , m_type(type)
+    , m_addon(ActionTypes::None)
+    , m_buildType(ActionTypes::None)
+    , m_buildID(0)
+    , m_job(UnitJobs::None)
+    , m_timeUntilBuilt(0)
+    , m_timeUntilFree(0)
+    //!!! PROBLEM UNUSED    , m_numLarva                (0)
+    , m_timeChronoBoost(0)
+    , m_timeChronoBoostAgain(0)
+    , m_maxEnergyAllowed(0)
+    , m_energy(0)
+    , m_morphed(false)
+{
+}
+
 Unit::Unit(ActionType type, NumUnits id, NumUnits builderID, TimeType frameStarted)
     : m_id                      (id)
     , m_frameStarted            (frameStarted)
