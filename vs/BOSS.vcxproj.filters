@@ -121,6 +121,9 @@
     <ClCompile Include="..\src\DFSPolicyAndValue.cpp">
       <Filter>search\CombatSearch\Integral\Network</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\NMCTS.cpp">
+      <Filter>search\CombatSearch\Integral\NMCTS</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\ActionType.h" />
@@ -249,6 +252,9 @@
     <ClInclude Include="..\src\DFSPolicyAndValue.h">
       <Filter>search\CombatSearch\Integral\Network</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\NMCTS.h">
+      <Filter>search\CombatSearch\Integral\NMCTS</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="BuildOrder">
@@ -292,6 +298,9 @@
     </Filter>
     <Filter Include="search\CombatSearch\Integral\Network">
       <UniqueIdentifier>{0f037cb3-fdb6-4b22-aa45-9e606638c89f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="search\CombatSearch\Integral\NMCTS">
+      <UniqueIdentifier>{d8708309-09a7-4909-a877-f9f9352d8b95}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

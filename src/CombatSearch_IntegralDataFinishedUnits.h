@@ -78,7 +78,7 @@ namespace BOSS
         void popFinishedLastOrder(const GameState & prevState, const GameState & currState);
 
         void print(const BuildOrderAbilities & buildOrder = BuildOrderAbilities()) const;
-        void printIntegralData(const int index, const std::vector<IntegralDataFinishedUnits> & integral_stack, const GameState & state, const BuildOrderAbilities & buildOrder) const;
+        void printIntegralData(int index, const std::vector<IntegralDataFinishedUnits> & integral_stack, const GameState & state, const BuildOrderAbilities & buildOrder) const;
         void print(const std::vector<IntegralDataFinishedUnits> & integral_stack, const GameState & state, const BuildOrderAbilities & buildOrder) const;
 
         BuildOrderAbilities createBuildOrderEndTimes() const;

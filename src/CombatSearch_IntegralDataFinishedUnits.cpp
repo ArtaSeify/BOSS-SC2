@@ -101,7 +101,17 @@ void CombatSearch_IntegralDataFinishedUnits::update(const GameState & state, con
 
 void CombatSearch_IntegralDataFinishedUnits::addUnitEntry(const GameState & state, int unitIndex, TimeType startFrame, TimeType endFrame, const CombatSearchParameters & params)
 {
-    FracType value = Eval::ArmyResourceUnit(state, unitIndex) + m_integralStack.back().eval;
+    FracType value = m_integralStack.back().eval;
+    
+    if (params.getEnemyUnits().size() > 0)
+    {
+        value += Eval::UnitValueWithOpponent(state, state.getUnit(unitIndex).getType(), params);
+    }
+    else
+    {
+       value += Eval::UnitValue(state, state.getUnit(unitIndex).getType());
+    }
+    
     TimeType timeElapsed = endFrame - m_integralStack.back().timeFinished;
     FracType valueToAdd = m_integralStack.back().eval * timeElapsed;
     FracType integralToThisPoint = m_integralStack.back().integral_ToThisPoint + valueToAdd;
@@ -137,7 +147,7 @@ void CombatSearch_IntegralDataFinishedUnits::print(const BuildOrderAbilities & b
     }
 }
 
-void CombatSearch_IntegralDataFinishedUnits::printIntegralData(const int index, const std::vector<IntegralDataFinishedUnits> & integral_stack, const GameState & /*!!! PROBLEM UNUSED state */, const BuildOrderAbilities & buildOrder) const
+void CombatSearch_IntegralDataFinishedUnits::printIntegralData(int index, const std::vector<IntegralDataFinishedUnits> & integral_stack, const GameState & /*!!! PROBLEM UNUSED state */, const BuildOrderAbilities & buildOrder) const
 {
     printf("%7d %8d %10.2lf %15.2lf %16.2lf   ", (int)integral_stack[index].timeStarted, (int)integral_stack[index].timeFinished, integral_stack[index].eval, integral_stack[index].integral_ToThisPoint, integral_stack[index].integral_UntilFrameLimit);
     std::cout << buildOrder.getNameString(2, index) << std::endl;
