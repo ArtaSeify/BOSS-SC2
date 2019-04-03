@@ -16,7 +16,9 @@ namespace BOSS
         FracType ArmyInProgressResourceSum(const GameState & state);
         FracType ArmyTotalResourceSum(const GameState & state);
         FracType UnitValue(const GameState & state, ActionType type);
+
         FracType UnitValueWithOpponent(const GameState & state, ActionType type, const CombatSearchParameters & params);
+        FracType UnitWeight(ActionType type, const CombatSearchParameters & params);
 
         bool BuildOrderBetter(const BuildOrderAbilities & buildOrder, const BuildOrderAbilities & compareTo);
         bool StateBetter(const GameState & state, const GameState & compareTo);

@@ -55,7 +55,6 @@ FracType Eval::UnitValue(const GameState & state, ActionType type)
     return sum / 100;
 }
 
-
 FracType Eval::UnitValueWithOpponent(const GameState & state, ActionType type, const CombatSearchParameters & params)
 {
     FracType sum = 0;
@@ -64,6 +63,7 @@ FracType Eval::UnitValueWithOpponent(const GameState & state, ActionType type, c
     {
         sum += type.mineralPrice();
         sum += FracType(GASWORTH * type.gasPrice());
+
     }
 
     return sum / 100;
