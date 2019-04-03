@@ -35,16 +35,22 @@ namespace BOSS
         bool                        isAddon         = false;
         bool                        isMorphed       = false;
         ActionType                  whatBuilds;
+        //ActionType                  whatBuildsSecond;
         std::vector<bool>           whatBuildsVector;           // the size of this vector is the number of actions of this actions' race. 
         uint4                       whatBuildsCount = 1;
         ActionType                  whatBuildsAddon;
         std::string                 whatBuildsStr;
+        //std::string                 whatBuildsStrSecond;
         std::string                 whatBuildsStatus;
         std::string                 whatBuildsAddonStr;
         std::vector<std::string>    equivalentStrings;
         std::vector<std::string>    requiredStrings;
+        std::vector<std::vector<std::string>>    strongStrings;
+        std::vector<std::vector<std::string>>    weakStrings;
         std::vector<ActionType>     equivalent;
         std::vector<ActionType>     required;
+        std::vector<std::vector<ActionType>>     strongAgainst;
+        std::vector<std::vector<ActionType>>     weakAgainst;
 
         static void Init(const json & filename);
         static void CreateActionTypeData(const json & actions, RaceID race);

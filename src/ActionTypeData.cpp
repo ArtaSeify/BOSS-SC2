@@ -65,7 +65,15 @@ void ActionTypeData::CreateActionTypeData(const json & actions, RaceID race)
 
             BOSS_ASSERT(actions[index].count("whatBuilds"), "no 'whatBuilds' member");
             auto & whatBuilds = actions[index]["whatBuilds"];
-            data.whatBuildsStr = whatBuilds[0].get<std::string>();
+            if (whatBuilds[0].is_array())
+            {
+                data.whatBuildsStr = whatBuilds[0][0].get<std::string>();
+                //data.whatBuildsStrSecond = whatBuilds[0][1].get<std::string>();
+            }
+            else
+            {
+                data.whatBuildsStr = whatBuilds[0].get<std::string>();
+            }
             data.whatBuildsCount = std::stoul(whatBuilds[1].get<std::string>());
             data.whatBuildsStatus = whatBuilds[2].get<std::string>();
             if (data.whatBuildsStatus == "Morphed")
@@ -74,16 +82,48 @@ void ActionTypeData::CreateActionTypeData(const json & actions, RaceID race)
             }
             if (whatBuilds.size() == 4) { data.whatBuildsAddonStr = whatBuilds[3].get<std::string>(); }
 
+            BOSS_ASSERT(actions[index].count("equivalent"), "no 'equivalent' member");
+            for (auto & equiv : actions[index]["equivalent"])
+            {
+                data.equivalentStrings.push_back(equiv);
+            }
+
             BOSS_ASSERT(actions[index].count("required"), "no 'required' member");
             for (auto & req : actions[index]["required"])
             {
                 data.requiredStrings.push_back(req);
             }
 
-            BOSS_ASSERT(actions[index].count("equivalent"), "no 'equivalent' member");
-            for (auto & equiv : actions[index]["equivalent"])
+            if (actions[index].count("strong"))
             {
-                data.equivalentStrings.push_back(equiv);
+                BOSS_ASSERT(actions[index]["strong"].size() == 3, "Missing a race in 'strong' memeber");
+                for (auto & raceStrong : actions[index]["strong"])
+                {
+                    data.strongStrings.push_back(raceStrong.get<std::vector<std::string>>());
+                }               
+            }
+            else
+            {
+                for (int i = 0; i < 3; ++i)
+                {
+                    data.strongStrings.push_back(std::vector<std::string>());
+                }
+            }
+
+            if (actions[index].count("weak"))
+            {
+                BOSS_ASSERT(actions[index]["weak"].size() == 3, "Missing a race in 'weak' memeber");
+                for (auto & raceWeak : actions[index]["weak"])
+                {
+                    data.weakStrings.push_back(raceWeak.get<std::vector<std::string>>());
+                }
+            }
+            else
+            {
+                for (int i = 0; i < 3; ++i)
+                {
+                    data.weakStrings.push_back(std::vector<std::string>());
+                }
             }
 
             // the name map stores the index that will hold this data, which is the current size
@@ -130,6 +170,15 @@ void ActionTypeData::Init(const json & j)
             // get the types of the thing that builds this type
             data.whatBuilds = ActionType(ActionTypeNameMap.at(data.whatBuildsStr));
         }
+        
+        /*if (data.whatBuildsStrSecond.size() > 0)
+        {
+            data.whatBuildsSecond = ActionType(ActionTypeNameMap.at(data.whatBuildsStrSecond));
+        }
+        else
+        {
+            data.whatBuildsSecond = ActionType(ActionTypeNameMap.at("None"));
+        }*/
 
         if (data.whatBuildsAddonStr.size() > 0) 
         {
@@ -151,6 +200,50 @@ void ActionTypeData::Init(const json & j)
                 data.required.push_back(ActionType(ActionTypeNameMap.at(data.requiredStrings[i])));
             }
         }
+        
+        
+        std::vector<size_t> raceOrdering = { 2, 0, 1 };
+        // the units this unit is strong against
+        if (data.strongStrings.size() > 0)
+        {
+            for (size_t i : raceOrdering)
+            {
+                std::vector<ActionType> strongAgainstTypes;
+                for (const std::string & unitName : data.strongStrings[i])
+                {
+                    strongAgainstTypes.push_back(ActionType(ActionTypeNameMap.at(unitName)));
+                }
+                data.strongAgainst.push_back(strongAgainstTypes);
+            }
+        }
+        else
+        {
+            for (int i = 0; i < 3; ++i)
+            {
+                data.strongAgainst.push_back(std::vector<ActionType>());
+            }
+        }
+
+        // the units this unit is weak against
+        if (data.weakStrings.size() > 0)
+        {
+            for (size_t i : raceOrdering)
+            {
+                std::vector<ActionType> weakAgainstTypes;
+                for (const std::string & unitName : data.weakStrings[i])
+                {
+                    weakAgainstTypes.push_back(ActionType(ActionTypeNameMap.at(unitName)));
+                }
+                data.weakAgainst.push_back(weakAgainstTypes);
+            }
+        }
+        else
+        {
+            for (int i = 0; i < 3; ++i)
+            {
+                data.weakAgainst.push_back(std::vector<ActionType>());
+            }
+        }
     }
 
     // whatBuildsVector contains a 1 in the slot pertaining to the raceActionID of
@@ -168,5 +261,9 @@ void ActionTypeData::Init(const json & j)
         {
             data.whatBuildsVector[data.whatBuilds.getRaceActionID()] = true;
         }
+        /*if (data.whatBuildsStrSecond.size() > 0)
+        {
+            data.whatBuildsVector[data.whatBuildsSecond.getRaceActionID()] = true;
+        }*/
     }
 }

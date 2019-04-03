@@ -68,6 +68,11 @@ ActionType ActionType::whatBuilds() const
     return ActionTypeData::GetActionTypeData(m_id).whatBuilds;
 }
 
+//ActionType ActionType::whatBuildsSecond() const
+//{
+//    return ActionTypeData::GetActionTypeData(m_id).whatBuildsSecond;
+//}
+
 const std::vector<bool> & ActionType::whatBuildsVector() const
 {
     return ActionTypeData::GetActionTypeData(m_id).whatBuildsVector;
@@ -93,6 +98,16 @@ const std::vector<ActionType> & ActionType::equivalent() const
     return ActionTypeData::GetActionTypeData(m_id).equivalent;
 }
 
+const std::vector<ActionType> & ActionType::strongAgainst(RaceID race) const
+{
+    return ActionTypeData::GetActionTypeData(m_id).strongAgainst[race];
+}
+
+const std::vector<ActionType> & ActionType::weakAgainst(RaceID race) const
+{
+    return ActionTypeData::GetActionTypeData(m_id).weakAgainst[race];
+}
+
 const ActionSetAbilities & ActionType::getPrerequisiteActionCount() const
 {
     return allActionPrerequisites[m_id];
@@ -116,6 +131,7 @@ namespace ActionTypes
     std::vector<ActionType> resourceDepotActionTypes;
     std::vector<ActionType> specialActionTypes;
     std::vector<ActionType> detectorTypes;
+    ActionType              warpGateResearch;
 
     void Init()
     {
@@ -130,6 +146,17 @@ namespace ActionTypes
                 raceActionTypesCount[allActionTypes[i].getRace()]++;
             }
             actionTypesFile << i << "," << allActionTypes[i].getName() << std::endl;
+
+            //std::cout << allActionTypes[i].getName() << ": ";
+            //if (allActionTypes[i].strongAgainst(Races::Terran).size() > 0)
+            //{
+            //    std::cout << allActionTypes[i].strongAgainst(Races::Terran)[0].getName();
+            //}
+            //if (allActionTypes[i].weakAgainst(Races::Terran).size() > 0)
+            //{
+            //    std::cout << ", " << allActionTypes[i].weakAgainst(Races::Terran)[0].getName();
+            //}
+            //std::cout << std::endl;
         }
 
         workerActionTypes.push_back(ActionTypes::GetActionType("Probe"));
@@ -138,6 +165,7 @@ namespace ActionTypes
         resourceDepotActionTypes.push_back(ActionTypes::GetActionType("Nexus"));
         specialActionTypes.push_back(ActionTypes::GetActionType("ChronoBoost"));
         detectorTypes.push_back(ActionTypes::GetActionType("Observer"));
+        warpGateResearch = ActionTypes::GetActionType("WarpGateResearch");
 
         workerActionTypes.push_back(ActionTypes::GetActionType("SCV"));
         refineryActionTypes.push_back(ActionTypes::GetActionType("Refinery"));
@@ -198,6 +226,11 @@ namespace ActionTypes
     ActionType GetDetector(RaceID raceID)
     {
         return detectorTypes[raceID];
+    }
+
+    ActionType GetWarpGateResearch()
+    {
+        return warpGateResearch;
     }
     
     ActionType GetActionType(const std::string & name)

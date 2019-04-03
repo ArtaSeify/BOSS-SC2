@@ -189,18 +189,16 @@ IntegralExperiment::IntegralExperiment(const std::string & experimentName, const
 
     if (exp.count("OpponentUnits"))
     {
-        BOSS_ASSERT(exp["OpponentUnits"].is_array(), "OpponentUnits must be an array");
-        std::vector<Unit> enemyUnits;
+        BOSS_ASSERT(exp["OpponentUnits"].is_array() && exp["OpponentUnits"].size() > 0, "OpponentUnits must be an array");
+        std::vector<int> enemyUnits(ActionTypes::GetAllActionTypes().size());
+        m_params.setEnemyRace(ActionTypes::GetActionType(exp["OpponentUnits"][0][0]).getRace());
         for (auto & units : exp["OpponentUnits"])
         {
             BOSS_ASSERT(units.is_array() && units.size() == 2, "Unit vector inside OpponentUnits must be an array of size 2");
             BOSS_ASSERT(units[0].is_string(), "First index of unit must be a string corresponding to name");
             BOSS_ASSERT(units[1].is_number_integer(), "Second index of unit must be an integer corresponding to the number of units");
         
-            for (int i = 0; i < units[1]; ++i)
-            {
-                enemyUnits.push_back(ActionTypes::GetActionType(units[0]));
-            }
+            enemyUnits[ActionTypes::GetActionType(units[0]).getID()] = units[1];
         }
 
         m_params.setEnemyUnits(enemyUnits);
