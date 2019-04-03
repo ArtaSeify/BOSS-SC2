@@ -76,7 +76,7 @@ GameState::GameState(const std::vector<Unit> & unitVector, RaceID race, FracType
             }
         }
 
-        m_unitTypes[unit.getType().getRaceActionID()] = true;
+        m_unitTypes[unit.getType().getRaceActionID()]++;
         //std::cout << "name: " << unit.getType().getName() << std::endl;
     }
     /*std::cout << Races::GetRaceName(m_race) << std::endl;
@@ -106,6 +106,10 @@ bool GameState::isLegal(ActionType action) const
     // if the race can't do the action
     if (action.getRace() != m_race) { return false; }
 
+    if (action == ActionTypes::GetActionType("WarpGate")) { return false; }
+   
+    if (action.whatBuilds() == ActionTypes::GetActionType("Gateway") && timeUntilResearchDone(ActionTypes::GetWarpGateResearch()) == 0) { return false; }
+
     // if we have no gas income we can't make a gas unit
     if ((m_gas < action.gasPrice()) && (m_gasWorkers == 0)) { return false; }
 
@@ -120,7 +124,7 @@ bool GameState::isLegal(ActionType action) const
     if (action.isWorker() && m_mineralWorkers >= m_numDepots * CONSTANTS::WorkersPerDepot) { return false; }
 
     // can only have one of each upgrade
-    if (action.isUpgrade() && m_unitTypes[action.getRaceActionID()]) { return false; }
+    if (action.isUpgrade() && m_unitTypes[action.getRaceActionID()] > 0) { return false; }
 
     // only one Mothership is allowed
     if (action.supplyCost() == 8 && haveType(action)) { return false; }
@@ -273,6 +277,7 @@ void GameState::fastForward(TimeType toFrame)
 
         // if the current action in progress will finish after the ff time, we can stop
         const TimeType actionCompletionTime = previousFrame + unit.getTimeUntilBuilt();
+
         if (actionCompletionTime > toFrame) { break; }
 
         // add the resources we gathered during this time period
@@ -348,6 +353,33 @@ void GameState::completeUnit(Unit & unit)
         m_inProgressDepots--;
         m_numDepots++;
     }
+    // if we have WarpGate research, all gateways turn into warpgates on their own when they are built
+    else if (unit.getType() == ActionTypes::GetActionType("Gateway") && timeUntilResearchDone(ActionTypes::GetWarpGateResearch()) == 0)
+    {
+        addUnit(ActionTypes::GetActionType("WarpGate"), unit.getID());
+        //std::cout << "changing gateway to warpgate since it finished building!" << std::endl;
+    }
+    // when we finish warpgate research, all gateways turn into warpgates on their own
+    else if (unit.getType() == ActionTypes::GetWarpGateResearch())
+    {
+        ActionType gateway = ActionTypes::GetActionType("Gateway");
+        for (auto & current_unit : m_units)
+        {
+            if (current_unit.getType() == gateway && current_unit.getTimeUntilFree() == 0)
+            {
+                addUnit(ActionTypes::GetActionType("WarpGate"), current_unit.getID());
+                
+                //std::cout << "changing gateway to warpgate since upgrade finished!" << std::endl;
+            }
+        }
+    }
+    // gateways that were training something when warpgate research finished automatically turn into warpgates
+    else if (unit.getBuilderID() != -1 && !unit.getType().isBuilding() &&
+        m_units[unit.getBuilderID()].getType() == ActionTypes::GetActionType("Gateway") && timeUntilResearchDone(ActionTypes::GetWarpGateResearch()) == 0)
+    {
+        addUnit(ActionTypes::GetActionType("WarpGate"), unit.getBuilderID());
+        //std::cout << "changing gateway to warpgate since it finished producing its unit !" << std::endl;
+    }
 }
 
 // add a unit of the given type to the state
@@ -355,7 +387,7 @@ void GameState::completeUnit(Unit & unit)
 void GameState::addUnit(ActionType type, NumUnits builderID)
 {
     BOSS_ASSERT(m_race == Races::None || type.getRace() == m_race, "Adding an Unit of a different race");
-
+   
     m_race = type.getRace();
     Unit unit(type, NumUnits(m_units.size()), builderID, m_currentFrame);
     m_units.push_back(unit);
@@ -364,27 +396,14 @@ void GameState::addUnit(ActionType type, NumUnits builderID)
 
     if (m_unitTypes.size() == 0)
     {
-        m_unitTypes = std::vector<bool>(ActionTypes::GetRaceActionCount(m_race), false);
+        m_unitTypes = std::vector<int>(ActionTypes::GetRaceActionCount(m_race), 0);
     }
 
-    m_unitTypes[unit.getType().getRaceActionID()] = true;
+    m_unitTypes[unit.getType().getRaceActionID()]++;
 
     if (type.isMorphed() && builderID != -1)
     {
-        ActionType beforeMorphType = getUnit(builderID).getType();
-        bool haveNotMorphed = false;
-        Unit & morphingUnit = getUnit(builderID);
-        for (auto & unit : m_units)
-        {
-            if (unit.getType() == beforeMorphType && !unit.getMorphed() && unit.getID() != morphingUnit.getID())
-            {
-                haveNotMorphed = true;
-            }
-        }
-        if (!haveNotMorphed)
-        {
-            m_unitTypes[getUnit(builderID).getType().getRaceActionID()] = false;
-        }
+        m_unitTypes[getUnit(builderID).getType().getRaceActionID()]--;
     }
     
     else
@@ -402,11 +421,17 @@ void GameState::addUnit(ActionType type, NumUnits builderID)
     // if we have a valid builder for this object, add it to the Units being built
     if (builderID != -1)
     {
+        // since WarpGates are built automatically, we need to adjust their built time to match our fast forwarding scheme
+        if (type == ActionTypes::GetActionType("WarpGate"))
+        {
+            m_units.back().setTimeUntilBuilt(m_units.back().getTimeUntilBuilt() + (m_currentFrame - m_previousFrame));
+            m_units.back().setTimeUntilFree(m_units.back().getTimeUntilBuilt());
+        }
+
         getUnit(builderID).startBuilding(m_units[m_units.size() - 1]);
 
         // add the Unit ID being built and sort the list
         m_unitsBeingBuilt.push_back(unit.getID());
-        
 
         // we know the list is already sorted when we add this unit, so we just swap it from the end until it's in the right place
         for (int i = (int)m_unitsBeingBuilt.size() - 1; i > 0; i--)
@@ -702,33 +727,14 @@ int GameState::getBuilderID(ActionType action) const
 
 bool GameState::haveBuilder(ActionType type) const
 {
-    // check if it's built by a worker. Speeds things up
-    /*if (type.whatBuilds() == ActionTypes::GetWorker(m_race))
-    {
-        if (m_mineralWorkers > 0 || m_gasWorkers > 0 || m_buildingWorkers > 0)
-        {
-            return true;
-        }
-
-        return false;
-    }
-    bool bruteforceresult = false;
-    bruteforceresult = std::any_of(m_units.rbegin(), m_units.rend(),
-           [&type](const Unit & u){ return u.whenCanBuild(type) != -1; });
-    */
-
-    return m_unitTypes[type.whatBuilds().getRaceActionID()];
+    return m_unitTypes[type.whatBuilds().getRaceActionID()] > 0;
 }
 
 bool GameState::havePrerequisites(ActionType type) const
 {
-    /*return std::all_of(type.required().begin(), type.required().end(), 
-           [this](ActionType req) { return this->haveType(req); });
-    */
-
     for (const ActionType & req : type.required())
     {
-        if (!m_unitTypes[req.getRaceActionID()])
+        if (m_unitTypes[req.getRaceActionID()] == 0)
         {
             return false;
         }
@@ -769,14 +775,22 @@ bool GameState::haveType(ActionType action) const
            [&action](const Unit & i){ return i.getType() == action; });
 }
 
+int GameState::timeUntilResearchDone(ActionType action) const
+{
+    if (m_unitTypes[action.getRaceActionID()] == 0)
+    {
+        return std::numeric_limits<int>::max();
+    }
+    return std::find_if(m_units.begin(), m_units.end(),
+        [&action](const Unit & unit) { return unit.getType() == action; })->getTimeUntilBuilt();
+}
+
 void GameState::getSpecialAbilityTargets(ActionSetAbilities & actionSet, int index) const
 {
     if (m_race == Races::Protoss)
     {
-        // if there are any chronoboostable targets, we remove the placeholder CB
-        // action with target -1. Otherwise, we keep it in
         storeChronoBoostTargets(actionSet, index);
-        actionSet.remove(ActionTypes::GetSpecialAction(m_race), index);
+        actionSet.remove(ActionTypes::GetSpecialAction(m_race), index); // remove placeholder 
     }
 }
 

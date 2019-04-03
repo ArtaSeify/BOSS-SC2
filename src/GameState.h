@@ -24,7 +24,7 @@ class GameState
     std::vector<NumUnits>       m_unitsBeingBuilt;      // indices of m_units which are not completed, sorted descending by finish time
     std::vector<NumUnits>       m_unitsSortedEndFrame;  // indices of m_units which are completed, in order
     std::vector<AbilityAction>  m_chronoBoosts;
-    std::vector<bool>           m_unitTypes;             // a vector containing all the unit types we have
+    std::vector<int>            m_unitTypes;             // a vector containing all the unit types we have
     RaceID                      m_race;
     FracType                    m_minerals;
     FracType                    m_gas;
@@ -43,17 +43,17 @@ class GameState
     ActionType                  m_lastAction;
     AbilityAction               m_lastAbility;
  
-    int                     getBuilderID(ActionType type)               const;
-    bool                    haveBuilder(ActionType type)                const;
-    bool                    havePrerequisites(ActionType type)          const;
+    int                             getBuilderID(ActionType type)               const;
+    bool                            haveBuilder(ActionType type)                const;
+    bool                            havePrerequisites(ActionType type)          const;
 
-    int                     whenSupplyReady(ActionType action)          const;
-    int                     whenPrerequisitesReady(ActionType action)   const;
-    int                     whenResourcesReady(ActionType action)       const;
-    int                     whenBuilderReady(ActionType action)         const;
+    int                             whenSupplyReady(ActionType action)          const;
+    int                             whenPrerequisitesReady(ActionType action)   const;
+    int                             whenResourcesReady(ActionType action)       const;
+    int                             whenBuilderReady(ActionType action)         const;
 
-    Unit &                  getUnit(NumUnits id) { return m_units[id]; }
-    void                    completeUnit(Unit & Unit);
+    Unit &                          getUnit(NumUnits id) { return m_units[id]; }
+    void                            completeUnit(Unit & Unit);
 
   public: 
     GameState();
@@ -78,6 +78,7 @@ class GameState
     void                            getLegalActions(std::vector<ActionType> & legalActions) const;
     bool                            isLegal(ActionType type)                                const;
     bool                            haveType(ActionType action)                             const;
+    int                             timeUntilResearchDone(ActionType action)                const;
 
     void                            doAbility(ActionType type, NumUnits targetID);
     void                            doAction(ActionType type);
@@ -101,15 +102,14 @@ class GameState
     RaceID                          getRace()                           const { return m_race; }
     FracType                        getMinerals()                       const { return m_minerals; }
     FracType                        getGas()                            const { return m_gas; }
-    /*const Vector_AbilityAction &    getChronoBoostTargets()             const { return m_chronoBoosts; }
-    const Vector_FinishedUnits &    getFinishedUnits()                  const { return m_unitsSortedEndFrame; }*/
-    const std::vector<AbilityAction> & getChronoBoostTargets()             const { return m_chronoBoosts; }
-    const std::vector<NumUnits> &    getFinishedUnits()                  const { return m_unitsSortedEndFrame; }
+    const std::vector<AbilityAction>&getChronoBoostTargets()            const { return m_chronoBoosts; }
+    const std::vector<NumUnits> &   getFinishedUnits()                  const { return m_unitsSortedEndFrame; }
     ActionType                      getUnitType(NumUnits id)            const { return m_units[id].getType(); }
     ActionType                      getLastAction()                     const { return m_lastAction; }
     const AbilityAction &           getLastAbility()                    const { return m_lastAbility; }
     const Unit &                    getUnit(NumUnits id)                const { return m_units[id]; }
     const std::vector<NumUnits> &   getUnitsBeingBuilt()                const { return m_unitsBeingBuilt; }
+    const std::vector<int> &        getUnitTypes()                      const { return m_unitTypes; }
     
     std::string                     toString()                          const;
     void                            printunitsbeingbuilt()              const;

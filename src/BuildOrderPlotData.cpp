@@ -65,21 +65,16 @@ void BuildOrderPlotData::calculateStartEndTimes()
     }
 
     
-    int latestTimeFinish = 0;
-    const GameState stateLatestFinish(state);
-    for (int i = 0; i < stateLatestFinish.getNumUnits(); ++i)
+    auto unitsBeingBuilt = state.getUnitsBeingBuilt();
+    if (unitsBeingBuilt.size() > 0)
     {
-        int timeUntilBuilt = stateLatestFinish.getUnit(i).getTimeUntilBuilt();
-        if (timeUntilBuilt > latestTimeFinish)
-        {
-            latestTimeFinish = timeUntilBuilt;
-        }
+        state.fastForward(state.getCurrentFrame() + static_cast<const GameState>(state).getUnit(unitsBeingBuilt[0]).getTimeUntilBuilt() + 1); // ff far enough so everything is done
     }
-    state.fastForward(state.getCurrentFrame() + latestTimeFinish + 1); // ff far enough so everything is done
 
     // get the finish times
     const GameState constState(state);
     int abilities = 0;
+    int warpgates = 0;
     m_maxFinishTime = 0;
 
     for (int i(0); i < m_buildOrder.size(); ++i)
@@ -95,10 +90,23 @@ void BuildOrderPlotData::calculateStartEndTimes()
 
         else
         {
-            finish = constState.getUnit(NumUnits(numInitialUnits + i - abilities)).getFinishFrame();
+            
+            while (true)
+            {
+                const Unit & unit = constState.getUnit(NumUnits(numInitialUnits + i + warpgates - abilities));
+                if (unit.getType() == ActionTypes::GetActionType("WarpGate"))
+                {
+                    warpgates++;
+                    //m_finishTimes.push_back(unit.getFinishFrame());
+                }
+                else
+                {
+                    break;
+                }
+            }
+            finish = constState.getUnit(NumUnits(numInitialUnits + i + warpgates - abilities)).getFinishFrame();
         }
         
-
         m_finishTimes.push_back(finish);
         m_maxFinishTime = std::max(m_maxFinishTime, finish);
     }

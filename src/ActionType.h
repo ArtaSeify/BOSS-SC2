@@ -45,11 +45,14 @@ namespace BOSS
         bool isMorphed()        const;
     
         ActionType whatBuilds() const;
+        //ActionType whatBuildsSecond() const;
         const std::vector<bool> & whatBuildsVector() const;
         const std::string & whatBuildsStatus() const;
         ActionType whatBuildsAddon() const;
         const std::vector<ActionType> & required() const;
         const std::vector<ActionType> & equivalent() const;
+        const std::vector<ActionType> & strongAgainst(RaceID race) const;
+        const std::vector<ActionType> & weakAgainst(RaceID race) const;
         const ActionSetAbilities & getPrerequisiteActionCount() const;
         const ActionSetAbilities & getRecursivePrerequisiteActionCount() const;
 
@@ -69,6 +72,7 @@ namespace BOSS
         ActionType GetResourceDepot(RaceID raceID);
         ActionType GetSpecialAction(RaceID raceID);
         ActionType GetDetector(RaceID raceID);
+        ActionType GetWarpGateResearch();
         ActionType GetActionType(const std::string & name);
         bool TypeExists(const std::string & name);
 

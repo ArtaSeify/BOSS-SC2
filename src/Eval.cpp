@@ -4,8 +4,6 @@
 
 using namespace BOSS;
 
-FracType Eval::GASWORTH = 1.5;
-
 FracType Eval::ArmyInProgressResourceSum(const GameState & state)
 {
     FracType sum(0);
@@ -55,6 +53,36 @@ FracType Eval::UnitValue(const GameState & state, ActionType type)
     return sum / 100;
 }
 
+FracType Eval::UnitWeight(const GameState & state, ActionType type, const CombatSearchParameters & params)
+{
+    const std::vector<int> currentUnits = state.getUnitTypes();
+    const std::vector<int> enemyUnits = params.getEnemyUnits();
+
+    FracType multiplier = 1.0;
+    for (ActionType unit : type.strongAgainst(params.getEnemyRace()))
+    {
+        // don't consider workers
+        if (unit.getID() == ActionTypes::GetWorker(params.getEnemyRace()).getID())
+        {
+            continue;
+        }
+        if (enemyUnits[unit.getID()] > 0)
+        {
+            multiplier *= 2;
+        }
+    }
+
+    for (ActionType unit : type.weakAgainst(params.getEnemyRace()))
+    {
+        if (enemyUnits[unit.getID()] > 0)
+        {
+            multiplier *= 1 / 2;
+        }
+    }
+
+    return multiplier;
+}
+
 FracType Eval::UnitValueWithOpponent(const GameState & state, ActionType type, const CombatSearchParameters & params)
 {
     FracType sum = 0;
@@ -64,6 +92,7 @@ FracType Eval::UnitValueWithOpponent(const GameState & state, ActionType type, c
         sum += type.mineralPrice();
         sum += FracType(GASWORTH * type.gasPrice());
 
+        //sum *= Eval::UnitWeight(state, type, params);
     }
 
     return sum / 100;

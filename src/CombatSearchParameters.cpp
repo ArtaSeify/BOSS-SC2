@@ -104,14 +104,24 @@ const BuildOrderAbilities & CombatSearchParameters::getEnemyBuildOrder() const
     return m_enemyBuildOrder;
 }
 
-void CombatSearchParameters::setEnemyUnits(const std::vector<Unit> & units)
+void CombatSearchParameters::setEnemyUnits(const std::vector<int> & units)
 {
     m_enemyUnits = units;
 }
 
-const std::vector<Unit> & CombatSearchParameters::getEnemyUnits() const
+const std::vector<int> & CombatSearchParameters::getEnemyUnits() const
 {
     return m_enemyUnits;
+}
+
+void CombatSearchParameters::setEnemyRace(RaceID race)
+{
+    m_enemyRace = race;
+}
+
+RaceID CombatSearchParameters::getEnemyRace() const
+{
+    return m_enemyRace;
 }
 
 void CombatSearchParameters::setRepetitions(ActionType a,int repetitions)

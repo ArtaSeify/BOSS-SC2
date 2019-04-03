@@ -99,7 +99,8 @@ namespace BOSS
 
         GameState m_enemyInitialState;
         BuildOrderAbilities m_enemyBuildOrder;
-        std::vector<Unit>   m_enemyUnits;
+        std::vector<int>    m_enemyUnits;
+        RaceID              m_enemyRace;
 
         ActionSetAbilities m_relevantActions;
         int m_frameTimeLimit;
@@ -143,8 +144,11 @@ namespace BOSS
         void setEnemyBuildOrder(const BuildOrderAbilities & buildOrder);
         const BuildOrderAbilities & getEnemyBuildOrder() const;
 
-        void setEnemyUnits(const std::vector<Unit> & units);
-        const std::vector<Unit> & getEnemyUnits() const;
+        void setEnemyUnits(const std::vector<int> & units);
+        const std::vector<int> & getEnemyUnits() const;
+
+        void setEnemyRace(RaceID race);
+        RaceID getEnemyRace() const;
 
         void setSearchTimeLimit(float timeLimitMS);
         float getSearchTimeLimit() const;
