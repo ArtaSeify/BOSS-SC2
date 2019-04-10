@@ -54,6 +54,7 @@ namespace BOSS
         void pickBestBuildOrder(std::shared_ptr<Node> root, bool useVisitCount);
 
         BuildOrderAbilities createFinishedUnitsBuildOrder(const BuildOrderAbilities & buildOrder) const;
+        BuildOrderAbilities createUsefulBuildOrder(const BuildOrderAbilities & buildOrder) const;
 
         void test(const GameState & state);
         void test2(const GameState & state);

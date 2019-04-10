@@ -37,6 +37,7 @@ namespace BOSS
         //std::vector<ActionType> buildOrder; // the build order
         BuildOrderAbilities buildOrder;
         BuildOrderAbilities finishedUnitsBuildOrder;
+        BuildOrderAbilities usefulBuildOrder;
 
         float highestEval;
 
