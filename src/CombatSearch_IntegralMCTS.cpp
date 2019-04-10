@@ -156,6 +156,7 @@ void CombatSearch_IntegralMCTS::recurse(const GameState & state, int depth)
     m_buildOrder = m_bestBuildOrderFound;
 
     BuildOrderAbilities finishedUnitsBuildOrder = createFinishedUnitsBuildOrder(m_bestBuildOrderFound);
+    m_results.usefulBuildOrder = createUsefulBuildOrder(finishedUnitsBuildOrder);
 
     m_results.highestEval = m_integral.getCurrentStackValue();
     m_results.buildOrder = m_bestBuildOrderFound;
@@ -317,7 +318,14 @@ void CombatSearch_IntegralMCTS::doRandomAction(Node & node, const GameState & pr
                 action = legalActions[index];
             }
         }
-        updateBOIntegral(node, ActionAbilityPair(action.first, node.getState().getLastAbility()), prevGameState, false);
+        if (action.first.isAbility())
+        {
+            updateBOIntegral(node, ActionAbilityPair(action.first, node.getState().getLastAbility()), prevGameState, false);
+        }
+        else
+        {
+            updateBOIntegral(node, ActionAbilityPair(action.first, AbilityAction()), prevGameState, false);
+        }
     }
     else
     {
@@ -485,57 +493,156 @@ BuildOrderAbilities CombatSearch_IntegralMCTS::createFinishedUnitsBuildOrder(con
     }
 
     return completeBuildOrder;
+}
 
-    /*const GameState bestState(integral.getState());
-    int numInitialUnits = m_params.getInitialState().getNumUnits();
-    int numTotalUnits = bestState.getNumUnits();
-    auto & chronoboosts = bestState.getChronoBoostTargets();
-    int chronoboostIndex = 0;
-    TimeType nextCBTime = 0;
-    if (chronoboosts.size() > 0)
+BuildOrderAbilities CombatSearch_IntegralMCTS::createUsefulBuildOrder(const BuildOrderAbilities & buildOrder) const
+{
+    // map from index of unit in state to index in build order that built it
+    std::map<int, int> unitBuildOrderMap;
+
+    GameState state(m_params.getInitialState());
+    int numInitialUnits = state.getNumUnits();
+    int offset = 0;
+    int buildOrderActions = 0;
+    for (auto & action : buildOrder)
     {
-        nextCBTime = chronoboosts[chronoboostIndex].frameCast;
+        ActionType type = action.first;
+        if (type.isAbility())
+        {
+            state.doAbility(type, action.second.targetID);
+        }
+        else
+        {
+            state.doAction(type);
+        }
+        
+        if (type.isAbility())
+        {
+            unitBuildOrderMap[buildOrderActions] = -1;
+        }
+
+        while (!type.isAbility())
+        {
+            const int index = numInitialUnits + offset;
+            const Unit unit = static_cast<const GameState>(state).getUnit(index);
+
+            /*std::cout << "index: " << index << std::endl;
+            std::cout << "unit type: " << unit.getType().getID() << std::endl;
+            std::cout << "build order type: " << type.getID() << std::endl;*/
+            if (unit.getType() == type)
+            {
+                unitBuildOrderMap[buildOrderActions] = index;
+                ++offset;
+                break;
+            }
+            //std::cout << "skipping!" << std::endl;
+            ++offset;
+        }
+        ++buildOrderActions;
     }
 
-    BuildOrderAbilities finishedUnitsBuildOrder;
-    for (int index = 0; index < numTotalUnits - numInitialUnits; ++index)
+    BuildOrderAbilities usefulBuildOrder;
+    auto unitTypes = m_params.getInitialState().getUnitTypes();
+    for (auto it = unitBuildOrderMap.begin(); it != unitBuildOrderMap.end(); ++it)
     {
-        auto & unit = bestState.getUnit(index + numInitialUnits);
-        if (unit.getFinishFrame() == -1)
+        int buildOrderIndex = it->first;
+        int stateIndex = it->second;
+
+        // chronoboost is always useful
+        if (stateIndex == -1)
         {
+            usefulBuildOrder.add(buildOrder[buildOrderIndex]);
             continue;
         }
-        if (chronoboostIndex < chronoboosts.size())
+
+        // part of the initial build order
+        if (buildOrderIndex < m_params.getOpeningBuildOrder().size())
         {
-            while (nextCBTime < unit.getStartFrame())
+            usefulBuildOrder.add(buildOrder[buildOrderIndex]);
+            unitTypes[buildOrder[buildOrderIndex].first.getRaceActionID()]++;
+            continue;
+        }
+
+        const Unit unit = static_cast<const GameState>(state).getUnit(stateIndex);
+        ActionType unitType = unit.getType();
+
+        // warpgates are linked to Gateways, so we just ignore them and only consider gateways
+        if (unitType == ActionTypes::GetActionType("WarpGate"))
+        {
+            std::cout << "this shouldn't happen!!!!" << std::endl;
+            continue;
+        }
+        // These actions are always useful
+        if (unitType.isWorker() || unitType.isDepot() || unitType.isRefinery() || unitType.isSupplyProvider())
+        {
+            usefulBuildOrder.add(buildOrder[buildOrderIndex]);
+            continue;
+        }
+
+        // this unit did not produce anything and is not a prerequisite for any created unit,
+        // so it's a "useless" action.
+        // if it's a prerequisite but we have more than 1, we can remove the extra ones
+        if (unit.getBuildID() == 0 && Eval::UnitValue(state, unitType) == 0)
+        {
+            // morphed building (Gateway)
+            if (unit.getMorphID() != -1)
             {
-                const AbilityAction & cb = chronoboosts[chronoboostIndex];
-                if (bestState.getUnit(cb.targetProductionID).getFinishFrame() != -1)
+                const Unit u = static_cast<const GameState>(state).getUnit(unit.getMorphID());
+                if (u.getBuildID() != 0)
                 {
-                    finishedUnitsBuildOrder.add(cb.type, cb);
+                    usefulBuildOrder.add(buildOrder[buildOrderIndex]);
                 }
-                chronoboostIndex++;
-                if (chronoboostIndex == chronoboosts.size())
+                continue;
+            }
+
+            // even if it's a prereq, if we have more than 1 it's still useless
+            if (unitTypes[unitType.getRaceActionID()] == 1)
+            {
+                //std::cout << "removing: " << unitType.getName() << " because it's a building that we have more than 1 off" << std::endl;
+            }
+            // if we only have one, we need to see if it's a prereq for anything
+            else
+            {
+                bool isUseful = false;
+
+                for (int i = unit.getID() + 1; i < state.getNumUnits(); ++i)
                 {
-                    break;
+                    const Unit u = static_cast<const GameState>(state).getUnit(i);
+                    for (auto & req : u.getType().required())
+                    {
+                        // this unit is a prerequisite for something we have built, so it's "useful"
+                        if (req == unitType)
+                        {
+                            isUseful = true;
+                            break;
+                        }
+                    }
+
+                    if (isUseful)
+                    {
+                        usefulBuildOrder.add(buildOrder[buildOrderIndex]);
+                        unitTypes[unitType.getRaceActionID()]++;
+                        break;
+                    }
                 }
-                nextCBTime = chronoboosts[chronoboostIndex].frameCast;
+
+                if (!isUseful)
+                {
+                    //std::cout << "removing: " << unitType.getName() << " because isUseful is false" << std::endl;
+                }
             }
         }
-
-        finishedUnitsBuildOrder.add(unit.getType());
-    }
-    while (chronoboostIndex < chronoboosts.size())
-    {
-        const AbilityAction & cb = chronoboosts[chronoboostIndex];
-        if (bestState.getUnit(cb.targetProductionID).getFinishFrame() != -1)
+        else
         {
-            finishedUnitsBuildOrder.add(cb.type, cb);
+            usefulBuildOrder.add(buildOrder[buildOrderIndex]);
+            unitTypes[unitType.getRaceActionID()]++;
         }
-        chronoboostIndex++;
     }
 
-    return finishedUnitsBuildOrder;*/
+    //buildOrder.print();
+    //usefulBuildOrder.print();
+
+    return usefulBuildOrder;
 }
 
 void CombatSearch_IntegralMCTS::updateNodeVisits(bool nodeExpanded, bool isTerminal)

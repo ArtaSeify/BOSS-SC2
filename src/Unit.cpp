@@ -22,6 +22,7 @@ Unit::Unit()
     , m_maxEnergyAllowed        (0)
     , m_energy                  (0)
     , m_morphID                 (-1)
+    , m_morphed                 (false)
 {
 }
 
@@ -64,26 +65,27 @@ Unit::Unit(ActionType type, NumUnits id, NumUnits builderID, TimeType frameStart
     , m_maxEnergyAllowed        (float(type.maxEnergy()))
     , m_energy                  (float(type.startingEnergy()))
     , m_morphID                 (-1)
+    , m_morphed                 (false)
 {
     
 }
 
 void Unit::startBuilding(Unit & Unit)
 {
-    if (m_morphID != -1)
+    if (m_morphed)
     {
         return;
     }
-    //BOSS_ASSERT(!Unit.getType().isMorphed(), "called 'startBuilding' function with a morphing unit.");
+
+    if (Unit.getType().isMorphed())
+    {
+        m_morphID = Unit.getID();
+        return;
+    }
 
     // if it's not a probe, this Unit won't be free until the build time is done
     if (!m_type.isWorker() || m_type.getRace() != Races::Protoss)
     {
-        if (Unit.getType().isMorphed())
-        {
-            m_timeUntilFree += Unit.getType().buildTime();
-            return;
-        }
         if (Unit.getType().whatBuildsStatus() != "None")
         {
             m_timeUntilFree = Unit.getType().buildTime();
@@ -150,10 +152,11 @@ void Unit::complete(TimeType frameFinished)
 
 void Unit::fastForward(TimeType frames)
 {
-    if (m_morphID != -1)
+    if (m_morphed)
     {
         return;
     }
+
     // if we are completing the thing that this Unit is building
     if ((m_buildType != ActionTypes::None) && frames >= m_timeUntilFree)
     {
@@ -182,7 +185,7 @@ void Unit::fastForward(TimeType frames)
 // returns when this Unit can build a given type, -1 if it can't
 int Unit::whenCanBuild(ActionType type) const
 {
-    if (m_morphID != -1)
+    if (m_morphed)
     {
         return -1;
     }
@@ -212,7 +215,7 @@ int Unit::whenCanBuild(ActionType type) const
     return m_timeUntilFree;
 }
 
-void Unit::castAbility(ActionType type, Unit & abilityTarget, Unit & abilityTargetProduction, Unit & abilityTargetMorph)
+void Unit::castAbility(ActionType type, Unit & abilityTarget, Unit & abilityTargetProduction, Unit & abilityTargetMorphed)
 {
     BOSS_ASSERT(type.whatBuilds() == m_type, "Ability %s can't be cast by unit %s on unit %s", type.getName().c_str(), m_type.getName().c_str(), abilityTarget.getType().getName().c_str());
 
@@ -224,10 +227,12 @@ void Unit::castAbility(ActionType type, Unit & abilityTarget, Unit & abilityTarg
     {
         int change = abilityTarget.applyChronoBoost(type.buildTime(), abilityTargetProduction);
 
-        if (abilityTargetMorph.getMorphID() != -1)
+        // if chronoboosting a unit that a gateway is producing and we have researched warpgate, then the build time
+        // of the warpgate is also reduced
+        if (abilityTarget.getMorphID() != -1)
         {
-            abilityTargetMorph.setTimeUntilBuilt(abilityTargetMorph.getTimeUntilBuilt() - change);
-            abilityTargetMorph.setTimeUntilFree(abilityTargetMorph.getTimeUntilBuilt());
+            abilityTargetMorphed.setTimeUntilBuilt(abilityTargetMorphed.getTimeUntilBuilt() - change);
+            abilityTargetMorphed.setTimeUntilFree(abilityTargetMorphed.getTimeUntilBuilt());
         }
     }
 }
@@ -246,11 +251,6 @@ int Unit::applyChronoBoost(TimeType time, Unit & unitBeingProduced)
     m_timeChronoBoost = time;
 
     BOSS_ASSERT(m_timeUntilFree > 0, "Chrono Boost used on %s, but it is not producing anything, %f", m_type.getName().c_str(), m_timeUntilFree);
-
-    if (!m_type.isMorphed())
-    {
-        BOSS_ASSERT(unitBeingProduced.getTimeUntilBuilt() > 0, "Chrono Boost used on target that is not producing anything");
-    }
 
     // Chrono Boost speeds up production by 50%
     int newTimeUntilFree = (int)std::ceil(m_timeUntilFree / 1.5);
@@ -296,7 +296,8 @@ void Unit::writeToSS(std::stringstream & ss) const
     //ss << m_numLarva << ", ";
     ss << m_maxEnergyAllowed << ",";
     ss << m_energy;
-    //ss << m_morphed << "]";
+    ss << m_morphID;
+    ss << m_morphed << "]";
     ss << "]";
 }
 
@@ -319,7 +320,8 @@ json Unit::writeToJson() const
     data["TimeChronoBoostAgain"] = m_timeChronoBoostAgain;
     data["MaxEnergyAllowed"] = m_maxEnergyAllowed;
     data["Energy"] = m_energy;
-    data["Morphed"] = m_morphID;
+    data["MorphID"] = m_morphID;
+    data["Morphed"] = m_morphed;
 
     return data;
 }

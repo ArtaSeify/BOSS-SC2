@@ -66,6 +66,7 @@ FracType Eval::UnitWeight(const GameState & state, ActionType type, const Combat
         {
             continue;
         }
+        // if (enemyUnits[unit.getID()] > 0 && state.getUnitTypes(type) <= enemyUnits[unit.getID()])
         if (enemyUnits[unit.getID()] > 0)
         {
             counters++;

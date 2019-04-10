@@ -84,6 +84,7 @@ class GameState
     void                            doAction(ActionType type);
     void                            fastForward(TimeType frames);
     void                            addUnit(ActionType Unit, NumUnits builderID = -1);
+    void                            resortUnitsBeingBuilt(int buildID, int morphID);
   
     void                            setMinerals(FracType minerals) { m_minerals = minerals; }
     void                            setGas(FracType gas) { m_gas = gas; }
@@ -110,6 +111,7 @@ class GameState
     const Unit &                    getUnit(NumUnits id)                const { return m_units[id]; }
     const std::vector<NumUnits> &   getUnitsBeingBuilt()                const { return m_unitsBeingBuilt; }
     const std::vector<int> &        getUnitTypes()                      const { return m_unitTypes; }
+    int                             getNumType(ActionType type)         const { return m_unitTypes[type.getRaceActionID()]; }
     
     std::string                     toString()                          const;
     void                            printunitsbeingbuilt()              const;

@@ -101,13 +101,13 @@
     </ClCompile>
     <ClCompile Include="..\src\BuildOrderAbilities.cpp" />
     <ClCompile Include="..\src\CombatSearch_IntegralMCTS.cpp">
-      <Filter>search\CombatSearch\Integral\MCTS2</Filter>
+      <Filter>search\CombatSearch\Integral\MCTS</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Node.cpp">
-      <Filter>search\CombatSearch\Integral\MCTS2</Filter>
+      <Filter>search\CombatSearch\Integral\MCTS</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Edge.cpp">
-      <Filter>search\CombatSearch\Integral\MCTS2</Filter>
+      <Filter>search\CombatSearch\Integral\MCTS</Filter>
     </ClCompile>
     <ClCompile Include="..\src\NMCS.cpp">
       <Filter>search\CombatSearch\Integral\NMCS</Filter>
@@ -232,13 +232,13 @@
       <Filter>util</Filter>
     </ClInclude>
     <ClInclude Include="..\src\CombatSearch_IntegralMCTS.h">
-      <Filter>search\CombatSearch\Integral\MCTS2</Filter>
+      <Filter>search\CombatSearch\Integral\MCTS</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Node.h">
-      <Filter>search\CombatSearch\Integral\MCTS2</Filter>
+      <Filter>search\CombatSearch\Integral\MCTS</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Edge.h">
-      <Filter>search\CombatSearch\Integral\MCTS2</Filter>
+      <Filter>search\CombatSearch\Integral\MCTS</Filter>
     </ClInclude>
     <ClInclude Include="..\src\NMCS.h">
       <Filter>search\CombatSearch\Integral\NMCS</Filter>
@@ -290,9 +290,6 @@
     <Filter Include="search\CombatSearch\Integral">
       <UniqueIdentifier>{841059ad-587a-41f4-9642-a83478d31d49}</UniqueIdentifier>
     </Filter>
-    <Filter Include="search\CombatSearch\Integral\MCTS2">
-      <UniqueIdentifier>{d4bca63e-59b7-4207-848f-9cc0d95f7013}</UniqueIdentifier>
-    </Filter>
     <Filter Include="search\CombatSearch\Integral\NMCS">
       <UniqueIdentifier>{117c0c5b-8945-40cb-ab9d-a69dc5b223b0}</UniqueIdentifier>
     </Filter>
@@ -300,7 +297,10 @@
       <UniqueIdentifier>{0f037cb3-fdb6-4b22-aa45-9e606638c89f}</UniqueIdentifier>
     </Filter>
     <Filter Include="search\CombatSearch\Integral\NMCTS">
-      <UniqueIdentifier>{47306cae-4299-4d7a-8c1a-f4ce0b77712a}</UniqueIdentifier>
+      <UniqueIdentifier>{a8af9655-abf9-4561-a352-6efee6b3eb78}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="search\CombatSearch\Integral\MCTS">
+      <UniqueIdentifier>{d4bca63e-59b7-4207-848f-9cc0d95f7013}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

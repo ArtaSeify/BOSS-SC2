@@ -31,7 +31,8 @@ class Unit
     //int1        m_numLarva;         // number of larva this building currently has (Hatch only)
     FracType    m_maxEnergyAllowed; // maximum energy allowed for this building
     FracType    m_energy;            // energy of the building
-    NumUnits    m_morphID;           // has the building been morphed. if true, this unit is no longer used for anything, but we keep it around as a placeholder
+    NumUnits    m_morphID;           // index in GameState::m_units of the unit this unit morphed into
+    bool        m_morphed;              // flag that determines whether the unit has finished morphing
 
 public:
     Unit();
@@ -52,16 +53,17 @@ public:
     ActionType  getAddon()                  const   { return m_addon; }
     ActionType  getBuildType()              const   { return m_buildType; }
     int         getMorphID()                const   { return m_morphID; }
+    bool        isMorphed()                 const   { return m_morphed; }
 
     void        setTimeUntilBuilt(TimeType time)    { m_timeUntilBuilt = time; }
     void        setTimeUntilFree(TimeType time)     { m_timeUntilFree = time; }
     void        setBuilderID(NumUnits id)           { m_builderID = id; }
-    void        setMorphID(NumUnits id)             { m_morphID = id; }
+    void        setMorphed(bool val)                { m_morphed = val; }
     void        setEnergy(FracType energy)          { m_energy = energy; }
     void        reduceEnergy(FracType energy)       { m_energy -= energy; }
 
-    int        applyChronoBoost(TimeType time, Unit & unitBeingProduced);
-    void        castAbility(ActionType type, Unit & abilityTarget, Unit & abilityTargetProduction, Unit & abilityTargetMorph);
+    int         applyChronoBoost(TimeType time, Unit & unitBeingProduced);
+    void        castAbility(ActionType type, Unit & abilityTarget, Unit & abilityTargetProduction, Unit & abilityTargetMorphed);
     void        complete(TimeType frameFinished);
     void        startBuilding(Unit & Unit);
     //void        morph(ActionType newType);

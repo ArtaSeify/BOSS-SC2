@@ -90,7 +90,6 @@ void BuildOrderPlotData::calculateStartEndTimes()
 
         else
         {
-            
             while (true)
             {
                 const Unit & unit = constState.getUnit(NumUnits(numInitialUnits + i + warpgates - abilities));
