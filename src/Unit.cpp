@@ -21,7 +21,7 @@ Unit::Unit()
     , m_timeChronoBoostAgain    (0)
     , m_maxEnergyAllowed        (0)
     , m_energy                  (0)
-    , m_morphed                 (false)
+    , m_morphID                 (-1)
 {
 }
 
@@ -63,14 +63,14 @@ Unit::Unit(ActionType type, NumUnits id, NumUnits builderID, TimeType frameStart
     , m_timeChronoBoostAgain    (0)
     , m_maxEnergyAllowed        (float(type.maxEnergy()))
     , m_energy                  (float(type.startingEnergy()))
-    , m_morphed                 (false)
+    , m_morphID                 (-1)
 {
     
 }
 
 void Unit::startBuilding(Unit & Unit)
 {
-    if (m_morphed)
+    if (m_morphID != -1)
     {
         return;
     }
@@ -79,6 +79,11 @@ void Unit::startBuilding(Unit & Unit)
     // if it's not a probe, this Unit won't be free until the build time is done
     if (!m_type.isWorker() || m_type.getRace() != Races::Protoss)
     {
+        if (Unit.getType().isMorphed())
+        {
+            m_timeUntilFree += Unit.getType().buildTime();
+            return;
+        }
         if (Unit.getType().whatBuildsStatus() != "None")
         {
             m_timeUntilFree = Unit.getType().buildTime();
@@ -116,7 +121,6 @@ void Unit::startBuilding(Unit & Unit)
     
     m_buildType = Unit.getType();
     m_buildID = Unit.getID();
-    m_morphed = Unit.getType().isMorphed();
 
     // the building might still be chrono boosted
     if (m_timeChronoBoost > 0)
@@ -146,7 +150,7 @@ void Unit::complete(TimeType frameFinished)
 
 void Unit::fastForward(TimeType frames)
 {
-    if (m_morphed)
+    if (m_morphID != -1)
     {
         return;
     }
@@ -178,7 +182,7 @@ void Unit::fastForward(TimeType frames)
 // returns when this Unit can build a given type, -1 if it can't
 int Unit::whenCanBuild(ActionType type) const
 {
-    if (m_morphed)
+    if (m_morphID != -1)
     {
         return -1;
     }
@@ -208,7 +212,7 @@ int Unit::whenCanBuild(ActionType type) const
     return m_timeUntilFree;
 }
 
-void Unit::castAbility(ActionType type, Unit & abilityTarget, Unit & abilityTargetProduction)
+void Unit::castAbility(ActionType type, Unit & abilityTarget, Unit & abilityTargetProduction, Unit & abilityTargetMorph)
 {
     BOSS_ASSERT(type.whatBuilds() == m_type, "Ability %s can't be cast by unit %s on unit %s", type.getName().c_str(), m_type.getName().c_str(), abilityTarget.getType().getName().c_str());
 
@@ -218,11 +222,17 @@ void Unit::castAbility(ActionType type, Unit & abilityTarget, Unit & abilityTarg
     // use ability on target
     if (type.getName() == "ChronoBoost")
     {
-        abilityTarget.applyChronoBoost(type.buildTime(), abilityTargetProduction);
+        int change = abilityTarget.applyChronoBoost(type.buildTime(), abilityTargetProduction);
+
+        if (abilityTargetMorph.getMorphID() != -1)
+        {
+            abilityTargetMorph.setTimeUntilBuilt(abilityTargetMorph.getTimeUntilBuilt() - change);
+            abilityTargetMorph.setTimeUntilFree(abilityTargetMorph.getTimeUntilBuilt());
+        }
     }
 }
 
-void Unit::applyChronoBoost(TimeType time, Unit & unitBeingProduced)
+int Unit::applyChronoBoost(TimeType time, Unit & unitBeingProduced)
 {
     if (m_timeChronoBoostAgain > 0)
     {
@@ -255,6 +265,7 @@ void Unit::applyChronoBoost(TimeType time, Unit & unitBeingProduced)
         m_timeChronoBoost = 0;
     }
 
+    int change = m_timeUntilFree - newTimeUntilFree;
     m_timeUntilFree = newTimeUntilFree;
 
     if (!m_type.isMorphed())
@@ -262,6 +273,8 @@ void Unit::applyChronoBoost(TimeType time, Unit & unitBeingProduced)
         unitBeingProduced.setTimeUntilBuilt(m_timeUntilFree);
         unitBeingProduced.setTimeUntilFree(m_timeUntilFree);
     }
+
+    return change;
 }
 
 void Unit::writeToSS(std::stringstream & ss) const
@@ -306,7 +319,7 @@ json Unit::writeToJson() const
     data["TimeChronoBoostAgain"] = m_timeChronoBoostAgain;
     data["MaxEnergyAllowed"] = m_maxEnergyAllowed;
     data["Energy"] = m_energy;
-    data["Morphed"] = m_morphed;
+    data["Morphed"] = m_morphID;
 
     return data;
 }

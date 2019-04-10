@@ -106,9 +106,9 @@ bool GameState::isLegal(ActionType action) const
     // if the race can't do the action
     if (action.getRace() != m_race) { return false; }
 
-    if (action == ActionTypes::GetActionType("WarpGate")) { return false; }
+    //if (action == ActionTypes::GetActionType("WarpGate")) { return false; }
    
-    if (action.whatBuilds() == ActionTypes::GetActionType("Gateway") && timeUntilResearchDone(ActionTypes::GetWarpGateResearch()) == 0) { return false; }
+    //if (action.whatBuilds() == ActionTypes::GetActionType("Gateway") && timeUntilResearchDone(ActionTypes::GetWarpGateResearch()) == 0) { return false; }
 
     // if we have no gas income we can't make a gas unit
     if ((m_gas < action.gasPrice()) && (m_gasWorkers == 0)) { return false; }
@@ -227,7 +227,9 @@ void GameState::doAbility(ActionType type, NumUnits targetID)
         m_lastAbility = abilityAction;
 
         // cast chronoboost
-        getUnit(getBuilderID(type)).castAbility(type, getUnit(targetID), getUnit(getUnit(targetID).getBuildID()));
+        //NumUnits morphedUnit = getUnit(targetID).getMorphID();
+        //if (morphedUnit)
+        getUnit(getBuilderID(type)).castAbility(type, getUnit(targetID), getUnit(getUnit(targetID).getBuildID()), m_units[0]);
         
         m_chronoBoosts.push_back(abilityAction);
 
@@ -365,7 +367,7 @@ void GameState::completeUnit(Unit & unit)
         ActionType gateway = ActionTypes::GetActionType("Gateway");
         for (auto & current_unit : m_units)
         {
-            if (current_unit.getType() == gateway && current_unit.getTimeUntilFree() == 0)
+            if (current_unit.getType() == gateway && current_unit.getTimeUntilBuilt() == 0)
             {
                 addUnit(ActionTypes::GetActionType("WarpGate"), current_unit.getID());
                 
@@ -374,11 +376,9 @@ void GameState::completeUnit(Unit & unit)
         }
     }
     // gateways that were training something when warpgate research finished automatically turn into warpgates
-    else if (unit.getBuilderID() != -1 && !unit.getType().isBuilding() &&
-        m_units[unit.getBuilderID()].getType() == ActionTypes::GetActionType("Gateway") && timeUntilResearchDone(ActionTypes::GetWarpGateResearch()) == 0)
+    else if (unit.getType() == ActionTypes::GetActionType("WarpGate"))
     {
-        addUnit(ActionTypes::GetActionType("WarpGate"), unit.getBuilderID());
-        //std::cout << "changing gateway to warpgate since it finished producing its unit !" << std::endl;
+        getUnit(unit.getBuilderID()).setMorphID(unit.getID());
     }
 }
 
@@ -424,7 +424,8 @@ void GameState::addUnit(ActionType type, NumUnits builderID)
         // since WarpGates are built automatically, we need to adjust their built time to match our fast forwarding scheme
         if (type == ActionTypes::GetActionType("WarpGate"))
         {
-            m_units.back().setTimeUntilBuilt(m_units.back().getTimeUntilBuilt() + (m_currentFrame - m_previousFrame));
+            m_units.back().setTimeUntilBuilt(m_units.back().getTimeUntilBuilt() + 
+                (int)std::max(m_currentFrame - m_previousFrame, getUnit(builderID).getTimeUntilFree()));
             m_units.back().setTimeUntilFree(m_units.back().getTimeUntilBuilt());
         }
 
@@ -835,7 +836,7 @@ int GameState::storeChronoBoostTargets(ActionSetAbilities & actionSet, int index
 bool GameState::chronoBoostableTarget(const Unit & unit) const
 {
     // can't cast on a morphed unit as they are just a placeholder
-    if (unit.getMorphed()) { return false; }
+    if (unit.getMorphID() != -1) { return false; }
 
     // can only be used on buildings
     if (!unit.getType().isBuilding()) { return false; }

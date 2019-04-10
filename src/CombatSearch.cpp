@@ -105,7 +105,7 @@ void CombatSearch::generateLegalActions(const GameState & state, ActionSetAbilit
             // gateways automatically turn into warpgates when warpgate research is finished, so we can no longer
             // build gateway units
             if (actionType.whatBuilds() == gateway && state.getUnitTypes()[ActionTypes::GetWarpGateResearch().getRaceActionID()] > 0 &&
-                state.timeUntilResearchDone(ActionTypes::GetWarpGateResearch()) <= whenCanPerformAction)
+                state.timeUntilResearchDone(ActionTypes::GetWarpGateResearch()) + state.getCurrentFrame() <= whenCanPerformAction)
             {
                 illegalActions.add(actionType);
             }
@@ -153,7 +153,7 @@ void CombatSearch::generateLegalActions(const GameState & state, ActionSetAbilit
             // gateways automatically turn into warpgates when warpgate research is finished, so we can no longer
             // build gateway units
             if (actionType.whatBuilds() == gateway && state.getUnitTypes()[ActionTypes::GetWarpGateResearch().getRaceActionID()] > 0 &&
-                state.timeUntilResearchDone(ActionTypes::GetWarpGateResearch()) <= whenCanPerformAction)
+                state.timeUntilResearchDone(ActionTypes::GetWarpGateResearch()) + state.getCurrentFrame() <= whenCanPerformAction)
             {
                 illegalActions.add(actionType);
             }

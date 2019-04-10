@@ -11,7 +11,7 @@ namespace BOSS
 {
     namespace Eval
     {
-        static FracType GASWORTH = 1.5;
+        static FracType GASWORTH = 1.0;
 
         //double ArmyCompletedResourceSum(const GameState & state);
         FracType ArmyInProgressResourceSum(const GameState & state);

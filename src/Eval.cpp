@@ -58,7 +58,7 @@ FracType Eval::UnitWeight(const GameState & state, ActionType type, const Combat
     const std::vector<int> currentUnits = state.getUnitTypes();
     const std::vector<int> enemyUnits = params.getEnemyUnits();
 
-    FracType multiplier = 1.0;
+    int counters = 0;
     for (ActionType unit : type.strongAgainst(params.getEnemyRace()))
     {
         // don't consider workers
@@ -68,19 +68,20 @@ FracType Eval::UnitWeight(const GameState & state, ActionType type, const Combat
         }
         if (enemyUnits[unit.getID()] > 0)
         {
-            multiplier *= 2;
+            counters++;
         }
     }
 
+    int countered = 0;
     for (ActionType unit : type.weakAgainst(params.getEnemyRace()))
     {
-        if (enemyUnits[unit.getID()] > 0)
+        if (!unit.isWorker() && enemyUnits[unit.getID()] > 0)
         {
-            multiplier *= 1 / 2;
+            countered++;
         }
     }
 
-    return multiplier;
+    return FracType((1.0 + counters) / (1.0 + countered));
 }
 
 FracType Eval::UnitValueWithOpponent(const GameState & state, ActionType type, const CombatSearchParameters & params)
@@ -92,7 +93,7 @@ FracType Eval::UnitValueWithOpponent(const GameState & state, ActionType type, c
         sum += type.mineralPrice();
         sum += FracType(GASWORTH * type.gasPrice());
 
-        //sum *= Eval::UnitWeight(state, type, params);
+        sum *= Eval::UnitWeight(state, type, params);
     }
 
     return sum / 100;
