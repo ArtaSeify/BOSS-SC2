@@ -10,7 +10,6 @@ namespace BOSS
     {
         FracType m_exploration_parameter;
 
-        int m_simulationsPerStep;
         int m_writeEveryKSimulations;
 
         std::mt19937 m_rnggen;
@@ -52,9 +51,6 @@ namespace BOSS
 
         // sets the class variables to the best build order found during search
         void pickBestBuildOrder(std::shared_ptr<Node> root, bool useVisitCount);
-
-        BuildOrderAbilities createFinishedUnitsBuildOrder(const BuildOrderAbilities & buildOrder) const;
-        BuildOrderAbilities createUsefulBuildOrder(const BuildOrderAbilities & buildOrder) const;
 
         void test(const GameState & state);
         void test2(const GameState & state);

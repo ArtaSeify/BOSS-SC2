@@ -7,14 +7,18 @@ using namespace BOSS;
 CombatSearch_IntegralMCTS::CombatSearch_IntegralMCTS(const CombatSearchParameters p, const std::string & dir, 
                                                         const std::string & prefix, const std::string & name)
     : m_exploration_parameter (p.getExplorationValue())
+    , m_promisingNodeIntegral(CombatSearch_IntegralDataFinishedUnits())
+    , m_promisingNodeBuildOrder(BuildOrderAbilities())
     , m_bestIntegralFound(CombatSearch_IntegralDataFinishedUnits())
     , m_bestBuildOrderFound(BuildOrderAbilities())
     , m_numSimulations(0)
+    , m_dataStream()
+    , m_resultsStream()
+    , m_needToWriteBestValue(false)
 {
     m_params = p;
     Edge::USE_MAX_VALUE = m_params.getUseMaxValue();
 
-    m_simulationsPerStep = m_params.getSimulationsPerStep();
     m_writeEveryKSimulations = 1;
     m_dir = dir;
     m_name = prefix;
@@ -61,8 +65,15 @@ void CombatSearch_IntegralMCTS::recurse(const GameState & state, int depth)
     while (!timeLimitReached() && m_numSimulations < m_params.getNumberOfSimulations() && m_results.nodeVisits < m_params.getNumberOfNodes())
     {
         // change the root of the tree. Remove all the nodes and edges that are now irrelevant
-        if (m_params.getChangingRoot() && m_numSimulations > 0 && (m_simulationsPerStep == 1 || m_numSimulations%m_simulationsPerStep == 0))
+        if (m_params.getChangingRoot() && m_numSimulations > 0 && (m_params.getSimulationsPerStep() == 1 || m_numSimulations% m_params.getSimulationsPerStep() == 0))
         {
+            int sum = 0;
+            for (int i = 0; i < currentRoot->getNumEdges(); ++i)
+            {
+                sum += currentRoot->getEdge(i)->timesVisited();
+            }
+            BOSS_ASSERT(sum >= m_params.getSimulationsPerStep(), "The total visit of the edges must be higher than or equal to the number of simulations before moving the root");
+
             std::shared_ptr<Edge> childEdge = currentRoot->getHighestValueChild(m_params);
 
             // TODO: DONT CRASH, CREATE NODE INSTEAD
@@ -466,184 +477,184 @@ void CombatSearch_IntegralMCTS::pickBestBuildOrder(std::shared_ptr<Node> root,  
     m_promisingNodeIntegral.update(finalState, m_promisingNodeBuildOrder, m_params, m_searchTimer, false);
 }
 
-BuildOrderAbilities CombatSearch_IntegralMCTS::createFinishedUnitsBuildOrder(const BuildOrderAbilities & buildOrder) const
-{
-    // create a build order based only on the units that finished
-    BuildOrderAbilities completeBuildOrder;
-
-    GameState state(m_params.getInitialState());
-    for (auto & action : buildOrder)
-    {
-        ActionType type = action.first;
-        if (type.isAbility())
-        {
-            state.doAbility(type, action.second.targetID);
-        }
-        else
-        {
-            state.doAction(type);
-        }
-
-        if (state.getCurrentFrame() > m_params.getFrameTimeLimit())
-        {
-            break;
-        }
-
-        completeBuildOrder.add(action);
-    }
-
-    return completeBuildOrder;
-}
-
-BuildOrderAbilities CombatSearch_IntegralMCTS::createUsefulBuildOrder(const BuildOrderAbilities & buildOrder) const
-{
-    // map from index of unit in state to index in build order that built it
-    std::map<int, int> unitBuildOrderMap;
-
-    GameState state(m_params.getInitialState());
-    int numInitialUnits = state.getNumUnits();
-    int offset = 0;
-    int buildOrderActions = 0;
-    for (auto & action : buildOrder)
-    {
-        ActionType type = action.first;
-        if (type.isAbility())
-        {
-            state.doAbility(type, action.second.targetID);
-        }
-        else
-        {
-            state.doAction(type);
-        }
-        
-        if (type.isAbility())
-        {
-            unitBuildOrderMap[buildOrderActions] = -1;
-        }
-
-        while (!type.isAbility())
-        {
-            const int index = numInitialUnits + offset;
-            const Unit unit = static_cast<const GameState>(state).getUnit(index);
-
-            /*std::cout << "index: " << index << std::endl;
-            std::cout << "unit type: " << unit.getType().getID() << std::endl;
-            std::cout << "build order type: " << type.getID() << std::endl;*/
-            if (unit.getType() == type)
-            {
-                unitBuildOrderMap[buildOrderActions] = index;
-                ++offset;
-                break;
-            }
-            //std::cout << "skipping!" << std::endl;
-            ++offset;
-        }
-        ++buildOrderActions;
-    }
-
-    BuildOrderAbilities usefulBuildOrder;
-    auto unitTypes = m_params.getInitialState().getUnitTypes();
-    for (auto it = unitBuildOrderMap.begin(); it != unitBuildOrderMap.end(); ++it)
-    {
-        int buildOrderIndex = it->first;
-        int stateIndex = it->second;
-
-        // chronoboost is always useful
-        if (stateIndex == -1)
-        {
-            usefulBuildOrder.add(buildOrder[buildOrderIndex]);
-            continue;
-        }
-
-        // part of the initial build order
-        if (buildOrderIndex < m_params.getOpeningBuildOrder().size())
-        {
-            usefulBuildOrder.add(buildOrder[buildOrderIndex]);
-            unitTypes[buildOrder[buildOrderIndex].first.getRaceActionID()]++;
-            continue;
-        }
-
-        const Unit unit = static_cast<const GameState>(state).getUnit(stateIndex);
-        ActionType unitType = unit.getType();
-
-        // warpgates are linked to Gateways, so we just ignore them and only consider gateways
-        if (unitType == ActionTypes::GetActionType("WarpGate"))
-        {
-            std::cout << "this shouldn't happen!!!!" << std::endl;
-            continue;
-        }
-        // These actions are always useful
-        if (unitType.isWorker() || unitType.isDepot() || unitType.isRefinery() || unitType.isSupplyProvider())
-        {
-            usefulBuildOrder.add(buildOrder[buildOrderIndex]);
-            continue;
-        }
-
-        // this unit did not produce anything and is not a prerequisite for any created unit,
-        // so it's a "useless" action.
-        // if it's a prerequisite but we have more than 1, we can remove the extra ones
-        if (unit.getBuildID() == 0 && Eval::UnitValue(state, unitType) == 0)
-        {
-            // morphed building (Gateway)
-            if (unit.getMorphID() != -1)
-            {
-                const Unit u = static_cast<const GameState>(state).getUnit(unit.getMorphID());
-                if (u.getBuildID() != 0)
-                {
-                    usefulBuildOrder.add(buildOrder[buildOrderIndex]);
-                }
-                continue;
-            }
-
-            // even if it's a prereq, if we have more than 1 it's still useless
-            if (unitTypes[unitType.getRaceActionID()] == 1)
-            {
-                //std::cout << "removing: " << unitType.getName() << " because it's a building that we have more than 1 off" << std::endl;
-            }
-            // if we only have one, we need to see if it's a prereq for anything
-            else
-            {
-                bool isUseful = false;
-
-                for (int i = unit.getID() + 1; i < state.getNumUnits(); ++i)
-                {
-                    const Unit u = static_cast<const GameState>(state).getUnit(i);
-                    for (auto & req : u.getType().required())
-                    {
-                        // this unit is a prerequisite for something we have built, so it's "useful"
-                        if (req == unitType)
-                        {
-                            isUseful = true;
-                            break;
-                        }
-                    }
-
-                    if (isUseful)
-                    {
-                        usefulBuildOrder.add(buildOrder[buildOrderIndex]);
-                        unitTypes[unitType.getRaceActionID()]++;
-                        break;
-                    }
-                }
-
-                if (!isUseful)
-                {
-                    //std::cout << "removing: " << unitType.getName() << " because isUseful is false" << std::endl;
-                }
-            }
-        }
-        else
-        {
-            usefulBuildOrder.add(buildOrder[buildOrderIndex]);
-            unitTypes[unitType.getRaceActionID()]++;
-        }
-    }
-
-    //buildOrder.print();
-    //usefulBuildOrder.print();
-
-    return usefulBuildOrder;
-}
+//BuildOrderAbilities CombatSearch_IntegralMCTS::createFinishedUnitsBuildOrder(const BuildOrderAbilities & buildOrder) const
+//{
+//    // create a build order based only on the units that finished
+//    BuildOrderAbilities completeBuildOrder;
+//
+//    GameState state(m_params.getInitialState());
+//    for (auto & action : buildOrder)
+//    {
+//        ActionType type = action.first;
+//        if (type.isAbility())
+//        {
+//            state.doAbility(type, action.second.targetID);
+//        }
+//        else
+//        {
+//            state.doAction(type);
+//        }
+//
+//        if (state.getCurrentFrame() > m_params.getFrameTimeLimit())
+//        {
+//            break;
+//        }
+//
+//        completeBuildOrder.add(action);
+//    }
+//
+//    return completeBuildOrder;
+//}
+//
+//BuildOrderAbilities CombatSearch_IntegralMCTS::createUsefulBuildOrder(const BuildOrderAbilities & buildOrder) const
+//{
+//    // map from index of unit in state to index in build order that built it
+//    std::map<int, int> unitBuildOrderMap;
+//
+//    GameState state(m_params.getInitialState());
+//    int numInitialUnits = state.getNumUnits();
+//    int offset = 0;
+//    int buildOrderActions = 0;
+//    for (auto & action : buildOrder)
+//    {
+//        ActionType type = action.first;
+//        if (type.isAbility())
+//        {
+//            state.doAbility(type, action.second.targetID);
+//        }
+//        else
+//        {
+//            state.doAction(type);
+//        }
+//        
+//        if (type.isAbility())
+//        {
+//            unitBuildOrderMap[buildOrderActions] = -1;
+//        }
+//
+//        while (!type.isAbility())
+//        {
+//            const int index = numInitialUnits + offset;
+//            const Unit unit = static_cast<const GameState>(state).getUnit(index);
+//
+//            /*std::cout << "index: " << index << std::endl;
+//            std::cout << "unit type: " << unit.getType().getID() << std::endl;
+//            std::cout << "build order type: " << type.getID() << std::endl;*/
+//            if (unit.getType() == type)
+//            {
+//                unitBuildOrderMap[buildOrderActions] = index;
+//                ++offset;
+//                break;
+//            }
+//            //std::cout << "skipping!" << std::endl;
+//            ++offset;
+//        }
+//        ++buildOrderActions;
+//    }
+//
+//    BuildOrderAbilities usefulBuildOrder;
+//    auto unitTypes = m_params.getInitialState().getUnitTypes();
+//    for (auto it = unitBuildOrderMap.begin(); it != unitBuildOrderMap.end(); ++it)
+//    {
+//        int buildOrderIndex = it->first;
+//        int stateIndex = it->second;
+//
+//        // chronoboost is always useful
+//        if (stateIndex == -1)
+//        {
+//            usefulBuildOrder.add(buildOrder[buildOrderIndex]);
+//            continue;
+//        }
+//
+//        // part of the initial build order
+//        if (buildOrderIndex < m_params.getOpeningBuildOrder().size())
+//        {
+//            usefulBuildOrder.add(buildOrder[buildOrderIndex]);
+//            unitTypes[buildOrder[buildOrderIndex].first.getRaceActionID()]++;
+//            continue;
+//        }
+//
+//        const Unit unit = static_cast<const GameState>(state).getUnit(stateIndex);
+//        ActionType unitType = unit.getType();
+//
+//        // warpgates are linked to Gateways, so we just ignore them and only consider gateways
+//        if (unitType == ActionTypes::GetActionType("WarpGate"))
+//        {
+//            std::cout << "this shouldn't happen!!!!" << std::endl;
+//            continue;
+//        }
+//        // These actions are always useful
+//        if (unitType.isWorker() || unitType.isDepot() || unitType.isRefinery() || unitType.isSupplyProvider())
+//        {
+//            usefulBuildOrder.add(buildOrder[buildOrderIndex]);
+//            continue;
+//        }
+//
+//        // this unit did not produce anything and is not a prerequisite for any created unit,
+//        // so it's a "useless" action.
+//        // if it's a prerequisite but we have more than 1, we can remove the extra ones
+//        if (unit.getBuildID() == 0 && Eval::UnitValue(state, unitType) == 0)
+//        {
+//            // morphed building (Gateway)
+//            if (unit.getMorphID() != -1)
+//            {
+//                const Unit u = static_cast<const GameState>(state).getUnit(unit.getMorphID());
+//                if (u.getBuildID() != 0)
+//                {
+//                    usefulBuildOrder.add(buildOrder[buildOrderIndex]);
+//                }
+//                continue;
+//            }
+//
+//            // even if it's a prereq, if we have more than 1 it's still useless
+//            if (unitTypes[unitType.getRaceActionID()] == 1)
+//            {
+//                //std::cout << "removing: " << unitType.getName() << " because it's a building that we have more than 1 off" << std::endl;
+//            }
+//            // if we only have one, we need to see if it's a prereq for anything
+//            else
+//            {
+//                bool isUseful = false;
+//
+//                for (int i = unit.getID() + 1; i < state.getNumUnits(); ++i)
+//                {
+//                    const Unit u = static_cast<const GameState>(state).getUnit(i);
+//                    for (auto & req : u.getType().required())
+//                    {
+//                        // this unit is a prerequisite for something we have built, so it's "useful"
+//                        if (req == unitType)
+//                        {
+//                            isUseful = true;
+//                            break;
+//                        }
+//                    }
+//
+//                    if (isUseful)
+//                    {
+//                        usefulBuildOrder.add(buildOrder[buildOrderIndex]);
+//                        unitTypes[unitType.getRaceActionID()]++;
+//                        break;
+//                    }
+//                }
+//
+//                if (!isUseful)
+//                {
+//                    //std::cout << "removing: " << unitType.getName() << " because isUseful is false" << std::endl;
+//                }
+//            }
+//        }
+//        else
+//        {
+//            usefulBuildOrder.add(buildOrder[buildOrderIndex]);
+//            unitTypes[unitType.getRaceActionID()]++;
+//        }
+//    }
+//
+//    //buildOrder.print();
+//    //usefulBuildOrder.print();
+//
+//    return usefulBuildOrder;
+//}
 
 void CombatSearch_IntegralMCTS::updateNodeVisits(bool nodeExpanded, bool isTerminal)
 {
