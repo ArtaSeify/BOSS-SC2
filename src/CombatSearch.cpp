@@ -88,7 +88,6 @@ void CombatSearch::generateLegalActions(const GameState & state, ActionSetAbilit
             return;
         }
 
-        ActionType gateway = ActionTypes::GetActionType("Gateway");
         // figure out if anything can be made before a worker
         for (auto it = legalActions.begin(); it != legalActions.end(); ++it)
         {
@@ -98,13 +97,6 @@ void CombatSearch::generateLegalActions(const GameState & state, ActionSetAbilit
 
             // if action goes past the time limit, it is illegal
             if (whenCanPerformAction > params.getFrameTimeLimit())
-            {
-                illegalActions.add(actionType);
-            }
-            // gateways automatically turn into warpgates when warpgate research is finished, so we can no longer
-            // build gateway units
-            if (actionType.whatBuilds() == gateway && state.getUnitTypes()[ActionTypes::GetWarpGateResearch().getRaceActionID()] > 0 &&
-                state.timeUntilResearchDone(ActionTypes::GetWarpGateResearch()) + state.getCurrentFrame() <= whenCanPerformAction)
             {
                 illegalActions.add(actionType);
             }
@@ -142,21 +134,11 @@ void CombatSearch::generateLegalActions(const GameState & state, ActionSetAbilit
 
     else
     {
-        ActionType gateway = ActionTypes::GetActionType("Gateway");
         // figure out if any action goes past the time limit
         for (auto it = legalActions.begin(); it != legalActions.end(); ++it)
         {
             ActionType actionType = it->first;
             int whenCanPerformAction = state.whenCanBuild(actionType);
-
-            // gateways automatically turn into warpgates when warpgate research is finished, so we can no longer
-            // build gateway units
-            
-            if (actionType.whatBuilds() == gateway && state.getUnitTypes()[ActionTypes::GetWarpGateResearch().getRaceActionID()] > 0 &&
-                state.timeUntilResearchDone(ActionTypes::GetWarpGateResearch()) + state.getCurrentFrame() <= whenCanPerformAction)
-            {
-                illegalActions.add(actionType);
-            }
 
             // if action goes past the time limit, it is illegal
             if (whenCanPerformAction > params.getFrameTimeLimit())

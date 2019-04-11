@@ -45,6 +45,9 @@ namespace BOSS
         CombatSearch_Integral(const CombatSearchParameters p = CombatSearchParameters(),
             const std::string & dir = "", const std::string & prefix = "", const std::string & name = "");
         ~CombatSearch_Integral();
+
+        BuildOrderAbilities createFinishedUnitsBuildOrder(const BuildOrderAbilities & buildOrder) const;
+        BuildOrderAbilities createUsefulBuildOrder(const BuildOrderAbilities & buildOrder) const;
     
         virtual void printResults();
         virtual void writeResultsFile(const std::string & dir, const std::string & filename);

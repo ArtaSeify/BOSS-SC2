@@ -81,10 +81,10 @@ class GameState
     int                             timeUntilResearchDone(ActionType action)                const;
 
     void                            doAbility(ActionType type, NumUnits targetID);
+    void                            doAbility(ActionType type, NumUnits tragetID, TimeType frame);
     void                            doAction(ActionType type);
     void                            fastForward(TimeType frames);
     void                            addUnit(ActionType Unit, NumUnits builderID = -1);
-    void                            resortUnitsBeingBuilt(int buildID, int morphID);
   
     void                            setMinerals(FracType minerals) { m_minerals = minerals; }
     void                            setGas(FracType gas) { m_gas = gas; }

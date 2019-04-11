@@ -116,8 +116,9 @@ bool GameState::isLegal(ActionType action) const
     // if we have no mineral income we'll never have a minerla unit
     if ((m_minerals < action.mineralPrice()) && (mineralWorkers == 0)) { return false; }
 
-    // the number of mineral workers allowed is determined by WorkersPerDepot
-    if (action.isWorker() && m_mineralWorkers >= m_numDepots * CONSTANTS::WorkersPerDepot) { return false; }
+    // the number of workers allowed is determined by WorkersPerDepot + gas workers
+    if (action.isWorker() && 
+        getNumTotal(action) >= (m_numDepots + m_inProgressDepots) * (CONSTANTS::WorkersPerDepot + (2 * CONSTANTS::WorkersPerRefinery))) { return false; }
 
     // can only have one of each upgrade
     if (action.isUpgrade() && m_unitTypes[action.getRaceActionID()] > 0) { return false; }
@@ -207,7 +208,7 @@ void GameState::doAction(ActionType type)
     if (type == ActionTypes::GetWarpGateResearch())
     {
         ActionType gateway = ActionTypes::GetActionType("Gateway");
-        for (auto & current_unit : m_units)
+        for (auto current_unit : m_units)
         {
             if (current_unit.getType() == gateway)
             {
@@ -258,6 +259,48 @@ void GameState::doAbility(ActionType type, NumUnits targetID)
         }
         
         
+        m_chronoBoosts.push_back(abilityAction);
+
+        // have to resort the list, because build time of unit(s) is changed.
+        std::sort(m_unitsBeingBuilt.begin(), m_unitsBeingBuilt.end(),
+            [this](int lhs, int rhs) { return m_units[lhs].getTimeUntilBuilt() > m_units[rhs].getTimeUntilBuilt(); });
+
+        //resortUnitsBeingBuilt(getUnit(targetID).getBuildID(), getUnit(targetID).getMorphID());
+    }
+}
+
+void GameState::doAbility(ActionType type, NumUnits targetID, TimeType frame)
+{
+    BOSS_ASSERT(type.isAbility(), "doAbility should not be called with a non-ability action");
+    BOSS_ASSERT(targetID != -1, "Target of ability %s is invalid. Target ID: %u", type.getName().c_str(), targetID);
+
+    //!!!PROBLEM UNUSED short previousFrame = m_currentFrame;
+    m_lastAction = type;
+
+    fastForward(frame);
+
+    // figure out when this action can be done and fast forward to it
+    const TimeType timeWhenReady = whenCanCast(type, targetID);
+
+    BOSS_ASSERT(timeWhenReady == m_currentFrame, "the ability should be castable at the current frame");
+
+    if (m_race == Races::Protoss)
+    {
+        AbilityAction abilityAction(type, m_currentFrame, targetID, getUnit(targetID).getBuildID(), getUnit(targetID).getType(), getUnit(targetID).getBuildType());
+        m_lastAbility = abilityAction;
+
+        // cast chronoboost 
+        if (getUnit(targetID).getMorphID() == -1)
+        {
+            getUnit(getBuilderID(type)).castAbility(type, getUnit(targetID), getUnit(getUnit(targetID).getBuildID()), getUnit(targetID));
+        }
+        // this unit is warping into something else (Gateway into WarpGate), so we need to change the time of the WarpGate as well
+        else
+        {
+            getUnit(getBuilderID(type)).castAbility(type, getUnit(targetID), getUnit(getUnit(targetID).getBuildID()), getUnit(getUnit(targetID).getMorphID()));
+        }
+
+
         m_chronoBoosts.push_back(abilityAction);
 
         // have to resort the list, because build time of unit(s) is changed.
@@ -470,7 +513,7 @@ void GameState::addUnit(ActionType type, NumUnits builderID)
             morphingUnit.setTimeUntilFree(morphingUnit.getTimeUntilBuilt());
 
             // need to resort
-            for (int i = std::find(m_unitsBeingBuilt.begin(), m_unitsBeingBuilt.end(), morphID) - m_unitsBeingBuilt.begin(); i > 0; i--)
+            for (int i = int(std::find(m_unitsBeingBuilt.begin(), m_unitsBeingBuilt.end(), morphID) - m_unitsBeingBuilt.begin()); i > 0; i--)
             {
                 if (getUnit(m_unitsBeingBuilt[i]).getTimeUntilBuilt() > getUnit(m_unitsBeingBuilt[i - 1]).getTimeUntilBuilt())
                 {
