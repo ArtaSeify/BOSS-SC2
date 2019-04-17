@@ -55,6 +55,8 @@ namespace BOSS
         void test(const GameState & state);
         void test2(const GameState & state);
 
+        bool timeLimitReached();
+
         void updateNodeVisits(bool nodeExpanded, bool isTerminal);
 
         void writeResultsToFile(std::shared_ptr<Node> root);

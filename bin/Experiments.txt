@@ -5,24 +5,23 @@
     {   
         "test" :
         {
-            "Run"               : [ true, 36 ],
+            "Run"               : [ true, 1 ],
             "SearchType"        : [ "IntegralMCTS" ],
-            "SearchParameters"  : { "ExplorationConstant" : 0.15, "UseMax" : true, "Simulations" : 1000000, "Level" : 1 },
-            "SimulationsPerStep": [ true, 100 ],
-            "Threads"           : 6,
+            "SearchParameters"  : { "ExplorationConstant" : 0.15, "UseMax" : true, "Simulations" : 10000000, "Level" : 1 },
+            "SimulationsPerStep": [ true, 4000 ],
+            "Threads"           : 1,
             "Race"              : "Protoss",
-            "StartingState"     : "Protoss Start State",
+            "StartingState"     : "Protoss 0",
             "PrintNewBest"      : false,
             "OutputDir"         : "../bin/test",
             "SearchTimeLimitMS" : 10000000,
-            "FrameTimeLimit"    : 20000,
+            "FrameTimeLimit"    : 7500,
             "RelevantActions"   : ["ChronoBoost", "Probe", "Pylon", "Nexus", "Assimilator", "Gateway", "CyberneticsCore", "Stalker",
         "Zealot", "Colossus", "Forge", "FleetBeacon", "TwilightCouncil", "Stargate", "TemplarArchive", 
         "DarkShrine", "RoboticsBay", "RoboticsFacility", "ZealotWarped", "Zealot", "StalkerWarped", "Stalker", 
         "HighTemplarWarped", "HighTemplar", "DarkTemplarWarped", "DarkTemplar", "SentryWarped", "Sentry", 
-        "Phoenix", "Carrier", "VoidRay", "WarpPrism", "Observer", "Immortal", "Probe", "Interceptor", "AdeptWarped", "Adept", "Oracle", "Tempest", "Disruptor", "WarpGateResearch"],
+        "Phoenix", "Carrier", "VoidRay", "WarpPrism", "Observer", "Immortal", "Probe", "AdeptWarped", "Adept", "Oracle", "Tempest", "Disruptor", "WarpGateResearch"],
             "MaxActions"        : [ ["CyberneticsCore", 1], ["FleetBeacon", 1], ["TwilightCouncil", 1], ["TemplarArchive", 1], ["DarkShrine", 1], ["RoboticsBay", 1] ],
-            "OpponentUnits"     : [ ["Drone", 8], ["SpawningPool", 1], ["Zergling", 16] ],
             "AlwaysMakeWorkers" : true,
             "OpeningBuildOrder" : "Empty",
             "SortActions"       : false,
@@ -36,14 +35,14 @@
         "Protoss Start State"   : { "race" : "Protoss", "minerals" : 50, "gas" : 0, "units" : [ ["Nexus", 1], ["Probe", 12] ] },
         "Zerg Start State"      : { "race" : "Zerg",    "minerals" : 50, "gas" : 0, "units" : [ ["Hatchery", 1], ["Overlord", 1], ["Drone", 12] ] },
         "Terran Start State"    : { "race" : "Terran",  "minerals" : 50, "gas" : 0, "units" : [ ["CommandCenter", 1], ["SCV", 12] ] },
-        "Protoss 0": { "race": "Protoss", "units": [ ["Nexus",2],["Probe",23],["Pylon",2],["Gateway",1],["Assimilator",2],["CyberneticsCore",1] ],"minerals": 225,"gas": 128}
+        "Protoss 0": { "race": "Protoss", "units": [ ["Nexus",2],["Probe",23],["Pylon",30],["Gateway",1],["Assimilator",2],["CyberneticsCore",1], ["Stalker", 87] ],"minerals": 225,"gas": 128}
     },
     
     "Build Orders" :
     {
-        "Empty"                 : [ ],     
+        "Empty"                 : [ "Probe", "Pylon", "Probe"],     
         "Test1"                 : [ "Probe","Assimilator","Probe","Pylon","Probe","Gateway","Probe","CyberneticsCore","Probe", "WarpGateResearch", "Stalker", "Pylon", "Stalker", "Stalker"], 
-        "Test2"                 : [ "Probe","Assimilator", "Assimilator", "Probe","ChronoBoost_Nexus_Probe","Pylon","Probe","Gateway","Probe","Gateway","Probe","Zealot","Probe","CyberneticsCore","WarpGateResearch", "Probe", "Nexus", "Gateway", "Gateway", "Gateway", "Pylon", "Pylon", "Pylon", "Gateway", "Gateway", "Gateway" ],
+        "Test2"                 : [ "Probe","Pylon","Probe","Gateway","Probe","Gateway","Probe","CyberneticsCore","Probe","Zealot","Pylon", "ChronoBoost_Gateway_Zealot" ],
         "UAB Zealot Rush"       : [ "Probe", "Probe", "Pylon", "Gateway", "Gateway", "Zealot", "Zealot", "Zealot", "Pylon", "Zealot", "Probe", "Zealot", "Zealot", "Zealot" ],
         "Expand"                 : [ "Nexus", "Nexus", "Nexus"],
         "Test3"                 : ["Probe", "Pylon", "Probe", "ChronoBoost_Nexus_Probe", "Probe", "Pylon", "Probe", "Gateway", "Probe", "Assimilator", "Probe", "ChronoBoost_Nexus_Probe", "Assimilator", "Probe", "CyberneticsCore", "Probe", "Probe", "Adept", "Probe", "Stargate", "Probe", "Oracle", "Probe", "Stalker", "Pylon", "Stalker", "Probe", "Phoenix", "Probe", "Stalker", "Pylon", "Phoenix", "Probe", "Adept", "Probe", "Phoenix", "ChronoBoost_Stargate_Phoenix", "Pylon", "Phoenix", "Probe", "Zealot", "Probe", "Phoenix", "Pylon", "ChronoBoost_Stargate_Phoenix", "Zealot", "Probe", "Phoenix", "ChronoBoost_Stargate_Phoenix", "ChronoBoost_Gateway_Zealot", "Stalker", "Probe", "Pylon", "ChronoBoost_Gateway_Stalker", "Probe"]

@@ -31,7 +31,7 @@ namespace BOSS
 
         // does action at index of actions. Returns true if the action is sucessful
         // and the state is valid (doesn't go past the time limit). Otherwise returns false
-        bool doAction(std::shared_ptr<Edge> edge, const CombatSearchParameters & params);
+        bool doAction(std::shared_ptr<Edge> edge, const CombatSearchParameters & params, bool makeNode = false);
         bool doAction(const Action & action, const CombatSearchParameters & params);
         
         void printChildren() const;
@@ -40,7 +40,7 @@ namespace BOSS
         std::shared_ptr<Edge> selectChildEdge(FracType exploration_param, const CombatSearchParameters & params) const;
 
         // creates a node that hasn't been expanded in the tree yet 
-        std::shared_ptr<Node> notExpandedChild(std::shared_ptr<Edge> edge, const CombatSearchParameters & params) const;
+        std::shared_ptr<Node> notExpandedChild(std::shared_ptr<Edge> edge, const CombatSearchParameters & params, bool makeNode = false) const;
         
         // returns the child with the highest action value
         std::shared_ptr<Edge> getHighestValueChild(const CombatSearchParameters & params) const;

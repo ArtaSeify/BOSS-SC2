@@ -147,7 +147,7 @@ bool GameState::isLegal(ActionType action) const
     if (!action.isMorphed() && !action.isSupplyProvider() && ((m_currentSupply + action.supplyCost()) > totalSupply)) { return false; }  
 
     // we don't need to go over the maximum supply limit with supply providers
-    if (ActionTypes::GetSupplyProvider(m_race) == action && (totalSupply > 200)) { return false; }
+    if (ActionTypes::GetSupplyProvider(m_race) == action && (totalSupply >= 200)) { return false; }
 
     // need to have at least 1 Pylon to build Protoss buildings, except if it's an Assimilator
     if (m_race == Races::Protoss && action.isBuilding() && !action.isSupplyProvider() && !action.isRefinery() 
@@ -335,7 +335,7 @@ void GameState::fastForward(TimeType toFrame)
 
         // add the resources we gathered during this time period
         const TimeType timeElapsed    = actionCompletionTime - lastActionFinishTime;
-        m_minerals              += timeElapsed * CONSTANTS::MPWPF * m_mineralWorkers;
+        m_minerals              += timeElapsed * CONSTANTS::MPWPF * std::min((int)m_mineralWorkers, CONSTANTS::WorkersPerDepot * m_numDepots);
         m_gas                   += timeElapsed * CONSTANTS::GPWPF * m_gasWorkers;
         lastActionFinishTime    = actionCompletionTime;
         m_currentFrame += timeElapsed;
@@ -353,7 +353,7 @@ void GameState::fastForward(TimeType toFrame)
 
     // update resources from the last action finished to the ff frame
     TimeType timeElapsed = toFrame - lastActionFinishTime;
-    m_minerals      += timeElapsed * CONSTANTS::MPWPF * m_mineralWorkers;
+    m_minerals      += timeElapsed * CONSTANTS::MPWPF * std::min((int)m_mineralWorkers, CONSTANTS::WorkersPerDepot * m_numDepots);
     m_gas           += timeElapsed * CONSTANTS::GPWPF * m_gasWorkers;
 
     // update all the intances to the ff time
@@ -369,6 +369,7 @@ void GameState::completeUnit(Unit & unit)
 {
     unit.complete(m_currentFrame);
     m_maxSupply += unit.getType().supplyProvided();
+    m_maxSupply = std::min(m_maxSupply, (NumUnits)200);
     m_inProgressSupply -= unit.getType().supplyProvided();
        
     // stores units in the order they were finished, except the units we start with
@@ -539,11 +540,11 @@ void GameState::addUnit(ActionType type, NumUnits builderID)
     }
 }
 
-int GameState::whenCanBuild(ActionType action) const
+int GameState::whenCanBuild(ActionType action, NumUnits targetID) const
 {
     if (action.isAbility())
     {
-        return whenEnergyReady(action);
+        return whenCanCast(action, targetID);
     }
 
     // figure out when prerequisites will be ready
@@ -596,7 +597,7 @@ int GameState::whenResourcesReady(ActionType action) const
     }
 
     TimeType previousFrame          = m_currentFrame;
-    NumUnits currentMineralWorkers  = m_mineralWorkers;
+    NumUnits currentMineralWorkers  = std::min((int)m_mineralWorkers, CONSTANTS::WorkersPerDepot * m_numDepots);
     NumUnits currentGasWorkers      = m_gasWorkers;
     TimeType lastActionFinishFrame  = m_currentFrame;
     TimeType addedTime              = 0;

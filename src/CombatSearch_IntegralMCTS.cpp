@@ -82,6 +82,10 @@ void CombatSearch_IntegralMCTS::recurse(const GameState & state, int depth)
             std::shared_ptr<Edge> childEdge = currentRoot->getHighestValueChild(m_params);
 
             // TODO: DONT CRASH, CREATE NODE INSTEAD
+            if (childEdge->getChild() == nullptr)
+            {
+                currentRoot->notExpandedChild(childEdge, m_params, true);
+            }
             BOSS_ASSERT(childEdge->getChild() != nullptr, "currentRoot has become null");
             
             // we have made a choice, so we need to update the integral and build order permanently
@@ -172,11 +176,43 @@ void CombatSearch_IntegralMCTS::recurse(const GameState & state, int depth)
     m_buildOrder = m_bestBuildOrderFound;
 
     BuildOrderAbilities finishedUnitsBuildOrder = createFinishedUnitsBuildOrder(m_bestBuildOrderFound);
-    m_results.usefulBuildOrder = createUsefulBuildOrder(finishedUnitsBuildOrder);
-
-    m_results.highestEval = m_integral.getCurrentStackValue();
     m_results.buildOrder = m_bestBuildOrderFound;
     m_results.finishedUnitsBuildOrder = finishedUnitsBuildOrder;
+    m_results.usefulBuildOrder = createUsefulBuildOrder(finishedUnitsBuildOrder);
+
+    m_results.eval = m_integral.getCurrentStackValue();
+
+    GameState finishedUnitsState(m_params.getInitialState());
+    CombatSearch_IntegralDataFinishedUnits finishedUnitsIntegral;
+    for (auto & action : m_results.finishedUnitsBuildOrder)
+    {
+        if (action.first.isAbility())
+        {
+            finishedUnitsState.doAbility(action.first, action.second.targetID);
+        }
+        else
+        {
+            finishedUnitsState.doAction(action.first);
+        }
+        finishedUnitsIntegral.update(finishedUnitsState, m_results.finishedUnitsBuildOrder, m_params, m_searchTimer, true);
+    }
+    m_results.finishedEval = finishedUnitsIntegral.getCurrentStackValue();
+
+    GameState usefulUnitsState(m_params.getInitialState());
+    CombatSearch_IntegralDataFinishedUnits usefulUnitsIntegral;
+    for (auto & action : m_results.usefulBuildOrder)
+    {
+        if (action.first.isAbility())
+        {
+            usefulUnitsState.doAbility(action.first, action.second.targetID);
+        }
+        else
+        {
+            usefulUnitsState.doAction(action.first);
+        }
+        usefulUnitsIntegral.update(usefulUnitsState, m_results.usefulBuildOrder, m_params, m_searchTimer, true);
+    }
+    m_results.usefulEval = usefulUnitsIntegral.getCurrentStackValue();
 
     // write state data
     if (m_params.getSaveStates())
@@ -350,6 +386,11 @@ void CombatSearch_IntegralMCTS::doRandomAction(Node & node, const GameState & pr
     }
 
     updateNodeVisits(false, isTerminalNode(node));
+}
+
+bool CombatSearch_IntegralMCTS::timeLimitReached()
+{
+    return (m_params.getSearchTimeLimit() && (m_numSimulations % 5 == 0) && (m_searchTimer.getElapsedTimeInMilliSec() > m_params.getSearchTimeLimit()));
 }
 
 //void CombatSearch_IntegralMCTS::getChronoBoostTargets(const Node & node, ActionSetAbilities & legalActions)
@@ -538,6 +579,8 @@ void CombatSearch_IntegralMCTS::writeResultsFile(const std::string & dir, const 
 
     std::ofstream searchData(m_dir + "/" + m_name + "_SearchData.txt", std::ofstream::out | std::ofstream::app);
     searchData << "Max value found: " << m_bestIntegralFound.getCurrentStackValue() << "\n";
+    searchData << "Finished build order value: " << m_results.finishedEval << "\n";
+    searchData << "Useful build order value: " << m_results.usefulEval << "\n";
     searchData << "Best build order (all): " << m_bestBuildOrderFound.getNameString() << std::endl;
     searchData << "Best build order (finished): " << m_results.finishedUnitsBuildOrder.getNameString(0, -1, true) << std::endl;
     searchData << "Best build order (useful): " << m_results.usefulBuildOrder.getNameString(0, -1, true) << std::endl;

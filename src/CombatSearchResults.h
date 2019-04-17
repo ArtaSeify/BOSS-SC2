@@ -39,7 +39,9 @@ namespace BOSS
         BuildOrderAbilities finishedUnitsBuildOrder;
         BuildOrderAbilities usefulBuildOrder;
 
-        float highestEval;
+        float eval;
+        float finishedEval;
+        float usefulEval;
 
         float minerals;
         float gas;

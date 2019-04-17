@@ -61,7 +61,7 @@ class GameState
         NumUnits currentSupply, NumUnits maxSupply, NumUnits mineralWorkers, NumUnits gasWorkers,
         NumUnits builerWorkers, TimeType currentFrame, NumUnits numRefineries, NumUnits numDepots);
 
-    int                             whenCanBuild(ActionType action)                         const;
+    int                             whenCanBuild(ActionType action, NumUnits targetID = -1)      const;
     int                             whenCanCast(ActionType action, NumUnits targetID)       const;
     int                             whenEnergyReady(ActionType action)                      const;
     int                             getNextFinishTime(ActionType type)                      const;

@@ -11,8 +11,6 @@ namespace BOSS
 
     class CombatSearchParameters
     {
-        void init();
-
         std::vector<int> m_maxActions;
 
         //      Flag which determines whether or not doubling macro actions will be used in search.

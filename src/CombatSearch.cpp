@@ -9,7 +9,6 @@ using namespace BOSS;
 // function which is called to do the actual search
 void CombatSearch::search()
 {
-    std::cout << "Search started!" << std::endl;
     m_searchTimer.start();
 
     // apply the opening build order to the initial state
@@ -93,7 +92,7 @@ void CombatSearch::generateLegalActions(const GameState & state, ActionSetAbilit
         {
             ActionType actionType = it->first;
 
-            int whenCanPerformAction = state.whenCanBuild(actionType);
+            int whenCanPerformAction = state.whenCanBuild(actionType, it->second);
 
             // if action goes past the time limit, it is illegal
             if (whenCanPerformAction > params.getFrameTimeLimit())
@@ -138,7 +137,7 @@ void CombatSearch::generateLegalActions(const GameState & state, ActionSetAbilit
         for (auto it = legalActions.begin(); it != legalActions.end(); ++it)
         {
             ActionType actionType = it->first;
-            int whenCanPerformAction = state.whenCanBuild(actionType);
+            int whenCanPerformAction = state.whenCanBuild(actionType, it->second);
 
             // if action goes past the time limit, it is illegal
             if (whenCanPerformAction > params.getFrameTimeLimit())
@@ -165,7 +164,7 @@ const CombatSearchResults & CombatSearch::getResults() const
 
 bool CombatSearch::timeLimitReached()
 {
-    return (m_params.getSearchTimeLimit() && (m_results.nodesExpanded % 100 == 0) && (m_searchTimer.getElapsedTimeInMilliSec() > m_params.getSearchTimeLimit()));
+    return (m_params.getSearchTimeLimit() && (m_results.nodeVisits % 100 == 0) && (m_searchTimer.getElapsedTimeInMilliSec() > m_params.getSearchTimeLimit()));
 }
 
 void CombatSearch::finishSearch()

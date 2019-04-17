@@ -24,7 +24,7 @@ void NMCTS::recurse(const GameState & state, int depth)
 
     m_bestIntegralFound = searchResult.first;
     m_bestBuildOrderFound = searchResult.second;
-    m_results.highestEval = searchResult.first.getCurrentStackValue();
+    m_results.eval = searchResult.first.getCurrentStackValue();
     m_results.buildOrder = searchResult.second;
     m_results.finishedUnitsBuildOrder = finishedUnitsBuildOrder;
 }

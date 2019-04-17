@@ -114,7 +114,7 @@ void Node::removeEdges(std::shared_ptr<Edge> edge)
     }
 }
 
-bool Node::doAction(std::shared_ptr<Edge> edge, const CombatSearchParameters & params)
+bool Node::doAction(std::shared_ptr<Edge> edge, const CombatSearchParameters & params, bool makeNode)
 {
     const ActionAbilityPair & action = edge->getAction();
 
@@ -134,7 +134,7 @@ bool Node::doAction(std::shared_ptr<Edge> edge, const CombatSearchParameters & p
         return false;
     }
 
-    if (edge->timesVisited() == Edge::NODE_VISITS_BEFORE_EXPAND - 1)
+    if (edge->timesVisited() == Edge::NODE_VISITS_BEFORE_EXPAND - 1 || makeNode)
     {
         //std::shared_ptr<Node> newNode = std::make_shared<Node>(m_state, edge);
         //edge->setChild(newNode);
@@ -171,18 +171,11 @@ bool Node::doAction(const Action & action, const CombatSearchParameters & params
     
     if (actionType.isAbility())
     {
-        GameState copyState(m_state);
-        copyState.doAbility(actionType, actionTarget);
-        if (copyState.getCurrentFrame() > params.getFrameTimeLimit())
-        {
-            return false;
-        }
         m_state.doAbility(actionType, actionTarget);
     }
     else
     {
         m_state.doAction(actionType);
-        BOSS_ASSERT(m_state.getCurrentFrame() <= params.getFrameTimeLimit(), "frame limit passed");
     }
 
     return true;
@@ -216,7 +209,15 @@ std::shared_ptr<Edge> Node::selectChildEdge(FracType exploration_param, const Co
     int totalChildVisits = 0;
     for (auto & edge : m_edges)
     {
-        totalChildVisits += edge->timesVisited();
+        int edgeTimesVisited = edge->timesVisited();
+        
+        // if we have not visited this edge yet, this is the action we will take. 
+        if (edgeTimesVisited == 0)
+        {
+            return edge;
+        }
+
+        totalChildVisits += edgeTimesVisited;
     }
 /*
     float UCBValue = exploration_param * policyValue *
@@ -258,11 +259,11 @@ std::shared_ptr<Edge> Node::selectChildEdge(FracType exploration_param, const Co
     return m_edges[maxIndex];
 }
 
-std::shared_ptr<Node> Node::notExpandedChild(std::shared_ptr<Edge> edge, const CombatSearchParameters & params) const
+std::shared_ptr<Node> Node::notExpandedChild(std::shared_ptr<Edge> edge, const CombatSearchParameters & params, bool makeNode) const
 {
     // create a temporary node
     std::shared_ptr<Node> node = std::make_shared<Node>(m_state, edge);
-    BOSS_ASSERT(node->doAction(edge, params), "notExpandedChild should only be called with legal edge");
+    BOSS_ASSERT(node->doAction(edge, params, makeNode), "notExpandedChild should only be called with legal edge");
     return node;
 }
 
