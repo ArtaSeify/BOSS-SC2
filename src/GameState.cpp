@@ -8,7 +8,11 @@
 using namespace BOSS;
 
 GameState::GameState()
-    : m_race(Races::None)
+    : m_units()
+	, m_unitsBeingBuilt()
+	, m_unitsSortedEndFrame()
+	, m_chronoBoosts()
+	, m_race(Races::None)
     , m_minerals(0.0f)
     , m_gas(0.0f)
     , m_currentSupply(0)
@@ -40,6 +44,8 @@ GameState::GameState(const std::vector<Unit> & unitVector, RaceID race, FracType
     NumUnits currentSupply, NumUnits maxSupply, NumUnits mineralWorkers, NumUnits gasWorkers,
     NumUnits builerWorkers, TimeType currentFrame, NumUnits numRefineries, NumUnits numDepots)
     : m_units (unitVector)
+	, m_unitsSortedEndFrame()
+	, m_chronoBoosts()
     , m_unitTypes(ActionTypes::GetRaceActionCount(race), 0)
     , m_race(race)
     , m_minerals(minerals)
@@ -64,6 +70,7 @@ GameState::GameState(const std::vector<Unit> & unitVector, RaceID race, FracType
         if (unit.getTimeUntilBuilt() > 0)
         {
             m_inProgressSupply += unit.getType().supplyProvided();
+			m_unitsBeingBuilt.push_back(unit.getID());
 
             if (unit.getType().isRefinery())
             {
@@ -79,6 +86,8 @@ GameState::GameState(const std::vector<Unit> & unitVector, RaceID race, FracType
         m_unitTypes[unit.getType().getRaceActionID()]++;
         //std::cout << "name: " << unit.getType().getName() << std::endl;
     }
+	std::sort(m_unitsBeingBuilt.begin(), m_unitsBeingBuilt.end(),
+		[this](int lhs, int rhs) { return m_units[lhs].getTimeUntilBuilt() > m_units[rhs].getTimeUntilBuilt(); });
     /*std::cout << Races::GetRaceName(m_race) << std::endl;
     std::cout << m_minerals << std::endl;
     std::cout << m_gas << std::endl;
