@@ -11,8 +11,8 @@ namespace BOSS
 {
     class Node : public std::enable_shared_from_this<Node>
     {
-        std::shared_ptr<Edge> m_parentEdge;            // the edge leading to the parent
-        GameState m_state;              // the current game state
+        std::shared_ptr<Edge> m_parentEdge;             // the edge leading to the parent
+        GameState m_state;                              // the current game state
         std::vector<std::shared_ptr<Edge>> m_edges;     // each edge leads to a child node
         bool isTerminalNode;
         

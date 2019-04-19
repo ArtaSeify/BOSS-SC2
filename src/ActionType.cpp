@@ -132,6 +132,8 @@ namespace ActionTypes
     std::vector<ActionType> specialActionTypes;
     std::vector<ActionType> detectorTypes;
     ActionType              warpGateResearch;
+    ActionType              gatewayActionType;
+    ActionType              warpgateActionType;
 
     void Init()
     {
@@ -166,6 +168,8 @@ namespace ActionTypes
         specialActionTypes.push_back(ActionTypes::GetActionType("ChronoBoost"));
         detectorTypes.push_back(ActionTypes::GetActionType("Observer"));
         warpGateResearch = ActionTypes::GetActionType("WarpGateResearch");
+        gatewayActionType = ActionTypes::GetActionType("Gateway");
+        warpgateActionType = ActionTypes::GetActionType("WarpGate");
 
         workerActionTypes.push_back(ActionTypes::GetActionType("SCV"));
         refineryActionTypes.push_back(ActionTypes::GetActionType("Refinery"));
@@ -231,6 +235,16 @@ namespace ActionTypes
     ActionType GetWarpGateResearch()
     {
         return warpGateResearch;
+    }
+
+    ActionType GetGatewayAction()
+    {
+        return gatewayActionType;
+    }
+
+    ActionType GetWarpgateAction()
+    {
+        return warpgateActionType;
     }
     
     ActionType GetActionType(const std::string & name)

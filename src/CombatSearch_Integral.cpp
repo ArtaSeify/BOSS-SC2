@@ -348,6 +348,10 @@ BuildOrderAbilities CombatSearch_Integral::createUsefulBuildOrder(const BuildOrd
 
                 for (auto it2 = unitBuildOrderMap.begin(); it2 != unitBuildOrderMap.end(); ++it2)
                 {
+                    if (it2->second == -1)
+                    {
+                        continue;
+                    }
                     const Unit unitCheck = static_cast<const GameState>(state).getUnit(it2->second);
                     if (unitCheck.getID() != u.getID() && unitCheck.getBuilderID() == u.getID())
                     {
@@ -364,7 +368,7 @@ BuildOrderAbilities CombatSearch_Integral::createUsefulBuildOrder(const BuildOrd
             }
 
             // even if it's a prereq, if we have more than 1 it's still useless
-            if (unitTypes[unitType.getRaceActionID()] == 1)
+            if (unitTypes[unitType.getRaceActionID()].size() == 1)
             {
                 //std::cout << "breaking because it's a prereq building that we have more than 1 off!" << std::endl;
                 break;
@@ -391,7 +395,7 @@ BuildOrderAbilities CombatSearch_Integral::createUsefulBuildOrder(const BuildOrd
                     if (isUseful)
                     {
                         usefulBuildOrder.add(buildOrder[buildOrderIndex]);
-                        unitTypes[unitType.getRaceActionID()]++;
+                        unitTypes[unitType.getRaceActionID()].push_back(0);
                         break;
                     }
                 }

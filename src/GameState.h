@@ -16,6 +16,7 @@ namespace BOSS
     //using Vector_AbilityAction = BoundedVector<AbilityAction, 7>;
 class GameState 
 {
+    using UnitTypes = std::vector<std::vector<NumUnits>>;
     //Vector_Unit             m_units;
     //Vector_BuildingUnits    m_unitsBeingBuilt;      // indices of m_units which are not completed, sorted descending by finish time
     //Vector_FinishedUnits    m_unitsSortedEndFrame;  // indices of m_units which are completed, in order
@@ -24,7 +25,7 @@ class GameState
     std::vector<NumUnits>       m_unitsBeingBuilt;      // indices of m_units which are not completed, sorted descending by finish time
     std::vector<NumUnits>       m_unitsSortedEndFrame;  // indices of m_units which are completed, in order
     std::vector<AbilityAction>  m_chronoBoosts;
-    std::vector<int>            m_unitTypes;             // a vector containing all the unit types we have
+    UnitTypes m_unitTypes;             // a vector containing the indices of the units pertaining to that unit type
     RaceID                      m_race;
     FracType                    m_minerals;
     FracType                    m_gas;
@@ -70,7 +71,6 @@ class GameState
     void                            getSpecialAbilityTargets(ActionSetAbilities & actionSet, int index)         const;
     int                             storeChronoBoostTargets(ActionSetAbilities & actionSet, int index)          const;
     bool                            chronoBoostableTarget(const Unit & unit)                                    const;
-    bool                            canChronoBoost()                                                            const;
 
     int                             getNumInProgress(ActionType action)                     const;
     int                             getNumCompleted(ActionType action)                      const;
@@ -110,8 +110,8 @@ class GameState
     const AbilityAction &           getLastAbility()                    const { return m_lastAbility; }
     const Unit &                    getUnit(NumUnits id)                const { return m_units[id]; }
     const std::vector<NumUnits> &   getUnitsBeingBuilt()                const { return m_unitsBeingBuilt; }
-    const std::vector<int> &        getUnitTypes()                      const { return m_unitTypes; }
-    int                             getNumType(ActionType type)         const { return m_unitTypes[type.getRaceActionID()]; }
+    const UnitTypes &               getUnitTypes()                      const { return m_unitTypes; }
+    int                             getNumType(ActionType type)         const { return (int)m_unitTypes[type.getRaceActionID()].size(); }
     
     std::string                     toString()                          const;
     void                            printunitsbeingbuilt()              const;

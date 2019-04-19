@@ -55,7 +55,7 @@ FracType Eval::UnitValue(const GameState & state, ActionType type)
 
 FracType Eval::UnitWeight(const GameState & state, ActionType type, const CombatSearchParameters & params)
 {
-    const std::vector<int> currentUnits = state.getUnitTypes();
+    const std::vector<std::vector<NumUnits>> currentUnits = state.getUnitTypes();
     const std::vector<int> enemyUnits = params.getEnemyUnits();
 
     int counters = 0;

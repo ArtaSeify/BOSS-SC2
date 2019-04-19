@@ -70,6 +70,7 @@ public:
     void        fastForward(TimeType frames);
     int         whenCanBuild(ActionType type) const;
 
+    std::string toString() const;
     // writes the data of a unit in CSV format to a ss
     void        writeToSS(std::stringstream & ss) const;
     json        writeToJson() const;

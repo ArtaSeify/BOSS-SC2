@@ -192,7 +192,8 @@ int Unit::whenCanBuild(ActionType type) const
 
     // check to see if this type can build the given type
     // TODO: check equivalent types (hatchery gspire etc)
-    if (type.whatBuilds() != m_type) { return -1; }
+    //if (type.whatBuilds() != m_type) { return -1; }
+    BOSS_ASSERT(type.whatBuilds() == m_type, "Unit %s doesn't build type %s", m_type.getName().c_str(), type.getName().c_str());
 
     // we can always use an ability if we have enough energy
     if (type.isAbility())
@@ -275,6 +276,25 @@ int Unit::applyChronoBoost(TimeType time, Unit & unitBeingProduced)
     }
 
     return change;
+}
+
+std::string Unit::toString() const
+{
+    std::stringstream ss;
+    ss << m_type.getName() << ", ID: " << m_id << std::endl;
+    ss << "Frame started: " << m_frameStarted << ". Frame finished: " << m_frameFinished << std::endl;
+    ss << "BuilderID: " << m_builderID << std::endl;
+    ss << "Currently building: " << m_buildType.getName() << " with ID: " << m_buildID << std::endl;
+    ss << "Time until built: " << m_timeUntilBuilt << ". Time until free: " << m_timeUntilFree << std::endl;
+    ss << "Time Chrono Boosted: " << m_timeChronoBoost << ". Time Chrono Boost again: " << m_timeChronoBoostAgain << std::endl;
+    ss << "Energy: " << m_energy << "/" << m_maxEnergyAllowed << std::endl;
+    ss << "Morphed: " << (m_morphed ? "true" : "false") << std::endl;
+    if (m_morphed)
+    {
+        ss << "MorphID: " << m_morphID << std::endl;
+    }
+
+    return ss.str();
 }
 
 void Unit::writeToSS(std::stringstream & ss) const

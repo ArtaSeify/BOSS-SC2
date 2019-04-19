@@ -73,6 +73,8 @@ namespace BOSS
         ActionType GetSpecialAction(RaceID raceID);
         ActionType GetDetector(RaceID raceID);
         ActionType GetWarpGateResearch();
+        ActionType GetGatewayAction();
+        ActionType GetWarpgateAction();
         ActionType GetActionType(const std::string & name);
         bool TypeExists(const std::string & name);
 

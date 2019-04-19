@@ -293,16 +293,26 @@ int CombatSearchParameters::getLevel() const
 
 void CombatSearchParameters::print()
 {
-    printf("\n\nSearch Parameter Information\n\n");
+    std::stringstream ss;
+    ss << "\n\nSearch Parameter Information\n\n";
 
-    printf("%s", m_useRepetitions ?                    "\tUSE      Repetitions\n" : "");
+    /*std::stringstream ss;
+    ss << "change root: " << m_params.getChangingRoot() << std::endl;
+    ss << "rollouts per step: " << m_params.getSimulationsPerStep() << std::endl;
+    ss << "total rollouts: " << m_params.getNumberOfSimulations() << std::endl;
+    ss << "exploration value: " << m_params.getExplorationValue() << std::endl;
+    ss << "use max: " << m_params.getUseMaxValue() << std::endl;
+
+    std::cout << ss.str() << std::endl;*/
+
+    /*printf("%s", m_useRepetitions ?                    "\tUSE      Repetitions\n" : "");
     printf("%s", m_useIncreasingRepetitions ?          "\tUSE      Increasing Repetitions\n" : "");
     printf("%s", m_useWorkerCutoff ?                   "\tUSE      Worker Cutoff\n" : "");
     printf("%s", m_useLandmarkLowerBoundHeuristic ?    "\tUSE      Landmark Lower Bound\n" : "");
     printf("%s", m_useResourceLowerBoundHeuristic ?    "\tUSE      Resource Lower Bound\n" : "");
     printf("%s", m_useAlwaysMakeWorkers ?              "\tUSE      Always Make Workers\n" : "");
     printf("%s", m_useSupplyBounding ?                 "\tUSE      Supply Bounding\n" : "");
-    printf("\n");
+    printf("\n");*/
 
     //for (int a = 0; a < ACTIONS.size(); ++a)
     //{
