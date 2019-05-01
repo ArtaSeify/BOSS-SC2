@@ -166,7 +166,7 @@ void CombatSearch::search()
     GameState initialState(m_params.getInitialState());
     m_buildOrder = m_params.getOpeningBuildOrder();
     Tools::DoBuildOrder(initialState, m_buildOrder);
-    Eval::CalculateUnitWeightVector(initialState, m_params);
+    Eval::SetUnitWeightVector(Eval::CalculateUnitWeightVector(initialState, m_params.getEnemyUnits()));
 
     try
     {

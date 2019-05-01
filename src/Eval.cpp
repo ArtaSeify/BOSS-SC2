@@ -55,12 +55,11 @@ FracType Eval::UnitValue(const GameState & state, ActionType type)
     return sum / 100;
 }
 
-void Eval::CalculateUnitWeightVector(const GameState & state, const CombatSearchParameters& params)
+std::vector<FracType> Eval::CalculateUnitWeightVector(const GameState & state, const std::vector<int> & enemyUnits)
 {
     std::vector<FracType> weights = std::vector<FracType>(ActionTypes::GetRaceActionCount(state.getRace()), 0);
     std::vector<int> enemyCounters = std::vector<int>(ActionTypes::GetRaceActionCount(state.getRace()), 0);
     std::vector<int> enemyIsCountered = std::vector<int>(ActionTypes::GetRaceActionCount(state.getRace()), 0);
-    const std::vector<int> enemyUnits = params.getEnemyUnits();
 
     for (int index = 0; index < enemyUnits.size(); ++index)
     {
@@ -99,12 +98,17 @@ void Eval::CalculateUnitWeightVector(const GameState & state, const CombatSearch
         //std::cout << std::endl;
     }
 
-    UnitWeights = weights;
+    return weights;
 }
 
-std::vector<FracType> Eval::GetUnitWeightVector()
+const std::vector<FracType> & Eval::GetUnitWeightVector()
 {
     return UnitWeights;
+}
+
+void Eval::SetUnitWeightVector(const std::vector<FracType> & weights)
+{
+    UnitWeights = weights;
 }
 
 FracType Eval::UnitWeight(const GameState & state, ActionType type, const CombatSearchParameters & params)
