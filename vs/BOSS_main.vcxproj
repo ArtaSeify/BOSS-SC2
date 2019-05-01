@@ -38,6 +38,9 @@
       <Project>{9f8709e3-ac4f-45f2-8105-4a99d8e2a127}</Project>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\bin\Experiments.txt" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{BD4AD06D-B208-433D-B340-DDAF56A6D050}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>

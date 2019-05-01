@@ -124,7 +124,7 @@ namespace ActionTypes
 {
     std::vector<ActionType> allActionTypes;
     std::map<std::string, ActionType> nameMap;
-    std::vector<int>        raceActionTypesCount = std::vector<int>(3, 0);
+    std::vector<std::vector<ActionType>> raceActionTypes = std::vector<std::vector<ActionType>>(3, std::vector<ActionType>());
     std::vector<ActionType> workerActionTypes;
     std::vector<ActionType> refineryActionTypes;
     std::vector<ActionType> supplyProviderActionTypes;
@@ -145,7 +145,7 @@ namespace ActionTypes
             
             if (allActionTypes[i].getRace() != Races::None)
             {
-                raceActionTypesCount[allActionTypes[i].getRace()]++;
+                raceActionTypes[allActionTypes[i].getRace()].push_back(allActionTypes[i]);
             }
             actionTypesFile << i << "," << allActionTypes[i].getName() << std::endl;
 
@@ -199,7 +199,7 @@ namespace ActionTypes
 
     int GetRaceActionCount(RaceID raceID)
     {
-        return raceActionTypesCount[raceID];
+        return (int)raceActionTypes[raceID].size();
     }
 
     ActionType GetWorker(RaceID raceID)
@@ -252,6 +252,20 @@ namespace ActionTypes
         BOSS_ASSERT(TypeExists(name), "ActionType name not found: %s", name.c_str());
 
         return nameMap[name];
+    }
+
+    ActionType GetActionType(ActionID id)
+    {
+        BOSS_ASSERT(id < allActionTypes.size(), "id of action %i is not valid", id);
+
+        return allActionTypes[id];
+    }
+
+    ActionType GetRaceActionType(ActionID id, RaceID race)
+    {
+        BOSS_ASSERT(id < raceActionTypes[race].size(), "id of action %i is not valid for race %s", id, Races::GetRaceName(race).c_str());
+
+        return raceActionTypes[race][id];
     }
 
     bool TypeExists(const std::string & name) 

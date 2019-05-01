@@ -1,13 +1,33 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.2027
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28803.202
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BOSS", "BOSS.vcxproj", "{9F8709E3-AC4F-45F2-8105-4A99D8E2A127}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BOSS_main", "BOSS_main.vcxproj", "{BD4AD06D-B208-433D-B340-DDAF56A6D050}"
 	ProjectSection(ProjectDependencies) = postProject
 		{9F8709E3-AC4F-45F2-8105-4A99D8E2A127} = {9F8709E3-AC4F-45F2-8105-4A99D8E2A127}
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Network", "Network", "{782983D0-EED4-487E-84E8-D43B3A32C9DE}"
+	ProjectSection(SolutionItems) = preProject
+		..\bin\data\data_filter.py = ..\bin\data\data_filter.py
+		..\bin\data\data_filter_all_function.py = ..\bin\data\data_filter_all_function.py
+		..\bin\data\data_filter_functions.py = ..\bin\data\data_filter_functions.py
+		..\bin\data\data_filter_functions_onehot.py = ..\bin\data\data_filter_functions_onehot.py
+		..\bin\data\data_loader.py = ..\bin\data\data_loader.py
+		..\bin\data\data_loader_keras.py = ..\bin\data\data_loader_keras.py
+		..\bin\data\evaluate_model.py = ..\bin\data\evaluate_model.py
+		..\bin\data\main.py = ..\bin\data\main.py
+		..\bin\data\model.py = ..\bin\data\model.py
+		..\bin\data\models.py = ..\bin\data\models.py
+		..\bin\data\predictor.py = ..\bin\data\predictor.py
+		..\bin\data\test.py = ..\bin\data\test.py
+		..\bin\data\tests.py = ..\bin\data\tests.py
+		..\bin\data\train.py = ..\bin\data\train.py
+		..\bin\data\train_inference.py = ..\bin\data\train_inference.py
+		..\bin\data\train_model.py = ..\bin\data\train_model.py
 	EndProjectSection
 EndProject
 Global

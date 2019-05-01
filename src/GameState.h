@@ -85,6 +85,7 @@ class GameState
     void                            doAction(ActionType type);
     void                            fastForward(TimeType frames);
     void                            addUnit(ActionType Unit, NumUnits builderID = -1);
+    void                            getAbilityTargetUnit(std::pair<ActionType, AbilityAction> & action) const;
   
     void                            setMinerals(FracType minerals) { m_minerals = minerals; }
     void                            setGas(FracType gas) { m_gas = gas; }

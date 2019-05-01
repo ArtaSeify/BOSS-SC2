@@ -90,6 +90,9 @@ GameState::GameState(const std::vector<Unit> & unitVector, RaceID race, FracType
     std::sort(m_unitsBeingBuilt.begin(), m_unitsBeingBuilt.end(),
         [this](int lhs, int rhs) { return m_units[lhs].getTimeUntilBuilt() > m_units[rhs].getTimeUntilBuilt(); });
 
+    BOSS_ASSERT(m_mineralWorkers + m_gasWorkers + m_buildingWorkers == getNumCompleted(ActionTypes::GetWorker(m_race)), "Total number of workers doesn't add up. \
+            mineral workers: %i, gas workers: %i, building workers: %i, total: %i", m_mineralWorkers, m_gasWorkers, m_buildingWorkers, getNumTotal(ActionTypes::GetWorker(m_race)));
+
     /*std::cout << Races::GetRaceName(m_race) << std::endl;
     std::cout << m_minerals << std::endl;
     std::cout << m_gas << std::endl;
@@ -247,6 +250,23 @@ void GameState::doAbility(ActionType type, NumUnits targetID)
     // figure out when this action can be done and fast forward to it
     const TimeType timeWhenReady = whenCanCast(type, targetID);
 
+    if (timeWhenReady == -1)
+    {
+        TimeType maxTime = m_currentFrame;
+        TimeType energyReady = whenEnergyReady(type);
+        //TimeType buildingFinished       = m_currentFrame + getUnit(targetID).getTimeUntilBuilt();
+        TimeType canChronoBoostAgain = m_currentFrame + getUnit(targetID).getChronoBoostAgainTime();
+
+        maxTime = std::max(energyReady, maxTime);
+        //maxTime = std::max(buildingFinished,    maxTime);
+        maxTime = std::max(canChronoBoostAgain, maxTime);
+
+        std::cout << "energyReady: " << energyReady << std::endl;
+        std::cout << "canChronoBoostAgain: " << canChronoBoostAgain << std::endl;
+        std::cout << "building will finish production before we can chronoboost: " << (maxTime >= m_currentFrame + getUnit(targetID).getTimeUntilFree() && m_race == Races::Protoss) << std::endl;
+        std::cout << "target: " << getUnit(targetID).getType().getName() << std::endl;
+        std::cout << "target time until free: " << getUnit(targetID).getTimeUntilFree() << std::endl;
+    }
     BOSS_ASSERT(timeWhenReady != -1, "Unable to cast ability");
 
     fastForward(timeWhenReady);
@@ -557,6 +577,34 @@ void GameState::addUnit(ActionType type, NumUnits builderID)
     }
 }
 
+void GameState::getAbilityTargetUnit(std::pair<ActionType, AbilityAction> & action) const
+{
+    ActionType type = action.first;
+    ActionType targetType = action.second.targetType;
+    ActionType targetProductionType = action.second.targetProductionType;
+    for (int index = 0; index < getNumUnits(); ++index)
+    {
+        const auto & unit = getUnit(index);
+        if (unit.getType() == targetType && unit.getBuildType() == targetProductionType)
+        {
+            action.second.targetID = unit.getID();
+            action.second.targetProductionID = unit.getBuildID();
+
+            // can't cast on this unit
+            if (whenCanCast(action.first, unit.getID()) == -1)
+            {
+                std::cout << "matches but when can cast is -1" << std::endl;
+                continue;
+            }
+            return;
+        }
+    }
+
+    std::cout << "target type: " << targetType.getName() << std::endl;
+    std::cout << "target production type: " << targetProductionType.getName() << std::endl;
+    BOSS_ASSERT(false, "Could not find the target for %s", action.first.getName().c_str());
+}
+
 int GameState::whenCanBuild(ActionType action, NumUnits targetID) const
 {
     if (action.isAbility())
@@ -584,7 +632,7 @@ int GameState::whenCanBuild(ActionType action, NumUnits targetID) const
 int GameState::whenCanCast(ActionType action, NumUnits targetID) const
 {
     BOSS_ASSERT(action.isAbility(), "whenCanCast should only be called with an ability");
-    BOSS_ASSERT(getUnit(targetID).getTimeUntilBuilt() == 0, "Casting on a unit that is not built yet");
+    BOSS_ASSERT(getUnit(targetID).getTimeUntilBuilt() == 0, "Casting on %s which is not built yet", getUnit(targetID).getType().getName());
 
     TimeType maxTime                = m_currentFrame;
     TimeType energyReady            = whenEnergyReady(action);

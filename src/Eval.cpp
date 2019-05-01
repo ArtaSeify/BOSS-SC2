@@ -4,6 +4,8 @@
 
 using namespace BOSS;
 
+std::vector<FracType> UnitWeights;
+
 FracType Eval::ArmyInProgressResourceSum(const GameState & state)
 {
     FracType sum(0);
@@ -53,36 +55,89 @@ FracType Eval::UnitValue(const GameState & state, ActionType type)
     return sum / 100;
 }
 
-FracType Eval::UnitWeight(const GameState & state, ActionType type, const CombatSearchParameters & params)
+void Eval::CalculateUnitWeightVector(const GameState & state, const CombatSearchParameters& params)
 {
-    const std::vector<std::vector<NumUnits>> currentUnits = state.getUnitTypes();
+    std::vector<FracType> weights = std::vector<FracType>(ActionTypes::GetRaceActionCount(state.getRace()), 0);
+    std::vector<int> enemyCounters = std::vector<int>(ActionTypes::GetRaceActionCount(state.getRace()), 0);
+    std::vector<int> enemyIsCountered = std::vector<int>(ActionTypes::GetRaceActionCount(state.getRace()), 0);
     const std::vector<int> enemyUnits = params.getEnemyUnits();
 
-    int counters = 0;
-    for (ActionType unit : type.strongAgainst(params.getEnemyRace()))
+    for (int index = 0; index < enemyUnits.size(); ++index)
     {
-        // don't consider workers
-        if (unit.getID() == ActionTypes::GetWorker(params.getEnemyRace()).getID())
+        int numEnemyUnit = enemyUnits[index];
+
+        if (numEnemyUnit == 0)
         {
             continue;
         }
-        // if (enemyUnits[unit.getID()] > 0 && state.getUnitTypes(type) <= enemyUnits[unit.getID()])
-        if (enemyUnits[unit.getID()] > 0)
+
+        for (const auto& strongAgainst : ActionTypes::GetActionType(index).strongAgainst(state.getRace()))
         {
-            counters++;
+            BOSS_ASSERT(strongAgainst.getRace() == state.getRace(), "Wrong race for unit!");
+            if (strongAgainst.getID() == ActionTypes::GetWorker(state.getRace()).getID())
+            {
+                continue;
+            }
+
+            enemyCounters[strongAgainst.getRaceActionID()]++;
+        }
+
+        for (const auto& weakAgainst : ActionTypes::GetActionType(index).weakAgainst(state.getRace()))
+        {
+            BOSS_ASSERT(weakAgainst.getRace() == state.getRace(), "Wrong race for unit!");
+            enemyIsCountered[weakAgainst.getRaceActionID()]++;
         }
     }
 
-    int countered = 0;
-    for (ActionType unit : type.weakAgainst(params.getEnemyRace()))
+    for (int index = 0; index < enemyCounters.size(); ++index)
     {
-        if (!unit.isWorker() && enemyUnits[unit.getID()] > 0)
-        {
-            countered++;
-        }
+        weights[index] = FracType((1.0 + enemyIsCountered[index]) / (1.0 + enemyCounters[index]));
+
+        //ActionType action = ActionTypes::GetRaceActionType(index, state.getRace());
+        //std::cout << "action: " << action.getName() << std::endl;
+        //std::cout << "weight: " << weights[action.getRaceActionID()] << std::endl;
+        //std::cout << std::endl;
     }
 
-    return FracType((1.0 + counters) / (1.0 + countered));
+    UnitWeights = weights;
+}
+
+std::vector<FracType> Eval::GetUnitWeightVector()
+{
+    return UnitWeights;
+}
+
+FracType Eval::UnitWeight(const GameState & state, ActionType type, const CombatSearchParameters & params)
+{
+    return UnitWeights[type.getRaceActionID()];
+    //const std::vector<std::vector<NumUnits>> currentUnits = state.getUnitTypes();
+    //const std::vector<int> enemyUnits = params.getEnemyUnits();
+
+    //int counters = 0;
+    //for (ActionType unit : type.strongAgainst(params.getEnemyRace()))
+    //{
+    //    // don't consider workers
+    //    if (unit.getID() == ActionTypes::GetWorker(params.getEnemyRace()).getID())
+    //    {
+    //        continue;
+    //    }
+    //    // if (enemyUnits[unit.getID()] > 0 && state.getUnitTypes(type) <= enemyUnits[unit.getID()])
+    //    if (enemyUnits[unit.getID()] > 0)
+    //    {
+    //        counters++;
+    //    }
+    //}
+
+    //int countered = 0;
+    //for (ActionType unit : type.weakAgainst(params.getEnemyRace()))
+    //{
+    //    if (!unit.isWorker() && enemyUnits[unit.getID()] > 0)
+    //    {
+    //        countered++;
+    //    }
+    //}
+
+    //return FracType((1.0 + counters) / (1.0 + countered));
 }
 
 FracType Eval::UnitValueWithOpponent(const GameState & state, ActionType type, const CombatSearchParameters & params)

@@ -53,7 +53,7 @@ test_iterator = test_dataset.make_iterator(sess, [args.testset_file])
 # network = model.PolicyNetwork(feature_shape, policy_shape, args.save_name, batch_size, learning_rate, "models/" + args.save_name + ".h5", True if args.load_model is None else False)
 network = model.PolicyAndValueNetwork(feature_shape, policy_shape, value_shape, args.save_name, batch_size, learning_rate, "models/" + args.save_name + ".h5", True if args.load_model is None else False)
 if args.load_model:
-	network.load("models/" + args.load_model + ".h5")
+    network.load("models/" + args.load_model + ".h5")
 
 evaluations = []
 # train and evaluate
@@ -63,16 +63,16 @@ evaluations.append(network.evaluate(test_iterator, int(floor(testset_samples/bat
 # evaluations.append(network.evaluate(test_iterator, None, verbose))
 
 # network.train(train_iterator, 1, 100, verbose)
-	# network.epochs += 1
-	# evaluations.append(network.evaluate(test_iterator, 100, verbose))
+    # network.epochs += 1
+    # evaluations.append(network.evaluate(test_iterator, 100, verbose))
 
 print(evaluations)
 if not os.path.isdir(os.path.join(os.getcwd(), "logs/evaluations/")):
-	os.makedirs(os.path.join(os.getcwd(), "logs/evaluations/"))
+    os.makedirs(os.path.join(os.getcwd(), "logs/evaluations/"))
 with open(os.path.join(os.getcwd(), "logs/evaluations/" + args.save_name + ".txt"), 'w') as outputFile:
-	for val in evaluations:
-		outputFile.write(str(val))
-		outputFile.write("\n")
+    for val in evaluations:
+        outputFile.write(str(val))
+        outputFile.write("\n")
 
 # save data
 #network.save("C:\\School Work\\BOSS\\bin\\data\\models\\" + args.save_name + ".h5")

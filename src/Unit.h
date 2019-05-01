@@ -58,6 +58,8 @@ public:
     void        setTimeUntilBuilt(TimeType time)    { m_timeUntilBuilt = time; }
     void        setTimeUntilFree(TimeType time)     { m_timeUntilFree = time; }
     void        setBuilderID(NumUnits id)           { m_builderID = id; }
+    void        setBuildType(ActionType type)       { m_buildType = type; }
+    void        setBuildID(NumUnits id)             { m_buildID = id; }
     void        setMorphed(bool val)                { m_morphed = val; }
     void        setEnergy(FracType energy)          { m_energy = energy; }
     void        reduceEnergy(FracType energy)       { m_energy -= energy; }

@@ -28,4 +28,7 @@
       <UniqueIdentifier>{9dd9da0e-2324-4f41-be61-d9d52346ad76}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\bin\Experiments.txt" />
+  </ItemGroup>
 </Project>

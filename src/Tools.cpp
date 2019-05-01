@@ -469,20 +469,11 @@ void Tools::DoBuildOrder(GameState & state, BuildOrderAbilities & buildOrder)
         ActionType type = x.first;
         if (type.isAbility())
         {
-            ActionType targetType = x.second.targetType;
-            ActionType targetProductionType = x.second.targetProductionType;
-            for (int index = 0; index < state.getNumUnits(); ++index)
-            {
-                auto unit = static_cast<const GameState>(state).getUnit(index);
-                if (unit.getType() == targetType && unit.getBuildType() == targetProductionType)
-                {
-                    state.doAbility(type, index);
-                    x.second.targetID = unit.getID();
-                    x.second.targetProductionID = unit.getBuildID();
-                    x.second.frameCast = state.getCurrentFrame();
-                    break;
-                }
-            }
+            std::cout << "casting ability inside DoBuildOrder" << std::endl;
+            state.getAbilityTargetUnit(x);
+            state.doAbility(type, x.second.targetID);
+            std::cout << "ability successfully cast" << std::endl;
+            x.second.frameCast = state.getCurrentFrame();
         }
         else
         {

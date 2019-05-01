@@ -76,6 +76,8 @@ namespace BOSS
         ActionType GetGatewayAction();
         ActionType GetWarpgateAction();
         ActionType GetActionType(const std::string & name);
+        ActionType GetActionType(ActionID id);
+        ActionType GetRaceActionType(ActionID id, RaceID race);
         bool TypeExists(const std::string & name);
 
         ActionSetAbilities CalculatePrerequisites(ActionType action);

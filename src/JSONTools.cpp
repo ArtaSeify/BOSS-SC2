@@ -36,7 +36,7 @@ GameState JSONTools::GetGameState(const json & j)
 
             for (int n(0); n < unit[1]; ++n)
             {
-                state.addUnit(ActionTypes::GetActionType(unit[0]));
+                state.addUnit(ActionTypes::GetActionType(unit[0].get<std::string>()));
             }
         }
     }
@@ -60,7 +60,7 @@ BuildOrderSearchGoal JSONTools::GetBuildOrderSearchGoal(const json & j)
         {
             BOSS_ASSERT(unit.is_array() && unit.size() == 2 && unit[0].is_string() && unit[1].is_number_integer(), "Goal entry has to be array of size 2");
 
-            goal.setGoal(ActionTypes::GetActionType(unit[0]), unit[1]);
+            goal.setGoal(ActionTypes::GetActionType(unit[0].get<std::string>()), unit[1]);
         }
     }
 
@@ -70,7 +70,7 @@ BuildOrderSearchGoal JSONTools::GetBuildOrderSearchGoal(const json & j)
         {
             BOSS_ASSERT(unit.is_array() && unit.size() == 2 && unit[0].is_string() && unit[1].is_number_integer(), "Goal max entry has to be array of size 2");
 
-            goal.setGoalMax(ActionTypes::GetActionType(unit[0u]), unit[1u]);
+            goal.setGoalMax(ActionTypes::GetActionType(unit[0u].get<std::string>()), unit[1u]);
         }
     }
 
@@ -103,7 +103,7 @@ BuildOrderAbilities JSONTools::GetBuildOrder(const json & j)
 
         else
         {
-            buildOrder.add(ActionTypes::GetActionType(entry));
+            buildOrder.add(ActionTypes::GetActionType(entry_str));
         }
     }
     
