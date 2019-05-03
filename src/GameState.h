@@ -7,6 +7,7 @@
 #include "Unit.h"
 #include "AbilityAction.h"
 #include "BoundedVector.h"
+#include "BuildOrderAbilities.h"
 
 namespace BOSS
 {
@@ -85,10 +86,15 @@ class GameState
     void                            doAction(ActionType type);
     void                            fastForward(TimeType frames);
     void                            addUnit(ActionType Unit, NumUnits builderID = -1);
-    void                            getAbilityTargetUnit(std::pair<ActionType, AbilityAction> & action) const;
+
+    std::vector<std::pair<int, int>>getAbilityTargetUnit(const std::pair<ActionType, AbilityAction> & action) const;
+    bool                            fixBuildOrder(BuildOrderAbilities& buildOrder, int index) const;
   
     void                            setMinerals(FracType minerals) { m_minerals = minerals; }
     void                            setGas(FracType gas) { m_gas = gas; }
+    void                            setNumMineralWorkers(int workers) { m_mineralWorkers = NumUnits(workers); }
+    void                            setNumGasWorkers(int workers) { m_gasWorkers = NumUnits(workers); }
+    void                            setNumBuilderWorkers(int workers) { m_buildingWorkers = NumUnits(workers); }
 
     bool                            canBuildNow(ActionType action)      const { return whenCanBuild(action) == getCurrentFrame(); }
     int                             getNumMineralWorkers()              const { return m_mineralWorkers; }

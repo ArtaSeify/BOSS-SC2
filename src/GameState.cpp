@@ -93,17 +93,20 @@ GameState::GameState(const std::vector<Unit> & unitVector, RaceID race, FracType
     BOSS_ASSERT(m_mineralWorkers + m_gasWorkers + m_buildingWorkers == getNumCompleted(ActionTypes::GetWorker(m_race)), "Total number of workers doesn't add up. \
             mineral workers: %i, gas workers: %i, building workers: %i, total: %i", m_mineralWorkers, m_gasWorkers, m_buildingWorkers, getNumTotal(ActionTypes::GetWorker(m_race)));
 
-    /*std::cout << Races::GetRaceName(m_race) << std::endl;
-    std::cout << m_minerals << std::endl;
-    std::cout << m_gas << std::endl;
-    std::cout << m_currentSupply << std::endl;
-    std::cout << m_maxSupply << std::endl;
-    std::cout << m_currentFrame << std::endl;
-    std::cout << m_mineralWorkers << std::endl;
-    std::cout << m_gasWorkers << std::endl;
-    std::cout << m_buildingWorkers << std::endl;
-    std::cout << m_numRefineries << std::endl;
-    std::cout << m_numDepots << std::endl;*/
+    std::cout << "Race: " << Races::GetRaceName(m_race) << std::endl;
+    std::cout << "Minerals: " << m_minerals << std::endl;
+    std::cout << "Gas: " << m_gas << std::endl;
+    std::cout << "Current Supply: " << m_currentSupply << std::endl;
+    std::cout << "In Progress Supply: " << m_inProgressSupply << std::endl;
+    std::cout << "Max Supply: " << m_maxSupply << std::endl;
+    std::cout << "Current Frame: " << m_currentFrame << std::endl;
+    std::cout << "Mineral Workers: " << m_mineralWorkers << std::endl;
+    std::cout << "Gas Workers: " << m_gasWorkers << std::endl;
+    std::cout << "Building Workers: " << m_buildingWorkers << std::endl;
+    std::cout << "Num Refineries: " << m_numRefineries << std::endl;
+    std::cout << "In Progress Refineries: " << m_inProgressRefineries << std::endl;
+    std::cout << "Num Depots: " << m_numDepots << std::endl;
+    std::cout << "In Progress Depots: " << m_inProgressDepots << std::endl;
 }
 
 void GameState::getLegalActions(std::vector<ActionType> & legalActions) const
@@ -423,7 +426,7 @@ void GameState::completeUnit(Unit & unit)
         m_inProgressRefineries--;
         m_numRefineries++;
         //std::cout << "we have " << m_numRefineries << " refineries, and " << (int)(m_numDepots + getNumInProgress(ActionTypes::GetResourceDepot(m_race))) << " bases." << std::endl;
-        BOSS_ASSERT(m_numRefineries <= 2 * m_numDepots, "Shouldn't have more refineries than 2*depots");
+        BOSS_ASSERT(m_numRefineries <= 2 * m_numDepots, "Shouldn't have more refineries than 2*depots, have %i refineries, %i depots", m_numRefineries, m_numDepots);
         int needGasWorkers = std::max(0, (CONSTANTS::WorkersPerRefinery*m_numRefineries - m_gasWorkers));
         BOSS_ASSERT(needGasWorkers < m_mineralWorkers, "Shouldn't need more gas workers than we have mineral workers. "
                                                        "%d required gas workers, %d mineral workers", needGasWorkers, m_mineralWorkers);
@@ -577,32 +580,26 @@ void GameState::addUnit(ActionType type, NumUnits builderID)
     }
 }
 
-void GameState::getAbilityTargetUnit(std::pair<ActionType, AbilityAction> & action) const
+std::vector<std::pair<int, int>> GameState::getAbilityTargetUnit(const std::pair<ActionType, AbilityAction> & action) const
 {
+    std::vector<std::pair<int, int>> targetIDs;
     ActionType type = action.first;
     ActionType targetType = action.second.targetType;
     ActionType targetProductionType = action.second.targetProductionType;
     for (int index = 0; index < getNumUnits(); ++index)
     {
         const auto & unit = getUnit(index);
-        if (unit.getType() == targetType && unit.getBuildType() == targetProductionType)
+        if (unit.getType() == targetType && unit.getBuildType() == targetProductionType && whenCanCast(action.first, unit.getID()) != -1)
         {
-            action.second.targetID = unit.getID();
-            action.second.targetProductionID = unit.getBuildID();
-
-            // can't cast on this unit
-            if (whenCanCast(action.first, unit.getID()) == -1)
-            {
-                std::cout << "matches but when can cast is -1" << std::endl;
-                continue;
-            }
-            return;
+            targetIDs.push_back(std::make_pair(unit.getID(), unit.getBuildID()));
         }
     }
 
-    std::cout << "target type: " << targetType.getName() << std::endl;
-    std::cout << "target production type: " << targetProductionType.getName() << std::endl;
-    BOSS_ASSERT(false, "Could not find the target for %s", action.first.getName().c_str());
+    return targetIDs;
+
+    //std::cout << "target type: " << targetType.getName() << std::endl;
+    //std::cout << "target production type: " << targetProductionType.getName() << std::endl;
+    //BOSS_ASSERT(false, "Could not find the target for %s", action.first.getName().c_str());
 }
 
 int GameState::whenCanBuild(ActionType action, NumUnits targetID) const
@@ -722,7 +719,7 @@ int GameState::whenResourcesReady(ActionType action) const
 
         TimeType mineralTimeNeeded = (TimeType)std::ceil((mineralDifference - addedMinerals) / (currentMineralWorkers * CONSTANTS::MPWPF));
         TimeType gasTimeNeeded     = (TimeType)std::ceil((gasDifference - addedGas) / (currentGasWorkers * CONSTANTS::GPWPF));
-        addedTime               += std::max(mineralTimeNeeded, gasTimeNeeded);
+        addedTime                  += std::max(mineralTimeNeeded, gasTimeNeeded);
     }
     
     return addedTime + m_currentFrame;
@@ -986,6 +983,10 @@ bool GameState::chronoBoostableTarget(const Unit & unit) const
 
     // the building must be finished
     if (unit.getTimeUntilBuilt() > 0) { return false; }
+
+    // for now we don't allow chronoboost on a warpgate
+    // TODO: implement this properly so it can be used with CommandCenter. Works properly on its own.
+    if (unit.getType() == ActionTypes::GetWarpgateAction()) { return false; }
 
     // the unit must be producing something
     if (whenCanCast(ActionTypes::GetSpecialAction(m_race), unit.getID()) == -1) { return false; }
