@@ -588,10 +588,11 @@ std::vector<std::pair<int, int>> GameState::getAbilityTargetUnit(const std::pair
     ActionType targetProductionType = action.second.targetProductionType;
     for (int index = 0; index < getNumUnits(); ++index)
     {
-        const auto & unit = getUnit(index);
+        const auto unit = getUnit(index);
         if (unit.getType() == targetType && unit.getBuildType() == targetProductionType && whenCanCast(action.first, unit.getID()) != -1)
         {
             targetIDs.push_back(std::make_pair(unit.getID(), unit.getBuildID()));
+            std::cout << "target for chronoboost: " << unit.getType().getName() << std::endl;
         }
     }
 

@@ -19,7 +19,6 @@ namespace BOSS
         FracType UnitValue(const GameState & state, ActionType type);
 
         FracType UnitValueWithOpponent(const GameState & state, ActionType type, const CombatSearchParameters & params);
-        FracType UnitWeight(const GameState & state, ActionType type, const CombatSearchParameters & params);
 
         std::vector<FracType> CalculateUnitWeightVector(const GameState& state, const std::vector<int> & enemyUnits);
         const std::vector<FracType> & GetUnitWeightVector();

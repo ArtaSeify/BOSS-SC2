@@ -45,6 +45,12 @@ void BuildOrderAbilities::add(const BuildOrderAbilities & other)
     }
 }
 
+void BuildOrderAbilities::remove(int index)
+{
+    m_typeCount[m_buildOrder[index].first.getID()]--;
+    m_buildOrder.erase(m_buildOrder.begin() + index);
+}
+
 void BuildOrderAbilities::clear()
 {
     m_buildOrder.clear();

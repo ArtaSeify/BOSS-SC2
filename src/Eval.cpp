@@ -90,7 +90,8 @@ std::vector<FracType> Eval::CalculateUnitWeightVector(const GameState & state, c
 
     for (int index = 0; index < enemyCounters.size(); ++index)
     {
-        weights[index] = FracType((1.0 + enemyIsCountered[index]) / (1.0 + enemyCounters[index]));
+        //weights[index] = FracType((1.0 + enemyIsCountered[index]) / (1.0 + enemyCounters[index]));
+        weights[index] = FracType(enemyIsCountered[index] - enemyCounters[index]);
 
         //ActionType action = ActionTypes::GetRaceActionType(index, state.getRace());
         //std::cout << "action: " << action.getName() << std::endl;
@@ -111,39 +112,6 @@ void Eval::SetUnitWeightVector(const std::vector<FracType> & weights)
     UnitWeights = weights;
 }
 
-FracType Eval::UnitWeight(const GameState & state, ActionType type, const CombatSearchParameters & params)
-{
-    return UnitWeights[type.getRaceActionID()];
-    //const std::vector<std::vector<NumUnits>> currentUnits = state.getUnitTypes();
-    //const std::vector<int> enemyUnits = params.getEnemyUnits();
-
-    //int counters = 0;
-    //for (ActionType unit : type.strongAgainst(params.getEnemyRace()))
-    //{
-    //    // don't consider workers
-    //    if (unit.getID() == ActionTypes::GetWorker(params.getEnemyRace()).getID())
-    //    {
-    //        continue;
-    //    }
-    //    // if (enemyUnits[unit.getID()] > 0 && state.getUnitTypes(type) <= enemyUnits[unit.getID()])
-    //    if (enemyUnits[unit.getID()] > 0)
-    //    {
-    //        counters++;
-    //    }
-    //}
-
-    //int countered = 0;
-    //for (ActionType unit : type.weakAgainst(params.getEnemyRace()))
-    //{
-    //    if (!unit.isWorker() && enemyUnits[unit.getID()] > 0)
-    //    {
-    //        countered++;
-    //    }
-    //}
-
-    //return FracType((1.0 + counters) / (1.0 + countered));
-}
-
 FracType Eval::UnitValueWithOpponent(const GameState & state, ActionType type, const CombatSearchParameters & params)
 {
     FracType sum = 0;
@@ -153,7 +121,8 @@ FracType Eval::UnitValueWithOpponent(const GameState & state, ActionType type, c
         sum += type.mineralPrice();
         sum += FracType(GASWORTH * type.gasPrice());
 
-        sum *= Eval::UnitWeight(state, type, params);
+        //sum *= Eval::UnitWeight(state, type, params);
+        sum += UnitWeights[type.getRaceActionID()];
     }
 
     return sum / 100;

@@ -26,6 +26,8 @@ namespace BOSS
         void add(ActionType type, int amount);
         void add(const BuildOrderAbilities & other);
 
+        void remove(int index);
+
         void clear();
         const ActionAbilityPair & back() const;
         void pop_back();

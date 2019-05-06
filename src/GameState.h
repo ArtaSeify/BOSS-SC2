@@ -46,9 +46,7 @@ class GameState
     AbilityAction               m_lastAbility;
  
     int                             getBuilderID(ActionType type)               const;
-    bool                            haveBuilder(ActionType type)                const;
-    bool                            havePrerequisites(ActionType type)          const;
-
+    
     int                             whenSupplyReady(ActionType action)          const;
     int                             whenPrerequisitesReady(ActionType action)   const;
     int                             whenResourcesReady(ActionType action)       const;
@@ -76,6 +74,8 @@ class GameState
     int                             getNumInProgress(ActionType action)                     const;
     int                             getNumCompleted(ActionType action)                      const;
     int                             getNumTotal(ActionType action)                          const;
+    bool                            haveBuilder(ActionType type)                            const;
+    bool                            havePrerequisites(ActionType type)                      const;
     void                            getLegalActions(std::vector<ActionType> & legalActions) const;
     bool                            isLegal(ActionType type)                                const;
     bool                            haveType(ActionType action)                             const;
