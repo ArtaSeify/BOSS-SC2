@@ -91,7 +91,7 @@ std::vector<FracType> Eval::CalculateUnitWeightVector(const GameState & state, c
     for (int index = 0; index < enemyCounters.size(); ++index)
     {
         //weights[index] = FracType((1.0 + enemyIsCountered[index]) / (1.0 + enemyCounters[index]));
-        weights[index] = FracType(enemyIsCountered[index] - enemyCounters[index]);
+        weights[index] = FracType(enemyIsCountered[index]) - enemyCounters[index];
     }
 
     return weights;
@@ -105,10 +105,6 @@ const std::vector<FracType> & Eval::GetUnitWeightVector()
 void Eval::SetUnitWeightVector(const std::vector<FracType> & weights)
 {
     UnitWeights = weights;
-    for (int index = 0; index < UnitWeights.size(); ++index)
-    {
-        std::cout << ActionTypes::GetActionType(index + 1).getName() << ": " << weights[index] << std::endl;
-    }
 }
 
 FracType Eval::UnitValueWithOpponent(const GameState & state, ActionType type, const CombatSearchParameters & params)
@@ -119,12 +115,14 @@ FracType Eval::UnitValueWithOpponent(const GameState & state, ActionType type, c
     {
         sum += type.mineralPrice();
         sum += FracType(GASWORTH * type.gasPrice());
+        sum /= 100;
 
         //sum *= Eval::UnitWeight(state, type, params);
         sum += UnitWeights[type.getRaceActionID()];
+        sum = std::max(sum, (FracType)0);
     }
 
-    return sum / 100;
+    return sum;
 }
 
 bool Eval::BuildOrderBetter(const BuildOrderAbilities & buildOrder, const BuildOrderAbilities & compareTo)

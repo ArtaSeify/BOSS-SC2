@@ -108,6 +108,7 @@ namespace BOSS
         FracType m_explorationValue;
         bool m_changingRoot;
         bool m_useMaxValue;
+        bool m_maximizeValue;
         int m_numberOfSimulations;
         int m_numberOfNodes;
         int m_simulationsPerStep;
@@ -174,6 +175,9 @@ namespace BOSS
 
         void setUseMaxValue(bool value);
         bool getUseMaxValue() const;
+
+        void setMaximizeValue(bool value);
+        bool getMaximizeValue() const;
 
         void setNumberOfSimulations(int value);
         int getNumberOfSimulations() const;

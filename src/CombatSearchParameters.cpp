@@ -31,6 +31,7 @@ CombatSearchParameters::CombatSearchParameters()
     , m_explorationValue(1)
     , m_changingRoot(false)
     , m_useMaxValue(false)
+    , m_maximizeValue(false)
     , m_numberOfSimulations(10)
     , m_numberOfNodes(std::numeric_limits<int>::max())
     , m_simulationsPerStep(0)
@@ -222,6 +223,16 @@ void CombatSearchParameters::setUseMaxValue(bool value)
 bool CombatSearchParameters::getUseMaxValue() const
 {
     return m_useMaxValue;
+}
+
+void CombatSearchParameters::setMaximizeValue(bool value)
+{
+    m_maximizeValue = value;
+}
+
+bool CombatSearchParameters::getMaximizeValue() const
+{
+    return m_maximizeValue;
 }
 
 void CombatSearchParameters::setNumberOfSimulations(int value)

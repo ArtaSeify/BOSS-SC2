@@ -203,6 +203,12 @@ IntegralExperiment::IntegralExperiment(const std::string & experimentName, const
 
         m_params.setEnemyUnits(enemyUnits);
     }
+
+    if (exp.count("MaximizeValue"))
+    {
+        BOSS_ASSERT(exp["MaximizeValue"].is_boolean(), "MaximizeValue must be a bool");
+        m_params.setMaximizeValue(exp["MaximizeValue"]);
+    }
 }
 
 void IntegralExperiment::runExperimentThread(int thread, int runForThread, int startingIndex)

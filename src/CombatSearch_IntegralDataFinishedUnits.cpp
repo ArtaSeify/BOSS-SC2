@@ -112,10 +112,22 @@ void CombatSearch_IntegralDataFinishedUnits::addUnitEntry(const GameState & stat
        value += Eval::UnitValue(state, state.getUnit(unitIndex).getType());
     }
     
-    TimeType timeElapsed = endFrame - m_integralStack.back().timeFinished;
-    FracType valueToAdd = m_integralStack.back().eval * timeElapsed;
-    FracType integralToThisPoint = m_integralStack.back().integral_ToThisPoint + valueToAdd;
-    FracType integralUntilFrameLimit = integralToThisPoint + (params.getFrameTimeLimit() - endFrame) * value;
+    FracType integralToThisPoint = 0;
+    FracType integralUntilFrameLimit = 0;
+
+    if (params.getMaximizeValue())
+    {
+        integralToThisPoint = value;
+        integralUntilFrameLimit = value;
+    }
+
+    else
+    {
+        TimeType timeElapsed = endFrame - m_integralStack.back().timeFinished;
+        FracType valueToAdd = m_integralStack.back().eval * timeElapsed;
+        integralToThisPoint = m_integralStack.back().integral_ToThisPoint + valueToAdd;
+        integralUntilFrameLimit = integralToThisPoint + (params.getFrameTimeLimit() - endFrame) * value;
+    }
 
     IntegralDataFinishedUnits entry(value, integralToThisPoint, integralUntilFrameLimit, startFrame, endFrame);
     m_integralStack.push_back(entry);
@@ -124,10 +136,23 @@ void CombatSearch_IntegralDataFinishedUnits::addUnitEntry(const GameState & stat
 void CombatSearch_IntegralDataFinishedUnits::addChronoBoostEntry(TimeType startFrame, TimeType endFrame, const CombatSearchParameters & params)
 {
     FracType value = m_integralStack.back().eval;
-    TimeType timeElapsed = endFrame - m_integralStack.back().timeFinished;
-    FracType valueToAdd = m_integralStack.back().eval * timeElapsed;
-    FracType integralToThisPoint = m_integralStack.back().integral_ToThisPoint + valueToAdd;
-    FracType integralUntilFrameLimit = integralToThisPoint + (params.getFrameTimeLimit() - endFrame) * value;
+
+    FracType integralToThisPoint = 0;
+    FracType integralUntilFrameLimit = 0;
+
+    if (params.getMaximizeValue())
+    {
+        integralToThisPoint = value;
+        integralUntilFrameLimit = value;
+    }
+
+    else
+    {
+        TimeType timeElapsed = endFrame - m_integralStack.back().timeFinished;
+        FracType valueToAdd = m_integralStack.back().eval * timeElapsed;
+        integralToThisPoint = m_integralStack.back().integral_ToThisPoint + valueToAdd;
+        integralUntilFrameLimit = integralToThisPoint + (params.getFrameTimeLimit() - endFrame) * value;
+    }
 
     IntegralDataFinishedUnits entry(value, integralToThisPoint, integralUntilFrameLimit, startFrame, endFrame, 'c');
     m_integralStack.push_back(entry);
