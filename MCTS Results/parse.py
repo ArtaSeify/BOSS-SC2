@@ -1,74 +1,70 @@
 import numpy as np
 import pickle
 import os
+import argparse
 
-#flags = ["TrueFlag", "FalseFlag"]
-data_files_folder = "SRMV2"
+parser = argparse.ArgumentParser()
+parser.add_argument("files_dir", help="Name of dir containing the data files")
+parser.add_argument("save_dir", help="Name of save dir")
+args = parser.parse_args()
 
-original_dir = os.getcwd()
+files_dir = args.files_dir
+save_dir = os.path.join(os.path.join(os.getcwd(), "parsed data"), args.save_dir)
+results = dict()
 
-#for flag in flags:
-data_dir = os.path.join(os.getcwd(), data_files_folder)
-save_dir = os.path.join(os.path.join(os.getcwd(), "parsed data"), data_files_folder)
+def parseDataLine(line):
+	dic = dict()
+	values = line.split(",")
+	dic["NodesExpanded"] = int(values[0])
+	dic["NodeVisits"] = int(values[1])
+	dic["LeafNodesExpanded"] = int(values[2])
+	dic["LeafNodeVisits"] = int(values[3])
+	dic["SearchTimeSeconds"] = float(values[4])
+	dic["NumSimulations"] = int(values[5])
+	dic["BuildOrder"] = values[6]
+	dic["SearchEval"] = float(values[7])
 
-if not os.path.isdir(data_dir):
-	print("data directory doesn't exist!")
+	if (len(values) == 9):
+		dic["SearchValue"] = float(values[8])
+
+	return dic
+
+def parse(name_prepend, cwd):
+	all_files = os.listdir(cwd)
+
+	for file in all_files:
+		file_path = os.path.join(cwd, file)
+
+		if "Run" in file:
+			run = file.split("Run")[1].split("\n")[0]
+			# create the dict if it doesn't exist
+			if name_prepend not in results:
+				results[name_prepend] = dict()
+			results[name_prepend][run] = []
+			# get the data for that run
+			data_files = os.listdir(file_path)
+			for data_file in data_files:
+				if "Results.csv" in data_file:
+					with open(os.path.join(file_path, data_file), "r") as results_csv:
+						for line in results_csv:
+							results[name_prepend][run].append(parseDataLine(line))
+
+		# recuse
+		else:
+			if os.path.isdir(file_path):
+				name = name_prepend
+				if name_prepend is not "":
+					name += "_"
+				name += file 
+				parse(name, file_path)
+			else:
+				print("MISTAKE!!!")
+
+parse("", files_dir)
 
 if not os.path.isdir(save_dir):
 	os.makedirs(save_dir)
 
-os.chdir(data_dir)
-directories = os.listdir(os.getcwd())
-curr_path = os.getcwd()
-folder_names = dict()
-
-# get folder directories for each cValue
-for direc in directories:
-	#if "MCTS" not in direc:
-		#continue
-
-	path_to_folder = os.path.join(curr_path, direc)
-	cValue = direc.split("Run")[0].split("C")[1]
-	#cValue = cValue[1]
-
-	# cValue doesn't exist as key. create a dict with that cValue key
-	if cValue not in folder_names:
-		folder_names[cValue] = []
-	
-	folder_names[cValue].append(path_to_folder)
-
-		# add searchlength under cValue
-		#if searchLength not in folder_names[cValue]:
-			#folder_names[cValue][searchLength] = [path_to_folder]
-		#else:
-			#folder_names[cValue][searchLength].append(path_to_folder)
-
-	# get the experiment results
-	
-highestValue = dict()
-for cValue in folder_names:
-	print("working on cValue: " + str(cValue))
-	highestValue[cValue] = []
-	
-	#for searchLength in folder_names[cValue]:
-		#print("working on search length: " + str(searchLength))
-		#mostVisited[cValue][searchLength] = [[searchLength]))]
-		#highestValue[cValue][searchLength] = [[] for i in range(len(folder_names[cValue][searchLength]))]
-
-	for run,file_path in enumerate(folder_names[cValue]):
-		os.chdir(file_path)
-		subdir_files = os.listdir()
-		for subdir_file in subdir_files:
-			if "Results.csv" in subdir_file:
-				with open(subdir_file, "r") as results_csv:
-					all_data = results_csv.readline()
-					all_data = all_data.split(",")
-					del all_data[-1]
-					all_data = [float(x) for x in all_data]
-					highestValue[cValue].append(all_data)
-
-output_file = open(os.path.join(save_dir, "values.pickle"),"wb")
-pickle.dump(highestValue, output_file)
-output_file.close()
-
-os.chdir(original_dir)
+for key in results:
+	with open(os.path.join(save_dir, key), "wb") as output_file:
+		pickle.dump(results[key], output_file)

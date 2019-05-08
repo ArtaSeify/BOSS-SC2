@@ -22,7 +22,7 @@ CombatSearch_IntegralMCTS::CombatSearch_IntegralMCTS(const CombatSearchParameter
     m_writeEveryKSimulations = 1;
     m_dir = dir;
     m_name = prefix;
-    m_resultsStream << "0,0,0,0,0,0, ,0\n";
+    m_resultsStream << "0,0,0,0,0,0, ,0,0\n";
 
     std::random_device rd; // obtain a random number from hardware
     m_rnggen.seed(rd());
@@ -544,7 +544,8 @@ void CombatSearch_IntegralMCTS::writeResultsToFile(std::shared_ptr<Node> root)
     m_resultsStream << m_results.nodesExpanded << "," << m_results.nodeVisits << ","
         << m_results.leafNodesExpanded << "," << m_results.leafNodesVisited << ","
         << m_results.searchTimer.getElapsedTimeInMilliSec() / 1000 << "," << m_numSimulations << ","
-        << m_bestBuildOrderFound.getNameString() << "," << m_bestIntegralFound.getCurrentStackValue() << "\n";
+        << m_bestBuildOrderFound.getNameString() << "," << m_bestIntegralFound.getCurrentStackEval() << ","
+        << m_bestIntegralFound.getCurrentStackValue() << "\n";
     
     m_needToWriteBestValue = false;
 }

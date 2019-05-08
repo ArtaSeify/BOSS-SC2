@@ -1,101 +1,81 @@
 import numpy as np
 import os
 import pickle
+import argparse
+from math import ceil
 import matplotlib.pyplot as plt
 
-def drawGraph(values, name):
-	# draw each line
-	for run in range(len(values)):
-		number_of_simulations = len(values[run])
-		simulations = [10*i for i in range(int(number_of_simulations))]
-		plt.plot(simulations, values[run][:int(number_of_simulations)], label="run: " + str(run))
+parser = argparse.ArgumentParser()
+parser.add_argument("files_dir", help="Name of dir containing the data files")
+parser.add_argument("save_dir", help="Name of save dir")
+parser.add_argument("name_in_data", help="The name the data file must include to be considered")
+args = parser.parse_args()
+
+def drawGraph(x, max_x, y, max_y, name):
+	# draw graph
+	plt.plot(x, y, label=name, color='r' if "Integral" in name else 'b')
 	
 	plt.legend(loc="upper left")
-	plt.xlabel("Number of simulations", fontsize='xx-large')
-	plt.ylabel("Integral value", fontsize='xx-large')
-	# if searchLength == "10000":
-	plt.gca().set_ylim([0, 300000])
-	# elif searchLength == "8000":
-	# 	plt.gca().set_ylim([0, 150000])
-	# elif searchLength == "6000":
-	# 	plt.gca().set_ylim([0, 50000])
-	# elif searchLength == "4000":
-	# 	plt.gca().set_ylim([0, 10000])
+	plt.gca().set_xlim([0, max_x])
+	plt.gca().set_ylim([0, max_y])
 	#plt.show()
 	
-	plt.savefig(name)
-	plt.clf()
+	#plt.savefig(name)
+	#plt.clf()
 
-data_names = ["CRMV", "CRAV", "SRAV", "SRMV", "SRAV2", "SRMV2"]
+def fixData (x, y, max_x):
+	assert len(x) == len(y)
+	x_range = [1000*i for i in range(ceil(max_x/1000.0) + 1)]
 
-for data_name in data_names:
-	data_dir = os.path.join(os.path.join(os.getcwd(), "parsed data"), data_name)
-	graphs_dir = os.path.join(os.getcwd(), "graphs")
-	saved_every_simulations = 10
+	all_runs_x = [x_range for i in range(len(x))]
+	all_runs_y = [[] for i in range(len(y))]
+	
+	for run in range(len(x)):
+		max_x_index = [-1 for i in range(len(x_range))]
+		max_x_index[0] = 0
 
-	pickle_in = open(os.path.join(data_dir, "values.pickle"),"rb")
-	values = pickle.load(pickle_in)
+		run_x = x[run]
+		run_y = y[run]
 
-	plt.figure(figsize=(30.0, 18.0)) # in inches!	
+		for ind in range(1, len(run_x)):
+			max_x_index[int(run_x[ind] / 1000) + 1] = ind
 
-	lowest_length = 9999999
-	average = dict()
-	std = dict()
-	for cValue in values:
-		# graph for every run
-		save_dir = os.path.join(graphs_dir, "HyperParameters_" + data_name)
-		if not os.path.isdir(save_dir):
-			os.makedirs(save_dir)
+		for index,val in enumerate(max_x_index):
+			if val == -1:
+				assert index > 0
+				max_x_index[index] = max_x_index[index-1]
+			all_runs_y[run].append(int(run_y[max_x_index[index]]))
 
+	average_x = np.mean(all_runs_x, axis=0)
+	average_y = np.mean(all_runs_y, axis=0)
 
-		# make them all the same size
-		run_lenghts = [ len(l) for l in values[cValue] ] 
-		min_length = np.min(run_lenghts)
-		lowest_length = min(min_length, lowest_length)
-		for run in range(len(values[cValue])):
-			values[cValue][run] = values[cValue][run][0:min_length]
+	return average_x, average_y
 
-		# average and std
-		values[cValue] = np.array(values[cValue])
-		average[cValue] = np.mean(values[cValue], axis=0)
-		std[cValue] = np.std(values[cValue], axis=0)
+data_files = os.listdir(args.files_dir)
 
-		drawGraph(values[cValue], os.path.join(save_dir, "MCTS_" + cValue + "_highestValue_runs.png"))
+max_simulations = 0
+max_value = 0
+for data_file in data_files:
+	if args.name_in_data in data_file:
+		with open(os.path.join(args.files_dir, data_file), "rb") as pickle_in:
+			data = pickle.load(pickle_in)
+			for run in data:
+				max_simulations = max(max_simulations, data[run][-1]["NumSimulations"])
+				max_value = max(max_value, data[run][-1]["SearchEval"])
 
-	max_values = [ np.max(average[cValue][0:lowest_length]) for cValue in values]
-	for ind,cValue in enumerate(values):
-		print("data: " + data_name + ", exploration parameter: " + str(cValue) + ", highest value: " + str(max_values[ind]))
+for data_file in data_files:
+	if args.name_in_data in data_file:
+		with open(os.path.join(args.files_dir, data_file), "rb") as pickle_in:
+			data = pickle.load(pickle_in)
 
-	import random
-	# create a graph that contains all the average results
-	for cValue in values:
-		number_of_simulations = lowest_length
-		simulations = [10*i for i in range(int(number_of_simulations))]
-		errorevery = random.randint(800, 1501)
+			simulations = [[] for run in data]
+			values = [[] for run in data]
+			for run in data:
+				ind = int(run)
+				for data_point in data[run]:
+					simulations[ind].append(data_point["NumSimulations"])
+					values[ind].append(data_point["SearchEval"])
+			x, y = fixData(simulations, values, max_simulations)
+			drawGraph(x, max_simulations, y, max_value, data_file)
 
-		average[cValue] = average[cValue][0:number_of_simulations]
-		std[cValue] = std[cValue][0:number_of_simulations]
-
-		plt.errorbar(simulations, average[cValue], std[cValue], 
-					errorevery=errorevery, label=str(cValue))
-
-	plt.legend(loc="upper left")
-	plt.xlabel("Number of simulations", fontsize='xx-large')
-	plt.ylabel("Integral value", fontsize='xx-large')
-	# if searchLength == "10000":
-	plt.gca().set_ylim([0, 300000])
-	# elif searchLength == "8000":
-	# 	plt.gca().set_ylim([0, 150000])
-	# elif searchLength == "6000":
-	# 	plt.gca().set_ylim([0, 50000])
-	# elif searchLength == "4000":
-	# 	plt.gca().set_ylim([0, 10000])
-	#plt.show()
-
-	save_dir = os.path.join(graphs_dir, "HyperParameters_" + data_name)
-	if not os.path.isdir(save_dir):
-		os.makedirs(save_dir)
-
-	save_dir = os.path.join(save_dir, "average" + ".png")
-	plt.savefig(save_dir)
-	plt.clf()
+plt.show()
