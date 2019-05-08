@@ -4,6 +4,7 @@
 
 using namespace BOSS;
 
+std::vector<FracType> UnitValues;
 std::vector<FracType> UnitWeights;
 
 FracType Eval::ArmyInProgressResourceSum(const GameState & state)
@@ -53,6 +54,22 @@ FracType Eval::UnitValue(const GameState & state, ActionType type)
     }
 
     return sum / 100;
+}
+
+void Eval::CalculateUnitValues(const GameState & state)
+{
+    std::vector<FracType> unitValues = std::vector<FracType>(ActionTypes::GetRaceActionCount(state.getRace()), 0);
+    auto allActions = ActionTypes::GetAllActionTypes();
+    for (const ActionType& action : allActions)
+    {
+        if (action.getRace() == state.getRace() && !action.isBuilding() && !action.isWorker() && !action.isSupplyProvider()
+            && !action.isUpgrade() && !action.isAbility())
+        {
+            unitValues[action.getRaceActionID()] = (action.mineralPrice() + FracType(GASWORTH * action.gasPrice())) / 100;
+        }
+    }
+
+    UnitValues = unitValues;
 }
 
 std::vector<FracType> Eval::CalculateUnitWeightVector(const GameState & state, const std::vector<int> & enemyUnits)
@@ -109,20 +126,10 @@ void Eval::SetUnitWeightVector(const std::vector<FracType> & weights)
 
 FracType Eval::UnitValueWithOpponent(const GameState & state, ActionType type, const CombatSearchParameters & params)
 {
-    FracType sum = 0;
+    FracType value = UnitValues[type.getRaceActionID()] + UnitWeights[type.getRaceActionID()];
+    value = std::max(value, (FracType)0);
 
-    if (!type.isBuilding() && !type.isWorker() && !type.isSupplyProvider())
-    {
-        sum += type.mineralPrice();
-        sum += FracType(GASWORTH * type.gasPrice());
-        sum /= 100;
-
-        //sum *= Eval::UnitWeight(state, type, params);
-        sum += UnitWeights[type.getRaceActionID()];
-        sum = std::max(sum, (FracType)0);
-    }
-
-    return sum;
+    return value;
 }
 
 bool Eval::BuildOrderBetter(const BuildOrderAbilities & buildOrder, const BuildOrderAbilities & compareTo)
