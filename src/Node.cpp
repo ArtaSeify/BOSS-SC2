@@ -315,18 +315,18 @@ std::shared_ptr<Edge> Node::getRandomEdge()
     return m_edges[std::rand() % m_edges.size()];
 }
 
-std::shared_ptr<Edge> Node::getChild(const ActionType & action)
+std::shared_ptr<Edge> Node::getChild(const ActionAbilityPair & action)
 {
     BOSS_ASSERT(m_edges.size() > 0, "Number of edges is %i", m_edges.size());
 
     for (auto & edge : m_edges)
     {
-        if (edge->getAction().first == action)
+        if (edge->getAction().first == action.first && edge->getAction().second == action.second)
         {
             return edge;
         }
     }
 
-    BOSS_ASSERT(false, "Tried to get edge with action %s, but it doesn't exist", action.getName().c_str());
+    BOSS_ASSERT(false, "Tried to get edge with action %s, but it doesn't exist", action.first.getName().c_str());
     return std::make_shared<Edge>(ActionAbilityPair(ActionTypes::None, AbilityAction()), nullptr);
 }

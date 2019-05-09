@@ -13,7 +13,7 @@ args = parser.parse_args()
 
 def drawGraph(x, max_x, y, max_y, name):
 	# draw graph
-	plt.plot(x, y, label=name, color='r' if "Integral" in name else 'b')
+	plt.plot(x, y, label=name)
 	
 	plt.legend(loc="upper left")
 	plt.gca().set_xlim([0, max_x])

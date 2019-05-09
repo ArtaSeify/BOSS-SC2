@@ -38,8 +38,10 @@ namespace BOSS
             targetProductionType = newTargetProductionType;
         }
 
+        bool operator == (const AbilityAction& action) const { return (type == action.type) && (targetID == action.targetID) && (targetProductionID == action.targetProductionID); }
         void writeToSS(std::stringstream & ss) const;
         json writeToJson() const;
+
     };
 
     struct ActionValue
