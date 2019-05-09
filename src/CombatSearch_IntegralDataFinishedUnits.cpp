@@ -85,8 +85,8 @@ void CombatSearch_IntegralDataFinishedUnits::update(const GameState & state, con
         if (useTieBreaker)
         {
             m_bestIntegralBuildOrder = buildOrder;
+            m_bestIntegralGameState = state;
         }
-        m_bestIntegralGameState = state;
 
         // print the newly found best to console
         //printIntegralData(m_integralStack.size() - 1);

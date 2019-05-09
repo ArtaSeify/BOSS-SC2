@@ -53,7 +53,7 @@ namespace BOSS
 
         // returns the child node that is the result of action
         std::shared_ptr<Edge> getEdge(int index) { return m_edges[index]; }
-        std::shared_ptr<Edge> getChild(const ActionType & action);
+        std::shared_ptr<Edge> getChild(const ActionAbilityPair& action);
         Node & getChild(int index) 
         { 
             BOSS_ASSERT(index < m_edges.size(), "index out of range for m_edges"); 
