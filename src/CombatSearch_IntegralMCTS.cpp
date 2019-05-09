@@ -293,7 +293,7 @@ std::pair<std::shared_ptr<Node>, bool> CombatSearch_IntegralMCTS::getPromisingNo
         const GameState & prevStateNode = returnNode->getState();
 
         // select the edge with the highest UCT value
-        edge = returnNode->selectChildEdge(m_exploration_parameter, m_params);
+        edge = returnNode->selectChildEdge(m_exploration_parameter, m_rnggen, m_params);
 
         // the node doesn't exist in memory
         if (edge->getChild() == nullptr)
