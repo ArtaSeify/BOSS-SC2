@@ -237,14 +237,18 @@ void CombatSearch_IntegralMCTS::recurse(const GameState& state, int depth)
         m_dataStream << "," << m_integral.getCurrentStackValue() << "\n";
     }
 
-    auto buildOrderAndIntegral = pickBestBuildOrder(root, false);
-    BuildOrderAbilities bestBuildOrder = buildOrderAndIntegral.first;
-    BOSS_ASSERT(buildOrderAndIntegral.second.getCurrentStackValue() == m_bestIntegralFound.getCurrentStackValue(), "Value of best build order in tree %f must match the value of the best build order found %f", buildOrderAndIntegral.second.getCurrentStackValue(), m_bestIntegralFound.getCurrentStackValue());
-    BOSS_ASSERT(m_bestBuildOrderFound.size() == bestBuildOrder.size(), "Best build order in tree must match the best build order found when using max");
-    for (int index = 0; index < m_bestBuildOrderFound.size(); ++index)
+    // some sanity checks to make sure the result is as expected
+    if (!timeLimitReached())
     {
-        BOSS_ASSERT(m_bestBuildOrderFound[index].first == bestBuildOrder[index].first, "Best build order in tree must match the best build order found when using max");
-        BOSS_ASSERT(m_bestBuildOrderFound[index].second == bestBuildOrder[index].second, "Best build order in tree must match the best build order found when using max");
+        auto buildOrderAndIntegral = pickBestBuildOrder(root, false);
+        BuildOrderAbilities bestBuildOrder = buildOrderAndIntegral.first;
+        BOSS_ASSERT(buildOrderAndIntegral.second.getCurrentStackValue() == m_bestIntegralFound.getCurrentStackValue(), "Value of best build order in tree %f must match the value of the best build order found %f", buildOrderAndIntegral.second.getCurrentStackValue(), m_bestIntegralFound.getCurrentStackValue());
+        BOSS_ASSERT(m_bestBuildOrderFound.size() == bestBuildOrder.size(), "Best build order in tree must match the best build order found when using max");
+        for (int index = 0; index < m_bestBuildOrderFound.size(); ++index)
+        {
+            BOSS_ASSERT(m_bestBuildOrderFound[index].first == bestBuildOrder[index].first, "Best build order in tree must match the best build order found when using max");
+            BOSS_ASSERT(m_bestBuildOrderFound[index].second == bestBuildOrder[index].second, "Best build order in tree must match the best build order found when using max");
+        }
     }
 
     root->cleanUp();
@@ -532,7 +536,7 @@ std::pair<BuildOrderAbilities, CombatSearch_IntegralDataFinishedUnits> CombatSea
         }
         bestNode = bestEdge->getChild();
 
-        std::cout << "edge value: " << bestEdge->getValue() << std::endl;
+        //std::cout << "edge value: " << bestEdge->getValue() << std::endl;
 
         buildOrder.add(bestEdge->getAction());
         integral.update(bestNode->getState(), buildOrder, m_params, m_searchTimer, false);

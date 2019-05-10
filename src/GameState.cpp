@@ -52,22 +52,24 @@ GameState::GameState(const std::vector<Unit> & unitVector, RaceID race, FracType
     , m_minerals(minerals)
     , m_gas(gas)
     , m_currentSupply(currentSupply)
-    , m_maxSupply(maxSupply)
+    , m_maxSupply(0)
     , m_inProgressSupply(0)
     , m_currentFrame(currentFrame)
     , m_previousFrame(0)
     , m_mineralWorkers(mineralWorkers)
     , m_gasWorkers(gasWorkers)
     , m_buildingWorkers(builerWorkers)
-    , m_numRefineries(numRefineries)
+    , m_numRefineries(0)
     , m_inProgressRefineries(0)
-    , m_numDepots(numDepots)
+    , m_numDepots(0)
     , m_inProgressDepots(0)
     , m_lastAction(ActionTypes::None)
     , m_lastAbility(AbilityAction())
 {
+    NumUnits calculatedSupply = 0;
     for (auto & unit : m_units)
     {
+        calculatedSupply += unit.getType().supplyCost();
         if (unit.getTimeUntilBuilt() > 0)
         {
             m_inProgressSupply += unit.getType().supplyProvided();
@@ -83,6 +85,20 @@ GameState::GameState(const std::vector<Unit> & unitVector, RaceID race, FracType
                 m_inProgressDepots++;
             }
         }
+        else
+        {
+            m_maxSupply += unit.getType().supplyProvided();
+
+            if (unit.getType().isRefinery())
+            {
+                m_numRefineries++;
+            }
+
+            else if (unit.getType().isDepot())
+            {
+                m_numDepots++;
+            }
+        }
 
         m_unitTypes[unit.getType().getRaceActionID()].push_back(unit.getID());
         //std::cout << "name: " << unit.getType().getName() << std::endl;
@@ -92,6 +108,9 @@ GameState::GameState(const std::vector<Unit> & unitVector, RaceID race, FracType
 
     BOSS_ASSERT(m_mineralWorkers + m_gasWorkers + m_buildingWorkers == getNumCompleted(ActionTypes::GetWorker(m_race)), "Total number of workers doesn't add up. \
             mineral workers: %i, gas workers: %i, building workers: %i, total: %i", m_mineralWorkers, m_gasWorkers, m_buildingWorkers, getNumTotal(ActionTypes::GetWorker(m_race)));
+
+    BOSS_ASSERT(calculatedSupply == currentSupply, "Actual current supply %i and the one calculated by BOSS %i are different", currentSupply, calculatedSupply);
+    BOSS_ASSERT(m_currentSupply <= m_maxSupply, "Current supply %i must be less than or equal to max supply %i", m_currentSupply, m_maxSupply);
 
     std::cout << "Race: " << Races::GetRaceName(m_race) << std::endl;
     std::cout << "Minerals: " << m_minerals << std::endl;
@@ -582,7 +601,7 @@ void GameState::addUnit(ActionType type, NumUnits builderID)
 
 std::vector<std::pair<int, int>> GameState::getAbilityTargetUnit(const std::pair<ActionType, AbilityAction> & action) const
 {
-    std::vector<std::pair<int, int>> targetIDs;
+    std::vector<std::pair<int, int>> targetIDs = std::vector<std::pair<int, int>>();
     ActionType type = action.first;
     ActionType targetType = action.second.targetType;
     ActionType targetProductionType = action.second.targetProductionType;
