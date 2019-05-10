@@ -80,4 +80,8 @@ emscripten/BOSS.data
 /bin/tttt
 /bin/aa
 /bin/ValueVSIntegral
+/bin/ValueParameterSweepOld
+/bin/ValueParameterSweep
+/MCTS Results/ParameterSweep
+/MCTS Results/bigrun
 /bin/TestingTheory

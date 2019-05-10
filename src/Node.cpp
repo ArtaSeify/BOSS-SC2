@@ -199,25 +199,34 @@ void Node::printChildren() const
     std::cout << std::endl;
 }
 
-std::shared_ptr<Edge> Node::selectChildEdge(FracType exploration_param, const CombatSearchParameters & params) const
+std::shared_ptr<Edge> Node::selectChildEdge(FracType exploration_param, std::mt19937 & rnggen, const CombatSearchParameters & params) const
 {
     BOSS_ASSERT(m_edges.size() > 0, "selectChildEdge called when there are no edges.");
 
     // uniform policy
     float policyValue = 1.f / m_edges.size();
 
+    std::vector<int> unvisitedEdges;
     int totalChildVisits = 0;
-    for (auto & edge : m_edges)
+    for (int index = 0; index < m_edges.size(); ++index )
     {
+        const auto& edge = m_edges[index];
+
         int edgeTimesVisited = edge->timesVisited();
-        
-        // if we have not visited this edge yet, this is the action we will take. 
+        // all unvisited edges are taken as an action first 
         if (edgeTimesVisited == 0)
         {
-            return edge;
+            unvisitedEdges.push_back(index);
         }
 
         totalChildVisits += edgeTimesVisited;
+    }
+
+    // pick an unvisited edge at uniformly random
+    if (unvisitedEdges.size() > 0)
+    {
+        std::uniform_int_distribution<> distribution(0, int(unvisitedEdges.size()) - 1);
+        return m_edges[unvisitedEdges[distribution(rnggen)]];
     }
 /*
     float UCBValue = exploration_param * policyValue *
@@ -237,19 +246,23 @@ std::shared_ptr<Edge> Node::selectChildEdge(FracType exploration_param, const Co
         // we normalize the action value to a range of [0, 1] using the highest
         // value of the search thus far. 
         float childUCBValue = UCBValue / (1 + edge->timesVisited());
-        //std::cout << "UCB Value: " << childUCBValue << std::endl;
+        float actionValue = edge->getValue() / Edge::CURRENT_HIGHEST_VALUE;
+        BOSS_ASSERT(actionValue <= 1, "value of an action must be less than or equal to 1, but is %f", actionValue);
 
-        float actionValue = (edge->getValue() / Edge::CURRENT_HIGHEST_VALUE) + childUCBValue;
-        //std::cout << "action value: " << actionValue << std::endl;
+        float UCTValue = actionValue + childUCBValue;
+
+        /*std::cout << "UCB Value: " << childUCBValue << std::endl;
+        std::cout << "action value: " << actionValue << std::endl;
+        std::cout << "UCT value: " << UCTValue << std::endl;*/
 
         //std::cout << "edge value: " << edge->getValue() / Edge::CURRENT_HIGHEST_VALUE << ". UCT value: " << childUCBValue << std::endl;
 
         //std::cout << "times visited: " << child.timesVisited() << std::endl;
 
         // store the index of this action
-        if (maxActionValue < actionValue)
+        if (maxActionValue < UCTValue)
         {
-            maxActionValue = actionValue;
+            maxActionValue = UCTValue;
             maxIndex = index;
         }
 

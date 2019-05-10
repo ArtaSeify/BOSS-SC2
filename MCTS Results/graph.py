@@ -8,8 +8,13 @@ import matplotlib.pyplot as plt
 parser = argparse.ArgumentParser()
 parser.add_argument("files_dir", help="Name of dir containing the data files")
 parser.add_argument("save_dir", help="Name of save dir")
-parser.add_argument("name_in_data", help="The name the data file must include to be considered")
+parser.add_argument("save_name", help="Name of file to be saved")
+parser.add_argument("strings_in_data", help="The strings the data file name must include to be considered, seperated by commas")
+parser.add_argument("--topk", help="Top k results to show")
 args = parser.parse_args()
+
+strings_in_data = args.strings_in_data.split(",")
+plt.figure(figsize=(18.5, 10))
 
 def drawGraph(x, max_x, y, max_y, name):
 	# draw graph
@@ -56,15 +61,17 @@ data_files = os.listdir(args.files_dir)
 max_simulations = 0
 max_value = 0
 for data_file in data_files:
-	if args.name_in_data in data_file:
+	if all(s in data_file for s in strings_in_data):
 		with open(os.path.join(args.files_dir, data_file), "rb") as pickle_in:
 			data = pickle.load(pickle_in)
 			for run in data:
 				max_simulations = max(max_simulations, data[run][-1]["NumSimulations"])
-				max_value = max(max_value, data[run][-1]["SearchEval"])
+				max_value = max(max_value, data[run][-1]["SearchValue"])
 
+
+all_data = []
 for data_file in data_files:
-	if args.name_in_data in data_file:
+	if all(s in data_file for s in strings_in_data):
 		with open(os.path.join(args.files_dir, data_file), "rb") as pickle_in:
 			data = pickle.load(pickle_in)
 
@@ -74,8 +81,20 @@ for data_file in data_files:
 				ind = int(run)
 				for data_point in data[run]:
 					simulations[ind].append(data_point["NumSimulations"])
-					values[ind].append(data_point["SearchEval"])
+					values[ind].append(data_point["SearchValue"])
 			x, y = fixData(simulations, values, max_simulations)
-			drawGraph(x, max_simulations, y, max_value, data_file)
+			all_data.append((x, y, data_file))
+			print(data_file + " " + str(y[-1]))
 
-plt.show()
+
+all_data = sorted(all_data, reverse=True, key=lambda x: x[1][-1])
+topk = len(all_data) if args.topk is None else args.topk
+
+for i in range(int(topk)):
+	print(str(i + 1) + ": " + str(all_data[i][1]) + " " + all_data[i][2])
+	drawGraph(all_data[i][0], max_simulations, all_data[i][1], max_value, all_data[i][2])
+
+if not os.path.isdir(args.save_dir):
+	os.makedirs(args.save_dir)
+
+plt.savefig(os.path.join(args.save_dir, args.save_name + ".png"), format="png")
