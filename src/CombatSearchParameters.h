@@ -116,6 +116,7 @@ namespace BOSS
         int m_threadsForExperiment;
         int m_numPlayouts;
         int m_level;
+        bool m_useRealTimeSearch;
 
     public:
 
@@ -199,6 +200,9 @@ namespace BOSS
 
         void setLevel(int value);
         int getLevel() const;
+
+        void setUseRealTimeSearch(bool value);
+        int getUseRealTimeSearch() const;
     
         void print();
     };

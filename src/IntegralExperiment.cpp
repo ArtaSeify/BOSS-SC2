@@ -211,11 +211,11 @@ IntegralExperiment::IntegralExperiment(const std::string & experimentName, const
     }
 }
 
-void IntegralExperiment::runExperimentThread(int thread, int runForThread, int startingIndex)
+void IntegralExperiment::runExperimentThread(int thread, int numRuns, int startingIndex)
 {
     static std::string stars = "************************************************";
 
-    for (int i(0); i < runForThread; ++i)
+    for (int i(0); i < numRuns; ++i)
     {
         int index = i + (startingIndex);
         std::string name = m_name;
@@ -276,29 +276,39 @@ void IntegralExperiment::runExperimentThread(int thread, int runForThread, int s
 void IntegralExperiment::run(int numberOfRuns)
 {
     FileTools::MakeDirectory(m_outputDir);
+
+    if (m_params.getUseRealTimeSearch())
+    {
+
+    }
     
-    int runPerThread = 0;
-    int numThreads = m_params.getThreadsForExperiment();
+    else
+    {
+        int numThreads = m_params.getThreadsForExperiment();
+        std::vector<int> runPerThread = std::vector<int>(numThreads, int(numberOfRuns / numThreads));
+        int remainingRuns = numberOfRuns - int(numberOfRuns / numThreads) * numThreads;
 
-    while (runPerThread == 0)
-    {
-       runPerThread = int(numberOfRuns / numThreads);
-       if (runPerThread == 0)
-       {
-           numThreads--;
-       }
-    }
-    std::vector<std::thread> threads(numThreads);
-    int startingIndex = 0;
-    for (int thread = 0; thread < numThreads; ++thread)
-    {
-        threads[thread] = std::thread(&IntegralExperiment::runExperimentThread, this, thread, runPerThread, startingIndex);
-        std::this_thread::sleep_for(std::chrono::milliseconds(250));
-        startingIndex += runPerThread;
-    }
+        for (int index = 0; index < numThreads; ++index)
+        {
+            if (remainingRuns > 0)
+            {
+                ++runPerThread[index];
+                --remainingRuns;
+            }
+        }
 
-    for (auto & thread : threads)
-    {
-        thread.join();
+        std::vector<std::thread> threads(numThreads);
+        int startingIndex = 0;
+        for (int thread = 0; thread < numThreads; ++thread)
+        {
+            threads[thread] = std::thread(&IntegralExperiment::runExperimentThread, this, thread, runPerThread[thread], startingIndex);
+            std::this_thread::sleep_for(std::chrono::milliseconds(250));
+            startingIndex += runPerThread[thread];
+        }
+
+        for (auto& thread : threads)
+        {
+            thread.join();
+        }
     }
 }

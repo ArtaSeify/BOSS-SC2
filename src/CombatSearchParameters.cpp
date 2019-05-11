@@ -41,6 +41,7 @@ CombatSearchParameters::CombatSearchParameters()
     , m_level(0)
     , m_enemyUnits()
     , m_enemyRace(Races::None)
+    , m_useRealTimeSearch(false)
 {
     
 }
@@ -300,6 +301,16 @@ void CombatSearchParameters::setLevel(int value)
 int CombatSearchParameters::getLevel() const
 {
     return m_level;
+}
+
+void CombatSearchParameters::setUseRealTimeSearch(bool value)
+{
+    m_useRealTimeSearch = value;
+}
+
+int CombatSearchParameters::getUseRealTimeSearch() const
+{
+    return m_useRealTimeSearch;
 }
 
 void CombatSearchParameters::print()
