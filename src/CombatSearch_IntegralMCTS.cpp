@@ -580,7 +580,6 @@ void CombatSearch_IntegralMCTS::writeResultsToFile(std::shared_ptr<Node> root)
 
 void CombatSearch_IntegralMCTS::printResults()
 {
-    std::cout << m_bestIntegralFound.getState().getNumUnits() << std::endl;
     m_bestIntegralFound.print(m_bestBuildOrderFound);
     std::cout << "\nRan " << m_numSimulations << " simulations in " << m_results.timeElapsed << "ms @ " << (1000*m_numSimulations / m_results.timeElapsed) << " simulations/sec\n";
     std::cout << "Nodes expanded: " << m_results.nodesExpanded << ". Total nodes visited: " << m_results.nodeVisits << ", at a rate of " << (1000 * m_results.nodeVisits / m_results.timeElapsed) << " nodes/sec\n";
