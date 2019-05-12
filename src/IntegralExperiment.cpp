@@ -209,6 +209,12 @@ IntegralExperiment::IntegralExperiment(const std::string & experimentName, const
         BOSS_ASSERT(exp["MaximizeValue"].is_boolean(), "MaximizeValue must be a bool");
         m_params.setMaximizeValue(exp["MaximizeValue"]);
     }
+
+    if (exp.count("TotalTimeLimit"))
+    {
+        BOSS_ASSERT(exp["TotalTimeLimit"].is_number_integer(), "TotalTimeLimit must be an integer");
+        m_params.setTotalTimeLimit(exp["TotalTimeLimit"]);
+    }
 }
 
 void IntegralExperiment::runExperimentThread(int thread, int numRuns, int startingIndex)
@@ -273,42 +279,104 @@ void IntegralExperiment::runExperimentThread(int thread, int numRuns, int starti
     }
 }
 
+void IntegralExperiment::runExperimentsTotalTimeThread(int thread, int numRuns, int startingIndex)
+{
+    static std::string stars = "************************************************";
+
+    for (int i(0); i < numRuns; ++i)
+    {
+        int index = i + (startingIndex);
+        std::string name = m_name;
+        if (m_searchType != "IntegralDFS")
+        {
+            name += "Run" + std::to_string(index);
+        }
+        std::string outputDir = m_outputDir + "/" + Assert::CurrentDateTime() + "_" + name;
+        FileTools::MakeDirectory(outputDir);
+
+        std::string resultsFile = name;
+
+        std::cout << "\n" << stars << "\n* Running Experiment: " << name << " [" << m_searchType << "]\n" << stars << "\n";
+
+
+        std::unique_ptr<CombatSearch> combatSearch;
+
+        if (m_searchType == "IntegralDFS")
+        {
+            combatSearch = std::unique_ptr<CombatSearch>(new CombatSearch_Integral(m_params, outputDir, resultsFile, m_name));
+        }
+        else if (m_searchType == "IntegralDFSVN")
+        {
+            combatSearch = std::unique_ptr<CombatSearch>(new DFSValue(m_params, outputDir, resultsFile, m_name));
+        }
+        else if (m_searchType == "IntegralDFSPN")
+        {
+            combatSearch = std::unique_ptr<CombatSearch>(new DFSPolicy(m_params, outputDir, resultsFile, m_name));
+        }
+        else if (m_searchType == "IntegralDFSPVN")
+        {
+            combatSearch = std::unique_ptr<CombatSearch>(new DFSPolicyAndValue(m_params, outputDir, resultsFile, m_name));
+        }
+        else if (m_searchType == "IntegralMCTS")
+        {
+            //resultsFile += "_IntegralMCTS";
+            combatSearch = std::unique_ptr<CombatSearch>(new CombatSearch_IntegralMCTS(m_params, outputDir, resultsFile, m_name));
+        }
+        else if (m_searchType == "IntegralNMCS")
+        {
+            combatSearch = std::unique_ptr<CombatSearch>(new NMCS(m_params, outputDir, resultsFile, m_name));
+        }
+        else if (m_searchType == "IntegralNMCTS")
+        {
+            combatSearch = std::unique_ptr<CombatSearch>(new NMCTS(m_params, outputDir, resultsFile, m_name));
+        }
+        else
+        {
+            BOSS_ASSERT(false, "CombatSearch type not found: %s", m_searchType.c_str());
+        }
+
+        combatSearch->search();
+        combatSearch->printResults();
+        combatSearch->writeResultsFile(outputDir, resultsFile);
+        const CombatSearchResults& results = combatSearch->getResults();
+    }
+}
+
 void IntegralExperiment::run(int numberOfRuns)
 {
     FileTools::MakeDirectory(m_outputDir);
 
-    if (m_params.getUseRealTimeSearch())
-    {
+    int numThreads = m_params.getThreadsForExperiment();
+    std::vector<int> runPerThread = std::vector<int>(numThreads, int(numberOfRuns / numThreads));
+    int remainingRuns = numberOfRuns - int(numberOfRuns / numThreads) * numThreads;
 
-    }
-    
-    else
+    for (int index = 0; index < numThreads; ++index)
     {
-        int numThreads = m_params.getThreadsForExperiment();
-        std::vector<int> runPerThread = std::vector<int>(numThreads, int(numberOfRuns / numThreads));
-        int remainingRuns = numberOfRuns - int(numberOfRuns / numThreads) * numThreads;
-
-        for (int index = 0; index < numThreads; ++index)
+        if (remainingRuns > 0)
         {
-            if (remainingRuns > 0)
-            {
-                ++runPerThread[index];
-                --remainingRuns;
-            }
+            ++runPerThread[index];
+            --remainingRuns;
         }
+    }
 
-        std::vector<std::thread> threads(numThreads);
-        int startingIndex = 0;
-        for (int thread = 0; thread < numThreads; ++thread)
+    std::vector<std::thread> threads(numThreads);
+    int startingIndex = 0;
+    for (int thread = 0; thread < numThreads; ++thread)
+    {
+        if (m_params.getTotalTimeLimit() > 0)
+        {
+            threads[thread] = std::thread(&IntegralExperiment::runExperimentsTotalTime, this, thread, runPerThread[thread], startingIndex);
+        }
+        else
         {
             threads[thread] = std::thread(&IntegralExperiment::runExperimentThread, this, thread, runPerThread[thread], startingIndex);
-            std::this_thread::sleep_for(std::chrono::milliseconds(250));
-            startingIndex += runPerThread[thread];
         }
+        std::this_thread::sleep_for(std::chrono::milliseconds(250));
+        startingIndex += runPerThread[thread];
+    }
 
-        for (auto& thread : threads)
-        {
-            thread.join();
-        }
+    for (auto& thread : threads)
+    {
+        thread.join();
     }
 }

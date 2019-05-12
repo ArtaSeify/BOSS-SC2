@@ -23,6 +23,7 @@ namespace BOSS
         IntegralExperiment(const std::string & experimentName, const json & exp);
 
         void runExperimentThread(int thread, int numRuns, int startingIndex);
+        void runExperimentsTotalTimeThread(int thread, int numRuns, int startingIndex);
         void run(int numberOfRuns);
     };
 }

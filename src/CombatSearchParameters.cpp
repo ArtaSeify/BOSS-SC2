@@ -41,7 +41,7 @@ CombatSearchParameters::CombatSearchParameters()
     , m_level(0)
     , m_enemyUnits()
     , m_enemyRace(Races::None)
-    , m_useRealTimeSearch(false)
+    , m_totalTimeLimit(0)
 {
     
 }
@@ -303,14 +303,14 @@ int CombatSearchParameters::getLevel() const
     return m_level;
 }
 
-void CombatSearchParameters::setUseRealTimeSearch(bool value)
+void CombatSearchParameters::setTotalTimeLimit(int value)
 {
-    m_useRealTimeSearch = value;
+    m_totalTimeLimit = value;
 }
 
-int CombatSearchParameters::getUseRealTimeSearch() const
+int CombatSearchParameters::getTotalTimeLimit() const
 {
-    return m_useRealTimeSearch;
+    return m_totalTimeLimit;
 }
 
 void CombatSearchParameters::print()
@@ -352,5 +352,5 @@ void CombatSearchParameters::print()
     //    }
     //}
 
-    printf("\n\n");
+    //printf("\n\n");
 }
