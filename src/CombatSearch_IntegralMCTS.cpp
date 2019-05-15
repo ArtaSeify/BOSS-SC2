@@ -199,6 +199,7 @@ void CombatSearch_IntegralMCTS::recurse(const GameState& state, int depth)
     m_results.usefulBuildOrder = createUsefulBuildOrder(finishedUnitsBuildOrder);
 
     m_results.eval = m_integral.getCurrentStackValue();
+    m_results.value = m_integral.getCurrentStackEval();
     m_results.numSimulations = m_numTotalSimulations;
 
     GameState finishedUnitsState(m_params.getInitialState());
@@ -217,6 +218,7 @@ void CombatSearch_IntegralMCTS::recurse(const GameState& state, int depth)
         finishedUnitsIntegral.setState(finishedUnitsState);
     }
     m_results.finishedEval = finishedUnitsIntegral.getCurrentStackValue();
+    m_results.finishedValue = finishedUnitsIntegral.getCurrentStackEval();
 
     GameState usefulUnitsState(m_params.getInitialState());
     CombatSearch_IntegralDataFinishedUnits usefulUnitsIntegral;
@@ -234,6 +236,7 @@ void CombatSearch_IntegralMCTS::recurse(const GameState& state, int depth)
         usefulUnitsIntegral.setState(usefulUnitsState);
     }
     m_results.usefulEval = usefulUnitsIntegral.getCurrentStackValue();
+    m_results.usefulValue = usefulUnitsIntegral.getCurrentStackEval();
 
     // write state data
     if (m_params.getSaveStates())
@@ -252,7 +255,7 @@ void CombatSearch_IntegralMCTS::recurse(const GameState& state, int depth)
     }
 
     // some sanity checks to make sure the result is as expected
-    if (!timeLimitReached())
+    if (!timeLimitReached() && m_results.nodeVisits < m_params.getNumberOfNodes())
     {
         auto buildOrderAndIntegral = pickBestBuildOrder(root, false);
         BuildOrderAbilities bestBuildOrder = buildOrderAndIntegral.first;
@@ -607,11 +610,11 @@ void CombatSearch_IntegralMCTS::printResults()
 #include "BuildOrderPlotter.h"
 void CombatSearch_IntegralMCTS::writeResultsFile(const std::string & dir, const std::string & filename)
 {
-    BuildOrderPlotter plot;
+    /*BuildOrderPlotter plot;
     plot.setOutputDir(dir);
     plot.addPlot(filename, m_params.getInitialState(), m_bestBuildOrderFound);
     plot.doPlots();
-
+*/
     m_bestIntegralFound.writeToFile(dir, filename);
 
     std::ofstream boFile(dir + "/" + filename + "_BuildOrder.txt", std::ofstream::out | std::ofstream::app);
@@ -626,9 +629,12 @@ void CombatSearch_IntegralMCTS::writeResultsFile(const std::string & dir, const 
 
 
     std::ofstream searchData(m_dir + "/" + m_name + "_SearchData.txt", std::ofstream::out | std::ofstream::app);
-    searchData << "Max value found: " << m_bestIntegralFound.getCurrentStackValue() << "\n";
-    searchData << "Finished build order value: " << m_results.finishedEval << "\n";
-    searchData << "Useful build order value: " << m_results.usefulEval << "\n";
+    searchData << "Max eval found: " << m_bestIntegralFound.getCurrentStackValue() << "\n";
+    searchData << "Finished build order eval: " << m_results.finishedEval << "\n";
+    searchData << "Useful build order eval: " << m_results.usefulEval << "\n";
+    searchData << "Max value found: " << m_bestIntegralFound.getCurrentStackEval() << "\n";
+    searchData << "Finished build order value: " << m_results.finishedValue << "\n";
+    searchData << "Useful build order value: " << m_results.usefulValue << "\n";
     searchData << "Best build order (all): " << m_bestBuildOrderFound.getNameString() << std::endl;
     searchData << "Best build order (finished): " << m_results.finishedUnitsBuildOrder.getNameString(0, -1, true) << std::endl;
     searchData << "Best build order (useful): " << m_results.usefulBuildOrder.getNameString(0, -1, true) << std::endl;

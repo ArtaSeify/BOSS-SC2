@@ -46,6 +46,10 @@ namespace BOSS
         float finishedEval;
         float usefulEval;
 
+        float value;
+        float finishedValue;
+        float usefulValue;
+
         float minerals;
         float gas;
 
