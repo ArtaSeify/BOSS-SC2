@@ -20,6 +20,7 @@ data_files = os.listdir(args.files_dir)
 
 nodeVisits = 0
 total_runs = 0
+nodesPerSecond = 0
 CPUTime = 0
 for data_file in data_files:
 	if all(s in data_file for s in strings_in_data):
@@ -28,10 +29,11 @@ for data_file in data_files:
 			data = json.loads(json_data)
 			for run in data:
 				if len(data[run]) > 0:
-					nodeVisits += int(data[run][0]["Average"]["NodeVisits"])
-					CPUTime += float(data[run][0]["Average"]["TimeElapsedCPU"])
+					nodeVisits = int(data[run][0]["Average"]["NodeVisits"])
+					CPUTime = float(data[run][0]["Average"]["TimeElapsedCPU"])
+					nodesPerSecond += nodeVisits/CPUTime
+					#print(data_file + " " + str(nodeVisits/CPUTime) + " " + str(nodeVisits))
 					total_runs += 1
 
-nodeVisits /= total_runs
-CPUTime /= total_runs
-print("Node Visits: {}, CPU Time: {}, Average: {}".format(nodeVisits, CPUTime, nodeVisits/CPUTime))
+nodesPerSecond /= total_runs
+print("Nodes Per Second: {}, Total Runs: {}".format(nodesPerSecond, total_runs))

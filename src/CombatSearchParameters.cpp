@@ -247,11 +247,11 @@ int CombatSearchParameters::getNumberOfSimulations() const
     return m_numberOfSimulations;
 }
 
-void CombatSearchParameters::setNumberOfNodes(int value)
+void CombatSearchParameters::setNumberOfNodes(uint8 value)
 {
     m_numberOfNodes = value;
 }
-int CombatSearchParameters::getNumberOfNodes() const
+uint8 CombatSearchParameters::getNumberOfNodes() const
 {
     return m_numberOfNodes;
 }

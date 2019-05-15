@@ -110,7 +110,7 @@ namespace BOSS
         bool m_useMaxValue;
         bool m_maximizeValue;
         int m_numberOfSimulations;
-        int m_numberOfNodes;
+        uint8 m_numberOfNodes;
         int m_simulationsPerStep;
         FracType m_simulationsPerStepDecay;
         bool m_useNetworkPrediction;
@@ -184,8 +184,8 @@ namespace BOSS
         void setNumberOfSimulations(int value);
         int getNumberOfSimulations() const;
 
-        void setNumberOfNodes(int value);
-        int getNumberOfNodes() const;
+        void setNumberOfNodes(uint8 value);
+        uint8 getNumberOfNodes() const;
 
         void setSimulationsPerStep(int value);
         int getSimulationsPerStep() const;

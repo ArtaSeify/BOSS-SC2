@@ -310,19 +310,23 @@ void IntegralExperimentOMP::runTotalTimeExperiment(int run)
     std::string resultsFile = m_name;
     std::vector<CombatSearchResults> results;
     CombatSearchParameters params = m_params;
+    int nodesPerMilliSecond = 300;
+    params.setNumberOfNodes(int(params.getSearchTimeLimit() * nodesPerMilliSecond));
 
     while (true)
     {
         if (results.size() > 0)
         {
-            params.setSearchTimeLimit(float((double)params.getSearchTimeLimit() - results.back().timeElapsedCPU));
+            params.setNumberOfNodes(params.getNumberOfNodes() - results.back().nodeVisits);
 
             // we're done
-            if (params.getSearchTimeLimit() <= 0)
+            if (params.getNumberOfNodes() <= 0)
             {
                 break;
             }
         }
+
+        std::cout << "node limit is: " << params.getNumberOfNodes() << std::endl;
 
         std::string dir = outputDir + "/Run" + std::to_string(numRuns);
         FileTools::MakeDirectory(dir);
@@ -339,26 +343,38 @@ void IntegralExperimentOMP::runTotalTimeExperiment(int run)
 
     CombatSearchResults avgResults;
     CombatSearchResults bestResults;
-    for (const auto& result : results)
+    int bestRun = 0;
+    int bestRunFinished = 0;
+    int bestRunUseful = 0;
+    for (int index = 0; index < results.size(); ++index)
     {
+        const auto& result = results[index];
         avgResults.eval += result.eval;
+        avgResults.value += result.value;
         if (result.eval > bestResults.eval)
         {
             bestResults.eval = result.eval;
+            bestResults.value = result.value;
             bestResults.buildOrder = result.buildOrder;
+            bestRun = index;
         }
 
         avgResults.finishedEval += result.finishedEval;
+        avgResults.finishedValue += result.finishedValue;
         if (result.finishedEval > bestResults.finishedEval)
         {
             bestResults.finishedEval = result.finishedEval;
+            bestResults.finishedValue = result.finishedValue;
             bestResults.finishedUnitsBuildOrder = result.finishedUnitsBuildOrder;
+            bestRunFinished = index;
         }
 
         avgResults.usefulEval += result.usefulEval;
-        if (result.usefulEval > bestResults.usefulEval)
+        avgResults.usefulValue += result.usefulValue;
+        if (result.usefulEval > bestResults.usefulEval || results.size() == 1)
         {
             bestResults.usefulEval = result.usefulEval;
+            bestResults.usefulValue = result.usefulValue;
             bestResults.usefulBuildOrder = result.usefulBuildOrder;
             bestResults.leafNodesExpanded = result.leafNodesExpanded;
             bestResults.leafNodesVisited = result.leafNodesVisited;
@@ -367,6 +383,7 @@ void IntegralExperimentOMP::runTotalTimeExperiment(int run)
             bestResults.timeElapsed = (result.timeElapsed / 1000);
             bestResults.timeElapsedCPU = (result.timeElapsedCPU / 1000);
             bestResults.numSimulations = result.numSimulations;
+            bestRunUseful = index;
         }
 
         avgResults.leafNodesExpanded = result.leafNodesExpanded;
@@ -381,8 +398,11 @@ void IntegralExperimentOMP::runTotalTimeExperiment(int run)
     double totalTimeElapsedCPU = avgResults.timeElapsedCPU;
 
     avgResults.eval /= results.size();
+    avgResults.value /= results.size();
     avgResults.finishedEval /= results.size();
+    avgResults.finishedValue /= results.size();
     avgResults.usefulEval /= results.size();
+    avgResults.usefulValue /= results.size();
     avgResults.leafNodesExpanded /= results.size();
     avgResults.leafNodesVisited /= results.size();
     avgResults.nodesExpanded /= results.size();
@@ -400,10 +420,13 @@ void IntegralExperimentOMP::runTotalTimeExperiment(int run)
     json jResult;
 
     jResult["Average"]["Eval"] = avgResults.eval;
+    jResult["Average"]["Value"] = avgResults.value;
     jResult["Average"]["FinishedEval"] = avgResults.finishedEval;
+    jResult["Average"]["FinishedValue"] = avgResults.finishedValue;
     jResult["Average"]["UsefulEval"] = avgResults.usefulEval;
+    jResult["Average"]["UsefulValue"] = avgResults.usefulValue;
     jResult["Average"]["LeafNodesExpanded"] = avgResults.leafNodesExpanded;
-    jResult["Average"]["LeadNodesVisited"] = avgResults.leafNodesVisited;
+    jResult["Average"]["LeafNodesVisited"] = avgResults.leafNodesVisited;
     jResult["Average"]["NodesExpanded"] = avgResults.nodesExpanded;
     jResult["Average"]["NodeVisits"] = avgResults.nodeVisits;
     jResult["Average"]["TimeElapsed"] = avgResults.timeElapsed;
@@ -411,18 +434,24 @@ void IntegralExperimentOMP::runTotalTimeExperiment(int run)
     jResult["Average"]["NumSimulations"] = avgResults.numSimulations;
 
     jResult["Best"]["Eval"] = bestResults.eval;
+    jResult["Best"]["Value"] = bestResults.value;
     jResult["Best"]["EvalBuildOrder"] = bestResults.buildOrder.getNameString();
     jResult["Best"]["FinishedEval"] = bestResults.finishedEval;
+    jResult["Best"]["FinishedValue"] = bestResults.finishedValue;
     jResult["Best"]["FinishedBuildOrder"] = bestResults.finishedUnitsBuildOrder.getNameString();
     jResult["Best"]["UsefulEval"] = bestResults.usefulEval;
+    jResult["Best"]["UsefulValue"] = bestResults.usefulValue;
     jResult["Best"]["UsefulBuildOrder"] = bestResults.usefulBuildOrder.getNameString();
     jResult["Best"]["LeafNodesExpanded"] = bestResults.leafNodesExpanded;
-    jResult["Best"]["LeadNodesVisited"] = bestResults.leafNodesVisited;
+    jResult["Best"]["LeafNodesVisited"] = bestResults.leafNodesVisited;
     jResult["Best"]["NodesExpanded"] = bestResults.nodesExpanded;
     jResult["Best"]["NodeVisits"] = bestResults.nodeVisits;
     jResult["Best"]["TimeElapsed"] = bestResults.timeElapsed;
     jResult["Best"]["TimeElapsedCPU"] = bestResults.timeElapsedCPU;
     jResult["Best"]["NumSimulations"] = bestResults.numSimulations;
+    jResult["Best"]["BestRunEval"] = bestRun;
+    jResult["Best"]["BestRunEvalFinished"] = bestRunFinished;
+    jResult["Best"]["BestRunEvalUseful"] = bestRunUseful;
 
     std::ofstream outputStream(outputDir + "/Results.json");
     outputStream << std::setw(4) << jResult << std::endl;
@@ -435,6 +464,13 @@ void IntegralExperimentOMP::run(int numberOfRuns)
     #pragma omp parallel for
     for (int run = 0; run < numberOfRuns; ++run)
     {
-        runTotalTimeExperiment(run);
+        if (m_params.getUseTotalTimeLimit())
+        {
+            runTotalTimeExperiment(run);
+        }
+        else
+        {
+
+        }
     }   
 }

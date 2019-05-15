@@ -28,7 +28,7 @@ def parse(name_prepend, cwd):
 			# get the data for that run
 			data_files = os.listdir(file_path)
 			for data_file in data_files:
-				if "Results.json" in data_file:
+				if "Results.json" in data_file and ".zip" not in data_file:
 					with open(os.path.join(file_path, data_file), "r") as results_json:
 						results[name_prepend][run].append(json.loads(results_json.read()))
 

@@ -255,7 +255,7 @@ void CombatSearch_IntegralMCTS::recurse(const GameState& state, int depth)
     }
 
     // some sanity checks to make sure the result is as expected
-    if (!timeLimitReached())
+    if (!timeLimitReached() && m_results.nodeVisits < m_params.getNumberOfNodes())
     {
         auto buildOrderAndIntegral = pickBestBuildOrder(root, false);
         BuildOrderAbilities bestBuildOrder = buildOrderAndIntegral.first;
