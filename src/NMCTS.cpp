@@ -112,7 +112,7 @@ NMCTS::SearchResult NMCTS::executeSearch(std::shared_ptr<Node> node, int level)
             {
                 backPropogation(promisingNode, m_promisingNodeIntegral.getCurrentStackValue());
             }
-            m_numSimulations++;
+            m_numTotalSimulations++;
         }
     }
 

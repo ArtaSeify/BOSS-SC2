@@ -1,10 +1,11 @@
 /* -*- c-basic-offset: 4 -*- */
 
 #include "Experiments.h"
-#include "IntegralExperiment.h"
+#include "IntegralExperimentOMP.h"
 #include "BuildOrderPlotter.h"
 #include "FileTools.h"
 #include <thread>
+#include <future>
 
 using namespace BOSS;
 
@@ -23,18 +24,18 @@ void ExperimentsArta::RunExperiments(const std::string & experimentFilename)
         std::cout << threadRun << std::endl;
     }*/
 
-    std::vector<std::thread> threads(j["ExperimentsInParallel"].get<int>());
+    std::vector<std::future<void>> threads(j["ExperimentsInParallel"].get<int>());
     int startingIndex = 0;
     for (int thread = 0; thread < threads.size(); ++thread)
     {
-        threads[thread] = std::thread(runExperimentsThread, j, thread, experimentsPerThread[thread], startingIndex);
+        threads[thread] = std::async(runExperimentsThread, j, thread, experimentsPerThread[thread], startingIndex);
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
         startingIndex += experimentsPerThread[thread];
     }
     
     for (auto & thread : threads)
     {
-        thread.join();
+        thread.wait();
     }
 
     std::cout << "\n\n";
@@ -135,7 +136,7 @@ void ExperimentsArta::RunDFSExperiment(const std::string & experimentName, const
 {
     std::cout << "DFS Integral Search Experiment - " << experimentName << std::endl;
 
-    IntegralExperiment intexp(experimentName, exp);
+    IntegralExperimentOMP intexp(experimentName, exp);
     intexp.run(numberOfRuns);
 
     std::cout << "    " << experimentName << " completed" << std::endl;
@@ -145,7 +146,7 @@ void ExperimentsArta::RunMCTSExperiment(const std::string & experimentName, cons
 {
     std::cout << "MCTS Search Experiment - " << experimentName << std::endl;
 
-    IntegralExperiment intexp(experimentName, exp);
+    IntegralExperimentOMP intexp(experimentName, exp);
     intexp.run(numberOfRuns);
 
     std::cout << "    " << experimentName << " completed" << std::endl;
@@ -155,7 +156,7 @@ void ExperimentsArta::RunNMCSExperiment(const std::string & experimentName, cons
 {
     std::cout << "NMCS Search Experiment - " << experimentName << std::endl;
 
-    IntegralExperiment intexp(experimentName, exp);
+    IntegralExperimentOMP intexp(experimentName, exp);
     intexp.run(numberOfRuns);
 
     std::cout << "    " << experimentName << " completed" << std::endl;
@@ -165,7 +166,7 @@ void ExperimentsArta::RunNMCTSExperiment(const std::string & experimentName, con
 {
     std::cout << "NMCTS Search Experiment - " << experimentName << std::endl;
 
-    IntegralExperiment intexp(experimentName, exp);
+    IntegralExperimentOMP intexp(experimentName, exp);
     intexp.run(numberOfRuns);
 
     std::cout << "    " << experimentName << " completed" << std::endl;

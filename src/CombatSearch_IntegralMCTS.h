@@ -15,7 +15,9 @@ namespace BOSS
         std::mt19937 m_rnggen;
      
     protected:
-        int m_numSimulations;
+        int m_numTotalSimulations;
+        int m_numCurrentRootSimulations;
+        int m_simulationsPerStep;
 
         CombatSearch_IntegralDataFinishedUnits  m_bestIntegralFound;
         BuildOrderAbilities                     m_bestBuildOrderFound;
@@ -71,7 +73,7 @@ namespace BOSS
 
         ~CombatSearch_IntegralMCTS();
 
-        int getNumSimulations() const { return m_numSimulations; }
+        int getNumSimulations() const { return m_numTotalSimulations; }
     };
 }
 

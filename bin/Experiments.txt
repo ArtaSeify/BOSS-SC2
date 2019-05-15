@@ -1,5 +1,5 @@
 {
-    "ExperimentsInParallel"     : 4,
+    "ExperimentsInParallel"     : 1,
 
     "Experiments" : 
     {   
@@ -9,11 +9,11 @@
             "SearchType"        : [ "IntegralMCTS" ],
             "SearchParameters"  : { "ExplorationConstant" : 0.15, "UseMax" : true, "Simulations" : 3000000},
             "SimulationsPerStep": [ true, 1000 ],
-            "Threads"           : 3,
+            "Threads"           : 1,
             "Race"              : "Protoss",
             "StartingState"     : "Protoss Start State",
             "PrintNewBest"      : false,
-            "OutputDir"         : "../bin/test5",
+            "OutputDir"         : "../bin/test6",
             "SearchTimeLimitMS" : 20000000,
             "FrameTimeLimit"    : 2000,
             "RelevantActions"	: ["ChronoBoost", "Probe", "Pylon", "Nexus", "Assimilator", "Gateway", "CyberneticsCore", "Stalker", "Zealot", "Colossus", "Forge", "FleetBeacon", "TwilightCouncil", "Stargate", "TemplarArchive", "DarkShrine", "RoboticsBay", "RoboticsFacility", "ZealotWarped", "Zealot", "StalkerWarped", "DarkTemplarWarped", "DarkTemplar", "Carrier", "VoidRay", "Immortal", "AdeptWarped", "Adept", "Tempest"], 

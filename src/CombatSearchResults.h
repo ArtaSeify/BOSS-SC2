@@ -22,12 +22,15 @@ namespace BOSS
         int upperBound;         // upper bound of first node
         int lowerBound;         // lower bound of first node
 
+        int numSimulations;
+
         uint8  nodesExpanded;   // number of nodes expanded in the search
         uint8  nodeVisits;      // number of nodes visited. Duplicates are counted
         uint8  leafNodesExpanded; // number of leaf nodes expanded in the search
         uint8  leafNodesVisited;  // number of leaf nodes visited. Duplicates are counted
 
         double timeElapsed;     // time elapsed in milliseconds
+        double timeElapsedCPU;  // time elapsed in CPU milliseconds
         float avgBranch;        // avg branching factor
 
         Timer searchTimer;         
@@ -42,6 +45,10 @@ namespace BOSS
         float eval;
         float finishedEval;
         float usefulEval;
+
+        float value;
+        float finishedValue;
+        float usefulValue;
 
         float minerals;
         float gas;

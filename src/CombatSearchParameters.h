@@ -112,11 +112,12 @@ namespace BOSS
         int m_numberOfSimulations;
         int m_numberOfNodes;
         int m_simulationsPerStep;
+        FracType m_simulationsPerStepDecay;
         bool m_useNetworkPrediction;
         int m_threadsForExperiment;
         int m_numPlayouts;
         int m_level;
-        int m_totalTimeLimit;
+        int m_useTotalTimeLimit;
 
     public:
 
@@ -189,6 +190,9 @@ namespace BOSS
         void setSimulationsPerStep(int value);
         int getSimulationsPerStep() const;
 
+        void setSimulationsPerStepDecay(FracType value);
+        FracType getSimulationsPerStepDecay() const;
+
         void setNetworkPrediction(bool value);
         bool useNetworkPrediction() const;
 
@@ -201,8 +205,8 @@ namespace BOSS
         void setLevel(int value);
         int getLevel() const;
 
-        void setTotalTimeLimit(int value);
-        int getTotalTimeLimit() const;
+        void setUseTotalTimeLimit(bool value);
+        bool getUseTotalTimeLimit() const;
     
         void print();
     };

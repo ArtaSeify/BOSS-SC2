@@ -14,7 +14,7 @@
 namespace BOSS
 {
     class CombatSearch;
-    class IntegralExperiment
+    class IntegralExperimentOMP
     {
         std::string                 m_name;
         std::string                 m_outputDir;
@@ -24,11 +24,11 @@ namespace BOSS
 
     public:
 
-        IntegralExperiment();
-        IntegralExperiment(const std::string & experimentName, const json & exp);
+        IntegralExperimentOMP();
+        IntegralExperimentOMP(const std::string& experimentName, const json& exp);
 
         void runExperimentThread(int thread, int numRuns, int startingIndex);
-        void runExperimentsTotalTimeThread(int thread, int numRuns, int startingIndex);
+        void runTotalTimeExperiment(int run);
         void run(int numberOfRuns);
     };
 }

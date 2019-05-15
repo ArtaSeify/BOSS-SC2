@@ -140,7 +140,7 @@ std::pair<CombatSearch_IntegralDataFinishedUnits, BuildOrderAbilities> NMCS::ran
         m_promisingNodeBuildOrder = m_buildOrder;
 
         CombatSearch_IntegralMCTS::randomPlayout(node);
-        m_numSimulations++;
+        m_numTotalSimulations++;
 
         if (m_promisingNodeIntegral.getCurrentStackValue() >= bestIntegralFound.getCurrentStackValue())
         {
@@ -180,7 +180,7 @@ bool NMCS::timeLimitReached()
 void NMCS::printResults()
 {
     m_bestIntegralFound.print(m_bestBuildOrderFound);
-    std::cout << "\nRan " << m_numSimulations << " simulations in " << m_results.timeElapsed << "ms @ " << (1000 * m_numSimulations / m_results.timeElapsed) << " simulations/sec\n";
+    std::cout << "\nRan " << m_numTotalSimulations << " simulations in " << m_results.timeElapsed << "ms @ " << (1000 * m_numTotalSimulations / m_results.timeElapsed) << " simulations/sec\n";
     std::cout << "Nodes expanded: " << m_results.nodesExpanded << ". Total nodes visited: " << m_results.nodeVisits << ", at a rate of " << (1000 * m_results.nodeVisits / m_results.timeElapsed) << " nodes/sec\n";
 }
 
@@ -195,7 +195,7 @@ void NMCS::writeResultsFile(const std::string & dir, const std::string & filenam
     m_bestIntegralFound.writeToFile(dir, filename);
 
     std::ofstream boFile(dir + "/" + filename + "_BuildOrder.txt", std::ofstream::out | std::ofstream::app);
-    boFile << "\nRan " << m_numSimulations << " simulations in " << m_results.timeElapsed << "ms @ " << (1000 * m_numSimulations / m_results.timeElapsed) << " simulations/sec" << std::endl;
+    boFile << "\nRan " << m_numTotalSimulations << " simulations in " << m_results.timeElapsed << "ms @ " << (1000 * m_numTotalSimulations / m_results.timeElapsed) << " simulations/sec" << std::endl;
     boFile << "Nodes expanded: " << m_results.nodesExpanded << ". Total nodes visited: " << m_results.nodeVisits << ", at a rate of " << (1000 * m_results.nodeVisits / m_results.timeElapsed) << " nodes/sec\n";
 
     // Write search data to file 
@@ -214,6 +214,6 @@ void NMCS::writeResultsFile(const std::string & dir, const std::string & filenam
     searchData << "Leaf nodes expanded: " << m_results.leafNodesExpanded << "\n";
     searchData << "Leaf nodes traversed: " << m_results.leafNodesVisited << "\n";
     searchData << "Search time in ms: " << m_results.timeElapsed << "\n";
-    searchData << "Simulations: " << m_numSimulations;
+    searchData << "Simulations: " << m_numTotalSimulations;
     searchData.close();
 }

@@ -1,6 +1,6 @@
 /* -*- c-basic-offset: 4 -*- */
 
-#include "IntegralExperiment.h"
+#include "IntegralExperimentOMP.h"
 #include "CombatSearch.h"
 #include "CombatSearch_Integral.h"
 #include "CombatSearch_Bucket.h"
@@ -17,17 +17,18 @@
 #include <chrono>
 #include <thread>
 #include <future>
+#include <omp.h>
 
 
 using namespace BOSS;
 
-IntegralExperiment::IntegralExperiment()
+IntegralExperimentOMP::IntegralExperimentOMP()
     : m_race(Races::None)
 {
 
 }
 
-IntegralExperiment::IntegralExperiment(const std::string & experimentName, const json & exp)
+IntegralExperimentOMP::IntegralExperimentOMP(const std::string& experimentName, const json& exp)
     : m_name(experimentName)
     , m_race(Races::None)
 {
@@ -61,7 +62,7 @@ IntegralExperiment::IntegralExperiment(const std::string & experimentName, const
     BOSS_ASSERT(exp.count("Threads") && exp["Threads"].is_number_integer(), "Integral Search must have a Threads int");
     m_params.setThreadsForExperiment(exp["Threads"]);
 
-    const std::string & searchType = exp["SearchType"][0].get<std::string>();
+    const std::string& searchType = exp["SearchType"][0].get<std::string>();
     m_searchType = searchType;
 
     if (searchType == "IntegralDFS" || searchType == "IntegralDFSVN" || searchType == "IntegralDFSPN" || searchType == "IntegralDFSPVN")
@@ -72,7 +73,7 @@ IntegralExperiment::IntegralExperiment(const std::string & experimentName, const
 
     if (searchType == "IntegralMCTS")
     {
-        auto & searchParameters = exp["SearchParameters"];
+        auto& searchParameters = exp["SearchParameters"];
         m_params.setExplorationValue(searchParameters["ExplorationConstant"]);
         m_params.setUseMaxValue(searchParameters["UseMax"]);
 
@@ -93,7 +94,7 @@ IntegralExperiment::IntegralExperiment(const std::string & experimentName, const
         {
             m_params.setNumberOfNodes(std::numeric_limits<int>::max());
         }
-       
+
         std::stringstream ss;
         ss << std::fixed << std::setprecision(2) << m_params.getExplorationValue();
         m_name += "C" + ss.str();
@@ -101,14 +102,14 @@ IntegralExperiment::IntegralExperiment(const std::string & experimentName, const
 
     else if (searchType == "IntegralNMCS")
     {
-        auto & searchParameters = exp["SearchParameters"];
+        auto& searchParameters = exp["SearchParameters"];
         m_params.setNumPlayouts(searchParameters["Playouts"]);
         m_params.setLevel(searchParameters["Level"]);
     }
-    
+
     else if (searchType == "IntegralNMCTS")
     {
-        auto & searchParameters = exp["SearchParameters"];
+        auto& searchParameters = exp["SearchParameters"];
         m_params.setNumPlayouts(searchParameters["Playouts"]);
         m_params.setLevel(searchParameters["Level"]);
         m_params.setUseMaxValue(searchParameters["UseMax"]);
@@ -121,7 +122,7 @@ IntegralExperiment::IntegralExperiment(const std::string & experimentName, const
 
     if (exp.count("MaxActions"))
     {
-        const json & maxActions = exp["MaxActions"];
+        const json& maxActions = exp["MaxActions"];
         BOSS_ASSERT(maxActions.is_array(), "MaxActions is not an array");
 
         for (size_t i(0); i < maxActions.size(); ++i)
@@ -130,7 +131,7 @@ IntegralExperiment::IntegralExperiment(const std::string & experimentName, const
 
             BOSS_ASSERT(maxActions[i].size() == 2 && maxActions[i][0u].is_string() && maxActions[i][1u].is_number_integer(), "MaxActions element must be [\"Action\", Count]");
 
-            const std::string & typeName = maxActions[i][0u];
+            const std::string& typeName = maxActions[i][0u];
 
             BOSS_ASSERT(ActionTypes::TypeExists(typeName), "Action Type doesn't exist: %s", typeName.c_str());
 
@@ -140,7 +141,7 @@ IntegralExperiment::IntegralExperiment(const std::string & experimentName, const
 
     if (exp.count("RelevantActions"))
     {
-        const json & relevantActions = exp["RelevantActions"];
+        const json& relevantActions = exp["RelevantActions"];
         BOSS_ASSERT(relevantActions.is_array(), "RelevantActions is not an array");
 
         ActionSetAbilities relevantActionSet;
@@ -172,7 +173,7 @@ IntegralExperiment::IntegralExperiment(const std::string & experimentName, const
 
     if (exp.count("BestResponseParams"))
     {
-        const json & brVal = exp["BestResponseParams"];
+        const json& brVal = exp["BestResponseParams"];
 
         BOSS_ASSERT(brVal.is_object(), "BestResponseParams not an object");
         BOSS_ASSERT(brVal.count("EnemyState"), "bestResponseParams must have 'enemyState' string");
@@ -201,12 +202,12 @@ IntegralExperiment::IntegralExperiment(const std::string & experimentName, const
         BOSS_ASSERT(exp["OpponentUnits"].is_array() && exp["OpponentUnits"].size() > 0, "OpponentUnits must be an array");
         std::vector<int> enemyUnits(ActionTypes::GetAllActionTypes().size());
         m_params.setEnemyRace(ActionTypes::GetActionType(exp["OpponentUnits"][0][0].get<std::string>()).getRace());
-        for (auto & units : exp["OpponentUnits"])
+        for (auto& units : exp["OpponentUnits"])
         {
             BOSS_ASSERT(units.is_array() && units.size() == 2, "Unit vector inside OpponentUnits must be an array of size 2");
             BOSS_ASSERT(units[0].is_string(), "First index of unit must be a string corresponding to name");
             BOSS_ASSERT(units[1].is_number_integer(), "Second index of unit must be an integer corresponding to the number of units");
-        
+
             enemyUnits[ActionTypes::GetActionType(units[0].get<std::string>()).getID()] = units[1];
         }
 
@@ -226,7 +227,7 @@ IntegralExperiment::IntegralExperiment(const std::string & experimentName, const
     }
 }
 
-void IntegralExperiment::runExperimentThread(int thread, int numRuns, int startingIndex)
+void IntegralExperimentOMP::runExperimentThread(int thread, int numRuns, int startingIndex)
 {
     static std::string stars = "************************************************";
 
@@ -284,189 +285,156 @@ void IntegralExperiment::runExperimentThread(int thread, int numRuns, int starti
         combatSearch->search();
         combatSearch->printResults();
         combatSearch->writeResultsFile(outputDir, resultsFile);
-        const CombatSearchResults & results = combatSearch->getResults();
+        const CombatSearchResults& results = combatSearch->getResults();
     }
 }
 
-void IntegralExperiment::runExperimentsTotalTimeThread(int thread, int numRuns, int startingIndex)
+void IntegralExperimentOMP::runTotalTimeExperiment(int run)
 {
     static std::string stars = "************************************************";
 
-    for (int i(0); i < numRuns; ++i)
+    std::string name = m_name;
+    if (m_searchType != "IntegralDFS")
     {
-        int index = i + (startingIndex);
-        std::string name = m_name;
-        if (m_searchType != "IntegralDFS")
-        {
-            name += "Run" + std::to_string(index);
-        }
-        std::string outputDir = m_outputDir + "/" + Assert::CurrentDateTime() + "_" + name;
-        FileTools::MakeDirectory(outputDir);
-
-        std::cout << "\n" << stars << "\n* Running Experiment: " << name << " [" << m_searchType << "]\n" << stars << "\n";
-        
-        auto startRealTime = std::chrono::system_clock::now();
-        boost::chrono::thread_clock::time_point start = boost::chrono::thread_clock::now();
-
-        int run = 0;
-        std::string resultsFile = m_name;
-        std::vector<CombatSearchResults> results;
-        CombatSearchParameters params = m_params;
-
-        while (true)
-        {
-            if (results.size() > 0)
-            {
-                params.setSearchTimeLimit(float((double)params.getSearchTimeLimit() - results.back().timeElapsedCPU));
-                
-                // we're done
-                if (params.getSearchTimeLimit() <= 0)
-                {
-                    break;
-                }
-            }
-
-            std::string dir = outputDir + "/Run" + std::to_string(run);
-            FileTools::MakeDirectory(dir);
-
-            std::cout << "search time limit: " << params.getSearchTimeLimit() << std::endl;
-            std::unique_ptr<CombatSearch> combatSearch = std::unique_ptr<CombatSearch>(new CombatSearch_IntegralMCTS(params, dir, resultsFile, m_name));
-
-            combatSearch->search();
-            //combatSearch->printResults();
-            combatSearch->writeResultsFile(dir, resultsFile);
-            results.push_back(combatSearch->getResults());
-            ++run;
-        }
-
-        CombatSearchResults avgResults;
-        CombatSearchResults bestResults;
-        for (const auto& result : results)
-        {
-            avgResults.eval += result.eval;
-            if (result.eval > bestResults.eval)
-            {
-                bestResults.eval = result.eval;
-                bestResults.buildOrder = result.buildOrder;
-            }
-
-            avgResults.finishedEval += result.finishedEval;
-            if (result.finishedEval > bestResults.finishedEval)
-            {
-                bestResults.finishedEval = result.finishedEval;
-                bestResults.finishedUnitsBuildOrder = result.finishedUnitsBuildOrder;
-            }
-
-            avgResults.usefulEval += result.usefulEval;
-            if (result.usefulEval > bestResults.usefulEval)
-            {
-                bestResults.usefulEval = result.usefulEval;
-                bestResults.usefulBuildOrder = result.usefulBuildOrder;
-                bestResults.leafNodesExpanded = result.leafNodesExpanded;
-                bestResults.leafNodesVisited = result.leafNodesVisited;
-                bestResults.nodesExpanded = result.nodesExpanded;
-                bestResults.nodeVisits = result.nodeVisits;
-                bestResults.timeElapsed = (result.timeElapsed / 1000);
-                bestResults.timeElapsedCPU = (result.timeElapsedCPU / 1000);
-                bestResults.numSimulations = result.numSimulations;
-            }
-
-            avgResults.leafNodesExpanded = result.leafNodesExpanded;
-            avgResults.leafNodesVisited += result.leafNodesVisited;
-            avgResults.nodesExpanded += result.nodesExpanded;
-            avgResults.nodeVisits += result.nodeVisits;
-            avgResults.timeElapsed += (result.timeElapsed / 1000);
-            avgResults.timeElapsedCPU += (result.timeElapsedCPU / 1000);
-            avgResults.numSimulations += result.numSimulations;
-        }
-        double totalTimeElapsed = avgResults.timeElapsed;
-        double totalTimeElapsedCPU = avgResults.timeElapsedCPU;
-
-        avgResults.eval /= results.size();
-        avgResults.finishedEval /= results.size();
-        avgResults.usefulEval /= results.size();
-        avgResults.leafNodesExpanded /= results.size();
-        avgResults.leafNodesVisited /= results.size();
-        avgResults.nodesExpanded /= results.size();
-        avgResults.nodeVisits /= results.size();
-        avgResults.timeElapsed /= results.size();
-        avgResults.timeElapsedCPU /= results.size();
-        avgResults.numSimulations /= (int)results.size();
-
-        std::cout << "total real search time: " << totalTimeElapsed << std::endl;
-        std::cout << "total cpu search time: " << totalTimeElapsedCPU << std::endl;
-     
-        std::cout << "real time elapsed: " << std::chrono::duration<double>(std::chrono::system_clock::now() - startRealTime).count() << std::endl;
-        std::cout << "cpu time elapsed: " << boost::chrono::duration_cast<boost::chrono::duration<long long, boost::milli>>(boost::chrono::thread_clock::now() - start).count() / 1000 << std::endl;
-
-        json jResult;
-
-        jResult["Average"]["Eval"] = avgResults.eval;
-        jResult["Average"]["FinishedEval"] = avgResults.finishedEval;
-        jResult["Average"]["UsefulEval"] = avgResults.usefulEval;
-        jResult["Average"]["LeafNodesExpanded"] = avgResults.leafNodesExpanded;
-        jResult["Average"]["LeadNodesVisited"] = avgResults.leafNodesVisited;
-        jResult["Average"]["NodesExpanded"] = avgResults.nodesExpanded;
-        jResult["Average"]["NodeVisits"] = avgResults.nodeVisits;
-        jResult["Average"]["TimeElapsed"] = avgResults.timeElapsed;
-        jResult["Average"]["TimeElapsedCPU"] = avgResults.timeElapsedCPU;
-        jResult["Average"]["NumSimulations"] = avgResults.numSimulations;
-
-        jResult["Best"]["Eval"] = bestResults.eval;
-        jResult["Best"]["EvalBuildOrder"] = bestResults.buildOrder.getNameString();
-        jResult["Best"]["FinishedEval"] = bestResults.finishedEval;
-        jResult["Best"]["FinishedBuildOrder"] = bestResults.finishedUnitsBuildOrder.getNameString();
-        jResult["Best"]["UsefulEval"] = bestResults.usefulEval;
-        jResult["Best"]["UsefulBuildOrder"] = bestResults.usefulBuildOrder.getNameString();
-        jResult["Best"]["LeafNodesExpanded"] = bestResults.leafNodesExpanded;
-        jResult["Best"]["LeadNodesVisited"] = bestResults.leafNodesVisited;
-        jResult["Best"]["NodesExpanded"] = bestResults.nodesExpanded;
-        jResult["Best"]["NodeVisits"] = bestResults.nodeVisits;
-        jResult["Best"]["TimeElapsed"] = bestResults.timeElapsed;
-        jResult["Best"]["TimeElapsedCPU"] = bestResults.timeElapsedCPU;
-        jResult["Best"]["NumSimulations"] = bestResults.numSimulations;
-
-        std::ofstream outputStream(outputDir + "/Results.json");
-        outputStream << std::setw(4) << jResult << std::endl;
+        name += "Run" + std::to_string(run);
     }
+    std::string outputDir = m_outputDir + "/" + Assert::CurrentDateTime() + "_" + name;
+    FileTools::MakeDirectory(outputDir);
+
+    std::cout << "\n" << stars << "\n* Running Experiment: " << name << " [" << m_searchType << "]\n" << stars << "\n";
+
+    auto startRealTime = std::chrono::system_clock::now();
+    boost::chrono::thread_clock::time_point start = boost::chrono::thread_clock::now();
+
+    int numRuns = 0;
+    std::string resultsFile = m_name;
+    std::vector<CombatSearchResults> results;
+    CombatSearchParameters params = m_params;
+
+    while (true)
+    {
+        if (results.size() > 0)
+        {
+            params.setSearchTimeLimit(float((double)params.getSearchTimeLimit() - results.back().timeElapsedCPU));
+
+            // we're done
+            if (params.getSearchTimeLimit() <= 0)
+            {
+                break;
+            }
+        }
+
+        std::string dir = outputDir + "/Run" + std::to_string(numRuns);
+        FileTools::MakeDirectory(dir);
+
+        //std::cout << "search time limit: " << params.getSearchTimeLimit() << std::endl;
+        std::unique_ptr<CombatSearch> combatSearch = std::unique_ptr<CombatSearch>(new CombatSearch_IntegralMCTS(params, dir, resultsFile, m_name));
+
+        combatSearch->search();
+        //combatSearch->printResults();
+        combatSearch->writeResultsFile(dir, resultsFile);
+        results.push_back(combatSearch->getResults());
+        ++numRuns;
+    }
+
+    CombatSearchResults avgResults;
+    CombatSearchResults bestResults;
+    for (const auto& result : results)
+    {
+        avgResults.eval += result.eval;
+        if (result.eval > bestResults.eval)
+        {
+            bestResults.eval = result.eval;
+            bestResults.buildOrder = result.buildOrder;
+        }
+
+        avgResults.finishedEval += result.finishedEval;
+        if (result.finishedEval > bestResults.finishedEval)
+        {
+            bestResults.finishedEval = result.finishedEval;
+            bestResults.finishedUnitsBuildOrder = result.finishedUnitsBuildOrder;
+        }
+
+        avgResults.usefulEval += result.usefulEval;
+        if (result.usefulEval > bestResults.usefulEval)
+        {
+            bestResults.usefulEval = result.usefulEval;
+            bestResults.usefulBuildOrder = result.usefulBuildOrder;
+            bestResults.leafNodesExpanded = result.leafNodesExpanded;
+            bestResults.leafNodesVisited = result.leafNodesVisited;
+            bestResults.nodesExpanded = result.nodesExpanded;
+            bestResults.nodeVisits = result.nodeVisits;
+            bestResults.timeElapsed = (result.timeElapsed / 1000);
+            bestResults.timeElapsedCPU = (result.timeElapsedCPU / 1000);
+            bestResults.numSimulations = result.numSimulations;
+        }
+
+        avgResults.leafNodesExpanded = result.leafNodesExpanded;
+        avgResults.leafNodesVisited += result.leafNodesVisited;
+        avgResults.nodesExpanded += result.nodesExpanded;
+        avgResults.nodeVisits += result.nodeVisits;
+        avgResults.timeElapsed += (result.timeElapsed / 1000);
+        avgResults.timeElapsedCPU += (result.timeElapsedCPU / 1000);
+        avgResults.numSimulations += result.numSimulations;
+    }
+    double totalTimeElapsed = avgResults.timeElapsed;
+    double totalTimeElapsedCPU = avgResults.timeElapsedCPU;
+
+    avgResults.eval /= results.size();
+    avgResults.finishedEval /= results.size();
+    avgResults.usefulEval /= results.size();
+    avgResults.leafNodesExpanded /= results.size();
+    avgResults.leafNodesVisited /= results.size();
+    avgResults.nodesExpanded /= results.size();
+    avgResults.nodeVisits /= results.size();
+    avgResults.timeElapsed /= results.size();
+    avgResults.timeElapsedCPU /= results.size();
+    avgResults.numSimulations /= (int)results.size();
+
+    /*std::cout << "total real search time: " << totalTimeElapsed << std::endl;
+    std::cout << "total cpu search time: " << totalTimeElapsedCPU << std::endl;
+
+    std::cout << "real time elapsed: " << std::chrono::duration<double>(std::chrono::system_clock::now() - startRealTime).count() << std::endl;
+    std::cout << "cpu time elapsed: " << boost::chrono::duration_cast<boost::chrono::duration<long long, boost::milli>>(boost::chrono::thread_clock::now() - start).count() / 1000 << std::endl;
+*/
+    json jResult;
+
+    jResult["Average"]["Eval"] = avgResults.eval;
+    jResult["Average"]["FinishedEval"] = avgResults.finishedEval;
+    jResult["Average"]["UsefulEval"] = avgResults.usefulEval;
+    jResult["Average"]["LeafNodesExpanded"] = avgResults.leafNodesExpanded;
+    jResult["Average"]["LeadNodesVisited"] = avgResults.leafNodesVisited;
+    jResult["Average"]["NodesExpanded"] = avgResults.nodesExpanded;
+    jResult["Average"]["NodeVisits"] = avgResults.nodeVisits;
+    jResult["Average"]["TimeElapsed"] = avgResults.timeElapsed;
+    jResult["Average"]["TimeElapsedCPU"] = avgResults.timeElapsedCPU;
+    jResult["Average"]["NumSimulations"] = avgResults.numSimulations;
+
+    jResult["Best"]["Eval"] = bestResults.eval;
+    jResult["Best"]["EvalBuildOrder"] = bestResults.buildOrder.getNameString();
+    jResult["Best"]["FinishedEval"] = bestResults.finishedEval;
+    jResult["Best"]["FinishedBuildOrder"] = bestResults.finishedUnitsBuildOrder.getNameString();
+    jResult["Best"]["UsefulEval"] = bestResults.usefulEval;
+    jResult["Best"]["UsefulBuildOrder"] = bestResults.usefulBuildOrder.getNameString();
+    jResult["Best"]["LeafNodesExpanded"] = bestResults.leafNodesExpanded;
+    jResult["Best"]["LeadNodesVisited"] = bestResults.leafNodesVisited;
+    jResult["Best"]["NodesExpanded"] = bestResults.nodesExpanded;
+    jResult["Best"]["NodeVisits"] = bestResults.nodeVisits;
+    jResult["Best"]["TimeElapsed"] = bestResults.timeElapsed;
+    jResult["Best"]["TimeElapsedCPU"] = bestResults.timeElapsedCPU;
+    jResult["Best"]["NumSimulations"] = bestResults.numSimulations;
+
+    std::ofstream outputStream(outputDir + "/Results.json");
+    outputStream << std::setw(4) << jResult << std::endl;
 }
 
-void IntegralExperiment::run(int numberOfRuns)
+void IntegralExperimentOMP::run(int numberOfRuns)
 {
     FileTools::MakeDirectory(m_outputDir);
 
-    //int numThreads = m_params.getThreadsForExperiment();
-    int numThreads = std::thread::hardware_concurrency() - 1;
-    std::vector<int> runPerThread = std::vector<int>(numThreads, int(numberOfRuns / numThreads));
-    int remainingRuns = numberOfRuns - int(numberOfRuns / numThreads) * numThreads;
-
-    for (int index = 0; index < numThreads; ++index)
+    #pragma omp parallel for
+    for (int run = 0; run < numberOfRuns; ++run)
     {
-        if (remainingRuns > 0)
-        {
-            ++runPerThread[index];
-            --remainingRuns;
-        }
-    }
-
-    std::vector<std::future<void>> threads(numThreads);
-    int startingIndex = 0;
-    for (int thread = 0; thread < numThreads; ++thread)
-    {
-        if (m_params.getUseTotalTimeLimit())
-        {
-            threads[thread] = std::async(std::launch::async, &IntegralExperiment::runExperimentsTotalTimeThread, this, thread, runPerThread[thread], startingIndex);
-        }
-        else
-        {
-            threads[thread] = std::async(std::launch::async, &IntegralExperiment::runExperimentThread, this, thread, runPerThread[thread], startingIndex);
-        }
-        std::this_thread::sleep_for(std::chrono::milliseconds(250));
-        startingIndex += runPerThread[thread];
-    }
-
-    for (auto& thread : threads)
-    {
-        thread.wait();
-    }
+        runTotalTimeExperiment(run);
+    }   
 }
