@@ -1,20 +1,15 @@
-SHELL=C:/Windows/System32/cmd.exe
-CC=C:\Libraries\emscripten\emscripten\1.37.1\em++.bat
-CFLAGS=-O3 -Wno-tautological-constant-out-of-range-compare -std=c++11
-LDFLAGS=-O3 --llvm-lto 1 -s DISABLE_EXCEPTION_CATCHING=0 
-INCLUDES=-Isource/json -Isrc -Isource/CImg
-SOURCES=$(wildcard src/*.cpp) 
-OBJECTS=$(SOURCES:.cpp=.o)
+#-I /usr/src/kernels/4.19.9-300.fc29.x86_64/arch/x86/include/asm/ -I /usr/src/kernels/4.19.9-300.fc29.x86_64/arch/x86/include/
+INC= -I /usr/include/python3.7m 
 
-all:emscripten/BOSS.js
+LIBS=-L /usr/lib64 \
+	 -L /usr/lib64/python3.7/lib-dynload
 
-JSFLAGS=--memory-init-file 0 -s EXPORTED_FUNCTIONS="['_BOSS_JS_Init', '_BOSS_JS_GetBuildOrderPlot']" --preload-file bin/
+LIB=-lpython3.7m\
+	-lboost_filesystem \
+	-lboost_system \
+	-lboost_python \
+	-lboost_chrono \
+	-lpthread
 
-emscripten/BOSS.js:$(OBJECTS) Makefile
-	$(CC) $(OBJECTS) -o $@ $(LDFLAGS) $(JSFLAGS)
-
-.cpp.o:
-	$(CC) -c $(CFLAGS) $(INCLUDES) $< -o $@
-
-clean:
-	rm $(OBJECTS)
+BOSS: ./src/*.cpp
+	g++ -O3 -std=c++17 $(LIBS) $(INC) ./src/*.cpp -o ./bin/BOSS_main -fopenmp $(LIB)
