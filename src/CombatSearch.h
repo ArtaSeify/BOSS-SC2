@@ -8,6 +8,7 @@
 #include "BuildOrderAbilities.h"
 #include "CombatSearchParameters.h"
 #include "CombatSearchResults.h"
+#include <boost/chrono.hpp>
 
 namespace BOSS
 {
@@ -25,6 +26,7 @@ namespace BOSS
 
         //int                         m_upperBound;         // the current upper bound for search
         Timer                       m_searchTimer;
+        boost::chrono::thread_clock::time_point m_searchTimerCPU;
 
         BuildOrderAbilities         m_buildOrder;
 

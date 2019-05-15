@@ -11,6 +11,9 @@
     <ClCompile Include="..\src\IntegralExperiment.cpp">
       <Filter>Experiments - Arta</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\IntegralExperimentOMP.cpp">
+      <Filter>Experiments - Arta</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\BOSSConfig.h" />
@@ -20,6 +23,9 @@
       <Filter>Experiments - Arta</Filter>
     </ClInclude>
     <ClInclude Include="..\src\IntegralExperiment.h">
+      <Filter>Experiments - Arta</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\IntegralExperimentOMP.h">
       <Filter>Experiments - Arta</Filter>
     </ClInclude>
   </ItemGroup>

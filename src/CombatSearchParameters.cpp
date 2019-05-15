@@ -35,13 +35,14 @@ CombatSearchParameters::CombatSearchParameters()
     , m_numberOfSimulations(10)
     , m_numberOfNodes(std::numeric_limits<int>::max())
     , m_simulationsPerStep(0)
+    , m_simulationsPerStepDecay(1)
     , m_useNetworkPrediction(0)
     , m_threadsForExperiment(1)
     , m_numPlayouts(0)
     , m_level(0)
     , m_enemyUnits()
     , m_enemyRace(Races::None)
-    , m_totalTimeLimit(0)
+    , m_useTotalTimeLimit(false)
 {
     
 }
@@ -265,6 +266,16 @@ int CombatSearchParameters::getSimulationsPerStep() const
     return m_simulationsPerStep;
 }
 
+void CombatSearchParameters::setSimulationsPerStepDecay(FracType value)
+{
+    m_simulationsPerStepDecay = value;
+}
+
+FracType CombatSearchParameters::getSimulationsPerStepDecay() const
+{
+    return m_simulationsPerStepDecay;
+}
+
 void CombatSearchParameters::setNetworkPrediction(bool value)
 {
     m_useNetworkPrediction = value;
@@ -303,14 +314,14 @@ int CombatSearchParameters::getLevel() const
     return m_level;
 }
 
-void CombatSearchParameters::setTotalTimeLimit(int value)
+void CombatSearchParameters::setUseTotalTimeLimit(bool value)
 {
-    m_totalTimeLimit = value;
+    m_useTotalTimeLimit = value;
 }
 
-int CombatSearchParameters::getTotalTimeLimit() const
+bool CombatSearchParameters::getUseTotalTimeLimit() const
 {
-    return m_totalTimeLimit;
+    return m_useTotalTimeLimit;
 }
 
 void CombatSearchParameters::print()

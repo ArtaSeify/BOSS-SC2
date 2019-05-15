@@ -1,7 +1,15 @@
 /* -*- c-basic-offset: 4 -*- */
+#ifdef __linux__
+#include <sys/resource.h>
+#include <stdio.h> 
+#include <sys/time.h>   
+#include <sys/resource.h> 
+#endif
 
 #include "CombatSearch.h"
 #include "Tools.h"
+
+#include <thread>
 
 using namespace BOSS;
 
@@ -10,6 +18,16 @@ using namespace BOSS;
 void CombatSearch::search()
 {
     m_searchTimer.start();
+    m_searchTimerCPU = boost::chrono::thread_clock::now();
+    
+#ifdef __linux__
+    struct rusage buf;
+    getrusage(RUSAGE_THREAD, &buf);
+    double startCPUTime = ((buf.ru_utime.tv_sec) + (buf.ru_utime.tv_usec / 1000000.f) + (buf.ru_stime.tv_sec) + (buf.ru_stime.tv_usec / 1000000.f))*1000.0;
+#endif
+    /*FILETIME creation, exit, kernel, user;
+    auto th = GetCurrentThread();
+    BOSS_ASSERT(GetThreadTimes(th, &creation, &exit, &kernel, &user), "failed");*/
 
     // apply the opening build order to the initial state    
     GameState initialState(m_params.getInitialState());
@@ -33,6 +51,38 @@ void CombatSearch::search()
     }
 
     m_results.timeElapsed = m_searchTimer.getElapsedTimeInMilliSec();
+    m_results.timeElapsedCPU = boost::chrono::duration_cast<boost::chrono::duration<double, boost::milli>>(boost::chrono::thread_clock::now() - m_searchTimerCPU).count();
+    
+    #ifdef __linux__
+        struct rusage bufEnd;
+        getrusage(RUSAGE_THREAD, &bufEnd);
+        double endCPUTime = ((bufEnd.ru_utime.tv_sec) + (bufEnd.ru_utime.tv_usec / 1000000.f) + (bufEnd.ru_stime.tv_sec) + (bufEnd.ru_stime.tv_usec / 1000000.f))*1000.0;
+    
+        //std::cout << "CPU time according to boost: " << m_results.timeElapsedCPU << std::endl;
+        //std::cout << "CPU time accoding to Linux: " << endCPUTime - startCPUTime << std::endl;
+    #endif
+
+
+    /*FILETIME creationEnd, exitEnd, kernelEnd, userEnd;
+    BOSS_ASSERT(GetThreadTimes(th, &creationEnd, &exitEnd, &kernelEnd, &userEnd), "failed");
+
+    SYSTEMTIME stKernel, stKernelEnd, stUser, stUserEnd;
+    BOSS_ASSERT(FileTimeToSystemTime(&kernel, &stKernel), "failed");
+    BOSS_ASSERT(FileTimeToSystemTime(&user, &stUser), "failed");
+    BOSS_ASSERT(FileTimeToSystemTime(&kernelEnd, &stKernelEnd), "failed");
+    BOSS_ASSERT(FileTimeToSystemTime(&userEnd, &stUserEnd), "failed");
+
+    double totalStart = stKernel.wMilliseconds + stKernel.wSecond * 1000 + stKernel.wMinute * 60 * 1000 + stKernel.wHour * 60 * 60 * 1000 +
+        stUser.wMilliseconds + stUser.wSecond * 1000 + stUser.wMinute * 60 * 1000 + stUser.wHour * 60 * 60 * 1000;
+    double totalEnd = stKernelEnd.wMilliseconds + stKernelEnd.wSecond * 1000 + stKernelEnd.wMinute * 60 * 1000 + stKernelEnd.wHour * 60 * 60 * 1000 +
+        stUserEnd.wMilliseconds + stUserEnd.wSecond * 1000 + stUserEnd.wMinute * 60 * 1000 + stUserEnd.wHour * 60 * 60 * 1000;
+    
+    std::cout << "thread time through windows: " << totalEnd - totalStart << std::endl;
+    std::cout << "thread time through boost: " << m_results.timeElapsedCPU << std::endl;
+    std::cout << "kernel: " << stKernel.wMilliseconds + stKernel.wSecond * 1000 + stKernel.wMinute * 60 * 1000 + stKernel.wHour * 60 * 60 * 1000 << " "
+        << stKernelEnd.wMilliseconds + stKernelEnd.wSecond * 1000 + stKernelEnd.wMinute * 60 * 1000 + stKernelEnd.wHour * 60 * 60 * 1000 << std::endl;
+    std::cout << "user: " << stUser.wMilliseconds + stUser.wSecond * 1000 + stUser.wMinute * 60 * 1000 + stUser.wHour * 60 * 60 * 1000 << " "
+        << stUserEnd.wMilliseconds + stUserEnd.wSecond * 1000 + stUserEnd.wMinute * 60 * 1000 + stUserEnd.wHour * 60 * 60 * 1000 << std::endl;*/
 }
 
 // This function generates the legal actions from a GameState based on the input search parameters

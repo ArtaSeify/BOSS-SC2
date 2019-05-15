@@ -24,6 +24,7 @@
     <ClCompile Include="..\src\CombatSearchExperiment.cpp" />
     <ClCompile Include="..\src\Experiments.cpp" />
     <ClCompile Include="..\src\IntegralExperiment.cpp" />
+    <ClCompile Include="..\src\IntegralExperimentOMP.cpp" />
     <ClCompile Include="..\src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -32,6 +33,7 @@
     <ClInclude Include="..\src\CombatSearchExperiment.h" />
     <ClInclude Include="..\src\Experiments.h" />
     <ClInclude Include="..\src\IntegralExperiment.h" />
+    <ClInclude Include="..\src\IntegralExperimentOMP.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="BOSS.vcxproj">
@@ -161,6 +163,7 @@
       <MinimalRebuild>false</MinimalRebuild>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -221,6 +224,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <BrowseInformation>false</BrowseInformation>
+      <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
