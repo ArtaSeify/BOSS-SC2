@@ -27,7 +27,7 @@ namespace BOSS
         IntegralExperimentOMP();
         IntegralExperimentOMP(const std::string& experimentName, const json& exp);
 
-        void runExperimentThread(int thread, int numRuns, int startingIndex);
+        void runExperimentThread(int run);
         void runTotalTimeExperiment(int run);
         void run(int numberOfRuns);
     };

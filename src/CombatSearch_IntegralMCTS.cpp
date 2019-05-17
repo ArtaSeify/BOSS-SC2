@@ -87,7 +87,7 @@ void CombatSearch_IntegralMCTS::recurse(const GameState& state, int depth)
         // change the root of the tree. Remove all the nodes and edges that are now irrelevant
         if (m_params.getChangingRoot() && m_numTotalSimulations > 0 && (m_numCurrentRootSimulations == m_simulationsPerStep) || (m_simulationsPerStep != 1000 && shouldChangeRoot(currentRoot, m_numCurrentRootSimulations, rootDepth)))
         {
-            std::cout << "simulations before root change: " << m_numCurrentRootSimulations << std::endl;
+            //std::cout << "simulations before root change: " << m_numCurrentRootSimulations << std::endl;
             // reached a leaf node, we are done
             if (currentRoot->getNumEdges() == 0)
             {
@@ -438,23 +438,13 @@ bool CombatSearch_IntegralMCTS::shouldChangeRoot(std::shared_ptr<Node> root, int
     }
 
     std::shared_ptr<Edge> edge = root->getParentEdge();
-    if (m_params.getUseMaxValue())
+    //std::cout << (edge->getValue() - edge->getMean()) / edge->getSD() << std::endl;
+    if (edge->getMean() + 3.0 * edge->getSD() <= edge->getMax())
     {
-        /*std::cout << (edge->getValue() - edge->getMean()) / edge->getSD() << std::endl;
-        if (edge->getSD() == 0)
-        {
-            std::cout << edge->getMean() << std::endl;
-            std::cout << edge->getValue() << std::endl;
-            system("pause");
-        }*/
-        if (edge->getMean() + 3.5 * edge->getSD() <= edge->getValue())
-        {
-            return true;
-        }
-        return false;
+        return true;
     }
+    return false;
 
-    BOSS_ASSERT(false, "Not implemented yet");
     /*int simlowerbound = 200;
     int simupperbound = std::max(0, 20000 - (rootDepth * 500));
 

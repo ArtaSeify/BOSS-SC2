@@ -46,7 +46,7 @@ void ExperimentsArta::RunExperiments(const std::string & experimentFilename)
 
 void ExperimentsArta::runExperimentsThread(const json & j, int thread, int experimentsForThread, int startingIndex)
 {
-    #pragma omp parallel for
+    //#pragma omp parallel for
     for (int index = 0; index < experimentsForThread; ++index)
     {
         // move iterator forward

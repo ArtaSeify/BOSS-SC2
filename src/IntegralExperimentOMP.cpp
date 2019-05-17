@@ -227,66 +227,62 @@ IntegralExperimentOMP::IntegralExperimentOMP(const std::string& experimentName, 
     }
 }
 
-void IntegralExperimentOMP::runExperimentThread(int thread, int numRuns, int startingIndex)
+void IntegralExperimentOMP::runExperimentThread(int run)
 {
     static std::string stars = "************************************************";
 
-    for (int i(0); i < numRuns; ++i)
+    std::string name = m_name;
+    if (m_searchType != "IntegralDFS")
     {
-        int index = i + (startingIndex);
-        std::string name = m_name;
-        if (m_searchType != "IntegralDFS")
-        {
-            name += "Run" + std::to_string(index);
-        }
-        std::string outputDir = m_outputDir + "/" + Assert::CurrentDateTime() + "_" + name;
-        FileTools::MakeDirectory(outputDir);
-
-        std::string resultsFile = name;
-
-        std::cout << "\n" << stars << "\n* Running Experiment: " << name << " [" << m_searchType << "]\n" << stars << "\n";
-
-        std::unique_ptr<CombatSearch> combatSearch;
-
-        if (m_searchType == "IntegralDFS")
-        {
-            combatSearch = std::unique_ptr<CombatSearch>(new CombatSearch_Integral(m_params, outputDir, resultsFile, m_name));
-        }
-        else if (m_searchType == "IntegralDFSVN")
-        {
-            combatSearch = std::unique_ptr<CombatSearch>(new DFSValue(m_params, outputDir, resultsFile, m_name));
-        }
-        else if (m_searchType == "IntegralDFSPN")
-        {
-            combatSearch = std::unique_ptr<CombatSearch>(new DFSPolicy(m_params, outputDir, resultsFile, m_name));
-        }
-        else if (m_searchType == "IntegralDFSPVN")
-        {
-            combatSearch = std::unique_ptr<CombatSearch>(new DFSPolicyAndValue(m_params, outputDir, resultsFile, m_name));
-        }
-        else if (m_searchType == "IntegralMCTS")
-        {
-            //resultsFile += "_IntegralMCTS";
-            combatSearch = std::unique_ptr<CombatSearch>(new CombatSearch_IntegralMCTS(m_params, outputDir, resultsFile, m_name));
-        }
-        else if (m_searchType == "IntegralNMCS")
-        {
-            combatSearch = std::unique_ptr<CombatSearch>(new NMCS(m_params, outputDir, resultsFile, m_name));
-        }
-        else if (m_searchType == "IntegralNMCTS")
-        {
-            combatSearch = std::unique_ptr<CombatSearch>(new NMCTS(m_params, outputDir, resultsFile, m_name));
-        }
-        else
-        {
-            BOSS_ASSERT(false, "CombatSearch type not found: %s", m_searchType.c_str());
-        }
-
-        combatSearch->search();
-        combatSearch->printResults();
-        combatSearch->writeResultsFile(outputDir, resultsFile);
-        const CombatSearchResults& results = combatSearch->getResults();
+        name += "Run" + std::to_string(run);
     }
+    std::string outputDir = m_outputDir + "/" + Assert::CurrentDateTime() + "_" + name;
+    FileTools::MakeDirectory(outputDir);
+
+    std::string resultsFile = name;
+
+    std::cout << "\n" << stars << "\n* Running Experiment: " << name << " [" << m_searchType << "]\n" << stars << "\n";
+
+    std::unique_ptr<CombatSearch> combatSearch;
+
+    if (m_searchType == "IntegralDFS")
+    {
+        combatSearch = std::unique_ptr<CombatSearch>(new CombatSearch_Integral(m_params, outputDir, resultsFile, m_name));
+    }
+    else if (m_searchType == "IntegralDFSVN")
+    {
+        combatSearch = std::unique_ptr<CombatSearch>(new DFSValue(m_params, outputDir, resultsFile, m_name));
+    }
+    else if (m_searchType == "IntegralDFSPN")
+    {
+        combatSearch = std::unique_ptr<CombatSearch>(new DFSPolicy(m_params, outputDir, resultsFile, m_name));
+    }
+    else if (m_searchType == "IntegralDFSPVN")
+    {
+        combatSearch = std::unique_ptr<CombatSearch>(new DFSPolicyAndValue(m_params, outputDir, resultsFile, m_name));
+    }
+    else if (m_searchType == "IntegralMCTS")
+    {
+        //resultsFile += "_IntegralMCTS";
+        combatSearch = std::unique_ptr<CombatSearch>(new CombatSearch_IntegralMCTS(m_params, outputDir, resultsFile, m_name));
+    }
+    else if (m_searchType == "IntegralNMCS")
+    {
+        combatSearch = std::unique_ptr<CombatSearch>(new NMCS(m_params, outputDir, resultsFile, m_name));
+    }
+    else if (m_searchType == "IntegralNMCTS")
+    {
+        combatSearch = std::unique_ptr<CombatSearch>(new NMCTS(m_params, outputDir, resultsFile, m_name));
+    }
+    else
+    {
+        BOSS_ASSERT(false, "CombatSearch type not found: %s", m_searchType.c_str());
+    }
+
+    combatSearch->search();
+    combatSearch->printResults();
+    combatSearch->writeResultsFile(outputDir, resultsFile);
+    const CombatSearchResults& results = combatSearch->getResults();
 }
 
 void IntegralExperimentOMP::runTotalTimeExperiment(int run)
@@ -463,7 +459,7 @@ void IntegralExperimentOMP::run(int numberOfRuns)
 {
     FileTools::MakeDirectory(m_outputDir);
 
-    //#pragma omp parallel for
+    #pragma omp parallel for
     for (int run = 0; run < numberOfRuns; ++run)
     {
         if (m_params.getUseTotalTimeLimit())
@@ -472,7 +468,7 @@ void IntegralExperimentOMP::run(int numberOfRuns)
         }
         else
         {
-
+            runExperimentThread(run);
         }
     }   
 }

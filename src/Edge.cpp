@@ -13,8 +13,8 @@ Edge::Edge()
     , m_valueSimulations(0)
     , m_valueNetwork(0)
     , m_value(0)
-    , m_averageValue(0)
     , m_valuesSquared(0)
+    , m_averageValue(0)
     , m_maxValue(0)
     , m_action(ActionAbilityPair(ActionTypes::None, AbilityAction()))
     , m_child()
@@ -73,6 +73,7 @@ void Edge::updateEdge(FracType simulationValue)
     else
     {
         m_valueSimulations = m_averageValue;
+        setNewEdgeValue();
     }
 }
 

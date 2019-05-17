@@ -2,7 +2,7 @@ import numpy as np
 import os
 import pickle
 import argparse
-from math import ceil
+from math import ceil, sqrt
 import matplotlib.pyplot as plt
 import json
 
@@ -18,10 +18,10 @@ strings_in_data = args.strings_in_data.split(",")
 
 data_files = os.listdir(args.files_dir)
 
-nodeVisits = 0
+bestValue = 0
+avgValue = 0
+squaredValues = 0
 total_runs = 0
-nodesPerSecond = 0
-CPUTime = 0
 for data_file in data_files:
 	if all(s in data_file for s in strings_in_data):
 		with open(os.path.join(args.files_dir, data_file), "r") as json_file:
@@ -29,11 +29,12 @@ for data_file in data_files:
 			data = json.loads(json_data)
 			for run in data:
 				if len(data[run]) > 0:
-					nodeVisits = int(data[run][0]["Average"]["NodeVisits"])
-					CPUTime = float(data[run][0]["Average"]["TimeElapsedCPU"])
-					nodesPerSecond += nodeVisits/CPUTime
-					#print(data_file + " " + str(nodeVisits/CPUTime) + " " + str(nodeVisits))
+					bestValue = max(bestValue, float(data[run][0]["Best"]["UsefulEval"]))
+					print("run: " +str(run) + " " + str(data[run][0]["Best"]["UsefulEval"]))
+					avgValue += float(data[run][0]["Best"]["UsefulEval"])
+					squaredValues += (float(data[run][0]["Best"]["UsefulEval"]) * float(data[run][0]["Best"]["UsefulEval"]))
 					total_runs += 1
 
-nodesPerSecond /= total_runs
-print("Nodes Per Second: {}, Total Runs: {}".format(nodesPerSecond, total_runs))
+avgValue /= total_runs
+squaredValues /= total_runs
+print("Highest value found: {}, Average value: {}, SD: {}".format(bestValue, avgValue, sqrt(squaredValues - (avgValue * avgValue))))

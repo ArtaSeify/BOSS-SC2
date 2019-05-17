@@ -51,11 +51,12 @@ namespace BOSS
 
         int timesVisited() const { return m_timesVisited; }
         FracType getValue() const { return m_value; }
+        FracType getMean() const { return m_averageValue; }
+        FracType getMax() const { return m_maxValue; }
 
         void printValues() const;
         
         double getSD() const;
-        FracType getMean() const { return m_averageValue; }
     };
 }
 
