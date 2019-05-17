@@ -18,13 +18,15 @@ strings_in_data = args.strings_in_data.split(",")
 
 data_files = os.listdir(args.files_dir)
 
-bestValue = 0
-avgValue = 0
-squaredValues = 0
-total_runs = 0
+
 for data_file in data_files:
 	if all(s in data_file for s in strings_in_data):
 		with open(os.path.join(args.files_dir, data_file), "r") as json_file:
+			bestValue = 0
+			avgValue = 0
+			squaredValues = 0
+			total_runs = 0
+			print(data_file)
 			json_data = json_file.read()
 			data = json.loads(json_data)
 			for run in data:
@@ -35,6 +37,5 @@ for data_file in data_files:
 					squaredValues += (float(data[run][0]["Best"]["UsefulEval"]) * float(data[run][0]["Best"]["UsefulEval"]))
 					total_runs += 1
 
-avgValue /= total_runs
-squaredValues /= total_runs
-print("Highest value found: {}, Average value: {}, SD: {}".format(bestValue, avgValue, sqrt(squaredValues - (avgValue * avgValue))))
+			avgValue /= total_runs
+			print("Highest value found: {}, Average value: {}, SD: {}".format(bestValue, avgValue, sqrt((squaredValues - (total_runs * avgValue * avgValue))/(total_runs - 1))))

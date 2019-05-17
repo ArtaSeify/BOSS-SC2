@@ -95,6 +95,11 @@ IntegralExperimentOMP::IntegralExperimentOMP(const std::string& experimentName, 
             m_params.setNumberOfNodes(std::numeric_limits<int>::max());
         }
 
+        if (searchParameters.count("SDConst"))
+        {
+            m_params.setSDConstant(searchParameters["SDConst"]);
+        }
+
         std::stringstream ss;
         ss << std::fixed << std::setprecision(2) << m_params.getExplorationValue();
         m_name += "C" + ss.str();

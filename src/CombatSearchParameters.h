@@ -117,7 +117,8 @@ namespace BOSS
         int m_threadsForExperiment;
         int m_numPlayouts;
         int m_level;
-        int m_useTotalTimeLimit;
+        bool m_useTotalTimeLimit;
+        FracType m_SDConstant;
 
     public:
 
@@ -207,6 +208,9 @@ namespace BOSS
 
         void setUseTotalTimeLimit(bool value);
         bool getUseTotalTimeLimit() const;
+
+        void setSDConstant(FracType value);
+        FracType getSDConstant() const;
     
         void print();
     };

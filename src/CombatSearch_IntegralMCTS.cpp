@@ -432,55 +432,19 @@ bool CombatSearch_IntegralMCTS::isTerminalNode(const Node & node) const
 
 bool CombatSearch_IntegralMCTS::shouldChangeRoot(std::shared_ptr<Node> root, int simulationsThusFar, int rootDepth) const
 {
-    if (root->getParentEdge()->timesVisited() < 1000)
+    std::shared_ptr<Edge> edge = root->getParentEdge();
+
+    if (edge->timesVisited() < 1000)
     {
         return false;
     }
-
-    std::shared_ptr<Edge> edge = root->getParentEdge();
+    
     //std::cout << (edge->getValue() - edge->getMean()) / edge->getSD() << std::endl;
-    if (edge->getMean() + 3.0 * edge->getSD() <= edge->getMax())
+    if (edge->getMean() + m_params.getSDConstant() * edge->getSD() <= edge->getMax())
     {
         return true;
     }
     return false;
-
-    /*int simlowerbound = 200;
-    int simupperbound = std::max(0, 20000 - (rootDepth * 500));
-
-    if (simulationsThusFar > simupperbound)
-    {
-        return true;
-    }
-
-    static float lowerbound = 2.5;
-    static float upperbound = 3.5;
-
-    FracType max = 0;
-    int numSimulations = 0;
-    for (int index = 0; index < root->getNumEdges(); ++index)
-    {
-        std::shared_ptr<Edge> edge = root->getEdge(index);
-        float value = (edge->getValue() - edge->getMean()) / edge->getSD();
-        if (value < lowerbound)
-        {
-            return false;
-        }
-        max = std::max(value, max);
-        numSimulations += edge->timesVisited();
-    }
-
-    if (simulationsThusFar < simlowerbound)
-    {
-        return false;
-    }
-
-    if (max > upperbound)
-    {
-        return true;
-    }
-
-    return false;*/
 }
 
 void CombatSearch_IntegralMCTS::randomPlayout(Node node)

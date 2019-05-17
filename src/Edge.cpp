@@ -102,5 +102,5 @@ void Edge::printValues() const
 
 double Edge::getSD() const
 {
-    return sqrt((m_valuesSquared / m_timesVisited) - (m_averageValue * m_averageValue));
+    return sqrt((m_valuesSquared - (m_timesVisited *  m_averageValue * m_averageValue))/(m_timesVisited - 1));
 }

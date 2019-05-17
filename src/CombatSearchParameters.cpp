@@ -43,6 +43,7 @@ CombatSearchParameters::CombatSearchParameters()
     , m_enemyUnits()
     , m_enemyRace(Races::None)
     , m_useTotalTimeLimit(false)
+    , m_SDConstant(0)
 {
     
 }
@@ -322,6 +323,16 @@ void CombatSearchParameters::setUseTotalTimeLimit(bool value)
 bool CombatSearchParameters::getUseTotalTimeLimit() const
 {
     return m_useTotalTimeLimit;
+}
+
+void CombatSearchParameters::setSDConstant(FracType value)
+{
+    m_SDConstant = value;
+}
+
+FracType CombatSearchParameters::getSDConstant() const
+{
+    return m_SDConstant;
 }
 
 void CombatSearchParameters::print()
