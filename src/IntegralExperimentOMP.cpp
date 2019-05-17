@@ -312,6 +312,7 @@ void IntegralExperimentOMP::runTotalTimeExperiment(int run)
     CombatSearchParameters params = m_params;
     int nodesPerMilliSecond = 300;
     params.setNumberOfNodes(int(params.getSearchTimeLimit() * nodesPerMilliSecond));
+    params.setSearchTimeLimit(std::numeric_limits<float>::max());
 
     while (true)
     {
@@ -461,7 +462,7 @@ void IntegralExperimentOMP::run(int numberOfRuns)
 {
     FileTools::MakeDirectory(m_outputDir);
 
-    #pragma omp parallel for
+    //#pragma omp parallel for
     for (int run = 0; run < numberOfRuns; ++run)
     {
         if (m_params.getUseTotalTimeLimit())

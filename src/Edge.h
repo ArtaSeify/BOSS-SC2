@@ -17,12 +17,15 @@ namespace BOSS
         static int NODE_VISITS_BEFORE_EXPAND;
         static FracType MIXING_PARAMETER;
         static bool USE_MAX_VALUE;
-        
+
     private:
         int m_timesVisited;
         FracType m_valueSimulations;
         FracType m_valueNetwork;
         FracType m_value;
+        FracType m_averageValue;
+        FracType m_maxValue;
+        double m_valuesSquared;
         ActionAbilityPair m_action;
 
         std::shared_ptr<Node> m_child;
@@ -50,6 +53,9 @@ namespace BOSS
         FracType getValue() const { return m_value; }
 
         void printValues() const;
+        
+        double getSD() const;
+        FracType getMean() const { return m_averageValue; }
     };
 }
 
