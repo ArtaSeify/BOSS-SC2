@@ -6,182 +6,20 @@
         "test" :
         {
             "Run"               : [ true, 5 ],
-            "MaximizeValue"     : true,
-            "SearchType"        : [ "IntegralMCTS" ],
-            "SearchParameters"  : { "ExplorationConstant" : 0.15, "UseMax" : false, "Simulations" : 300000000},
             "UseTotalTimeLimit" : true,
-            "SimulationsPerStep": [ true, 100, 1.0 ],
-            "Threads"           : 1,
-            "Race"              : "Protoss",
-            "StartingState"     : "Protoss Start State",
-            "PrintNewBest"      : false,
-            "OutputDir"         : "../bin/test6",
-            "SearchTimeLimitMS" : 18750,
-            "FrameTimeLimit"    : 6720,
-            "RelevantActions"	: ["ChronoBoost", "Probe", "Pylon", "Nexus", "Assimilator", "Gateway", "CyberneticsCore", "Stalker", "Zealot", "Colossus", "Forge", "FleetBeacon", "TwilightCouncil", "Stargate", "TemplarArchive", "DarkShrine", "RoboticsBay", "RoboticsFacility", "ZealotWarped", "Zealot", "StalkerWarped", "DarkTemplarWarped", "DarkTemplar", "Carrier", "VoidRay", "Immortal", "AdeptWarped", "Adept", "Tempest"], 
-            "MaxActions"		: [ ["CyberneticsCore", 1], ["FleetBeacon", 1], ["TwilightCouncil", 1], ["TemplarArchive", 1], ["DarkShrine", 1], ["RoboticsBay", 1] ],
-            "AlwaysMakeWorkers" : true,
-            "OpeningBuildOrder" : "Empty",
-            "SortActions"       : false,
-            "SaveStates"        : false,
-            "UseNetwork"        : false
-        },
-        "test2" :
-        {
-            "Run"               : [ true, 5 ],
-            "MaximizeValue"     : true,
             "SearchType"        : [ "IntegralMCTS" ],
-            "SearchParameters"  : { "ExplorationConstant" : 0.15, "UseMax" : false, "Simulations" : 300000000},
-            "UseTotalTimeLimit" : true,
-            "SimulationsPerStep": [ false, 100, 1.0 ],
-            "Threads"           : 1,
+            "SearchParameters"  : { "ExplorationConstant" : 1.0, "UseMax" : true, "Simulations" : 2000000},
+            "SimulationsPerStep": [ true, 10000000, 1.0 ],
+            "Threads"           : 7,
             "Race"              : "Protoss",
-            "StartingState"     : "Protoss Start State",
+            "StartingState"     : "Protoss 0",
             "PrintNewBest"      : false,
-            "OutputDir"         : "../bin/test6",
-            "SearchTimeLimitMS" : 18750,
+            "OutputDir"         : "../bin/newtheory/new",
+            "SearchTimeLimitMS" : 75000,
             "FrameTimeLimit"    : 6720,
-            "RelevantActions"	: ["ChronoBoost", "Probe", "Pylon", "Nexus", "Assimilator", "Gateway", "CyberneticsCore", "Stalker", "Zealot", "Colossus", "Forge", "FleetBeacon", "TwilightCouncil", "Stargate", "TemplarArchive", "DarkShrine", "RoboticsBay", "RoboticsFacility", "ZealotWarped", "Zealot", "StalkerWarped", "DarkTemplarWarped", "DarkTemplar", "Carrier", "VoidRay", "Immortal", "AdeptWarped", "Adept", "Tempest"], 
-            "MaxActions"		: [ ["CyberneticsCore", 1], ["FleetBeacon", 1], ["TwilightCouncil", 1], ["TemplarArchive", 1], ["DarkShrine", 1], ["RoboticsBay", 1] ],
-            "AlwaysMakeWorkers" : true,
-            "OpeningBuildOrder" : "Empty",
-            "SortActions"       : false,
-            "SaveStates"        : false,
-            "UseNetwork"        : false
-        },
-        "test3" :
-        {
-            "Run"               : [ true, 5 ],
-            "MaximizeValue"     : true,
-            "SearchType"        : [ "IntegralMCTS" ],
-            "SearchParameters"  : { "ExplorationConstant" : 0.15, "UseMax" : false, "Simulations" : 300000000},
-            "UseTotalTimeLimit" : true,
-            "SimulationsPerStep": [ false, 100, 1.0 ],
-            "Threads"           : 1,
-            "Race"              : "Protoss",
-            "StartingState"     : "Protoss Start State",
-            "PrintNewBest"      : false,
-            "OutputDir"         : "../bin/test6",
-            "SearchTimeLimitMS" : 18750,
-            "FrameTimeLimit"    : 6720,
-            "RelevantActions"	: ["ChronoBoost", "Probe", "Pylon", "Nexus", "Assimilator", "Gateway", "CyberneticsCore", "Stalker", "Zealot", "Colossus", "Forge", "FleetBeacon", "TwilightCouncil", "Stargate", "TemplarArchive", "DarkShrine", "RoboticsBay", "RoboticsFacility", "ZealotWarped", "Zealot", "StalkerWarped", "DarkTemplarWarped", "DarkTemplar", "Carrier", "VoidRay", "Immortal", "AdeptWarped", "Adept", "Tempest"], 
-            "MaxActions"		: [ ["CyberneticsCore", 1], ["FleetBeacon", 1], ["TwilightCouncil", 1], ["TemplarArchive", 1], ["DarkShrine", 1], ["RoboticsBay", 1] ],
-            "AlwaysMakeWorkers" : true,
-            "OpeningBuildOrder" : "Empty",
-            "SortActions"       : false,
-            "SaveStates"        : false,
-            "UseNetwork"        : false
-        },
-        "test4" :
-        {
-            "Run"               : [ true, 5 ],
-            "MaximizeValue"     : true,
-            "SearchType"        : [ "IntegralMCTS" ],
-            "SearchParameters"  : { "ExplorationConstant" : 0.15, "UseMax" : false, "Simulations" : 300000000},
-            "UseTotalTimeLimit" : true,
-            "SimulationsPerStep": [ false, 100, 1.0 ],
-            "Threads"           : 1,
-            "Race"              : "Protoss",
-            "StartingState"     : "Protoss Start State",
-            "PrintNewBest"      : false,
-            "OutputDir"         : "../bin/test6",
-            "SearchTimeLimitMS" : 18750,
-            "FrameTimeLimit"    : 6720,
-            "RelevantActions"	: ["ChronoBoost", "Probe", "Pylon", "Nexus", "Assimilator", "Gateway", "CyberneticsCore", "Stalker", "Zealot", "Colossus", "Forge", "FleetBeacon", "TwilightCouncil", "Stargate", "TemplarArchive", "DarkShrine", "RoboticsBay", "RoboticsFacility", "ZealotWarped", "Zealot", "StalkerWarped", "DarkTemplarWarped", "DarkTemplar", "Carrier", "VoidRay", "Immortal", "AdeptWarped", "Adept", "Tempest"], 
-            "MaxActions"		: [ ["CyberneticsCore", 1], ["FleetBeacon", 1], ["TwilightCouncil", 1], ["TemplarArchive", 1], ["DarkShrine", 1], ["RoboticsBay", 1] ],
-            "AlwaysMakeWorkers" : true,
-            "OpeningBuildOrder" : "Empty",
-            "SortActions"       : false,
-            "SaveStates"        : false,
-            "UseNetwork"        : false
-        },
-        "test5" :
-        {
-            "Run"               : [ true, 5 ],
-            "MaximizeValue"     : true,
-            "SearchType"        : [ "IntegralMCTS" ],
-            "SearchParameters"  : { "ExplorationConstant" : 0.15, "UseMax" : false, "Simulations" : 300000000},
-            "UseTotalTimeLimit" : true,
-            "SimulationsPerStep": [ false, 100, 1.0 ],
-            "Threads"           : 1,
-            "Race"              : "Protoss",
-            "StartingState"     : "Protoss Start State",
-            "PrintNewBest"      : false,
-            "OutputDir"         : "../bin/test6",
-            "SearchTimeLimitMS" : 18750,
-            "FrameTimeLimit"    : 6720,
-            "RelevantActions"	: ["ChronoBoost", "Probe", "Pylon", "Nexus", "Assimilator", "Gateway", "CyberneticsCore", "Stalker", "Zealot", "Colossus", "Forge", "FleetBeacon", "TwilightCouncil", "Stargate", "TemplarArchive", "DarkShrine", "RoboticsBay", "RoboticsFacility", "ZealotWarped", "Zealot", "StalkerWarped", "DarkTemplarWarped", "DarkTemplar", "Carrier", "VoidRay", "Immortal", "AdeptWarped", "Adept", "Tempest"], 
-            "MaxActions"		: [ ["CyberneticsCore", 1], ["FleetBeacon", 1], ["TwilightCouncil", 1], ["TemplarArchive", 1], ["DarkShrine", 1], ["RoboticsBay", 1] ],
-            "AlwaysMakeWorkers" : true,
-            "OpeningBuildOrder" : "Empty",
-            "SortActions"       : false,
-            "SaveStates"        : false,
-            "UseNetwork"        : false
-        },
-        "test6" :
-        {
-            "Run"               : [ true, 5 ],
-            "MaximizeValue"     : true,
-            "SearchType"        : [ "IntegralMCTS" ],
-            "SearchParameters"  : { "ExplorationConstant" : 0.15, "UseMax" : false, "Simulations" : 300000000},
-            "UseTotalTimeLimit" : true,
-            "SimulationsPerStep": [ false, 100, 1.0 ],
-            "Threads"           : 1,
-            "Race"              : "Protoss",
-            "StartingState"     : "Protoss Start State",
-            "PrintNewBest"      : false,
-            "OutputDir"         : "../bin/test6",
-            "SearchTimeLimitMS" : 18750,
-            "FrameTimeLimit"    : 6720,
-            "RelevantActions"	: ["ChronoBoost", "Probe", "Pylon", "Nexus", "Assimilator", "Gateway", "CyberneticsCore", "Stalker", "Zealot", "Colossus", "Forge", "FleetBeacon", "TwilightCouncil", "Stargate", "TemplarArchive", "DarkShrine", "RoboticsBay", "RoboticsFacility", "ZealotWarped", "Zealot", "StalkerWarped", "DarkTemplarWarped", "DarkTemplar", "Carrier", "VoidRay", "Immortal", "AdeptWarped", "Adept", "Tempest"], 
-            "MaxActions"		: [ ["CyberneticsCore", 1], ["FleetBeacon", 1], ["TwilightCouncil", 1], ["TemplarArchive", 1], ["DarkShrine", 1], ["RoboticsBay", 1] ],
-            "AlwaysMakeWorkers" : true,
-            "OpeningBuildOrder" : "Empty",
-            "SortActions"       : false,
-            "SaveStates"        : false,
-            "UseNetwork"        : false
-        },
-        "test7" :
-        {
-            "Run"               : [ true, 5 ],
-            "MaximizeValue"     : true,
-            "SearchType"        : [ "IntegralMCTS" ],
-            "SearchParameters"  : { "ExplorationConstant" : 0.15, "UseMax" : false, "Simulations" : 300000000},
-            "UseTotalTimeLimit" : true,
-            "SimulationsPerStep": [ false, 100, 1.0 ],
-            "Threads"           : 1,
-            "Race"              : "Protoss",
-            "StartingState"     : "Protoss Start State",
-            "PrintNewBest"      : false,
-            "OutputDir"         : "../bin/test6",
-            "SearchTimeLimitMS" : 18750,
-            "FrameTimeLimit"    : 6720,
-            "RelevantActions"	: ["ChronoBoost", "Probe", "Pylon", "Nexus", "Assimilator", "Gateway", "CyberneticsCore", "Stalker", "Zealot", "Colossus", "Forge", "FleetBeacon", "TwilightCouncil", "Stargate", "TemplarArchive", "DarkShrine", "RoboticsBay", "RoboticsFacility", "ZealotWarped", "Zealot", "StalkerWarped", "DarkTemplarWarped", "DarkTemplar", "Carrier", "VoidRay", "Immortal", "AdeptWarped", "Adept", "Tempest"], 
-            "MaxActions"		: [ ["CyberneticsCore", 1], ["FleetBeacon", 1], ["TwilightCouncil", 1], ["TemplarArchive", 1], ["DarkShrine", 1], ["RoboticsBay", 1] ],
-            "AlwaysMakeWorkers" : true,
-            "OpeningBuildOrder" : "Empty",
-            "SortActions"       : false,
-            "SaveStates"        : false,
-            "UseNetwork"        : false
-        },
-        "test8" :
-        {
-            "Run"               : [ true, 5 ],
-            "MaximizeValue"     : true,
-            "SearchType"        : [ "IntegralMCTS" ],
-            "SearchParameters"  : { "ExplorationConstant" : 0.15, "UseMax" : false, "Simulations" : 300000000},
-            "UseTotalTimeLimit" : true,
-            "SimulationsPerStep": [ false, 100, 1.0 ],
-            "Threads"           : 1,
-            "Race"              : "Protoss",
-            "StartingState"     : "Protoss Start State",
-            "PrintNewBest"      : false,
-            "OutputDir"         : "../bin/test6",
-            "SearchTimeLimitMS" : 18750,
-            "FrameTimeLimit"    : 6720,
-            "RelevantActions"	: ["ChronoBoost", "Probe", "Pylon", "Nexus", "Assimilator", "Gateway", "CyberneticsCore", "Stalker", "Zealot", "Colossus", "Forge", "FleetBeacon", "TwilightCouncil", "Stargate", "TemplarArchive", "DarkShrine", "RoboticsBay", "RoboticsFacility", "ZealotWarped", "Zealot", "StalkerWarped", "DarkTemplarWarped", "DarkTemplar", "Carrier", "VoidRay", "Immortal", "AdeptWarped", "Adept", "Tempest"], 
-            "MaxActions"		: [ ["CyberneticsCore", 1], ["FleetBeacon", 1], ["TwilightCouncil", 1], ["TemplarArchive", 1], ["DarkShrine", 1], ["RoboticsBay", 1] ],
-            "AlwaysMakeWorkers" : true,
+            "RelevantActions"   : ["ChronoBoost", "Probe", "Pylon", "Nexus", "Assimilator", "Gateway", "CyberneticsCore", "Stalker", "Zealot", "Colossus", "FleetBeacon", "TwilightCouncil", "Stargate", "TemplarArchive", "DarkShrine", "RoboticsBay", "RoboticsFacility", "Zealot", "DarkTemplar", "Carrier", "VoidRay", "Immortal", "Adept", "Tempest", "Mothership"], 
+            "MaxActions"        : [ ["CyberneticsCore", 1], ["FleetBeacon", 1], ["TwilightCouncil", 1], ["TemplarArchive", 1], ["DarkShrine", 1], ["RoboticsBay", 1] ],
+            "AlwaysMakeWorkers" : false,
             "OpeningBuildOrder" : "Empty",
             "SortActions"       : false,
             "SaveStates"        : false,
@@ -195,7 +33,42 @@
         "Zerg Start State"      : { "race" : "Zerg",    "minerals" : 50, "gas" : 0, "units" : [ ["Drone", 12], ["Hatchery", 1], ["Overlord", 1] ] },
         "Terran Start State"    : { "race" : "Terran",  "minerals" : 50, "gas" : 0, "units" : [ ["SCV", 12], ["CommandCenter", 1] ] },
         "Protoss 0": { "race": "Protoss", "units": [ ["Nexus",2],["Probe",23],["Pylon",2],["Gateway",1],["Assimilator",2],["CyberneticsCore",1] ],"minerals": 225,"gas": 128},
-        "Protoss 1": { "race": "Protoss", "units": [ ["Nexus",2],["Probe",23],["Pylon",2],["Gateway",1],["Assimilator",2],["CyberneticsCore",1], ["Stargate", 1], ["FleetBeacon", 1] ],"minerals": 225,"gas": 128}
+        "Protoss 1": { "race": "Protoss", "units": [ ["Nexus",2],["Probe",23],["Pylon",2],["Gateway",1],["Assimilator",2],["CyberneticsCore",1], ["Stargate", 1], ["FleetBeacon", 1] ],"minerals": 225,"gas": 128},
+        "Protoss 3": {
+    "race": "Protoss",
+    "units": [
+      [
+        "Nexus",
+        2
+      ],
+      [
+        "Probe",
+        29
+      ],
+      [
+        "Pylon",
+        3
+      ],
+      [
+        "Gateway",
+        3
+      ],
+      [
+        "Assimilator",
+        2
+      ],
+      [
+        "CyberneticsCore",
+        1
+      ],
+      [
+        "Stalker",
+        2
+      ]
+    ],
+    "minerals": 35,
+    "gas": 62
+  }
     },
     
     "Build Orders" :

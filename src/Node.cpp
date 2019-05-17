@@ -272,6 +272,54 @@ std::shared_ptr<Edge> Node::selectChildEdge(FracType exploration_param, std::mt1
     return m_edges[maxIndex];
 }
 
+void Node::printPValues(FracType exploration_param, std::mt19937& rnggen, const CombatSearchParameters& params) const
+{
+    if (m_edges.size() == 0)
+    {
+        return;
+    }
+
+    std::vector<int> unvisitedEdges;
+    int totalChildVisits = 0;
+    for (int index = 0; index < m_edges.size(); ++index)
+    {
+        const auto& edge = m_edges[index];
+
+        int edgeTimesVisited = edge->timesVisited();
+        // all unvisited edges are taken as an action first 
+        if (edgeTimesVisited == 0)
+        {
+            unvisitedEdges.push_back(index);
+        }
+
+        totalChildVisits += edgeTimesVisited;
+    }
+
+    // pick an unvisited edge at uniformly random
+
+    float UCBValue = exploration_param *
+        static_cast<FracType>(std::sqrt(totalChildVisits));
+
+    float maxActionValue = 0;
+    int maxIndex = 0;
+    int index = 0;
+
+    for (int index = 0; index < m_edges.size(); ++index)
+    {
+        const auto& edge = m_edges[index];
+        // calculate UCB value and get the total value of action
+        // Q(s, a) + u(s, a)
+        // we normalize the action value to a range of [0, 1] using the highest
+        // value of the search thus far. 
+        float childUCBValue = UCBValue / (1 + edge->timesVisited());
+
+        float UCBWithoutParam = static_cast<FracType>(std::sqrt(totalChildVisits)) / (1 + edge->timesVisited());
+        float p = 1 / (exp(UCBWithoutParam * UCBWithoutParam * 2 * edge->timesVisited()));
+        std::cout << "edge: " << edge->getAction().first.getName() << " has UCB value: " << UCBWithoutParam << ". has p value: " << p << std::endl;
+    }
+    std::cout << std::endl;
+}
+
 std::shared_ptr<Node> Node::notExpandedChild(std::shared_ptr<Edge> edge, const CombatSearchParameters & params, bool makeNode) const
 {
     // create a temporary node

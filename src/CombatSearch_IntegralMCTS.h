@@ -19,6 +19,8 @@ namespace BOSS
         int m_numCurrentRootSimulations;
         int m_simulationsPerStep;
 
+        std::map<std::string, std::vector<FracType>> m_rootRewards;
+
         CombatSearch_IntegralDataFinishedUnits  m_bestIntegralFound;
         BuildOrderAbilities                     m_bestBuildOrderFound;
         bool                                    m_needToWriteBestValue;
@@ -35,6 +37,7 @@ namespace BOSS
         std::pair<std::shared_ptr<Node>, bool> getPromisingNode(std::shared_ptr<Node> node);
         
         bool isTerminalNode(const Node & node) const;
+        bool shouldChangeRoot(std::shared_ptr<Node> root, int simulationsThusFar, int rootDepth) const;
         
         void randomPlayout(Node node);
         

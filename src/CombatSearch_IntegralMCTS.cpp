@@ -11,6 +11,7 @@ CombatSearch_IntegralMCTS::CombatSearch_IntegralMCTS(const CombatSearchParameter
     , m_promisingNodeBuildOrder(BuildOrderAbilities())
     , m_bestIntegralFound(CombatSearch_IntegralDataFinishedUnits())
     , m_bestBuildOrderFound(BuildOrderAbilities())
+    , m_rootRewards()
     , m_numTotalSimulations(0)
     , m_numCurrentRootSimulations(0)
     , m_dataStream()
@@ -57,20 +58,36 @@ CombatSearch_IntegralMCTS::~CombatSearch_IntegralMCTS()
 
 void CombatSearch_IntegralMCTS::recurse(const GameState& state, int depth)
 {
+    //test(state);
+    //return;
     //test2(state);
     m_numTotalSimulations = 0;
     m_numCurrentRootSimulations = 0;
     int simulationsWritten = 0;
+    int rootDepth = 0;
 
     std::shared_ptr<Node> root = std::make_shared<Node>(state);
+    std::shared_ptr<Edge> root_parent = std::make_shared<Edge>();
+    root->setParentEdge(root_parent);
     std::shared_ptr<Node> currentRoot = root;
 
     while (!timeLimitReached() && m_numTotalSimulations < m_params.getNumberOfSimulations() && m_results.nodeVisits < m_params.getNumberOfNodes())
     {
-        // change the root of the tree. Remove all the nodes and edges that are now irrelevant
-        if (m_params.getChangingRoot() && m_numTotalSimulations > 0 && m_numCurrentRootSimulations == m_simulationsPerStep)
+        /*if (m_numTotalSimulations % 100 == 0)
         {
-            //std::cout << "simulations before root change: " << m_simulationsPerStep << std::endl;
+            std::cout << "num simulations: " << m_numTotalSimulations << std::endl;
+            currentRoot->printPValues(m_exploration_parameter, m_rnggen, m_params);
+        }*/
+
+        /*if (m_numTotalSimulations % 10000 == 0)
+        {
+            std::cout << m_numTotalSimulations << std::endl;
+        }*/
+        
+        // change the root of the tree. Remove all the nodes and edges that are now irrelevant
+        if (m_params.getChangingRoot() && m_numTotalSimulations > 0 && (m_numCurrentRootSimulations == m_simulationsPerStep) || (m_simulationsPerStep != 1000 && shouldChangeRoot(currentRoot, m_numCurrentRootSimulations, rootDepth)))
+        {
+            std::cout << "simulations before root change: " << m_numCurrentRootSimulations << std::endl;
             // reached a leaf node, we are done
             if (currentRoot->getNumEdges() == 0)
             {
@@ -85,7 +102,7 @@ void CombatSearch_IntegralMCTS::recurse(const GameState& state, int depth)
             {
                 sum += currentRoot->getEdge(i)->timesVisited();
             }
-            BOSS_ASSERT(sum >= m_simulationsPerStep, "The total visit of the edges %i must be higher than or equal to the number of simulations %i before moving the root", sum, m_simulationsPerStep);
+            //BOSS_ASSERT(sum >= m_simulationsPerStep || shouldChangeRoot(currentRoot), "The total visit of the edges %i must be higher than or equal to the number of simulations %i before moving the root", sum, m_simulationsPerStep);
 
             m_simulationsPerStep = (int)round(m_simulationsPerStep * m_params.getSimulationsPerStepDecay());
 
@@ -111,6 +128,8 @@ void CombatSearch_IntegralMCTS::recurse(const GameState& state, int depth)
             currentRoot->removeEdges(childEdge);
             currentRoot = childEdge->getChild();
             updateNodeVisits(false, isTerminalNode(*currentRoot));
+
+            ++rootDepth;
 
             // search is over
             if (isTerminalNode(*currentRoot) || m_numTotalSimulations >= m_params.getNumberOfSimulations())
@@ -217,6 +236,9 @@ void CombatSearch_IntegralMCTS::recurse(const GameState& state, int depth)
         finishedUnitsIntegral.update(finishedUnitsState, m_results.finishedUnitsBuildOrder, m_params, m_searchTimer, true);
         finishedUnitsIntegral.setState(finishedUnitsState);
     }
+    finishedUnitsState.fastForward(m_params.getFrameTimeLimit());
+    finishedUnitsIntegral.update(finishedUnitsState, m_results.finishedUnitsBuildOrder, m_params, m_searchTimer, true);
+    finishedUnitsIntegral.setState(finishedUnitsState);
     m_results.finishedEval = finishedUnitsIntegral.getCurrentStackValue();
     m_results.finishedValue = finishedUnitsIntegral.getCurrentStackEval();
 
@@ -235,6 +257,9 @@ void CombatSearch_IntegralMCTS::recurse(const GameState& state, int depth)
         usefulUnitsIntegral.update(usefulUnitsState, m_results.usefulBuildOrder, m_params, m_searchTimer, true);
         usefulUnitsIntegral.setState(usefulUnitsState);
     }
+    usefulUnitsState.fastForward(m_params.getFrameTimeLimit());
+    usefulUnitsIntegral.update(usefulUnitsState, m_results.usefulBuildOrder, m_params, m_searchTimer, true);
+    usefulUnitsIntegral.setState(usefulUnitsState);
     m_results.usefulEval = usefulUnitsIntegral.getCurrentStackValue();
     m_results.usefulValue = usefulUnitsIntegral.getCurrentStackEval();
 
@@ -255,7 +280,7 @@ void CombatSearch_IntegralMCTS::recurse(const GameState& state, int depth)
     }
 
     // some sanity checks to make sure the result is as expected
-    if (!timeLimitReached() && m_results.nodeVisits < m_params.getNumberOfNodes())
+    /*if (!timeLimitReached() && m_results.nodeVisits < m_params.getNumberOfNodes())
     {
         auto buildOrderAndIntegral = pickBestBuildOrder(root, false);
         BuildOrderAbilities bestBuildOrder = buildOrderAndIntegral.first;
@@ -266,38 +291,84 @@ void CombatSearch_IntegralMCTS::recurse(const GameState& state, int depth)
             BOSS_ASSERT(m_bestBuildOrderFound[index].first == bestBuildOrder[index].first, "Best build order in tree must match the best build order found when using max");
             BOSS_ASSERT(m_bestBuildOrderFound[index].second == bestBuildOrder[index].second, "Best build order in tree must match the best build order found when using max");
         }
+    }*/
+
+    for (const auto& pair : m_rootRewards)
+    {
+        std::ofstream f("../bin/StateDist/" + pair.first + ".txt", std::ofstream::out | std::ofstream::trunc);
+        for (auto reward : pair.second)
+        {
+            f << reward << "\n";
+        }
     }
+
+    /*for (int i = 0; i < root->getNumEdges(); ++i)
+    {
+        auto action = root->getEdge(i);
+        std::cout << action->getAction().first.getName() << ": MEAN " << action->getMean() << ", SD: " << action->getSD()
+            << ", MAX: " << action->getValue() << ", CONST: " << (action->getValue() - action->getMean()) / action->getSD()
+            << " s/sqrt(n): " << action->getSD() / sqrt(action->timesVisited())
+            << std::endl;
+    }
+    std::cout << std::endl;*/
 
     root->cleanUp();
 }
 
 void CombatSearch_IntegralMCTS::test(const GameState & state)
 {
-    /*Node root(state);
+    m_numTotalSimulations = 0;
+    m_numCurrentRootSimulations = 0;
+    int simulationsWritten = 0;
+
+    std::shared_ptr<Node> root = std::make_shared<Node>(state);
     ActionSetAbilities legalActions;
-    generateLegalActions(state, legalActions, m_params);
-    root.createChildrenEdges(legalActions, m_params);
-    root.printChildren();
-    std::cout << std::endl;
-    root.doAction(root.getChild(ActionTypes::GetActionType("Probe")), m_params);
-    root.printChildren();
-    std::cout << std::endl;
+    generateLegalActions(root->getState(), legalActions, m_params);
+    root->createChildrenEdges(legalActions, m_params);
 
-    Node & secondLevel = root.getChild(0);
-    legalActions.clear();
-    generateLegalActions(secondLevel.getState(), legalActions, m_params);
-    secondLevel.createChildrenEdges(legalActions, m_params);
-    secondLevel.printChildren();
-    std::cout << std::endl;
-    secondLevel.doAction(secondLevel.getChild(ActionTypes::GetActionType("Pylon")), m_params);
-    secondLevel.printChildren();
-    std::cout << std::endl;
+    for (int index = 0; index < root->getNumEdges(); ++index)
+    {
+        std::shared_ptr<Edge> action = root->getEdge(index);
+        root->notExpandedChild(action, m_params, true);
+    }
 
-    Node & thirdLevel = secondLevel.getChild(0);
-    legalActions.clear();
-    generateLegalActions(thirdLevel.getState(), legalActions, m_params);
-    thirdLevel.createChildrenEdges(legalActions, m_params);
-    thirdLevel.printChildren();*/
+    for (int ind = 0; ind < root->getNumEdges(); ++ind)
+    {
+        std::shared_ptr<Edge> action = root->getEdge(ind);
+        std::shared_ptr<Node> promisingNode = action->getChild();
+
+        std::cout << action->getAction().first.getName() << std::endl;
+
+        for (int sim = 0; sim < 20000; ++sim)
+        {
+            updateBOIntegral(*promisingNode, action->getAction(), root->getState(), false);
+            
+            randomPlayout(*promisingNode);
+            backPropogation(promisingNode);
+
+            m_promisingNodeBuildOrder = m_buildOrder;
+            m_promisingNodeIntegral = m_integral;
+        }
+    }
+    
+    for (const auto& pair : m_rootRewards)
+    {
+        std::ofstream f("../bin/StateDist/" + pair.first + ".txt", std::ofstream::out | std::ofstream::trunc);
+        for (auto reward : pair.second)
+        {
+            f << reward << "\n";
+        }
+    }
+
+    for (int i = 0; i < root->getNumEdges(); ++i)
+    {
+        auto action = root->getEdge(i);
+        std::cout << action->getAction().first.getName() << ": MEAN " << action->getMean() << ", SD: " << action->getSD() 
+            << ", MAX: " << action->getValue() << ", CONST: " << (action->getValue() - action->getMean()) / action->getSD()
+            << " s/sqrt(n): " << action->getSD() / sqrt(action->timesVisited())
+            << std::endl;
+    }
+    std::cout << std::endl;
 }
 
 void CombatSearch_IntegralMCTS::test2(const GameState & state)
@@ -357,6 +428,69 @@ std::pair<std::shared_ptr<Node>, bool> CombatSearch_IntegralMCTS::getPromisingNo
 bool CombatSearch_IntegralMCTS::isTerminalNode(const Node & node) const
 {
     return node.isTerminal();
+}
+
+bool CombatSearch_IntegralMCTS::shouldChangeRoot(std::shared_ptr<Node> root, int simulationsThusFar, int rootDepth) const
+{
+    if (root->getParentEdge()->timesVisited() < 1000)
+    {
+        return false;
+    }
+
+    std::shared_ptr<Edge> edge = root->getParentEdge();
+    if (m_params.getUseMaxValue())
+    {
+        /*std::cout << (edge->getValue() - edge->getMean()) / edge->getSD() << std::endl;
+        if (edge->getSD() == 0)
+        {
+            std::cout << edge->getMean() << std::endl;
+            std::cout << edge->getValue() << std::endl;
+            system("pause");
+        }*/
+        if (edge->getMean() + 3.5 * edge->getSD() <= edge->getValue())
+        {
+            return true;
+        }
+        return false;
+    }
+
+    BOSS_ASSERT(false, "Not implemented yet");
+    /*int simlowerbound = 200;
+    int simupperbound = std::max(0, 20000 - (rootDepth * 500));
+
+    if (simulationsThusFar > simupperbound)
+    {
+        return true;
+    }
+
+    static float lowerbound = 2.5;
+    static float upperbound = 3.5;
+
+    FracType max = 0;
+    int numSimulations = 0;
+    for (int index = 0; index < root->getNumEdges(); ++index)
+    {
+        std::shared_ptr<Edge> edge = root->getEdge(index);
+        float value = (edge->getValue() - edge->getMean()) / edge->getSD();
+        if (value < lowerbound)
+        {
+            return false;
+        }
+        max = std::max(value, max);
+        numSimulations += edge->timesVisited();
+    }
+
+    if (simulationsThusFar < simlowerbound)
+    {
+        return false;
+    }
+
+    if (max > upperbound)
+    {
+        return true;
+    }
+
+    return false;*/
 }
 
 void CombatSearch_IntegralMCTS::randomPlayout(Node node)
@@ -521,12 +655,26 @@ void CombatSearch_IntegralMCTS::backPropogation(std::shared_ptr<Node> node)
 
     //std::cout << "Simulation: " << m_numTotalSimulations << ". Value of search: " << m_promisingNodeIntegral.getCurrentStackValue() << std::endl;
 
-    while (parent_edge != nullptr)
+    while (true)
     {
         parent_edge->updateEdge(m_promisingNodeIntegral.getCurrentStackValue());
 
         //std::cout << "value of " << current_node->getAction().first.getName() << " changed to: " << current_node->getValue() << std::endl;
         //std::cout << std::endl;
+
+        if (parent_edge != nullptr && parent_edge->getParent() != nullptr && parent_edge->getParent()->getParentEdge() == nullptr)
+        {
+            if (m_rootRewards.find(parent_edge->getAction().first.getName()) == m_rootRewards.end())
+            {
+                m_rootRewards[parent_edge->getAction().first.getName()] = std::vector<FracType>();
+            }
+            m_rootRewards.at(parent_edge->getAction().first.getName()).push_back(m_promisingNodeIntegral.getBestStackValue());
+        }
+
+        if (parent_edge->getParent() == nullptr)
+        {
+            break;
+        }
 
         current_node = parent_edge->getParent();
         parent_edge = current_node->getParentEdge();

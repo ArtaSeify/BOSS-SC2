@@ -13,6 +13,9 @@ Edge::Edge()
     , m_valueSimulations(0)
     , m_valueNetwork(0)
     , m_value(0)
+    , m_averageValue(0)
+    , m_valuesSquared(0)
+    , m_maxValue(0)
     , m_action(ActionAbilityPair(ActionTypes::None, AbilityAction()))
     , m_child()
     , m_parent()
@@ -25,6 +28,9 @@ Edge::Edge(const ActionAbilityPair & action, std::shared_ptr<Node> parent)
     , m_valueSimulations(0)
     , m_valueNetwork(0)
     , m_value(0)
+    , m_averageValue(0)
+    , m_maxValue(0)
+    , m_valuesSquared(0)
     , m_action(action)
     , m_child()
     , m_parent(parent)
@@ -52,18 +58,21 @@ void Edge::updateEdge(FracType simulationValue)
 
     m_timesVisited++;
 
-    if (!USE_MAX_VALUE)
+    m_maxValue = std::max(simulationValue, m_maxValue);
+    m_averageValue = m_averageValue + ((1.f / m_timesVisited) * (simulationValue - m_averageValue));
+    m_valuesSquared += (simulationValue * simulationValue);
+
+    if (USE_MAX_VALUE)
     {
-        m_valueSimulations = m_valueSimulations + ((1.f / m_timesVisited) * (simulationValue - m_valueSimulations));
-        setNewEdgeValue();
+        if (m_valueSimulations < m_maxValue)
+        {
+            m_valueSimulations = m_maxValue;
+            setNewEdgeValue();
+        }
     }
     else
     {
-        if (simulationValue > m_valueSimulations)
-        {
-            m_valueSimulations = simulationValue;
-            setNewEdgeValue();
-        }
+        m_valueSimulations = m_averageValue;
     }
 }
 
@@ -88,4 +97,9 @@ void Edge::printValues() const
     std::cout << "Network Value: " << m_valueNetwork << std::endl;
     std::cout << "Simulations value: " << m_valueSimulations << " with " << m_timesVisited << " simulations " << std::endl;
     std::cout << "Edge Value: " << m_value << std::endl;
+}
+
+double Edge::getSD() const
+{
+    return sqrt((m_valuesSquared / m_timesVisited) - (m_averageValue * m_averageValue));
 }
