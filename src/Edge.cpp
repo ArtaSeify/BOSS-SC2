@@ -4,7 +4,7 @@
 using namespace BOSS;
 
 FracType Edge::CURRENT_HIGHEST_VALUE = 1.f;
-int Edge::NODE_VISITS_BEFORE_EXPAND = 1;
+int Edge::NODE_VISITS_BEFORE_EXPAND = 2;
 bool Edge::USE_MAX_VALUE = true;
 FracType Edge::MIXING_PARAMETER = 0.0f;
 

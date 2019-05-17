@@ -6,11 +6,14 @@
 #include "FileTools.h"
 #include <thread>
 #include <future>
+#include <omp.h>
 
 using namespace BOSS;
 
 void ExperimentsArta::RunExperiments(const std::string & experimentFilename)
 {
+    omp_set_nested(true);
+    omp_set_dynamic(true);
     std::ifstream file(experimentFilename);
     json j;
     file >> j;
@@ -43,6 +46,7 @@ void ExperimentsArta::RunExperiments(const std::string & experimentFilename)
 
 void ExperimentsArta::runExperimentsThread(const json & j, int thread, int experimentsForThread, int startingIndex)
 {
+    #pragma omp parallel for
     for (int index = 0; index < experimentsForThread; ++index)
     {
         // move iterator forward

@@ -312,6 +312,7 @@ void IntegralExperimentOMP::runTotalTimeExperiment(int run)
     CombatSearchParameters params = m_params;
     int nodesPerMilliSecond = 300;
     params.setNumberOfNodes(int(params.getSearchTimeLimit() * nodesPerMilliSecond));
+    params.setSearchTimeLimit(std::numeric_limits<float>::max());
 
     while (true)
     {
@@ -326,7 +327,7 @@ void IntegralExperimentOMP::runTotalTimeExperiment(int run)
             }
         }
 
-        std::cout << "node limit is: " << params.getNumberOfNodes() << std::endl;
+        //std::cout << "node limit is: " << params.getNumberOfNodes() << std::endl;
 
         std::string dir = outputDir + "/Run" + std::to_string(numRuns);
         FileTools::MakeDirectory(dir);
@@ -432,6 +433,7 @@ void IntegralExperimentOMP::runTotalTimeExperiment(int run)
     jResult["Average"]["TimeElapsed"] = avgResults.timeElapsed;
     jResult["Average"]["TimeElapsedCPU"] = avgResults.timeElapsedCPU;
     jResult["Average"]["NumSimulations"] = avgResults.numSimulations;
+    jResult["Average"]["NumRuns"] = results.size();
 
     jResult["Best"]["Eval"] = bestResults.eval;
     jResult["Best"]["Value"] = bestResults.value;
@@ -461,7 +463,7 @@ void IntegralExperimentOMP::run(int numberOfRuns)
 {
     FileTools::MakeDirectory(m_outputDir);
 
-    #pragma omp parallel for
+    //#pragma omp parallel for
     for (int run = 0; run < numberOfRuns; ++run)
     {
         if (m_params.getUseTotalTimeLimit())
