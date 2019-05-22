@@ -83,6 +83,13 @@ void CombatSearch_IntegralMCTS::recurse(const GameState& state, int depth)
                 break;
             }
 
+            // write state data
+            if (m_params.getSaveStates())
+            {
+                currentRoot->getState().writeToSS(m_ssStates, m_params);
+                m_ssStates << "," << m_integral.getCurrentStackValue() << "\n";
+            }
+
             m_numCurrentRootSimulations = 0;
 
             // sanity check
@@ -254,21 +261,21 @@ void CombatSearch_IntegralMCTS::recurse(const GameState& state, int depth)
     m_results.usefulEval = usefulUnitsIntegral.getCurrentStackValue();
     m_results.usefulValue = usefulUnitsIntegral.getCurrentStackEval();
 
-    // write state data
-    if (m_params.getSaveStates())
-    {
-        std::shared_ptr<Node> currentNode = root;
+    //// write state data
+    //if (m_params.getSaveStates())
+    //{
+    //    std::shared_ptr<Node> currentNode = root;
 
-        while (currentNode != currentRoot)
-        {
-            currentNode->getState().writeToSS(m_dataStream, m_params);
-            m_dataStream << "," << m_integral.getCurrentStackValue() << "\n";
+    //    while (currentNode != currentRoot)
+    //    {
+    //        currentNode->getState().writeToSS(m_dataStream, m_params);
+    //        m_dataStream << "," << m_integral.getCurrentStackValue() << "\n";
 
-            currentNode = currentNode->getHighestValueChild(m_params)->getChild();
-        }
-        currentNode->getState().writeToSS(m_dataStream, m_params);
-        m_dataStream << "," << m_integral.getCurrentStackValue() << "\n";
-    }
+    //        currentNode = currentNode->getHighestValueChild(m_params)->getChild();
+    //    }
+    //    currentNode->getState().writeToSS(m_dataStream, m_params);
+    //    m_dataStream << "," << m_integral.getCurrentStackValue() << "\n";
+    //}
 
     // some sanity checks to make sure the result is as expected
     /*if (!timeLimitReached() && m_results.nodeVisits < m_params.getNumberOfNodes())

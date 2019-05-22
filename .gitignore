@@ -91,3 +91,4 @@ emscripten/BOSS.data
 /bin/newtheory
 /MCTS Results/newtheory
 /bin/reset/true
+/bin/reset/false/1000

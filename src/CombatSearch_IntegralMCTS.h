@@ -26,7 +26,6 @@ namespace BOSS
         bool                                    m_needToWriteBestValue;
 
         std::stringstream m_resultsStream;
-        std::stringstream m_dataStream;
 
         CombatSearch_IntegralDataFinishedUnits m_promisingNodeIntegral;
         BuildOrderAbilities m_promisingNodeBuildOrder;
