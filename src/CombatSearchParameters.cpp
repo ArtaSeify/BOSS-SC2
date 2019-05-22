@@ -30,6 +30,7 @@ CombatSearchParameters::CombatSearchParameters()
     , m_saveStates(false)
     , m_explorationValue(1)
     , m_changingRoot(false)
+    , m_changingRootReset(false)
     , m_useMaxValue(false)
     , m_maximizeValue(false)
     , m_numberOfSimulations(10)
@@ -216,6 +217,16 @@ void CombatSearchParameters::setChangingRoot(bool value)
 bool CombatSearchParameters::getChangingRoot() const
 {
     return m_changingRoot;
+}
+
+void CombatSearchParameters::setChangingRootReset(bool value)
+{
+    m_changingRootReset = value;
+}
+
+bool CombatSearchParameters::getChangingRootReset() const
+{
+    return m_changingRootReset;
 }
 
 void CombatSearchParameters::setUseMaxValue(bool value)

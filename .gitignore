@@ -90,3 +90,4 @@ emscripten/BOSS.data
 /bin/CVal
 /bin/newtheory
 /MCTS Results/newtheory
+/bin/reset/true

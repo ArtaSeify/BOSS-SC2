@@ -73,17 +73,6 @@ void CombatSearch_IntegralMCTS::recurse(const GameState& state, int depth)
 
     while (!timeLimitReached() && m_numTotalSimulations < m_params.getNumberOfSimulations() && m_results.nodeVisits < m_params.getNumberOfNodes())
     {
-        /*if (m_numTotalSimulations % 100 == 0)
-        {
-            std::cout << "num simulations: " << m_numTotalSimulations << std::endl;
-            currentRoot->printPValues(m_exploration_parameter, m_rnggen, m_params);
-        }*/
-
-        /*if (m_numTotalSimulations % 10000 == 0)
-        {
-            std::cout << m_numTotalSimulations << std::endl;
-        }*/
-        
         // change the root of the tree. Remove all the nodes and edges that are now irrelevant
         if (m_params.getChangingRoot() && m_numTotalSimulations > 0 && m_numCurrentRootSimulations == m_simulationsPerStep)
         {
@@ -102,8 +91,7 @@ void CombatSearch_IntegralMCTS::recurse(const GameState& state, int depth)
             {
                 sum += currentRoot->getEdge(i)->timesVisited();
             }
-            //BOSS_ASSERT(sum >= m_simulationsPerStep || shouldChangeRoot(currentRoot), "The total visit of the edges %i must be higher than or equal to the number of simulations %i before moving the root", sum, m_simulationsPerStep);
-
+            
             //m_simulationsPerStep = (int)round(m_simulationsPerStep * m_params.getSimulationsPerStepDecay());
 
             // take the highest value child, but if it has lower value than the best found, we take the
@@ -115,7 +103,6 @@ void CombatSearch_IntegralMCTS::recurse(const GameState& state, int depth)
                 childEdge = currentRoot->getChild(m_bestBuildOrderFound[m_buildOrder.size()]);
             }
 
-            // TODO: DONT CRASH, CREATE NODE INSTEAD
             if (childEdge->getChild() == nullptr)
             {
                 currentRoot->notExpandedChild(childEdge, m_params, true);
@@ -127,6 +114,10 @@ void CombatSearch_IntegralMCTS::recurse(const GameState& state, int depth)
 
             currentRoot->removeEdges(childEdge);
             currentRoot = childEdge->getChild();
+            if (m_params.getChangingRootReset())
+            {
+                currentRoot->removeEdges();
+            }
             updateNodeVisits(false, isTerminalNode(*currentRoot));
 
             ++rootDepth;

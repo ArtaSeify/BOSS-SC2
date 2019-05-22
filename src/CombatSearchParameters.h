@@ -107,6 +107,7 @@ namespace BOSS
         bool m_saveStates;
         FracType m_explorationValue;
         bool m_changingRoot;
+        bool m_changingRootReset;
         bool m_useMaxValue;
         bool m_maximizeValue;
         int m_numberOfSimulations;
@@ -175,6 +176,9 @@ namespace BOSS
 
         void setChangingRoot(bool value);
         bool getChangingRoot() const;
+
+        void setChangingRootReset(bool value);
+        bool getChangingRootReset() const;
 
         void setUseMaxValue(bool value);
         bool getUseMaxValue() const;

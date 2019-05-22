@@ -28,6 +28,7 @@ namespace BOSS
 
         // removes all edges except the one passed as a parameter
         void removeEdges(std::shared_ptr<Edge> edge);
+        void removeEdges();
 
         // does action at index of actions. Returns true if the action is sucessful
         // and the state is valid (doesn't go past the time limit). Otherwise returns false

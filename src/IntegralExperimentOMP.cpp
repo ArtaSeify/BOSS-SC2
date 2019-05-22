@@ -191,15 +191,24 @@ IntegralExperimentOMP::IntegralExperimentOMP(const std::string& experimentName, 
         m_params.setEnemyBuildOrder(BOSSConfig::Instance().GetBuildOrder(brVal["EnemyBuildOrder"]));
     }
 
-    if (exp.count("SimulationsPerStep"))
+    if (exp.count("ChangingRoot"))
     {
-        BOSS_ASSERT(exp["SimulationsPerStep"].is_array() && exp["SimulationsPerStep"].size() == 3, "SimulationsPerStep must be an array of size 3");
-        BOSS_ASSERT(exp["SimulationsPerStep"][0].is_boolean(), "Entry 0 of SimulationsPerStep must be a bool");
-        BOSS_ASSERT(exp["SimulationsPerStep"][1].is_number_integer(), "Entry 1 of SimulationsPerStep must be an integer");
-        BOSS_ASSERT(exp["SimulationsPerStep"][2].is_number_float(), "Entry 2 of SimulationsPerStep must be a float");
-        m_params.setChangingRoot(exp["SimulationsPerStep"][0]);
-        m_params.setSimulationsPerStep(exp["SimulationsPerStep"][1]);
-        m_params.setSimulationsPerStepDecay(exp["SimulationsPerStep"][2]);
+        //BOSS_ASSERT(exp["ChangingRoot"].is_array() && exp["ChangingRoot"].size() > 0, "ChangingRoot must be an array");
+        auto& params = exp["ChangingRoot"];
+        BOSS_ASSERT(params.count("Active") && params["Active"].is_boolean(), "Must have a boolean 'Active' member inside ChangingRoot");
+        BOSS_ASSERT(params.count("Simulations") && params["Simulations"].is_number_integer(), "Must have an integer 'Simulations' member inside of SimulationsPerStep");
+        if (params.count("Decay"))
+        {
+            BOSS_ASSERT(params["Decay"].is_number_float(), "Decay value inside of ChangingRoot must be a float");
+            m_params.setSimulationsPerStepDecay(params["Decay"]);
+        }
+        if (params.count("Reset"))
+        {
+            BOSS_ASSERT(params["Reset"].is_boolean(), "Reset value inside of ChangingRoot must be a boolean");
+            m_params.setChangingRootReset(params["Reset"]);
+        }
+        m_params.setChangingRoot(params["Active"]);
+        m_params.setSimulationsPerStep(params["Simulations"]);
     }
 
     if (exp.count("OpponentUnits"))

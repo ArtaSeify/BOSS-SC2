@@ -114,6 +114,11 @@ void Node::removeEdges(std::shared_ptr<Edge> edge)
     }
 }
 
+void Node::removeEdges()
+{
+    removeEdges(std::make_shared<Edge>());
+}
+
 bool Node::doAction(std::shared_ptr<Edge> edge, const CombatSearchParameters & params, bool makeNode)
 {
     const ActionAbilityPair & action = edge->getAction();
