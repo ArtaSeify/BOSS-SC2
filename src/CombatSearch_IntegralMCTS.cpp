@@ -85,7 +85,7 @@ void CombatSearch_IntegralMCTS::recurse(const GameState& state, int depth)
         }*/
         
         // change the root of the tree. Remove all the nodes and edges that are now irrelevant
-        if (m_params.getChangingRoot() && m_numTotalSimulations > 0 && (m_numCurrentRootSimulations == m_simulationsPerStep) || (m_simulationsPerStep != 1000 && shouldChangeRoot(currentRoot, m_numCurrentRootSimulations, rootDepth)))
+        if (m_params.getChangingRoot() && m_numTotalSimulations > 0 && m_numCurrentRootSimulations == m_simulationsPerStep)
         {
             //std::cout << "simulations before root change: " << m_numCurrentRootSimulations << std::endl;
             // reached a leaf node, we are done
@@ -104,7 +104,7 @@ void CombatSearch_IntegralMCTS::recurse(const GameState& state, int depth)
             }
             //BOSS_ASSERT(sum >= m_simulationsPerStep || shouldChangeRoot(currentRoot), "The total visit of the edges %i must be higher than or equal to the number of simulations %i before moving the root", sum, m_simulationsPerStep);
 
-            m_simulationsPerStep = (int)round(m_simulationsPerStep * m_params.getSimulationsPerStepDecay());
+            //m_simulationsPerStep = (int)round(m_simulationsPerStep * m_params.getSimulationsPerStepDecay());
 
             // take the highest value child, but if it has lower value than the best found, we take the
             // action in the best found instead

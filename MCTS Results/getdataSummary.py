@@ -26,16 +26,16 @@ for data_file in data_files:
 			avgValue = 0
 			squaredValues = 0
 			total_runs = 0
-			print(data_file)
+			#print(data_file)
 			json_data = json_file.read()
 			data = json.loads(json_data)
 			for run in data:
 				if len(data[run]) > 0:
 					bestValue = max(bestValue, float(data[run][0]["Best"]["UsefulEval"]))
-					print("run: " +str(run) + " " + str(data[run][0]["Best"]["UsefulEval"]))
+					#print("run: " +str(run) + " " + str(data[run][0]["Best"]["UsefulEval"]))
 					avgValue += float(data[run][0]["Best"]["UsefulEval"])
 					squaredValues += (float(data[run][0]["Best"]["UsefulEval"]) * float(data[run][0]["Best"]["UsefulEval"]))
 					total_runs += 1
 
 			avgValue /= total_runs
-			print("Highest value found: {}, Average value: {}, SD: {}".format(bestValue, avgValue, sqrt((squaredValues - (total_runs * avgValue * avgValue))/(total_runs - 1))))
+			print("Data: {}. Highest value found: {}, Average value: {}, SD: {}".format(data_file, bestValue, avgValue, sqrt((squaredValues - (total_runs * avgValue * avgValue))/(total_runs - 1))))
