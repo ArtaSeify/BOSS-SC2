@@ -1,16 +1,15 @@
-def createUnitDict(filename):
-	unit_info = dict()
-	with open(filename, 'r') as unit_file:
-		all_units = unit_file.readlines()
-		for unit in all_units:
-			unit = unit.split(",")
-			unit_info[unit[1].split("\n")[0]] = int(unit[0])
+#def createUnitDict(filename):
+#	unit_info = dict()
+#	with open(filename, 'r') as unit_file:
+#		all_units = unit_file.readlines()
+#		for unit in all_units:
+#			unit = unit.split(",")
+#			unit_info[unit[1].split("\n")[0]] = int(unit[0])
 
-	return unit_info
+#	return unit_info
+NUM_PROTOSS_ACTIONS = 70;
 
 def getUnitData(units, unit_info):
-	NUM_PROTOSS_ACTIONS = 68;
-
 	unit_list = units.split("]")
 	# remove the empty character at the end of the list
 	unit_list = unit_list[: len(unit_list)-1]

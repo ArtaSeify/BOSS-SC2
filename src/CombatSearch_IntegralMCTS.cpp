@@ -14,7 +14,6 @@ CombatSearch_IntegralMCTS::CombatSearch_IntegralMCTS(const CombatSearchParameter
     , m_rootRewards()
     , m_numTotalSimulations(0)
     , m_numCurrentRootSimulations(0)
-    , m_dataStream()
     , m_resultsStream()
     , m_needToWriteBestValue(false)
 {
@@ -24,17 +23,12 @@ CombatSearch_IntegralMCTS::CombatSearch_IntegralMCTS(const CombatSearchParameter
 
     m_writeEveryKSimulations = 1;
     m_dir = dir;
-    m_name = prefix;
+    m_prefix = prefix;
+    m_name = name;
     m_resultsStream << "0,0,0,0,0,0, ,0,0\n";
 
     std::random_device rd; // obtain a random number from hardware
     m_rnggen.seed(rd());
-
-    if (m_params.getSaveStates())
-    {
-        std::string dataDir = CONSTANTS::ExecutablePath + "/SavedStates/" + m_name + ".csv";
-        m_fileStates.open(dataDir, std::ofstream::out | std::ofstream::app);
-    }
 
     if (m_params.useNetworkPrediction())
     {
@@ -50,9 +44,12 @@ CombatSearch_IntegralMCTS::~CombatSearch_IntegralMCTS()
 {
     if (m_params.getSaveStates())
     {
-        m_fileStates << m_dataStream.rdbuf();
-        m_dataStream.str(std::string());
-        m_fileStates.close();
+        FileTools::MakeDirectory(CONSTANTS::ExecutablePath + "/SavedStates");
+        //std::ofstream fileStates(CONSTANTS::ExecutablePath + "/SavedStates/" + m_prefix + "_" + std::to_string(m_filesWritten) + ".csv", std::ofstream::out | std::ofstream::app | std::ofstream::binary);
+        std::ofstream fileStates(CONSTANTS::ExecutablePath + "/SavedStates/" + m_name + ".csv", std::ofstream::out | std::ofstream::app | std::ofstream::binary);
+        #pragma omp critical
+        fileStates << m_ssStates.rdbuf();
+        m_ssStates.str(std::string());
     }
 }
 
@@ -87,7 +84,20 @@ void CombatSearch_IntegralMCTS::recurse(const GameState& state, int depth)
             if (m_params.getSaveStates())
             {
                 currentRoot->getState().writeToSS(m_ssStates, m_params);
-                m_ssStates << "," << m_integral.getCurrentStackValue() << "\n";
+                std::vector<float> MCTSPolicy = std::vector<float>(ActionTypes::GetRaceActionCount(Races::Protoss), 0.f);
+                int totalVisits = 0;
+                // policy is edge_i visit count / all edges visit count
+                for (int i = 0; i < currentRoot->getNumEdges(); ++i)
+                {
+                    const auto& edge = currentRoot->getEdge(i);
+                    MCTSPolicy[edge->getAction().first.getRaceActionID()] = static_cast<float>(edge->timesVisited());
+                    totalVisits += edge->timesVisited();
+                }
+                for (int i = 0; i < ActionTypes::GetRaceActionCount(Races::Protoss); ++i)
+                {
+                    m_ssStates << "," << (MCTSPolicy[i] / totalVisits);
+                }
+                m_ssStates << "\n";
             }
 
             m_numCurrentRootSimulations = 0;
@@ -110,6 +120,7 @@ void CombatSearch_IntegralMCTS::recurse(const GameState& state, int depth)
                 childEdge = currentRoot->getChild(m_bestBuildOrderFound[m_buildOrder.size()]);
             }
 
+            // create the child node if it doesn't exist
             if (childEdge->getChild() == nullptr)
             {
                 currentRoot->notExpandedChild(childEdge, m_params, true);
@@ -722,13 +733,13 @@ void CombatSearch_IntegralMCTS::writeResultsFile(const std::string & dir, const 
     boFile << "Nodes expanded: " << m_results.nodesExpanded << ". Total nodes visited: " << m_results.nodeVisits << ", at a rate of " << (1000 * m_results.nodeVisits / m_results.timeElapsed) << " nodes/sec\n";
 
     // Write search data to file 
-    std::ofstream file(m_dir + "/" + m_name + "_Results.csv", std::ofstream::out | std::ofstream::app);
+    std::ofstream file(m_dir + "/" + m_prefix + "_Results.csv", std::ofstream::out | std::ofstream::app);
     file << m_resultsStream.rdbuf();
     file.close();
     m_resultsStream.str(std::string());
 
 
-    std::ofstream searchData(m_dir + "/" + m_name + "_SearchData.txt", std::ofstream::out | std::ofstream::app);
+    std::ofstream searchData(m_dir + "/" + m_prefix + "_SearchData.txt", std::ofstream::out | std::ofstream::app);
     searchData << "Max eval found: " << m_bestIntegralFound.getCurrentStackValue() << "\n";
     searchData << "Finished build order eval: " << m_results.finishedEval << "\n";
     searchData << "Useful build order eval: " << m_results.usefulEval << "\n";

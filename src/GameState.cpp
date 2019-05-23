@@ -1123,18 +1123,15 @@ void GameState::printUnits() const
 
 void GameState::writeToSS(std::stringstream & ss, const CombatSearchParameters & params) const
 {    
-    ss << "[";
+    //ss << "[";
     for (int index = 0; index < m_units.size(); ++index)
     {
         m_units[index].writeToSS(ss);
-        if (index != m_units.size() - 1)
-        {
-            ss << ",";
-        }
+        ss << ",";
     }
-    ss << "],";
+    //ss << "],";
 
-    ss << "[";
+    /*ss << "[";
     for (int index = 0; index < m_unitsBeingBuilt.size(); ++index)
     {
         ss << m_unitsBeingBuilt[index];
@@ -1154,9 +1151,9 @@ void GameState::writeToSS(std::stringstream & ss, const CombatSearchParameters &
             ss << ",";
         }
     }
-    ss << "],";
+    ss << "],";*/
 
-    ss << "[";
+    /*ss << "[";
     for (int index = 0; index < m_chronoBoosts.size(); ++index)
     {
         m_chronoBoosts[index].writeToSS(ss);
@@ -1165,23 +1162,23 @@ void GameState::writeToSS(std::stringstream & ss, const CombatSearchParameters &
             ss << ",";
         }
     }
-    ss << "],";
+    ss << "],";*/
 
-    ss << int(m_race) << ",";
+    //ss << int(m_race) << ",";
     ss << m_minerals << ",";
     ss << m_gas << ",";
     ss << m_currentSupply << ",";
     ss << m_maxSupply << ",";
     ss << m_currentFrame << ",";
-    ss << m_previousFrame << ",";
-    ss << params.getFrameTimeLimit() << ",";
+    //ss << m_previousFrame << ",";
+    ss << params.getFrameTimeLimit() - m_currentFrame << ",";
     ss << m_mineralWorkers << ",";
     ss << m_gasWorkers << ",";
-    ss << m_buildingWorkers << ",";
-    ss << m_numRefineries << ",";
-    ss << m_numDepots << ",";
-    ss << m_lastAction.getID() << ",";
-    m_lastAbility.writeToSS(ss);
+    ss << m_buildingWorkers;
+    //ss << m_numRefineries << ",";
+    //ss << m_numDepots;
+    //ss << m_lastAction.getID() << ",";
+    //m_lastAbility.writeToSS(ss);
 }
 
 json GameState::writeToJson(const CombatSearchParameters & params) const

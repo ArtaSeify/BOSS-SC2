@@ -72,9 +72,7 @@ namespace BOSS
     public:
         CombatSearch_IntegralMCTS(const CombatSearchParameters p = CombatSearchParameters(), const std::string & dir = "", 
                                                                     const std::string & prefix = "", const std::string & name = "");
-
         ~CombatSearch_IntegralMCTS();
-
         int getNumSimulations() const { return m_numTotalSimulations; }
     };
 }

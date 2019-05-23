@@ -140,11 +140,11 @@ class PolicyNetwork(Model):
     # prediction = layers.Dense(output_shape, activation='linear')(layer)
     def create(self, input_shape, output_shape, model_name, batch_size, learning_rate):
         inputs = tf.keras.Input(shape=(input_shape, ), name="state")
-        layer = layers.Dense(2048, activation='elu')(inputs)
-        layer = layers.Dense(1024, activation='elu')(layer)
-        layer = layers.Dense(1024, activation='elu')(layer)
-        layer = layers.Dense(512, activation='elu')(layer)
-        layer = layers.Dense(512, activation='elu')(layer)
+        layer = layers.Dense(512, activation='elu')(inputs)
+        layer = layers.Dense(256, activation='elu')(layer)
+        layer = layers.Dense(256, activation='elu')(layer)
+        layer = layers.Dense(128, activation='elu')(layer)
+        layer = layers.Dense(128, activation='elu')(layer)
         prediction = layers.Dense(output_shape, activation='linear', name="policy")(layer)
         #prediction = layers.Dense(output_shape, activation='softmax')(layer)
 

@@ -12,7 +12,7 @@ Unit::Unit()
     , m_type                    (-1)
     , m_addon                   (ActionTypes::None)
     , m_buildType               (ActionTypes::None)
-    , m_buildID                 (0)
+    , m_buildID                 (-1)
     , m_job                     (UnitJobs::None)
     , m_timeUntilBuilt          (0)
     , m_timeUntilFree           (0)
@@ -55,7 +55,7 @@ Unit::Unit(ActionType type, NumUnits id, NumUnits builderID, TimeType frameStart
     , m_type                    (type)
     , m_addon                   (ActionTypes::None)
     , m_buildType               (ActionTypes::None)
-    , m_buildID                 (0)
+    , m_buildID                 (-1)
     , m_job                     (UnitJobs::None)
     , m_timeUntilBuilt          (builderID != -1 ? type.buildTime() : 0)
     , m_timeUntilFree           (builderID != -1 ? type.buildTime() : 0)
@@ -299,26 +299,26 @@ std::string Unit::toString() const
 
 void Unit::writeToSS(std::stringstream & ss) const
 {    
-    ss << "[";
+    //ss << "[";
     ss << m_id << ",";
-    ss << m_frameStarted << ",";
-    ss << m_frameFinished << ",";
-    ss << m_builderID << ",";
-    ss << m_type.getID() << ",";
-    ss << m_addon.getID() << ",";
-    ss << m_buildType.getID() << ",";
+    //ss << m_frameStarted << ",";
+    //ss << m_frameFinished << ",";
+    //ss << m_builderID << ",";
+    ss << m_type.getRaceActionID() << ",";
+    //ss << m_addon.getID() << ",";
+    //ss << m_buildType.getID() << ",";
     ss << m_buildID << ",";
-    ss << m_job << ",";
+    //ss << m_job << ",";
     ss << m_timeUntilBuilt << ",";
     ss << m_timeUntilFree << ",";
-    ss << m_timeChronoBoost << ",";
-    ss << m_timeChronoBoostAgain << ",";
+    //ss << m_timeChronoBoost << ",";
+    //ss << m_timeChronoBoostAgain << ",";
     //ss << m_numLarva << ", ";
     ss << m_maxEnergyAllowed << ",";
     ss << m_energy;
-    ss << m_morphID;
-    ss << m_morphed << "]";
-    ss << "]";
+    //ss << m_morphID << ",";
+    //ss << m_morphed;
+    //ss << "]";
 }
 
 json Unit::writeToJson() const

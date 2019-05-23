@@ -12,22 +12,22 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BOSS_main", "BOSS_main.vcxp
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Network", "Network", "{782983D0-EED4-487E-84E8-D43B3A32C9DE}"
 	ProjectSection(SolutionItems) = preProject
-		..\bin\data\data_filter.py = ..\bin\data\data_filter.py
-		..\bin\data\data_filter_all_function.py = ..\bin\data\data_filter_all_function.py
-		..\bin\data\data_filter_functions.py = ..\bin\data\data_filter_functions.py
-		..\bin\data\data_filter_functions_onehot.py = ..\bin\data\data_filter_functions_onehot.py
-		..\bin\data\data_loader.py = ..\bin\data\data_loader.py
-		..\bin\data\data_loader_keras.py = ..\bin\data\data_loader_keras.py
-		..\bin\data\evaluate_model.py = ..\bin\data\evaluate_model.py
-		..\bin\data\main.py = ..\bin\data\main.py
-		..\bin\data\model.py = ..\bin\data\model.py
-		..\bin\data\models.py = ..\bin\data\models.py
-		..\bin\data\predictor.py = ..\bin\data\predictor.py
-		..\bin\data\test.py = ..\bin\data\test.py
-		..\bin\data\tests.py = ..\bin\data\tests.py
-		..\bin\data\train.py = ..\bin\data\train.py
-		..\bin\data\train_inference.py = ..\bin\data\train_inference.py
-		..\bin\data\train_model.py = ..\bin\data\train_model.py
+		..\bin\ML\data_filter.py = ..\bin\ML\data_filter.py
+		..\bin\ML\data_filter_all_function.py = ..\bin\ML\data_filter_all_function.py
+		..\bin\ML\data_filter_functions.py = ..\bin\ML\data_filter_functions.py
+		..\bin\ML\data_filter_functions_onehot.py = ..\bin\ML\data_filter_functions_onehot.py
+		..\bin\ML\data_loader.py = ..\bin\ML\data_loader.py
+		..\bin\ML\data_loader_keras.py = ..\bin\ML\data_loader_keras.py
+		..\bin\ML\evaluate_model.py = ..\bin\ML\evaluate_model.py
+		..\bin\ML\main.py = ..\bin\ML\main.py
+		..\bin\ML\model.py = ..\bin\ML\model.py
+		..\bin\ML\models.py = ..\bin\ML\models.py
+		..\bin\ML\predictor.py = ..\bin\ML\predictor.py
+		..\bin\ML\test.py = ..\bin\ML\test.py
+		..\bin\ML\tests.py = ..\bin\ML\tests.py
+		..\bin\ML\train.py = ..\bin\ML\train.py
+		..\bin\ML\train_inference.py = ..\bin\ML\train_inference.py
+		..\bin\ML\train_model.py = ..\bin\ML\train_model.py
 	EndProjectSection
 EndProject
 Global

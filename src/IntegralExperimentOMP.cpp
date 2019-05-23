@@ -102,7 +102,7 @@ IntegralExperimentOMP::IntegralExperimentOMP(const std::string& experimentName, 
 
         std::stringstream ss;
         ss << std::fixed << std::setprecision(2) << m_params.getExplorationValue();
-        m_name += "C" + ss.str();
+        //m_name += "C" + ss.str();
     }
 
     else if (searchType == "IntegralNMCS")
@@ -294,6 +294,7 @@ void IntegralExperimentOMP::runExperimentThread(int run)
     }
 
     combatSearch->search();
+    #pragma omp critical
     combatSearch->printResults();
     combatSearch->writeResultsFile(outputDir, resultsFile);
     const CombatSearchResults& results = combatSearch->getResults();

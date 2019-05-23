@@ -19,17 +19,21 @@ CombatSearch_Integral::CombatSearch_Integral(const CombatSearchParameters p,
     m_prefix = prefix;
     m_name = name;
     m_ssHighestValue << "0,0\n";
+    m_ssStates.precision(4);
 
     //BOSS_ASSERT(m_params.getInitialState().getRace() != Races::None, "Combat search initial state is invalid");
 }
 
 CombatSearch_Integral::~CombatSearch_Integral()
 {
-    FileTools::MakeDirectory(CONSTANTS::ExecutablePath + "/SavedStates");
-    //std::ofstream fileStates(CONSTANTS::ExecutablePath + "/SavedStates/" + m_name + "_" + std::to_string(m_filesWritten) + ".csv", std::ofstream::out | std::ofstream::app | std::ofstream::binary);
-    std::ofstream fileStates(CONSTANTS::ExecutablePath + "/SavedStates/" + m_name + ".csv", std::ofstream::out | std::ofstream::app | std::ofstream::binary);
-    fileStates << m_ssStates.rdbuf();
-    m_ssStates.str(std::string());
+    if (m_params.getSaveStates())
+    {
+        FileTools::MakeDirectory(CONSTANTS::ExecutablePath + "/SavedStates");
+        //std::ofstream fileStates(CONSTANTS::ExecutablePath + "/SavedStates/" + m_name + "_" + std::to_string(m_filesWritten) + ".csv", std::ofstream::out | std::ofstream::app | std::ofstream::binary);
+        std::ofstream fileStates(CONSTANTS::ExecutablePath + "/SavedStates/" + m_name + ".csv", std::ofstream::out | std::ofstream::app | std::ofstream::binary);
+        fileStates << m_ssStates.rdbuf();
+        m_ssStates.str(std::string());
+    }
 
     std::ofstream fileHighestValue(m_dir + "/" + m_prefix + "_HighestValueOrdering.txt", std::ofstream::out | std::ofstream::trunc);
     fileHighestValue << m_ssHighestValue.rdbuf();

@@ -92,3 +92,6 @@ emscripten/BOSS.data
 /MCTS Results/newtheory
 /bin/reset/true
 /bin/reset/false/1000
+/bin/ML/logs
+/bin/ML/models
+/bin/ML/__pycache__

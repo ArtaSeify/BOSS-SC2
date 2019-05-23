@@ -142,8 +142,16 @@ namespace ActionTypes
         {
             allActionTypes.push_back(ActionType(i));
             nameMap[allActionTypes[i].getName()] = allActionTypes[i];
+
+            if (allActionTypes[i].getRace() == Races::None)
+            {
+                for (auto& race : raceActionTypes)
+                {
+                    race.push_back(allActionTypes[i]);
+                }
+            }
             
-            if (allActionTypes[i].getRace() != Races::None)
+            else
             {
                 raceActionTypes[allActionTypes[i].getRace()].push_back(allActionTypes[i]);
             }

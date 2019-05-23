@@ -1,24 +1,24 @@
-NUM_PROTOSS_ACTIONS = 69
+NUM_PROTOSS_ACTIONS = 70
 
-def createUnitDict(filename):
-    unit_info = dict()
-    with open(filename, 'r') as unit_file:
-        all_units = unit_file.readlines()
-        for unit in all_units:
-            unit = unit.split(",")
-            unit_info[unit[1].split("\n")[0]] = int(unit[0])
+#def createUnitDict(filename):
+#    unit_info = dict()
+#    with open(filename, 'r') as unit_file:
+#        all_units = unit_file.readlines()
+#        for unit in all_units:
+#            unit = unit.split(",")
+#            unit_info[unit[1].split("\n")[0]] = int(unit[0])
 
-    return unit_info
+#    return unit_info
 
-def createActionVector(values):
-    action_probs = [0 for i in range(NUM_PROTOSS_ACTIONS)]
-    total = 0
-    for i in range(0,len(values)-1,2):
-        action_probs[int(values[i])] = 1
-        total += 1
+#def createActionVector(values):
+#    action_probs = [0 for i in range(NUM_PROTOSS_ACTIONS)]
+#    total = 0
+#    for i in range(0,len(values)-1,2):
+#        action_probs[int(values[i])] = 1
+#        total += 1
 
-    action_probs = [i/total for i in action_probs]
-    return action_probs
+#    action_probs = [i/total for i in action_probs]
+#    return action_probs
 
 def splitArrayData(data):
     data = data.split("]")
@@ -26,7 +26,6 @@ def splitArrayData(data):
     data = data[: len(data)-1]
 
     all_units = []
-    unit_types = [0 for i in range(NUM_PROTOSS_ACTIONS)]
     for unit in data:
         unit = unit.split("[")[1]
 
