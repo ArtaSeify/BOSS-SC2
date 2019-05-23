@@ -114,7 +114,7 @@ namespace BOSS
         uint8 m_numberOfNodes;
         int m_simulationsPerStep;
         FracType m_simulationsPerStepDecay;
-        bool m_useNetworkPrediction;
+        bool m_usePolicyNetwork;
         int m_threadsForExperiment;
         int m_numPlayouts;
         int m_level;
@@ -198,8 +198,8 @@ namespace BOSS
         void setSimulationsPerStepDecay(FracType value);
         FracType getSimulationsPerStepDecay() const;
 
-        void setNetworkPrediction(bool value);
-        bool useNetworkPrediction() const;
+        void setUsePolicyNetwork(bool value);
+        bool usePolicyNetwork() const;
 
         void setThreadsForExperiment(int threads);
         int getThreadsForExperiment() const;

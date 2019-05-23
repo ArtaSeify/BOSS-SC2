@@ -5,10 +5,10 @@
     {   
         "test" :
         {
-            "Run"               : [ true, 8 ],
+            "Run"               : [ true, 1 ],
             "UseTotalTimeLimit" : false,
             "SearchType"        : [ "IntegralMCTS" ],
-            "SearchParameters"  : { "ExplorationConstant" : 0.15, "UseMax" : true},
+            "SearchParameters"  : { "ExplorationConstant" : 1.25, "UseMax" : true},
             "ChangingRoot"      : { "Active": true, "Simulations": 200, "Reset": true },
             "Threads"           : 7,
             "Race"              : "Protoss",
@@ -23,7 +23,7 @@
             "OpeningBuildOrder" : "Empty",
             "SortActions"       : false,
             "SaveStates"        : true,
-            "UseNetwork"        : false
+            "UsePolicyNetwork"  : false
         }
     },
 

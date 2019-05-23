@@ -30,14 +30,14 @@ CombatSearch_IntegralMCTS::CombatSearch_IntegralMCTS(const CombatSearchParameter
     std::random_device rd; // obtain a random number from hardware
     m_rnggen.seed(rd());
 
-    if (m_params.useNetworkPrediction())
+    /*if (m_params.useNetworkPrediction())
     {
         Edge::MIXING_PARAMETER = 0.5f;
     }
     else
-    {
+    {*/
         Edge::MIXING_PARAMETER = 0.0f;
-    }
+    //}
 }
 
 CombatSearch_IntegralMCTS::~CombatSearch_IntegralMCTS()
@@ -181,22 +181,22 @@ void CombatSearch_IntegralMCTS::recurse(const GameState& state, int depth)
                 }
                 else
                 {
-                    // get a child based on highest network value
-                    if (m_params.useNetworkPrediction())
-                    {
-                        const GameState& prevNodeState = promisingNode->getState();
-                        std::shared_ptr<Edge> action = promisingNode->getHighestValueChild(m_params);
-                        promisingNode = promisingNode->notExpandedChild(action, m_params);
-                        updateBOIntegral(*promisingNode, action->getAction(), prevNodeState, false);
-                    }
-                    // pick a child at random
-                    else
-                    {
+                    //// get a child based on highest network value
+                    //if (m_params.useNetworkPrediction())
+                    //{
+                    //    const GameState& prevNodeState = promisingNode->getState();
+                    //    std::shared_ptr<Edge> action = promisingNode->getHighestValueChild(m_params);
+                    //    promisingNode = promisingNode->notExpandedChild(action, m_params);
+                    //    updateBOIntegral(*promisingNode, action->getAction(), prevNodeState, false);
+                    //}
+                    //// pick a child at random
+                    //else
+                    //{
                         const GameState& prevNodeState = promisingNode->getState();
                         std::shared_ptr<Edge> action = promisingNode->getRandomEdge();
                         promisingNode = promisingNode->notExpandedChild(action, m_params);
                         updateBOIntegral(*promisingNode, action->getAction(), prevNodeState, false);
-                    }
+                    //}
 
                     updateNodeVisits(Edge::NODE_VISITS_BEFORE_EXPAND == 1, isTerminalNode(*promisingNode));
                 }
@@ -326,58 +326,58 @@ void CombatSearch_IntegralMCTS::recurse(const GameState& state, int depth)
 
 void CombatSearch_IntegralMCTS::test(const GameState & state)
 {
-    m_numTotalSimulations = 0;
-    m_numCurrentRootSimulations = 0;
-    int simulationsWritten = 0;
-
-    std::shared_ptr<Node> root = std::make_shared<Node>(state);
-    ActionSetAbilities legalActions;
-    generateLegalActions(root->getState(), legalActions, m_params);
-    root->createChildrenEdges(legalActions, m_params);
-
-    for (int index = 0; index < root->getNumEdges(); ++index)
-    {
-        std::shared_ptr<Edge> action = root->getEdge(index);
-        root->notExpandedChild(action, m_params, true);
-    }
-
-    for (int ind = 0; ind < root->getNumEdges(); ++ind)
-    {
-        std::shared_ptr<Edge> action = root->getEdge(ind);
-        std::shared_ptr<Node> promisingNode = action->getChild();
-
-        std::cout << action->getAction().first.getName() << std::endl;
-
-        for (int sim = 0; sim < 20000; ++sim)
-        {
-            updateBOIntegral(*promisingNode, action->getAction(), root->getState(), false);
-            
-            randomPlayout(*promisingNode);
-            backPropogation(promisingNode);
-
-            m_promisingNodeBuildOrder = m_buildOrder;
-            m_promisingNodeIntegral = m_integral;
-        }
-    }
-    
-    for (const auto& pair : m_rootRewards)
-    {
-        std::ofstream f("../bin/StateDist/" + pair.first + ".txt", std::ofstream::out | std::ofstream::trunc);
-        for (auto reward : pair.second)
-        {
-            f << reward << "\n";
-        }
-    }
-
-    for (int i = 0; i < root->getNumEdges(); ++i)
-    {
-        auto action = root->getEdge(i);
-        std::cout << action->getAction().first.getName() << ": MEAN " << action->getMean() << ", SD: " << action->getSD() 
-            << ", MAX: " << action->getValue() << ", CONST: " << (action->getValue() - action->getMean()) / action->getSD()
-            << " s/sqrt(n): " << action->getSD() / sqrt(action->timesVisited())
-            << std::endl;
-    }
-    std::cout << std::endl;
+//    m_numTotalSimulations = 0;
+//    m_numCurrentRootSimulations = 0;
+//    int simulationsWritten = 0;
+//
+//    std::shared_ptr<Node> root = std::make_shared<Node>(state);
+//    ActionSetAbilities legalActions;
+//    generateLegalActions(root->getState(), legalActions, m_params);
+//    root->createChildrenEdges(legalActions, m_params);
+//
+//    for (int index = 0; index < root->getNumEdges(); ++index)
+//    {
+//        std::shared_ptr<Edge> action = root->getEdge(index);
+//        root->notExpandedChild(action, m_params, true);
+//    }
+//
+//    for (int ind = 0; ind < root->getNumEdges(); ++ind)
+//    {
+//        std::shared_ptr<Edge> action = root->getEdge(ind);
+//        std::shared_ptr<Node> promisingNode = action->getChild();
+//
+//        std::cout << action->getAction().first.getName() << std::endl;
+//
+//        for (int sim = 0; sim < 20000; ++sim)
+//        {
+//            updateBOIntegral(*promisingNode, action->getAction(), root->getState(), false);
+//            
+//            randomPlayout(*promisingNode);
+//            backPropogation(promisingNode);
+//
+//            m_promisingNodeBuildOrder = m_buildOrder;
+//            m_promisingNodeIntegral = m_integral;
+//        }
+//    }
+//    
+//    for (const auto& pair : m_rootRewards)
+//    {
+//        std::ofstream f("../bin/StateDist/" + pair.first + ".txt", std::ofstream::out | std::ofstream::trunc);
+//        for (auto reward : pair.second)
+//        {
+//            f << reward << "\n";
+//        }
+//    }
+//
+//    for (int i = 0; i < root->getNumEdges(); ++i)
+//    {
+//        auto action = root->getEdge(i);
+//        std::cout << action->getAction().first.getName() << ": MEAN " << action->getMean() << ", SD: " << action->getSD() 
+//            << ", MAX: " << action->getValue() << ", CONST: " << (action->getValue() - action->getMean()) / action->getSD()
+//            << " s/sqrt(n): " << action->getSD() / sqrt(action->timesVisited())
+//            << std::endl;
+//    }
+//    std::cout << std::endl;
 }
 
 void CombatSearch_IntegralMCTS::test2(const GameState & state)
@@ -441,19 +441,20 @@ bool CombatSearch_IntegralMCTS::isTerminalNode(const Node & node) const
 
 bool CombatSearch_IntegralMCTS::shouldChangeRoot(std::shared_ptr<Node> root, int simulationsThusFar, int rootDepth) const
 {
-    std::shared_ptr<Edge> edge = root->getParentEdge();
-
-    if (edge->timesVisited() < 1000)
-    {
-        return false;
-    }
-    
-    //std::cout << (edge->getValue() - edge->getMean()) / edge->getSD() << std::endl;
-    if (edge->getMean() + m_params.getSDConstant() * edge->getSD() <= edge->getMax())
-    {
-        return true;
-    }
     return false;
+    //std::shared_ptr<Edge> edge = root->getParentEdge();
+
+    //if (edge->timesVisited() < 1000)
+    //{
+    //    return false;
+    //}
+    //
+    ////std::cout << (edge->getValue() - edge->getMean()) / edge->getSD() << std::endl;
+    //if (edge->getMean() + m_params.getSDConstant() * edge->getSD() <= edge->getMax())
+    //{
+    //    return true;
+    //}
+    //return false;
 }
 
 void CombatSearch_IntegralMCTS::randomPlayout(Node node)

@@ -37,7 +37,7 @@ CombatSearchParameters::CombatSearchParameters()
     , m_numberOfNodes(std::numeric_limits<int>::max())
     , m_simulationsPerStep(0)
     , m_simulationsPerStepDecay(1)
-    , m_useNetworkPrediction(0)
+    , m_usePolicyNetwork(0)
     , m_threadsForExperiment(1)
     , m_numPlayouts(0)
     , m_level(0)
@@ -288,14 +288,14 @@ FracType CombatSearchParameters::getSimulationsPerStepDecay() const
     return m_simulationsPerStepDecay;
 }
 
-void CombatSearchParameters::setNetworkPrediction(bool value)
+void CombatSearchParameters::setUsePolicyNetwork(bool value)
 {
-    m_useNetworkPrediction = value;
+    m_usePolicyNetwork = value;
 }
 
-bool CombatSearchParameters::useNetworkPrediction() const
+bool CombatSearchParameters::usePolicyNetwork() const
 {
-    return m_useNetworkPrediction;
+    return m_usePolicyNetwork;
 }
 
 void CombatSearchParameters::setThreadsForExperiment(int threads)

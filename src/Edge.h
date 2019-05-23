@@ -25,7 +25,7 @@ namespace BOSS
         FracType m_value;
         FracType m_averageValue;
         FracType m_maxValue;
-        double m_valuesSquared;
+        FracType m_policyValue;
         ActionAbilityPair m_action;
 
         std::shared_ptr<Node> m_child;
@@ -44,6 +44,9 @@ namespace BOSS
         
         const ActionAbilityPair & getAction() const { return m_action; }
         void setAction(const ActionAbilityPair & newAction) { m_action = newAction; }
+
+        void setPolicyValue(FracType value) { m_policyValue = value; }
+        FracType getPolicyValue() const { return m_policyValue; }
         
         std::shared_ptr<Node> getChild() { return m_child; }
         void setChild(std::shared_ptr<Node> node);
@@ -56,7 +59,7 @@ namespace BOSS
 
         void printValues() const;
         
-        double getSD() const;
+        //double getSD() const;
     };
 }
 

@@ -4,7 +4,7 @@
 using namespace BOSS;
 
 FracType Edge::CURRENT_HIGHEST_VALUE = 1.f;
-int Edge::NODE_VISITS_BEFORE_EXPAND = 2;
+int Edge::NODE_VISITS_BEFORE_EXPAND = 30;
 bool Edge::USE_MAX_VALUE = true;
 FracType Edge::MIXING_PARAMETER = 0.0f;
 
@@ -13,9 +13,9 @@ Edge::Edge()
     , m_valueSimulations(0)
     , m_valueNetwork(0)
     , m_value(0)
-    , m_valuesSquared(0)
     , m_averageValue(0)
     , m_maxValue(0)
+    , m_policyValue(0)
     , m_action(ActionAbilityPair(ActionTypes::None, AbilityAction()))
     , m_child()
     , m_parent()
@@ -30,7 +30,7 @@ Edge::Edge(const ActionAbilityPair & action, std::shared_ptr<Node> parent)
     , m_value(0)
     , m_averageValue(0)
     , m_maxValue(0)
-    , m_valuesSquared(0)
+    , m_policyValue(0)
     , m_action(action)
     , m_child()
     , m_parent(parent)
@@ -60,7 +60,6 @@ void Edge::updateEdge(FracType simulationValue)
 
     m_maxValue = std::max(simulationValue, m_maxValue);
     m_averageValue = m_averageValue + ((1.f / m_timesVisited) * (simulationValue - m_averageValue));
-    m_valuesSquared += (simulationValue * simulationValue);
 
     if (USE_MAX_VALUE)
     {
@@ -100,7 +99,7 @@ void Edge::printValues() const
     std::cout << "Edge Value: " << m_value << std::endl;
 }
 
-double Edge::getSD() const
-{
-    return sqrt((m_valuesSquared - (m_timesVisited *  m_averageValue * m_averageValue))/(m_timesVisited - 1));
-}
+//double Edge::getSD() const
+//{
+//    return sqrt((m_valuesSquared - (m_timesVisited *  m_averageValue * m_averageValue))/(m_timesVisited - 1));
+//}

@@ -55,20 +55,17 @@ IntegralExperiment::IntegralExperiment(const std::string & experimentName, const
     BOSS_ASSERT(exp.count("SaveStates") && exp["SaveStates"].is_boolean(), "IntegralSearch must have a SaveStates bool");
     m_params.setSaveStates(exp["SaveStates"]);
 
-    BOSS_ASSERT(exp.count("UseNetwork") && exp["UseNetwork"].is_boolean(), "IntegralSearch must have a UseNetwork bool");
-    m_params.setNetworkPrediction(exp["UseNetwork"]);
-
-    BOSS_ASSERT(exp.count("Threads") && exp["Threads"].is_number_integer(), "Integral Search must have a Threads int");
-    m_params.setThreadsForExperiment(exp["Threads"]);
+    BOSS_ASSERT(exp.count("UsePolicyNetwork") && exp["UsePolicyNetwork"].is_boolean(), "IntegralSearch must have a UsePolicyNetwork bool");
+    m_params.setUsePolicyNetwork(exp["UsePolicyNetwork"]);
 
     const std::string & searchType = exp["SearchType"][0].get<std::string>();
     m_searchType = searchType;
 
-    if (searchType == "IntegralDFS" || searchType == "IntegralDFSVN" || searchType == "IntegralDFSPN" || searchType == "IntegralDFSPVN")
+    /*if (searchType == "IntegralDFS" || searchType == "IntegralDFSVN" || searchType == "IntegralDFSPN" || searchType == "IntegralDFSPVN")
     {
         BOSS_ASSERT(searchType == "IntegralDFS" && !m_params.useNetworkPrediction() ||
             ((searchType == "IntegralDFSVN" || searchType == "IntegralDFSPN" || searchType == "IntegralDFSPVN") && m_params.useNetworkPrediction()), "Turn off UseNetwork flag for standard DFS search");
-    }
+    }*/
 
     if (searchType == "IntegralMCTS")
     {

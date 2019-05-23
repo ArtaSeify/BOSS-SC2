@@ -34,7 +34,7 @@ int main(int argc, char * argv[])
     full_path = fs::system_complete(fs::path(argv[0]));
     std::string parent_path = full_path.parent_path().string();
     std::replace(parent_path.begin(), parent_path.end(), '\\', '/');
-    std::string path_string = parent_path + "/data";
+    std::string path_string = parent_path + "/ML";
 
     BOSS::CONSTANTS::ExecutablePath = parent_path;
 
@@ -50,7 +50,7 @@ int main(int argc, char * argv[])
         PyRun_SimpleString(command.c_str());
         try
         {
-            BOSS::CONSTANTS::Predictor = python::import("predictor").attr("Network")(std::string(argv[2]), "both");
+            BOSS::CONSTANTS::Predictor = python::import("predictor").attr("Network")(std::string(argv[2]), "policy", true);
         }
         catch (const python::error_already_set&)
         {
