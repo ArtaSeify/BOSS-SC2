@@ -95,3 +95,4 @@ emscripten/BOSS.data
 /bin/ML/logs
 /bin/ML/models
 /bin/ML/__pycache__
+/bin/expop

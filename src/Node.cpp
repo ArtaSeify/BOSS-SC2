@@ -233,12 +233,12 @@ std::shared_ptr<Edge> Node::selectChildEdge(FracType exploration_param, std::mt1
         std::uniform_int_distribution<> distribution(0, int(unvisitedEdges.size()) - 1);
         return m_edges[unvisitedEdges[distribution(rnggen)]];
     }
-/*
+
     float UCBValue = exploration_param * policyValue *
         static_cast<FracType>(std::sqrt(totalChildVisits));
-*/
-    float UCBValue = exploration_param *
-            static_cast<FracType>(std::sqrt(totalChildVisits));
+
+    //float UCBValue = exploration_param *
+    //        static_cast<FracType>(std::sqrt(totalChildVisits));
 
     float maxActionValue = 0;
     int maxIndex = 0;
