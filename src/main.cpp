@@ -46,17 +46,24 @@ int main(int argc, char * argv[])
         std::string command = "import sys\nsys.path.append(\"" + path_string + "\")\n";
 
         Py_Initialize();
-        
+        PyEval_InitThreads();
+
         PyRun_SimpleString(command.c_str());
         try
         {
-            BOSS::CONSTANTS::Predictor = python::import("predictor").attr("Network")(std::string(argv[2]), "policy", true);
+            //BOSS::CONSTANTS::Predictor = python::import("predictor").attr("Network")(std::string(argv[2]), "policy", true);
+            PyObject* PyModule = PyImport_ImportModule("predictor");
+            PyObject* PyClass = PyObject_GetAttrString(PyModule, "Network");
+            PyObject* PyObj = PyEval_CallObject(PyClass, Py_BuildValue("(s, s, i)", std::string(argv[2]).c_str(), "policy", true));
+            BOSS::CONSTANTS::Predictor = PyObject_GetAttrString(PyObj, "predict");
         }
         catch (const python::error_already_set&)
         {
             PyErr_Print();
             BOSS_ASSERT(false, "error in evaluating states in Python");
         }
+
+        BOSS::CONSTANTS::PythonState = PyEval_SaveThread();
     }
 
     // Initialize all the BOSS internal data
@@ -64,6 +71,9 @@ int main(int argc, char * argv[])
 
     BOSS::BOSSConfig::Instance().ParseConfig(parent_path + "/" + argv[1] + ".txt");
     BOSS::ExperimentsArta::RunExperiments(parent_path + "/" + argv[1] + ".txt");
+
+    PyEval_RestoreThread(BOSS::CONSTANTS::PythonState);
+    Py_Finalize();
     
     return 0;
 }

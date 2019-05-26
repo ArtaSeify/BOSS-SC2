@@ -5,7 +5,7 @@
     {   
         "test" :
         {
-            "Run"               : [ true, 1 ],
+            "Run"               : [ true, 2 ],
             "UseTotalTimeLimit" : false,
             "SearchType"        : [ "IntegralMCTS" ],
             "SearchParameters"  : { "ExplorationConstant" : 1.25, "UseMax" : true},
@@ -23,7 +23,7 @@
             "OpeningBuildOrder" : "Empty",
             "SortActions"       : false,
             "SaveStates"        : true,
-            "UsePolicyNetwork"  : false
+            "UsePolicyNetwork"  : true
         }
     },
 

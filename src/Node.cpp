@@ -95,15 +95,17 @@ void Node::createChildrenEdges(ActionSetAbilities & legalActions, const CombatSe
         std::stringstream ss;
         m_state.writeToSS(ss, params);
 
-        // evaluate the states. the results will be returned as string
-        python::object policyValues = CONSTANTS::Predictor.attr("predict")(ss.str());
-
+        PyGILState_STATE gstate;
+        gstate = PyGILState_Ensure();
+        PyObject* policyValues = PyEval_CallObject(CONSTANTS::Predictor, Py_BuildValue("(s)", ss.str().c_str()));
+        PyGILState_Release(gstate);
+        
         for (auto& edge : m_edges)
         {
             //std::cout << "edge action: " << edge->getAction().first.getRaceActionID() << ", value: " 
             //    << python::extract<FracType>(policyValues[edge->getAction().first.getRaceActionID()]) << std::endl;
             // update the edge values
-            edge->setPolicyValue(python::extract<FracType>(policyValues[edge->getAction().first.getRaceActionID()]));
+            edge->setPolicyValue(static_cast<FracType>(PyFloat_AsDouble(PyList_GetItem(policyValues, edge->getAction().first.getRaceActionID()))));
         }
     }
     // use uniform probability if we're not using a policy network

@@ -19,6 +19,7 @@ class Network:
         else:
             self.sess = tf.Session()
         tf.keras.backend.set_session(self.sess)
+        
 
         NUM_PROTOSS_UNITS = 70
         NUM_UNIT_FEATURES = 7
@@ -32,6 +33,11 @@ class Network:
         self.learning_rate = 1e-4
         self.batch_size = 1
         self.loadNetwork(network_type)
+        self.network.predict(np.zeros([1,self.feature_shape]))
+
+        self.session = tf.keras.backend.get_session()
+        self.graph = tf.get_default_graph()
+        self.graph.finalize()
 
     def loadNetwork(self, network_type):      
         if network_type == "policy":
@@ -56,13 +62,18 @@ class Network:
     #    x = d[-(shape+1):]
     #    return x
 
+    #def parseStringPolicy(self, csv_string):
+    #    split_string = tf.string_split(tf.expand_dims(csv_string, axis=0), ",")
+    #    data = tf.string_to_number(tf.sparse_tensor_to_dense(split_string, default_value=''), tf.float32)
+    #    x = tf.squeeze(data)
+    #    # adds zeroes for missing units
+    #    x = tf.expand_dims(tf.concat([x, tf.zeros(self.feature_shape - tf.size(x))], 0), axis=0)
+    #    #x.set_shape(self.feature_shape,)
+    #    return x      
+
     def parseStringPolicy(self, csv_string):
-        split_string = tf.string_split(tf.expand_dims(csv_string, axis=0), ",")
-        data = tf.string_to_number(tf.sparse_tensor_to_dense(split_string, default_value=''), tf.float32)
-        x = tf.squeeze(data)
-        # adds zeroes for missing units
-        x = tf.expand_dims(tf.concat([x, tf.zeros(self.feature_shape - tf.size(x))], 0), axis=0)
-        #x.set_shape(self.feature_shape,)
+        split_string = csv_string.split(",")
+        x = np.expand_dims(np.concatenate((split_string, np.zeros([self.feature_shape - len(split_string)])), axis=0), axis=0)
         return x      
 
 

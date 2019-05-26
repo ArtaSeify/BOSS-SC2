@@ -8,9 +8,9 @@
 #include "CombatSearch_IntegralMCTS.h"
 #include "NMCS.h"
 #include "NMCTS.h"
-#include "DFSPolicy.h"
-#include "DFSValue.h"
-#include "DFSPolicyAndValue.h"
+//#include "DFSPolicy.h"
+//#include "DFSValue.h"
+//#include "DFSPolicyAndValue.h"
 #include "FileTools.h"
 
 #include <boost/chrono.hpp>
@@ -248,7 +248,7 @@ void IntegralExperiment::runExperimentThread(int thread, int numRuns, int starti
         {
             combatSearch = std::unique_ptr<CombatSearch>(new CombatSearch_Integral(m_params, outputDir, resultsFile, m_name));
         }
-        else if (m_searchType == "IntegralDFSVN")
+        /*else if (m_searchType == "IntegralDFSVN")
         {
             combatSearch = std::unique_ptr<CombatSearch>(new DFSValue(m_params, outputDir, resultsFile, m_name));
         }
@@ -259,7 +259,7 @@ void IntegralExperiment::runExperimentThread(int thread, int numRuns, int starti
         else if (m_searchType == "IntegralDFSPVN")
         {
             combatSearch = std::unique_ptr<CombatSearch>(new DFSPolicyAndValue(m_params, outputDir, resultsFile, m_name));
-        }
+        }*/
         else if (m_searchType == "IntegralMCTS")
         {
             //resultsFile += "_IntegralMCTS";

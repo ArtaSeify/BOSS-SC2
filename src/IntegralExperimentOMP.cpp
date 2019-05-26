@@ -8,9 +8,9 @@
 #include "CombatSearch_IntegralMCTS.h"
 #include "NMCS.h"
 #include "NMCTS.h"
-#include "DFSPolicy.h"
-#include "DFSValue.h"
-#include "DFSPolicyAndValue.h"
+//#include "DFSPolicy.h"
+//#include "DFSValue.h"
+//#include "DFSPolicyAndValue.h"
 #include "FileTools.h"
 
 #include <boost/chrono.hpp>
@@ -260,7 +260,7 @@ void IntegralExperimentOMP::runExperimentThread(int run)
     {
         combatSearch = std::unique_ptr<CombatSearch>(new CombatSearch_Integral(m_params, outputDir, resultsFile, m_name));
     }
-    else if (m_searchType == "IntegralDFSVN")
+    /*else if (m_searchType == "IntegralDFSVN")
     {
         combatSearch = std::unique_ptr<CombatSearch>(new DFSValue(m_params, outputDir, resultsFile, m_name));
     }
@@ -271,7 +271,7 @@ void IntegralExperimentOMP::runExperimentThread(int run)
     else if (m_searchType == "IntegralDFSPVN")
     {
         combatSearch = std::unique_ptr<CombatSearch>(new DFSPolicyAndValue(m_params, outputDir, resultsFile, m_name));
-    }
+    }*/
     else if (m_searchType == "IntegralMCTS")
     {
         //resultsFile += "_IntegralMCTS";
@@ -470,7 +470,6 @@ void IntegralExperimentOMP::runTotalTimeExperiment(int run)
 void IntegralExperimentOMP::run(int numberOfRuns)
 {
     FileTools::MakeDirectory(m_outputDir);
-
     #pragma omp parallel for
     for (int run = 0; run < numberOfRuns; ++run)
     {
@@ -482,5 +481,5 @@ void IntegralExperimentOMP::run(int numberOfRuns)
         {
             runExperimentThread(run);
         }
-    }   
+    } 
 }
