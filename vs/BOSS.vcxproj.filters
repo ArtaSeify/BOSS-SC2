@@ -112,15 +112,6 @@
     <ClCompile Include="..\src\NMCS.cpp">
       <Filter>search\CombatSearch\Integral\NMCS</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\DFSPolicy.cpp">
-      <Filter>search\CombatSearch\Integral\Network</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\DFSValue.cpp">
-      <Filter>search\CombatSearch\Integral\Network</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\DFSPolicyAndValue.cpp">
-      <Filter>search\CombatSearch\Integral\Network</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\NMCTS.cpp">
       <Filter>search\CombatSearch\Integral\NMCTS</Filter>
     </ClCompile>
@@ -242,15 +233,6 @@
     </ClInclude>
     <ClInclude Include="..\src\NMCS.h">
       <Filter>search\CombatSearch\Integral\NMCS</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\DFSPolicy.h">
-      <Filter>search\CombatSearch\Integral\Network</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\DFSValue.h">
-      <Filter>search\CombatSearch\Integral\Network</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\DFSPolicyAndValue.h">
-      <Filter>search\CombatSearch\Integral\Network</Filter>
     </ClInclude>
     <ClInclude Include="..\src\NMCTS.h">
       <Filter>search\CombatSearch\Integral\NMCTS</Filter>

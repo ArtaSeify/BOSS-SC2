@@ -12,6 +12,7 @@ parser.add_argument("save_name", help="Name of model to save")
 parser.add_argument("trainset", help="Path to datafile to use for training")
 parser.add_argument("--testset", help="Path to datafile to use for testing")
 parser.add_argument("--load_model", help="Name of model to load")
+parser.add_argument("--epochs", help="Number of epochs to train")
 args = parser.parse_args()
 
 use_gpu = True
@@ -35,7 +36,7 @@ feature_shape = (MAX_NUM_UNITS * NUM_UNIT_FEATURES) + EXTRA_FEATURES
 policy_shape = NUM_PROTOSS_UNITS
 value_shape = 0
 learning_rate = 1e-4
-epochs = 15
+epochs = 15 if not args.epochs else int(args.epochs)
 verbose = 1
 batch_size = 32
 shuffle = True

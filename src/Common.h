@@ -60,7 +60,9 @@ namespace BOSS
         static FracType SRPF;                // shield regen per frame
         static NumUnits WorkersPerRefinery;  // number of workers per refinery
         static NumUnits WorkersPerDepot;     // number of workers gathering minerals per depot
-        static boost::python::object Predictor; // reference to module that contains the network used for evaluations
+        //static boost::python::object Predictor; // reference to module that contains the network used for evaluations
+        static PyObject* Predictor; // reference to module that contains the network used for evaluations
+        static PyThreadState* PythonState;
         static std::string ExecutablePath;      // path to this executable
     };
 

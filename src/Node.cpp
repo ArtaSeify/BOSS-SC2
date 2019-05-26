@@ -2,6 +2,7 @@
 #include <boost/python/list.hpp>
 #include <boost/python/extract.hpp>
 #include <boost/python/object_attributes.hpp>
+#include <boost/python/import.hpp>
 #include "Node.h"
 #include "Eval.h"
 
@@ -88,6 +89,34 @@ void Node::createChildrenEdges(ActionSetAbilities & legalActions, const CombatSe
     {
         isTerminalNode = true;
     }
+
+    if (params.usePolicyNetwork())
+    {
+        std::stringstream ss;
+        m_state.writeToSS(ss, params);
+
+        PyGILState_STATE gstate;
+        gstate = PyGILState_Ensure();
+        PyObject* policyValues = PyEval_CallObject(CONSTANTS::Predictor, Py_BuildValue("(s)", ss.str().c_str()));
+        PyGILState_Release(gstate);
+        
+        for (auto& edge : m_edges)
+        {
+            //std::cout << "edge action: " << edge->getAction().first.getRaceActionID() << ", value: " 
+            //    << python::extract<FracType>(policyValues[edge->getAction().first.getRaceActionID()]) << std::endl;
+            // update the edge values
+            edge->setPolicyValue(static_cast<FracType>(PyFloat_AsDouble(PyList_GetItem(policyValues, edge->getAction().first.getRaceActionID()))));
+        }
+    }
+    // use uniform probability if we're not using a policy network
+    else
+    {
+        float uniformVal = 1.f / m_edges.size();
+        for (auto& edge : m_edges)
+        {
+            edge->setPolicyValue(uniformVal);
+        }
+    }
 }
 
 void Node::removeEdges(std::shared_ptr<Edge> edge)
@@ -145,19 +174,19 @@ bool Node::doAction(std::shared_ptr<Edge> edge, const CombatSearchParameters & p
         //edge->setChild(newNode);
         edge->setChild(shared_from_this());
 
-        // evaluate the newly created state using the network and store the value in the edge
-        std::stringstream ss;
-        if (params.useNetworkPrediction())
-        {
-            m_state.writeToSS(ss, params);
+        //// evaluate the newly created state using the network and store the value in the edge
+        //std::stringstream ss;
+        //if (params.useNetworkPrediction())
+        //{
+        //    m_state.writeToSS(ss, params);
 
-            // evaluate the states. the results will be returned as string
-            python::object value = CONSTANTS::Predictor.attr("predict")(ss.str());
+        //    // evaluate the states. the results will be returned as string
+        //    python::object value = CONSTANTS::Predictor.attr("predict")(ss.str());
 
-            // update the edge values
-            //std::cout << python::extract<FracType>(value[0]) << std::endl;
-            edge->setNetworkValue(python::extract<FracType>(value[0]));
-        }
+        //    // update the edge values
+        //    //std::cout << python::extract<FracType>(value[0]) << std::endl;
+        //    edge->setNetworkValue(python::extract<FracType>(value[0]));
+        //}
     }
 
     return true;
@@ -209,7 +238,7 @@ std::shared_ptr<Edge> Node::selectChildEdge(FracType exploration_param, std::mt1
     BOSS_ASSERT(m_edges.size() > 0, "selectChildEdge called when there are no edges.");
 
     // uniform policy
-    float policyValue = 1.f / m_edges.size();
+    //float policyValue = 1.f / m_edges.size();
 
     std::vector<int> unvisitedEdges;
     int totalChildVisits = 0;
@@ -234,11 +263,11 @@ std::shared_ptr<Edge> Node::selectChildEdge(FracType exploration_param, std::mt1
         return m_edges[unvisitedEdges[distribution(rnggen)]];
     }
 
-    float UCBValue = exploration_param * policyValue *
+    float UCBValue = exploration_param *
         static_cast<FracType>(std::sqrt(totalChildVisits));
 
-    //float UCBValue = exploration_param *
-    //        static_cast<FracType>(std::sqrt(totalChildVisits));
+    /*float UCBValue = exploration_param *
+            static_cast<FracType>(std::sqrt(totalChildVisits));*/
 
     float maxActionValue = 0;
     int maxIndex = 0;
@@ -250,7 +279,7 @@ std::shared_ptr<Edge> Node::selectChildEdge(FracType exploration_param, std::mt1
         // Q(s, a) + u(s, a)
         // we normalize the action value to a range of [0, 1] using the highest
         // value of the search thus far. 
-        float childUCBValue = UCBValue / (1 + edge->timesVisited());
+        float childUCBValue = (UCBValue * edge->getPolicyValue()) / (1 + edge->timesVisited());
         float actionValue = edge->getValue() / Edge::CURRENT_HIGHEST_VALUE;
         BOSS_ASSERT(actionValue <= 1, "value of an action must be less than or equal to 1, but is %f", actionValue);
 
