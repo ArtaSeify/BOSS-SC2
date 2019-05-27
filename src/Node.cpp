@@ -90,9 +90,13 @@ void Node::createChildrenEdges(ActionSetAbilities & legalActions, const CombatSe
         std::stringstream ss;
         m_state.writeToSS(ss, params);
 
+        std::cout << ss.str() << std::endl;
+
         PyGILState_STATE gstate;
         gstate = PyGILState_Ensure();
         PyObject* policyValues = PyEval_CallObject(CONSTANTS::Predictor, Py_BuildValue("(s)", ss.str().c_str()));
+        system("pause");
+        BOSS_ASSERT(policyValues != nullptr, "No prediction result returned from Python code");
         PyGILState_Release(gstate);
         
         for (auto& edge : m_edges)
@@ -260,9 +264,6 @@ std::shared_ptr<Edge> Node::selectChildEdge(FracType exploration_param, std::mt1
 
     float UCBValue = exploration_param *
         static_cast<FracType>(std::sqrt(totalChildVisits));
-
-    /*float UCBValue = exploration_param *
-            static_cast<FracType>(std::sqrt(totalChildVisits));*/
 
     float maxActionValue = 0;
     int maxIndex = 0;

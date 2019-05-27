@@ -300,7 +300,7 @@ std::string Unit::toString() const
 void Unit::writeToSS(std::stringstream & ss) const
 {    
     //ss << "[";
-    ss << m_id << ",";
+    //ss << m_id << ",";
     //ss << m_frameStarted << ",";
     //ss << m_frameFinished << ",";
     //ss << m_builderID << ",";

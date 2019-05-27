@@ -2,9 +2,10 @@ import tensorflow as tf
 import json
 
 class DataLoader():
-    def __init__(self, feat_shape, policy_shape, value_shape, train_samples, test_samples, policy_and_value=False, shuffle=True, batch_size=32, workers=4):
+    def __init__(self, units_shape, extra_feat_shape, policy_shape, value_shape, train_samples, test_samples, policy_and_value=False, shuffle=True, batch_size=32, workers=4):
         self.file_list = tf.keras.backend.placeholder(dtype=tf.string, shape=[None])
-        self.feat_shape = feat_shape
+        self.units_shape = units_shape
+        self.extra_feat_shape = extra_feat_shape
         self.policy_shape = policy_shape
         self.value_shape = value_shape
         self.batch_size = batch_size
@@ -19,21 +20,28 @@ class DataLoader():
         if shuffle:
             self.dataset = self.dataset.shuffle(buffer_size=min(max(train_samples, test_samples), 100000))
         self.dataset = self.dataset.prefetch(self.batch_size*100)
-        self.dataset = self.dataset.batch(self.batch_size)
+        self.dataset = self.dataset.padded_batch(self.batch_size, (([None, self.units_shape], [self.extra_feat_shape]), [self.policy_shape]))
+        #self.dataset = self.dataset.batch(self.batch_size)
+
+        print(self.dataset)
 
     def _parse_fn_policy(self, csv_string):
-        split_string = tf.string_split(tf.expand_dims(csv_string, axis=0), ",")
-        data = tf.string_to_number(tf.sparse_tensor_to_dense(split_string, default_value=''), tf.float32)
-        d = tf.squeeze(data)
+        split_string = tf.sparse_tensor_to_dense(tf.string_split(tf.expand_dims(csv_string, axis=0), ","), default_value='')
+        split_string_unit_features = split_string[0][:-(self.policy_shape+self.extra_feat_shape)]
+        units_shape = [tf.cast(tf.divide(tf.size(split_string_unit_features), self.units_shape), tf.int32), self.units_shape]
+        split_string_unit_features = tf.reshape(split_string_unit_features, units_shape)
+        split_string_extra_features = split_string[0][-(self.policy_shape+self.extra_feat_shape):-self.policy_shape]
+        split_string_policy = split_string[0][-self.policy_shape:]
 
-        x, policy = d[:-self.policy_shape], d[-self.policy_shape:]
-        # adds zeroes for missing units
-        x = tf.concat([x, tf.zeros(self.feat_shape - tf.size(x))], 0)
+        units = tf.squeeze(tf.string_to_number(split_string_unit_features, tf.float32))
+        extra_features = tf.squeeze(tf.string_to_number(split_string_extra_features, tf.float32))
+        policy = tf.squeeze(tf.string_to_number(split_string_policy, tf.float32))
 
-        x.set_shape(self.feat_shape,)
+        units.set_shape([None, self.units_shape])
+        extra_features.set_shape(self.extra_feat_shape,)
         policy.set_shape(self.policy_shape,)
 
-        return x, policy      
+        return (units, extra_features), policy
 
     def _parse_fn(self, csv_string):
         split_string = tf.string_split(tf.expand_dims(csv_string, axis=0), ",")

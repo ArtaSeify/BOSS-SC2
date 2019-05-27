@@ -28,17 +28,17 @@ tf.keras.backend.set_session(sess)
 
 # constants
 NUM_PROTOSS_UNITS = 70
-NUM_UNIT_FEATURES = 7
-MAX_NUM_UNITS = 100
-EXTRA_FEATURES = 9
+NUM_UNIT_FEATURES = 6
+#MAX_NUM_UNITS = 100
+EXTRA_FEATURES = 12
 cpu_workers = 4
-feature_shape = (MAX_NUM_UNITS * NUM_UNIT_FEATURES) + EXTRA_FEATURES
+#feature_shape = (MAX_NUM_UNITS * NUM_UNIT_FEATURES) + EXTRA_FEATURES
 policy_shape = NUM_PROTOSS_UNITS
 value_shape = 0
 learning_rate = 1e-4
 epochs = 15 if not args.epochs else int(args.epochs)
 verbose = 1
-batch_size = 32
+batch_size = 8
 shuffle = True
 twoHeads = False
 
@@ -48,18 +48,23 @@ if args.testset:
 # trainset_samples = 10000
 # testset_samples = 1000
 
-train_dataset = DataLoader(feature_shape, policy_shape, value_shape, trainset_samples, testset_samples if args.testset else 0, twoHeads, shuffle, batch_size, cpu_workers)
+train_dataset = DataLoader(NUM_UNIT_FEATURES, EXTRA_FEATURES, policy_shape, value_shape, trainset_samples, testset_samples if args.testset else 0, twoHeads, shuffle, batch_size, cpu_workers)
 train_iterator = train_dataset.make_iterator(sess, [args.trainset])
 
 if args.testset:
-    test_dataset = DataLoader(feature_shape, policy_shape, value_shape, trainset_samples, testset_samples, twoHeads, shuffle, batch_size, cpu_workers)
+    test_dataset = DataLoader(NUM_UNIT_FEATURES, EXTRA_FEATURES, policy_shape, value_shape, trainset_samples, testset_samples, twoHeads, shuffle, batch_size, cpu_workers)
     test_iterator = test_dataset.make_iterator(sess, [args.testset])
 
-network = model.PolicyNetwork(feature_shape, policy_shape, args.save_name, batch_size, learning_rate, "models/" + args.save_name + ".h5", True if args.load_model is None else False)
+if not os.path.isdir("models"):
+    os.makedirs("models")
+
+network = model.RelationsPolicyNetwork(NUM_UNIT_FEATURES, EXTRA_FEATURES, policy_shape, args.save_name, batch_size, learning_rate, "models/" + args.save_name + ".h5", True if args.load_model is None else False)
 # network = model.PolicyAndValueNetwork(feature_shape, policy_shape, value_shape, args.save_name, batch_size, learning_rate, "models/" + args.save_name + ".h5", True if args.load_model is None else False)
 if args.load_model:
     network.load("models/" + args.load_model + ".h5")
 
+import numpy as np
+#network.model.fit(np.random.randint(20, size=(32, 30, 7)), np.random.randint(10, size=(32, 70)), batch_size=32)
 evaluations = []
 # train and evaluate
 network.train(train_iterator, epochs, int(floor(trainset_samples/batch_size)), verbose)	

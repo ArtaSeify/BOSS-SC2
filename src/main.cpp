@@ -2,7 +2,6 @@
 //
 //#define _CRT_NO_VA_START_VALIDATION
 //
-#define BOOST_PYTHON_STATIC_LIB
 #ifdef _DEBUG
     #undef _DEBUG
     #include <Python.h>
@@ -12,7 +11,6 @@
 #endif
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>
-#include <boost/python/import.hpp>
 #include "BOSS.h"
 #include "GameState.h"
 #include "BOSSExperiments.h"
@@ -22,7 +20,6 @@
 #include <string>
 
 using namespace BOSS;
-namespace python = boost::python;
 namespace fs = boost::filesystem;
 
 int main(int argc, char * argv[])
@@ -51,11 +48,11 @@ int main(int argc, char * argv[])
         PyRun_SimpleString(command.c_str());
         try
         {
-            //BOSS::CONSTANTS::Predictor = python::import("predictor").attr("Network")(std::string(argv[2]), "policy", true);
             PyObject* PyModule = PyImport_ImportModule("predictor");
             PyObject* PyClass = PyObject_GetAttrString(PyModule, "Network");
             PyObject* PyObj = PyEval_CallObject(PyClass, Py_BuildValue("(s, s, i)", std::string(argv[2]).c_str(), "policy", true));
             BOSS::CONSTANTS::Predictor = PyObject_GetAttrString(PyObj, "predict");
+            PyObject* policyValues = PyEval_CallObject(CONSTANTS::Predictor, Py_BuildValue("(s)", ""));
         }
         catch (const python::error_already_set&)
         {
@@ -72,7 +69,10 @@ int main(int argc, char * argv[])
     BOSS::BOSSConfig::Instance().ParseConfig(parent_path + "/" + argv[1] + ".txt");
     BOSS::ExperimentsArta::RunExperiments(parent_path + "/" + argv[1] + ".txt");
 
-    PyEval_RestoreThread(BOSS::CONSTANTS::PythonState);
+    if (argc > 2)
+    {
+        PyEval_RestoreThread(BOSS::CONSTANTS::PythonState);
+    }
     Py_Finalize();
     
     return 0;
