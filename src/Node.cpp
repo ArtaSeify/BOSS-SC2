@@ -1,8 +1,3 @@
-#define BOOST_PYTHON_STATIC_LIB
-#include <boost/python/list.hpp>
-#include <boost/python/extract.hpp>
-#include <boost/python/object_attributes.hpp>
-#include <boost/python/import.hpp>
 #include "Node.h"
 #include "Eval.h"
 
