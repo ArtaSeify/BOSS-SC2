@@ -16,24 +16,23 @@ class Network:
             device_count = {'GPU': 0}
             )
             self.sess = tf.Session(config=config)
+            print("NO GPU!!!")
         else:
             self.sess = tf.Session()
         tf.keras.backend.set_session(self.sess)
-        
 
         NUM_PROTOSS_UNITS = 70
-        NUM_UNIT_FEATURES = 7
-        MAX_NUM_UNITS = 100
-        EXTRA_FEATURES = 9
+        self.num_unit_features = 6
         cpu_workers = 4
-        self.feature_shape = (MAX_NUM_UNITS * NUM_UNIT_FEATURES) + EXTRA_FEATURES
+        self.extra_features = 12
+        #self.feature_shape = (MAX_NUM_UNITS * NUM_UNIT_FEATURES) + EXTRA_FEATURES
         self.policy_shape = NUM_PROTOSS_UNITS
         self.value_shape = 0
         self.name = network_name
         self.learning_rate = 1e-4
         self.batch_size = 1
         self.loadNetwork(network_type)
-        self.network.predict(np.zeros([1,self.feature_shape]))
+        self.network.predict((np.zeros((1, 1, self.num_unit_features)), np.zeros((1, self.extra_features))))
 
         self.session = tf.keras.backend.get_session()
         self.graph = tf.get_default_graph()
@@ -41,7 +40,7 @@ class Network:
 
     def loadNetwork(self, network_type):      
         if network_type == "policy":
-            self.network = model.PolicyNetwork(self.feature_shape, self.policy_shape, self.name, 
+            self.network = model.RelationsPolicyNetwork(self.num_unit_features, self.extra_features, self.policy_shape, self.name, 
                                                 self.batch_size, self.learning_rate, MODELS_PATH + "\\" + self.name, False)
         elif network_type == "value":
             self.network = model.IntegralValueNN(self.feature_shape, self.value_shape, self.name, 
@@ -52,7 +51,6 @@ class Network:
         else:
             print("invalid network type")
             assert False
-
         self.network.load(MODELS_PATH + "/" + self.name + ".h5")
 
     #def parseString(self, csv_string, shape):
@@ -71,41 +69,58 @@ class Network:
     #    #x.set_shape(self.feature_shape,)
     #    return x      
 
-    def parseStringPolicy(self, csv_string):
+    def parseStringPolicy(self, csv_string, have_policy=False):
         split_string = csv_string.split(",")
-        x = np.expand_dims(np.concatenate((split_string, np.zeros([self.feature_shape - len(split_string)])), axis=0), axis=0)
-        return x      
-
-
-    def evaluate(self, x_val, y_pred):
-        nn_input = self.parseStringPolicy(x_val)
-        output = self.network.model.evaluate(nn_input, actual, steps=1)
+        if have_policy:
+            units = split_string[:-(self.extra_features + self.policy_shape)]
+            units = np.expand_dims(np.reshape(units, (int(len(units)/self.num_unit_features), self.num_unit_features)), axis=0)
+            extra_features = np.expand_dims(split_string[-(self.extra_features + self.policy_shape):-self.policy_shape], axis=0)
+            policy = np.expand_dims(split_string[-self.policy_shape:], axis=0)
+            return (units, extra_features), policy
+        else:
+            units = split_string[:-self.extra_features]
+            units = np.expand_dims(np.reshape(units, (int(len(units)/self.num_unit_features), self.num_unit_features)), axis=0)
+            extra_features = np.expand_dims(split_string[-self.extra_features:], axis=0)
+            return (units, extra_features)
+        
+    def evaluate(self, data):
+        nn_input, policy = self.parseStringPolicy(data, True)
+        output = self.network.model.evaluate(nn_input, policy, steps=1)
         return output
 
-    #def predictParsed(self, data):
-    #    nn_input = tf.convert_to_tensor(list(map(lambda x: self.parseString(x, self.feature_shape), data.split("\n"))))
-    #    # output = np.ndarray.tolist(np.squeeze(self.network.predict_on_batch(nn_input)))
-    #    output = self.network.predict_on_batch(nn_input)
-    #    # if isinstance(output, float):
-    #        # output = [output]
-    #    return output
+    def compare(self, data):
+        nn_input, policy = self.parseStringPolicy(data, True)
+        predicted_policy = np.squeeze(self.network.predict(nn_input), axis=0)
+        actual_policy = np.squeeze(policy, axis=0)
+        for actual, predicted in zip(actual_policy, predicted_policy):
+            print(actual + "\t\t", predicted)
 
     def predict(self, data):
+        line = "2,0,0,0,200,109.9,2,-1,0,0,200,109.9,32,0,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,3,-1,0,0,0,0,3,-1,0,0,0,0,5,37,0,240,0,0,4,-1,0,0,0,0,4,-1,0,0,0,0,15,-1,0,0,0,0,32,-1,0,0,0,0,19,-1,0,0,0,0,10,36,0,475,0,0,17,-1,0,0,0,0,5,38,0,672,0,0,28,-1,475,475,0,0,19,-1,240,240,0,0,19,-1,672,672,0,0,487.8,140.2,36,46,1712,2288,18,6,0,0.0438,0.045,0.035"
+        print(self.network.predict(self.parseStringPolicy(line)))
+        return np.ndarray.tolist(np.squeeze(self.network.predict(self.parseStringPolicy(line))))
         #parse_start = time.clock()
         nn_input = self.parseStringPolicy(data)
         #parse_end = time.clock()
         
-        #prediction_start = time.clock()
-        output = list(map(float, self.network.predict(nn_input)[0]))
+        print(self.network.predict(nn_input))
+
+        #prediction_start = time.clock
+        output = np.ndarray.tolist(np.squeeze(self.network.predict(nn_input), axis=0))
         #prediction_end = time.clock()
+
+        print(output)
 
         #print("{} time to parse, {} time to predict".format(parse_end - parse_start, prediction_end - prediction_start))
         return output
 
-#def test():
-#    line = "0,2,-1,0,0,200,50,1,2,-1,0,0,200,50,2,32,-1,0,0,0,0,3,32,-1,0,0,0,0,4,32,-1,0,0,0,0,5,32,-1,0,0,0,0,6,32,-1,0,0,0,0,7,32,-1,0,0,0,0,8,32,-1,0,0,0,0,9,32,-1,0,0,0,0,10,32,-1,0,0,0,0,11,32,-1,0,0,0,0,12,32,-1,0,0,0,0,13,32,-1,0,0,0,0,14,32,-1,0,0,0,0,15,32,-1,0,0,0,0,16,32,-1,0,0,0,0,17,32,-1,0,0,0,0,18,32,-1,0,0,0,0,19,32,-1,0,0,0,0,20,32,-1,0,0,0,0,21,32,-1,0,0,0,0,22,32,-1,0,0,0,0,23,32,-1,0,0,0,0,24,32,-1,0,0,0,0,25,3,-1,0,0,0,0,26,3,-1,0,0,0,0,27,5,-1,0,0,0,0,28,4,-1,0,0,0,0,29,4,-1,0,0,0,0,30,15,-1,0,0,0,0,225,128,23,46,0,6720,17,6,0"
-#    network = Network("test", "policy")
+def test():
+    network = Network("asd", "policy", True)
 
-#    print(network.predict(line))
+    line = "2,0,0,0,200,109.9,2,-1,0,0,200,109.9,32,0,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,3,-1,0,0,0,0,3,-1,0,0,0,0,5,37,0,240,0,0,4,-1,0,0,0,0,4,-1,0,0,0,0,15,-1,0,0,0,0,32,-1,0,0,0,0,19,-1,0,0,0,0,10,36,0,475,0,0,17,-1,0,0,0,0,5,38,0,672,0,0,28,-1,475,475,0,0,19,-1,240,240,0,0,19,-1,672,672,0,0,487.8,140.2,36,46,1712,2288,18,6,0,0.0438,0.045,0.035"
+    network.predict(line)
+
+    line = "2,31,0,5,200,59.35,2,-1,0,0,200,59.35,32,33,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,3,-1,0,0,0,0,3,-1,0,0,0,0,5,32,0,405,0,0,4,-1,0,0,0,0,4,-1,0,0,0,0,15,-1,0,0,0,0,32,-1,5,5,0,0,19,-1,405,405,0,0,10,-1,960,960,0,0,98.81,0.09,26,46,267,3733,17,6,0,0.0438,0.045,0.035"
+    network.predict(line)
 
 #test()

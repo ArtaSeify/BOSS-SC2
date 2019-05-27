@@ -14,7 +14,7 @@ NumUnits                CONSTANTS::WorkersPerRefinery;
 NumUnits                CONSTANTS::WorkersPerDepot;
 //boost::python::object   CONSTANTS::Predictor;
 PyObject*               CONSTANTS::Predictor;
-PyThreadState *         CONSTANTS::PythonState;
+PyThreadState*          CONSTANTS::PythonState;
 std::string             CONSTANTS::ExecutablePath;
 
 RaceID Races::GetRaceID(const std::string & race)

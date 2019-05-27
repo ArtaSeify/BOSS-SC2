@@ -1174,7 +1174,10 @@ void GameState::writeToSS(std::stringstream & ss, const CombatSearchParameters &
     ss << params.getFrameTimeLimit() - m_currentFrame << ",";
     ss << m_mineralWorkers << ",";
     ss << m_gasWorkers << ",";
-    ss << m_buildingWorkers;
+    ss << m_buildingWorkers << ",";
+    ss << CONSTANTS::MPWPF << ",";
+    ss << CONSTANTS::GPWPF << ",";
+    ss << CONSTANTS::ERPF;
     //ss << m_numRefineries << ",";
     //ss << m_numDepots;
     //ss << m_lastAction.getID() << ",";

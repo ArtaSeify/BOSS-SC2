@@ -269,3 +269,92 @@ class PolicyAndValueNetwork(Model):
         self.model = tf.keras.models.load_model(path, 
             custom_objects={"top_2_accuracy": self.top_2_accuracy, "CCELogits": self.CCELogits, "accuracy": self.accuracy
                             , "percent_error": self.percent_error})
+
+
+class RelationsPolicyNetwork(Model):
+    def __init__(self, units_features_size, extra_features_size, output_shape, model_name, batch_size, learning_rate, model_path, create_network=True):
+        self.model_name = model_name
+        self.model_path = model_path
+        self.units_features_size = units_features_size
+        self.extra_features_size = extra_features_size
+        self.prediction_shape = output_shape
+        self.batch_size = batch_size
+        self.learning_rate = learning_rate
+        self.epochs = 0
+
+        self.checkpoint_best = tf.keras.callbacks.ModelCheckpoint(self.model_path.split(".")[0] + "_bestCA.h5", monitor='categorical_accuracy', save_best_only=True, mode='max')
+        self.checkpoint = tf.keras.callbacks.ModelCheckpoint(self.model_path)
+        
+        if create_network:
+            self.create()
+
+    #def exponential_decay(self, epoch, lr):
+    #    decay_rate = 0.70
+    #    reduce_every_epochs = 1.0
+    #    return lr * pow(decay_rate, math.floor((epoch+1) / reduce_every_epochs))
+
+    def top_2_accuracy(self, y_true, y_pred):
+        return tf.keras.metrics.top_k_categorical_accuracy(y_true, y_pred, k=2)
+
+    def CCELogits(self, y_true, y_pred):
+        return tf.keras.backend.categorical_crossentropy(y_true, y_pred, from_logits=True)
+
+    def accuracy(self, y_true, y_pred):
+        indices = tf.concat([tf.convert_to_tensor([[i] for i in range(self.batch_size)], dtype=tf.int64),
+                             tf.expand_dims(tf.keras.backend.argmax(y_pred, axis=-1), 1)], 1)
+        nonzeros = tf.math.divide(tf.math.count_nonzero(tf.gather_nd(y_true, indices)),self.batch_size)
+        return nonzeros 
+
+    def create(self):
+        units_output_size = 128
+        
+        units_input = tf.keras.Input(shape=(None, self.units_features_size), name="units_input")
+
+        layer_units = layers.Dense(512, activation='elu')(units_input)
+        layer_units = layers.Dense(256, activation='elu')(layer_units)
+        layer_units = layers.Dense(256, activation='elu')(layer_units)
+        layer_units = layers.Dense(128, activation='elu')(layer_units)
+        layer_units = layers.Dense(128, activation='elu')(layer_units)
+        units_output = layers.Dense(units_output_size, activation='elu', name="units_output")(layer_units)
+        units_output = layers.Lambda(lambda x: tf.keras.backend.mean(x, axis=1), name="average_units_output")(units_output)
+        
+        extra_features_input = tf.keras.Input(shape=(self.extra_features_size, ), name="extra_features_input")
+        concatenate_layer = layers.Concatenate()([units_output, extra_features_input])
+
+        layer = layers.Dense(512, activation='elu')(concatenate_layer)
+        layer = layers.Dense(256, activation='elu')(layer)
+        layer = layers.Dense(256, activation='elu')(layer)
+        layer = layers.Dense(128, activation='elu')(layer)
+        layer = layers.Dense(128, activation='elu')(layer)
+        policy = layers.Dense(self.prediction_shape, activation='linear', name="policy")(layer)
+        
+        self.model = tf.keras.Model(inputs=[units_input, extra_features_input], outputs=policy)
+        
+        #self.lrs = tf.keras.callbacks.LearningRateScheduler(self.exponential_decay)
+
+        self.model.compile(optimizer=tf.keras.optimizers.Adam(self.learning_rate),
+                #loss='categorical_crossentropy',
+                #loss='kld',
+                loss = self.CCELogits,
+                metrics=['categorical_accuracy'])#, self.top_2_accuracy, self.accuracy])
+
+    def train(self, iterator, epochs, steps_per_epoch, verbose):
+        return self.model.fit(iterator, epochs=epochs, steps_per_epoch=steps_per_epoch, verbose=verbose, 
+                                callbacks=[CustomTensorBoard(self.model, log_dir=os.path.join(os.getcwd(), os.path.join("logs", self.model_name)), write_graph=False, batch_size=self.batch_size), 
+                                        self.checkpoint, self.checkpoint_best])
+
+    def evaluate(self, iterator, steps, verbose):
+        return self.model.evaluate(iterator, steps=steps, verbose=verbose)
+
+    def predict(self, nn_input, batch_size=None, steps=1, verbose=0):
+        return softmax(self.model.predict(nn_input, batch_size=batch_size, steps=steps, verbose=verbose))
+
+    def predict_on_batch(self, nn_input):
+        return np.ndarray.tolist(np.squeeze(softmax(self.model.predict_on_batch(nn_input))))
+
+    def save(self, path):
+        tf.keras.models.save_model(self.model, path)
+
+    def load(self, path):
+        self.model = tf.keras.models.load_model(path, 
+            custom_objects={"top_2_accuracy": self.top_2_accuracy, "CCELogits": self.CCELogits, "accuracy": self.accuracy})
