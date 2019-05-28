@@ -23,8 +23,6 @@ class DataLoader():
         self.dataset = self.dataset.padded_batch(self.batch_size, (([None, self.units_shape], [self.extra_feat_shape]), [self.policy_shape]))
         #self.dataset = self.dataset.batch(self.batch_size)
 
-        print(self.dataset)
-
     def _parse_fn_policy(self, csv_string):
         split_string = tf.sparse_tensor_to_dense(tf.string_split(tf.expand_dims(csv_string, axis=0), ","), default_value='')
         split_string_unit_features = split_string[0][:-(self.policy_shape+self.extra_feat_shape)]

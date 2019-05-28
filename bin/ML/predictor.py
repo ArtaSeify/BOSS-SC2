@@ -16,7 +16,6 @@ class Network:
             device_count = {'GPU': 0}
             )
             self.sess = tf.Session(config=config)
-            print("NO GPU!!!")
         else:
             self.sess = tf.Session()
         tf.keras.backend.set_session(self.sess)
@@ -96,20 +95,13 @@ class Network:
             print(actual + "\t\t", predicted)
 
     def predict(self, data):
-        line = "2,0,0,0,200,109.9,2,-1,0,0,200,109.9,32,0,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,3,-1,0,0,0,0,3,-1,0,0,0,0,5,37,0,240,0,0,4,-1,0,0,0,0,4,-1,0,0,0,0,15,-1,0,0,0,0,32,-1,0,0,0,0,19,-1,0,0,0,0,10,36,0,475,0,0,17,-1,0,0,0,0,5,38,0,672,0,0,28,-1,475,475,0,0,19,-1,240,240,0,0,19,-1,672,672,0,0,487.8,140.2,36,46,1712,2288,18,6,0,0.0438,0.045,0.035"
-        print(self.network.predict(self.parseStringPolicy(line)))
-        return np.ndarray.tolist(np.squeeze(self.network.predict(self.parseStringPolicy(line))))
         #parse_start = time.clock()
         nn_input = self.parseStringPolicy(data)
         #parse_end = time.clock()
-        
-        print(self.network.predict(nn_input))
 
         #prediction_start = time.clock
         output = np.ndarray.tolist(np.squeeze(self.network.predict(nn_input), axis=0))
         #prediction_end = time.clock()
-
-        print(output)
 
         #print("{} time to parse, {} time to predict".format(parse_end - parse_start, prediction_end - prediction_start))
         return output

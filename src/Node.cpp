@@ -2,7 +2,6 @@
 #include "Eval.h"
 
 using namespace BOSS;
-namespace python = boost::python;
 
 Node::Node(const GameState & state)
     : m_parentEdge()
@@ -90,12 +89,9 @@ void Node::createChildrenEdges(ActionSetAbilities & legalActions, const CombatSe
         std::stringstream ss;
         m_state.writeToSS(ss, params);
 
-        std::cout << ss.str() << std::endl;
-
         PyGILState_STATE gstate;
         gstate = PyGILState_Ensure();
         PyObject* policyValues = PyEval_CallObject(CONSTANTS::Predictor, Py_BuildValue("(s)", ss.str().c_str()));
-        system("pause");
         BOSS_ASSERT(policyValues != nullptr, "No prediction result returned from Python code");
         PyGILState_Release(gstate);
         

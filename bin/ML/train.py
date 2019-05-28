@@ -38,7 +38,7 @@ value_shape = 0
 learning_rate = 1e-4
 epochs = 15 if not args.epochs else int(args.epochs)
 verbose = 1
-batch_size = 8
+batch_size = 16
 shuffle = True
 twoHeads = False
 
