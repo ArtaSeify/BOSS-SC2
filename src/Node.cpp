@@ -94,8 +94,7 @@ void Node::createChildrenEdges(ActionSetAbilities & legalActions, const CombatSe
 
         PyGILState_STATE gstate;
         gstate = PyGILState_Ensure();
-        PyObject* policyValues = PyEval_CallObject(CONSTANTS::Predictor, Py_BuildValue("(s)", ss.str().c_str()));
-        system("pause");
+        PyObject* policyValues = PyObject_CallObject(CONSTANTS::Predictor, Py_BuildValue("(s)", ss.str().c_str()));
         BOSS_ASSERT(policyValues != nullptr, "No prediction result returned from Python code");
         PyGILState_Release(gstate);
         

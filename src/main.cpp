@@ -50,9 +50,9 @@ int main(int argc, char * argv[])
         {
             PyObject* PyModule = PyImport_ImportModule("predictor");
             PyObject* PyClass = PyObject_GetAttrString(PyModule, "Network");
-            PyObject* PyObj = PyEval_CallObject(PyClass, Py_BuildValue("(s, s, i)", std::string(argv[2]).c_str(), "policy", true));
+            PyObject* PyObj = PyObject_CallFunction(PyClass, "ssi", std::string(argv[2]).c_str(), "policy", true);
             BOSS::CONSTANTS::Predictor = PyObject_GetAttrString(PyObj, "predict");
-            PyObject* policyValues = PyEval_CallObject(CONSTANTS::Predictor, Py_BuildValue("(s)", ""));
+            //PyObject* policyValues = PyEval_CallObject(CONSTANTS::Predictor, Py_BuildValue("(s)", ""));
         }
         catch (const python::error_already_set&)
         {
