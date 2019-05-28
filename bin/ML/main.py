@@ -25,6 +25,7 @@ class Driver:
             with open(BIN_PATH + "\\" + self.experiment_file_name + "_modified.txt", 'w') as modified_exp_file:
                 if self.load_name is None:
                     self.experiment_data["Experiments"][self.experiment_name]["UsePolicyNetwork"] = False
+                self.experiment_data["Experiments"][self.experiment_name]["OutputDir"] = "../" + self.experiment_name
 
                 json.dump(self.experiment_data, modified_exp_file)
                 self.experiment_file_name = "Experiments_modified"

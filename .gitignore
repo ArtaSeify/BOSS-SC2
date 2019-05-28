@@ -97,3 +97,6 @@ emscripten/BOSS.data
 /bin/ML/__pycache__
 /bin/expop
 /bin/bin/test
+/bin/Attempt1/WithoutNetwork
+/bin/Attempt2
+/bin/Attempt1/WithNetwork

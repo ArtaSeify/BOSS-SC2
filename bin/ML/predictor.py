@@ -16,7 +16,6 @@ class Network:
             device_count = {'GPU': 0}
             )
             self.sess = tf.Session(config=config)
-            print("NO GPU!!!")
         else:
             self.sess = tf.Session()
         tf.keras.backend.set_session(self.sess)
@@ -103,8 +102,6 @@ class Network:
         #prediction_start = time.clock
         output = np.ndarray.tolist(np.squeeze(self.network.predict(nn_input), axis=0))
         #prediction_end = time.clock()
-
-        print(output)
 
         #print("{} time to parse, {} time to predict".format(parse_end - parse_start, prediction_end - prediction_start))
         return output

@@ -1,8 +1,7 @@
 /* -*- c-basic-offset: 4 -*- */
 
 #pragma once
-#define BOOST_PYTHON_STATIC_LIB
-#include <boost/python/object/function.hpp>
+#include <Python.h>
 #include <cstdio>
 #include <cmath>
 #include <fstream>
@@ -16,7 +15,6 @@
 #include "json/json.hpp"
 
 using json = nlohmann::json;
-namespace python = boost::python;
 
 #include "BOSSAssert.h"
 
@@ -62,7 +60,6 @@ namespace BOSS
         static NumUnits WorkersPerDepot;     // number of workers gathering minerals per depot
         //static boost::python::object Predictor; // reference to module that contains the network used for evaluations
         static PyObject* Predictor; // reference to module that contains the network used for evaluations
-        static PyThreadState* PythonState;
         static std::string ExecutablePath;      // path to this executable
     };
 

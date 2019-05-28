@@ -34,6 +34,7 @@ int main(int argc, char * argv[])
     std::string path_string = parent_path + "/ML";
 
     BOSS::CONSTANTS::ExecutablePath = parent_path;
+    PyThreadState* PythonState;
 
     if (argc > 2)
     {
@@ -44,23 +45,16 @@ int main(int argc, char * argv[])
 
         Py_Initialize();
         PyEval_InitThreads();
-
+        
         PyRun_SimpleString(command.c_str());
-        try
-        {
-            PyObject* PyModule = PyImport_ImportModule("predictor");
-            PyObject* PyClass = PyObject_GetAttrString(PyModule, "Network");
-            PyObject* PyObj = PyObject_CallFunction(PyClass, "ssi", std::string(argv[2]).c_str(), "policy", true);
-            BOSS::CONSTANTS::Predictor = PyObject_GetAttrString(PyObj, "predict");
-            //PyObject* policyValues = PyEval_CallObject(CONSTANTS::Predictor, Py_BuildValue("(s)", ""));
-        }
-        catch (const python::error_already_set&)
-        {
-            PyErr_Print();
-            BOSS_ASSERT(false, "error in evaluating states in Python");
-        }
 
-        BOSS::CONSTANTS::PythonState = PyEval_SaveThread();
+        PyObject* PyModule = PyImport_ImportModule("predictor");
+        PyObject* PyClass = PyObject_GetAttrString(PyModule, "Network");
+        PyObject* PyObj = PyObject_CallObject(PyClass, Py_BuildValue("(s, s, i)", std::string(argv[2]).c_str(), "policy", true));
+        BOSS::CONSTANTS::Predictor = PyObject_GetAttrString(PyObj, "predict");
+        PyObject* policyValues = PyEval_CallObject(CONSTANTS::Predictor, Py_BuildValue("(s)", ""));
+
+        PythonState = PyEval_SaveThread();
     }
 
     // Initialize all the BOSS internal data
@@ -71,9 +65,10 @@ int main(int argc, char * argv[])
 
     if (argc > 2)
     {
-        PyEval_RestoreThread(BOSS::CONSTANTS::PythonState);
+        PyEval_RestoreThread(PythonState);
+        Py_DECREF(PyImport_ImportModule("threading"));
+        Py_Finalize();
     }
-    Py_Finalize();
-    
+
     return 0;
 }

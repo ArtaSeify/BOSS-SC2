@@ -2,7 +2,6 @@
 #include "Eval.h"
 
 using namespace BOSS;
-namespace python = boost::python;
 
 Node::Node(const GameState & state)
     : m_parentEdge()
@@ -89,8 +88,6 @@ void Node::createChildrenEdges(ActionSetAbilities & legalActions, const CombatSe
     {
         std::stringstream ss;
         m_state.writeToSS(ss, params);
-
-        std::cout << ss.str() << std::endl;
 
         PyGILState_STATE gstate;
         gstate = PyGILState_Ensure();
