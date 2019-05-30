@@ -36,7 +36,6 @@ namespace BOSS
         std::pair<std::shared_ptr<Node>, bool> getPromisingNode(std::shared_ptr<Node> node);
         
         bool isTerminalNode(const Node & node) const;
-        bool shouldChangeRoot(std::shared_ptr<Node> root, int simulationsThusFar, int rootDepth) const;
         
         void randomPlayout(Node node);
         

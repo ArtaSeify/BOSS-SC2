@@ -45,6 +45,7 @@ CombatSearchParameters::CombatSearchParameters()
     , m_enemyRace(Races::None)
     , m_useTotalTimeLimit(false)
     , m_SDConstant(0)
+    , m_temperatureChange(0)
 {
     
 }
@@ -344,6 +345,16 @@ void CombatSearchParameters::setSDConstant(FracType value)
 FracType CombatSearchParameters::getSDConstant() const
 {
     return m_SDConstant;
+}
+
+void CombatSearchParameters::setTemperatureChange(int value)
+{
+    m_temperatureChange = value;
+}
+
+int CombatSearchParameters::getTemperatureChange() const
+{
+    return m_temperatureChange;
 }
 
 void CombatSearchParameters::print()

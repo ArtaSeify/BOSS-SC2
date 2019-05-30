@@ -66,7 +66,7 @@ for data_file in data_files:
 			data = pickle.load(pickle_in)
 			for run in data:
 				max_simulations = max(max_simulations, data[run][-1]["NumSimulations"])
-				max_value = max(max_value, data[run][-1]["SearchValue"])
+				max_value = max(max_value, data[run][-1]["SearchIntegral"])
 
 
 all_data = []
@@ -81,7 +81,7 @@ for data_file in data_files:
 				ind = int(run)
 				for data_point in data[run]:
 					simulations[ind].append(data_point["NumSimulations"])
-					values[ind].append(data_point["SearchValue"])
+					values[ind].append(data_point["SearchIntegral"])
 			x, y = fixData(simulations, values, max_simulations)
 			all_data.append((x, y, data_file))
 			print(data_file + " " + str(y[-1]))

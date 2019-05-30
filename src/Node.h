@@ -40,8 +40,6 @@ namespace BOSS
         // selects a child based on UCB
         std::shared_ptr<Edge> selectChildEdge(FracType exploration_param, std::mt19937& rnggen, const CombatSearchParameters & params) const;
 
-        void printPValues(FracType exploration_param, std::mt19937& rnggen, const CombatSearchParameters& params) const;
-
         // creates a node that hasn't been expanded in the tree yet 
         std::shared_ptr<Node> notExpandedChild(std::shared_ptr<Edge> edge, const CombatSearchParameters & params, bool makeNode = false) const;
         
@@ -50,6 +48,9 @@ namespace BOSS
 
         // returns the child with the highest visit count
         std::shared_ptr<Edge> getHighestVisitedChild() const;
+
+        // returns a child with probability proportional to visit count
+        std::shared_ptr<Edge> getChildProportionalToVisitCount(std::mt19937& rnggen, const CombatSearchParameters& params) const;
 
         // gets a child at random
         std::shared_ptr<Edge> getRandomEdge();

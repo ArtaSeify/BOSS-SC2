@@ -120,6 +120,7 @@ namespace BOSS
         int m_level;
         bool m_useTotalTimeLimit;
         FracType m_SDConstant;
+        int m_temperatureChange;
 
     public:
 
@@ -215,6 +216,9 @@ namespace BOSS
 
         void setSDConstant(FracType value);
         FracType getSDConstant() const;
+
+        void setTemperatureChange(int value);
+        int getTemperatureChange() const;
     
         void print();
     };

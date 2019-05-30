@@ -91,17 +91,17 @@ void Node::createChildrenEdges(ActionSetAbilities & legalActions, const CombatSe
 
         PyGILState_STATE gstate;
         gstate = PyGILState_Ensure();
-        PyObject* policyValues = PyObject_CallObject(CONSTANTS::Predictor, Py_BuildValue("(s)", ss.str().c_str()));
-        BOSS_ASSERT(policyValues != nullptr, "No prediction result returned from Python code");
+        PyObject* policyValues = PyObject_CallMethod(CONSTANTS::Predictor, "predict", "(s)", ss.str().c_str());
+        BOSS_ASSERT(policyValues != NULL, "No prediction result returned from Python code");
         PyGILState_Release(gstate);
-        
+
         for (auto& edge : m_edges)
         {
             //std::cout << "edge action: " << edge->getAction().first.getRaceActionID() << ", value: " 
             //    << python::extract<FracType>(policyValues[edge->getAction().first.getRaceActionID()]) << std::endl;
             // update the edge values
             edge->setPolicyValue(static_cast<FracType>(PyFloat_AsDouble(PyList_GetItem(policyValues, edge->getAction().first.getRaceActionID()))));
-        }
+        }        
     }
     // use uniform probability if we're not using a policy network
     else
@@ -298,54 +298,6 @@ std::shared_ptr<Edge> Node::selectChildEdge(FracType exploration_param, std::mt1
     return m_edges[maxIndex];
 }
 
-void Node::printPValues(FracType exploration_param, std::mt19937& rnggen, const CombatSearchParameters& params) const
-{
-    if (m_edges.size() == 0)
-    {
-        return;
-    }
-
-    std::vector<int> unvisitedEdges;
-    int totalChildVisits = 0;
-    for (int index = 0; index < m_edges.size(); ++index)
-    {
-        const auto& edge = m_edges[index];
-
-        int edgeTimesVisited = edge->timesVisited();
-        // all unvisited edges are taken as an action first 
-        if (edgeTimesVisited == 0)
-        {
-            unvisitedEdges.push_back(index);
-        }
-
-        totalChildVisits += edgeTimesVisited;
-    }
-
-    // pick an unvisited edge at uniformly random
-
-    float UCBValue = exploration_param *
-        static_cast<FracType>(std::sqrt(totalChildVisits));
-
-    float maxActionValue = 0;
-    int maxIndex = 0;
-    int index = 0;
-
-    for (int index = 0; index < m_edges.size(); ++index)
-    {
-        const auto& edge = m_edges[index];
-        // calculate UCB value and get the total value of action
-        // Q(s, a) + u(s, a)
-        // we normalize the action value to a range of [0, 1] using the highest
-        // value of the search thus far. 
-        float childUCBValue = UCBValue / (1 + edge->timesVisited());
-
-        float UCBWithoutParam = static_cast<FracType>(std::sqrt(totalChildVisits)) / (1 + edge->timesVisited());
-        float p = 1 / (exp(UCBWithoutParam * UCBWithoutParam * 2 * edge->timesVisited()));
-        std::cout << "edge: " << edge->getAction().first.getName() << " has UCB value: " << UCBWithoutParam << ". has p value: " << p << std::endl;
-    }
-    std::cout << std::endl;
-}
-
 std::shared_ptr<Node> Node::notExpandedChild(std::shared_ptr<Edge> edge, const CombatSearchParameters & params, bool makeNode) const
 {
     // create a temporary node
@@ -395,6 +347,25 @@ std::shared_ptr<Edge> Node::getHighestVisitedChild() const
         });
 
     return *edge;
+}
+
+std::shared_ptr<Edge> Node::getChildProportionalToVisitCount(std::mt19937& rnggen, const CombatSearchParameters& params) const
+{
+    BOSS_ASSERT(params.getChangingRootReset(), "Must reset the tree after changing root to use this function");
+    std::uniform_int_distribution<> distribution(1, m_parentEdge->timesVisited());
+    int randomVisitCount = distribution(rnggen);
+    for (const auto& edge : m_edges)
+    {
+        int edgeVisits = edge->timesVisited();
+        if (edgeVisits >= randomVisitCount)
+        {
+            return edge;
+        }
+        randomVisitCount -= edgeVisits;
+    }
+
+    return std::make_shared<Edge>();
+    BOSS_ASSERT(false, "Couldn't find an edge given the distribution");
 }
 
 std::shared_ptr<Edge> Node::getRandomEdge()

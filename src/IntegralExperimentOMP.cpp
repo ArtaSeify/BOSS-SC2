@@ -19,7 +19,6 @@
 #include <future>
 #include <omp.h>
 
-
 using namespace BOSS;
 
 IntegralExperimentOMP::IntegralExperimentOMP()
@@ -71,7 +70,12 @@ IntegralExperimentOMP::IntegralExperimentOMP(const std::string& experimentName, 
     if (searchType == "IntegralMCTS")
     {
         auto& searchParameters = exp["SearchParameters"];
+        BOSS_ASSERT(searchParameters.count("ExplorationConstant") && searchParameters["ExplorationConstant"].is_number_float(),
+            "SearchParameters must include a float ExplorationConstant");
         m_params.setExplorationValue(searchParameters["ExplorationConstant"]);
+
+        BOSS_ASSERT(searchParameters.count("UseMax") && searchParameters["UseMax"].is_boolean(),
+            "SearchParameters must include a bool UseMax");
         m_params.setUseMaxValue(searchParameters["UseMax"]);
 
         if (searchParameters.count("Simulations"))
@@ -97,9 +101,9 @@ IntegralExperimentOMP::IntegralExperimentOMP(const std::string& experimentName, 
             m_params.setSDConstant(searchParameters["SDConst"]);
         }
 
-        std::stringstream ss;
-        ss << std::fixed << std::setprecision(2) << m_params.getExplorationValue();
-        //m_name += "C" + ss.str();
+        BOSS_ASSERT(searchParameters.count("TemperatureChangeFrame") && searchParameters["TemperatureChangeFrame"].is_number_integer(),
+            "SearchParameters must include an int TemperatureChangeFrame");
+        m_params.setTemperatureChange(searchParameters["TemperatureChangeFrame"]);
     }
 
     else if (searchType == "IntegralNMCS")

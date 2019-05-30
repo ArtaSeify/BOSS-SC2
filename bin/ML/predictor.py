@@ -33,9 +33,7 @@ class Network:
         self.loadNetwork(network_type)
         self.network.predict((np.zeros((1, 1, self.num_unit_features)), np.zeros((1, self.extra_features))))
 
-        self.session = tf.keras.backend.get_session()
-        self.graph = tf.get_default_graph()
-        self.graph.finalize()
+        tf.get_default_graph().finalize()
 
     def loadNetwork(self, network_type):      
         if network_type == "policy":
@@ -95,24 +93,25 @@ class Network:
             print(actual + "\t\t", predicted)
 
     def predict(self, data):
-        #parse_start = time.clock()
-        nn_input = self.parseStringPolicy(data)
-        #parse_end = time.clock()
+        with self.sess.as_default():
+            #parse_start = time.clock()
+            nn_input = self.parseStringPolicy(data)
+            #parse_end = time.clock()
 
-        #prediction_start = time.clock
-        output = np.ndarray.tolist(np.squeeze(self.network.predict(nn_input), axis=0))
-        #prediction_end = time.clock()
-
-        #print("{} time to parse, {} time to predict".format(parse_end - parse_start, prediction_end - prediction_start))
-        return output
+            #prediction_start = time.clock
+            output = np.ndarray.tolist(np.squeeze(self.network.predict(nn_input), axis=0))
+            #prediction_end = time.clock()
+            
+            #print("{} time to parse, {} time to predict".format(parse_end - parse_start, prediction_end - prediction_start))
+            return output
 
 def test():
-    network = Network("asd", "policy", True)
+    network = Network("test", "policy", True)
 
     line = "2,0,0,0,200,109.9,2,-1,0,0,200,109.9,32,0,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,3,-1,0,0,0,0,3,-1,0,0,0,0,5,37,0,240,0,0,4,-1,0,0,0,0,4,-1,0,0,0,0,15,-1,0,0,0,0,32,-1,0,0,0,0,19,-1,0,0,0,0,10,36,0,475,0,0,17,-1,0,0,0,0,5,38,0,672,0,0,28,-1,475,475,0,0,19,-1,240,240,0,0,19,-1,672,672,0,0,487.8,140.2,36,46,1712,2288,18,6,0,0.0438,0.045,0.035"
-    network.predict(line)
+    print(network.predict(line))
 
     line = "2,31,0,5,200,59.35,2,-1,0,0,200,59.35,32,33,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,3,-1,0,0,0,0,3,-1,0,0,0,0,5,32,0,405,0,0,4,-1,0,0,0,0,4,-1,0,0,0,0,15,-1,0,0,0,0,32,-1,5,5,0,0,19,-1,405,405,0,0,10,-1,960,960,0,0,98.81,0.09,26,46,267,3733,17,6,0,0.0438,0.045,0.035"
-    network.predict(line)
+    print(network.predict(line))
 
 #test()

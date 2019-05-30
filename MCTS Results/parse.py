@@ -22,10 +22,8 @@ def parseDataLine(line):
 	dic["SearchTimeSeconds"] = float(values[4])
 	dic["NumSimulations"] = int(values[5])
 	dic["BuildOrder"] = values[6]
-	dic["SearchEval"] = float(values[7])
-
-	if (len(values) == 9):
-		dic["SearchValue"] = float(values[8])
+	dic["SearchValue"] = float(values[7])
+	dic["SearchIntegral"] = float(values[8])
 
 	return dic
 
@@ -36,7 +34,7 @@ def parse(name_prepend, cwd):
 		file_path = os.path.join(cwd, file)
 
 		if "Run" in file:
-			run = file.split("Run")[1].split("\n")[0]
+			run = file.split("nRun")[1].split("\n")[0]
 			# create the dict if it doesn't exist
 			if name_prepend not in results:
 				results[name_prepend] = dict()

@@ -35,9 +35,9 @@ CombatSearch_IntegralMCTS::CombatSearch_IntegralMCTS(const CombatSearchParameter
         Edge::MIXING_PARAMETER = 0.5f;
     }
     else
-    {*/
+    {
         Edge::MIXING_PARAMETER = 0.0f;
-    //}
+    }*/
 }
 
 CombatSearch_IntegralMCTS::~CombatSearch_IntegralMCTS()
@@ -55,9 +55,6 @@ CombatSearch_IntegralMCTS::~CombatSearch_IntegralMCTS()
 
 void CombatSearch_IntegralMCTS::recurse(const GameState& state, int depth)
 {
-    //test(state);
-    //return;
-    //test2(state);
     m_numTotalSimulations = 0;
     m_numCurrentRootSimulations = 0;
     int simulationsWritten = 0;
@@ -102,22 +99,24 @@ void CombatSearch_IntegralMCTS::recurse(const GameState& state, int depth)
 
             m_numCurrentRootSimulations = 0;
 
-            // sanity check
-            int sum = 0;
-            for (int i = 0; i < currentRoot->getNumEdges(); ++i)
-            {
-                sum += currentRoot->getEdge(i)->timesVisited();
-            }
-            
             //m_simulationsPerStep = (int)round(m_simulationsPerStep * m_params.getSimulationsPerStepDecay());
 
+            std::shared_ptr<Edge> childEdge;
             // take the highest value child, but if it has lower value than the best found, we take the
-            // action in the best found instead
-            std::shared_ptr<Edge> childEdge = currentRoot->getHighestValueChild(m_params);
-            BOSS_ASSERT(childEdge->getValue() <= m_bestIntegralFound.getCurrentStackValue(), "Value of a node can't be higher than the best build order found");
-            if (childEdge->getValue() <= m_bestIntegralFound.getCurrentStackValue())
+            // action in the best found build order instead
+            if (currentRoot->getState().getCurrentFrame() >= m_params.getTemperatureChange())
             {
-                childEdge = currentRoot->getChild(m_bestBuildOrderFound[m_buildOrder.size()]);
+                childEdge = currentRoot->getHighestValueChild(m_params);
+                BOSS_ASSERT(childEdge->getValue() <= m_bestIntegralFound.getCurrentStackValue(), "Value of a node can't be higher than the best build order found");
+                if (!m_params.getChangingRootReset() && childEdge->getValue() <= m_bestIntegralFound.getCurrentStackValue())
+                {
+                    childEdge = currentRoot->getChild(m_bestBuildOrderFound[m_buildOrder.size()]);
+                }
+            }
+
+            else
+            {
+                childEdge = currentRoot->getChildProportionalToVisitCount(m_rnggen, m_params);
             }
 
             // create the child node if it doesn't exist
@@ -135,6 +134,7 @@ void CombatSearch_IntegralMCTS::recurse(const GameState& state, int depth)
             if (m_params.getChangingRootReset())
             {
                 currentRoot->removeEdges();
+                currentRoot->getParentEdge()->reset();
             }
             updateNodeVisits(false, isTerminalNode(*currentRoot));
 
@@ -437,24 +437,6 @@ std::pair<std::shared_ptr<Node>, bool> CombatSearch_IntegralMCTS::getPromisingNo
 bool CombatSearch_IntegralMCTS::isTerminalNode(const Node & node) const
 {
     return node.isTerminal();
-}
-
-bool CombatSearch_IntegralMCTS::shouldChangeRoot(std::shared_ptr<Node> root, int simulationsThusFar, int rootDepth) const
-{
-    return false;
-    //std::shared_ptr<Edge> edge = root->getParentEdge();
-
-    //if (edge->timesVisited() < 1000)
-    //{
-    //    return false;
-    //}
-    //
-    ////std::cout << (edge->getValue() - edge->getMean()) / edge->getSD() << std::endl;
-    //if (edge->getMean() + m_params.getSDConstant() * edge->getSD() <= edge->getMax())
-    //{
-    //    return true;
-    //}
-    //return false;
 }
 
 void CombatSearch_IntegralMCTS::randomPlayout(Node node)

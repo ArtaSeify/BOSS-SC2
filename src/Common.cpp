@@ -12,7 +12,6 @@ FracType                CONSTANTS::HRPF;
 FracType                CONSTANTS::SRPF;
 NumUnits                CONSTANTS::WorkersPerRefinery;
 NumUnits                CONSTANTS::WorkersPerDepot;
-//boost::python::object   CONSTANTS::Predictor;
 PyObject*               CONSTANTS::Predictor;
 std::string             CONSTANTS::ExecutablePath;
 
