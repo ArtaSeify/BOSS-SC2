@@ -60,6 +60,7 @@ void Edge::reset()
     m_averageValue = 0;
     m_maxValue = 0;
     m_policyValue = 0;
+    m_parent.reset();
 }
 
 void Edge::updateEdge(FracType simulationValue)

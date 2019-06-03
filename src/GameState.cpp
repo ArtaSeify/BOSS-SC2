@@ -1124,10 +1124,25 @@ void GameState::printUnits() const
 void GameState::writeToSS(std::stringstream & ss, const CombatSearchParameters & params) const
 {    
     //ss << "[";
+    std::vector<int> unitCount = std::vector<int>(ActionTypes::GetRaceActionCount(m_race), 0);
     for (int index = 0; index < m_units.size(); ++index)
     {
-        m_units[index].writeToSS(ss);
-        ss << ",";
+        const auto& unit = m_units[index];
+        ActionType type = unit.getType();
+        if (unit.getTimeUntilBuilt() == 0 && (type.isWorker() || (!type.isBuilding() && !type.isSupplyProvider()
+            && !type.isUpgrade() && !type.isAbility())))
+        {
+            ++unitCount[type.getRaceActionID()];
+        }
+        else
+        {
+            m_units[index].writeToSS(ss);
+            ss << ",";
+        }
+    }
+    for (int i = 0; i < unitCount.size(); ++i)
+    {
+        ss << unitCount[i] << ",";
     }
     //ss << "],";
 

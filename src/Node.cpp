@@ -354,6 +354,7 @@ std::shared_ptr<Edge> Node::getChildProportionalToVisitCount(std::mt19937& rngge
     BOSS_ASSERT(params.getChangingRootReset(), "Must reset the tree after changing root to use this function");
     std::uniform_int_distribution<> distribution(1, m_parentEdge->timesVisited());
     int randomVisitCount = distribution(rnggen);
+    
     for (const auto& edge : m_edges)
     {
         int edgeVisits = edge->timesVisited();

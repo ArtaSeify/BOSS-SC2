@@ -296,7 +296,7 @@ void IntegralExperimentOMP::runExperimentThread(int run)
 
     combatSearch->search();
     #pragma omp critical
-    combatSearch->printResults();
+    //combatSearch->printResults();
     combatSearch->writeResultsFile(outputDir, resultsFile);
     const CombatSearchResults& results = combatSearch->getResults();
 }

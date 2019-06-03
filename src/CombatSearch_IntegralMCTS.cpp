@@ -47,7 +47,7 @@ CombatSearch_IntegralMCTS::~CombatSearch_IntegralMCTS()
         FileTools::MakeDirectory(CONSTANTS::ExecutablePath + "/SavedStates");
         //std::ofstream fileStates(CONSTANTS::ExecutablePath + "/SavedStates/" + m_prefix + "_" + std::to_string(m_filesWritten) + ".csv", std::ofstream::out | std::ofstream::app | std::ofstream::binary);
         std::ofstream fileStates(CONSTANTS::ExecutablePath + "/SavedStates/" + m_name + ".csv", std::ofstream::out | std::ofstream::app | std::ofstream::binary);
-        #pragma omp critical
+        #pragma omp critical (WriteState)
         fileStates << m_ssStates.rdbuf();
         m_ssStates.str(std::string());
     }
@@ -72,7 +72,7 @@ void CombatSearch_IntegralMCTS::recurse(const GameState& state, int depth)
         {
             //std::cout << "simulations before root change: " << m_numCurrentRootSimulations << std::endl;
             // reached a leaf node, we are done
-            if (currentRoot->getNumEdges() == 0)
+            if (currentRoot->isTerminal())
             {
                 break;
             }
@@ -104,7 +104,7 @@ void CombatSearch_IntegralMCTS::recurse(const GameState& state, int depth)
             std::shared_ptr<Edge> childEdge;
             // take the highest value child, but if it has lower value than the best found, we take the
             // action in the best found build order instead
-            if (currentRoot->getState().getCurrentFrame() >= m_params.getTemperatureChange())
+            if (!m_params.getChangingRootReset() || currentRoot->getState().getCurrentFrame() >= m_params.getTemperatureChange())
             {
                 childEdge = currentRoot->getHighestValueChild(m_params);
                 BOSS_ASSERT(childEdge->getValue() <= m_bestIntegralFound.getCurrentStackValue(), "Value of a node can't be higher than the best build order found");
