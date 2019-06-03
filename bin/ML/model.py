@@ -337,8 +337,6 @@ class RelationsPolicyNetwork(Model):
         #self.lrs = tf.keras.callbacks.LearningRateScheduler(self.exponential_decay)
 
         self.model.compile(optimizer=tf.keras.optimizers.Adam(self.learning_rate),
-                #loss='categorical_crossentropy',
-                #loss='kld',
                 loss = self.CCELogits,
                 metrics=['categorical_accuracy', self.top_2_accuracy, self.accuracy])
 
@@ -361,4 +359,4 @@ class RelationsPolicyNetwork(Model):
 
     def load(self, path):
         self.model = tf.keras.models.load_model(path, 
-            custom_objects={"top_2_accuracy": self.top_2_accuracy, "CCELogits": self.CCELogits, "accuracy": self.accuracy})
+         custom_objects={"top_2_accuracy": self.top_2_accuracy, "CCELogits": self.CCELogits, "accuracy": self.accuracy})

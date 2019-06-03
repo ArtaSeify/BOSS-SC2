@@ -34,7 +34,7 @@ def parse(name_prepend, cwd):
 		file_path = os.path.join(cwd, file)
 
 		if "Run" in file:
-			run = file.split("nRun")[1].split("\n")[0]
+			run = file.split("Run")[1].split("\n")[0]
 			# create the dict if it doesn't exist
 			if name_prepend not in results:
 				results[name_prepend] = dict()
@@ -64,5 +64,8 @@ if not os.path.isdir(save_dir):
 	os.makedirs(save_dir)
 
 for key in results:
-	with open(os.path.join(save_dir, key), "wb") as output_file:
+	n = key
+	if n == '':
+		n = "0"
+	with open(os.path.join(save_dir, n), "wb") as output_file:
 		pickle.dump(results[key], output_file)

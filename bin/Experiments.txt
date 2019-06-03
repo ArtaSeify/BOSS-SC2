@@ -3,19 +3,19 @@
 
     "Experiments" : 
     {   
-        "7000Frames3" :
+        "asdasd" :
         {
-            "Run"               : [ true, 1000 ],
-            "UseTotalTimeLimit" : false,
+            "Run"               : [ true, 12 ],
+            "UseTotalTimeLimit" : true,
             "SearchType"        : [ "IntegralMCTS" ],
-            "SearchParameters"  : { "ExplorationConstant" : 3.0, "UseMax" : true, "TemperatureChangeFrame" : 1000},
-            "ChangingRoot"      : { "Active": true, "Simulations": 5000, "Reset": true },
+            "SearchParameters"  : { "ExplorationConstant" : 3.0, "UseMax" : true, "TemperatureChangeFrame" : 750},
+            "ChangingRoot"      : { "Active": false, "Simulations": 500, "Reset": true },
             "Threads"           : 7,
             "Race"              : "Protoss",
             "StartingState"     : "Protoss Start State",
             "PrintNewBest"      : false,
-            "OutputDir"         : "../bin/7000Frames3",
-            "SearchTimeLimitMS" : 20000000,
+            "OutputDir"         : "../bin/testingnetwork",
+            "SearchTimeLimitMS" : 20000,
             "FrameTimeLimit"    : 7000,
             "RelevantActions"   : ["Probe", "Pylon", "Nexus", "Assimilator", "Gateway", "CyberneticsCore", "Stalker", "Zealot", "Colossus", "FleetBeacon", "TwilightCouncil", "Stargate", "TemplarArchive", "DarkShrine", "RoboticsBay", "RoboticsFacility", "Zealot", "DarkTemplar", "Carrier", "VoidRay", "Immortal", "Adept", "Tempest", "Mothership"], 
             "MaxActions"        : [ ["CyberneticsCore", 1], ["FleetBeacon", 1], ["TwilightCouncil", 1], ["TemplarArchive", 1], ["DarkShrine", 1], ["RoboticsBay", 1] ],
@@ -23,7 +23,8 @@
             "OpeningBuildOrder" : "Empty",
             "SortActions"       : false,
             "SaveStates"        : true,
-            "UsePolicyNetwork"  : false
+            "UsePolicyNetwork"  : true
+            "UsePolicyNetwork"  : true
         }
     },
 

@@ -1129,8 +1129,8 @@ void GameState::writeToSS(std::stringstream & ss, const CombatSearchParameters &
     {
         const auto& unit = m_units[index];
         ActionType type = unit.getType();
-        if (type.isWorker() || (!type.isBuilding() && !type.isSupplyProvider()
-            && !type.isUpgrade() && !type.isAbility()))
+        if (unit.getTimeUntilBuilt() == 0 && (type.isWorker() || (!type.isBuilding() && !type.isSupplyProvider()
+            && !type.isUpgrade() && !type.isAbility())))
         {
             ++unitCount[type.getRaceActionID()];
         }

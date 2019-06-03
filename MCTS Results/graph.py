@@ -61,17 +61,17 @@ data_files = os.listdir(args.files_dir)
 max_simulations = 0
 max_value = 0
 for data_file in data_files:
-	if all(s in data_file for s in strings_in_data):
+	if any(s in data_file for s in strings_in_data):
 		with open(os.path.join(args.files_dir, data_file), "rb") as pickle_in:
 			data = pickle.load(pickle_in)
 			for run in data:
-				max_simulations = max(max_simulations, data[run][-1]["NumSimulations"])
+				max_simulations = max(max_simulations, data[run][-1]["NodeVisits"])
 				max_value = max(max_value, data[run][-1]["SearchIntegral"])
 
 
 all_data = []
 for data_file in data_files:
-	if all(s in data_file for s in strings_in_data):
+	if any(s in data_file for s in strings_in_data):
 		with open(os.path.join(args.files_dir, data_file), "rb") as pickle_in:
 			data = pickle.load(pickle_in)
 
@@ -80,7 +80,7 @@ for data_file in data_files:
 			for run in data:
 				ind = int(run)
 				for data_point in data[run]:
-					simulations[ind].append(data_point["NumSimulations"])
+					simulations[ind].append(data_point["NodeVisits"])
 					values[ind].append(data_point["SearchIntegral"])
 			x, y = fixData(simulations, values, max_simulations)
 			all_data.append((x, y, data_file))
@@ -91,7 +91,7 @@ all_data = sorted(all_data, reverse=True, key=lambda x: x[1][-1])
 topk = len(all_data) if args.topk is None else args.topk
 
 for i in range(int(topk)):
-	print(str(i + 1) + ": " + str(all_data[i][1]) + " " + all_data[i][2])
+	print(str(i + 1) + ": " + str(all_data[i][1][-1]) + " " + all_data[i][2])
 	drawGraph(all_data[i][0], max_simulations, all_data[i][1], max_value, all_data[i][2])
 
 if not os.path.isdir(args.save_dir):
