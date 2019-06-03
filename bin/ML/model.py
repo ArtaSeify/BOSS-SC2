@@ -306,26 +306,30 @@ class RelationsPolicyNetwork(Model):
         return nonzeros 
 
     def create(self):
-        units_output_size = 128
+        units_output_size = 256
         
         units_input = tf.keras.Input(shape=(None, self.units_features_size), name="units_input")
 
-        layer_units = layers.Dense(512, activation='elu')(units_input)
+        layer_units = layers.Dense(256, activation='elu')(units_input)
         layer_units = layers.Dense(256, activation='elu')(layer_units)
         layer_units = layers.Dense(256, activation='elu')(layer_units)
-        layer_units = layers.Dense(128, activation='elu')(layer_units)
-        layer_units = layers.Dense(128, activation='elu')(layer_units)
         units_output = layers.Dense(units_output_size, activation='elu', name="units_output")(layer_units)
         units_output = layers.Lambda(lambda x: tf.keras.backend.mean(x, axis=1), name="average_units_output")(units_output)
         
         extra_features_input = tf.keras.Input(shape=(self.extra_features_size, ), name="extra_features_input")
         concatenate_layer = layers.Concatenate()([units_output, extra_features_input])
 
-        layer = layers.Dense(512, activation='elu')(concatenate_layer)
+        layer = layers.Dense(1024, activation='elu')(concatenate_layer)
+        layer = layers.Dense(1024, activation='elu')(layer)
+        layer = layers.Dense(512, activation='elu')(layer)
+        layer = layers.Dense(512, activation='elu')(layer)
+        layer = layers.Dense(512, activation='elu')(layer)
+        layer = layers.Dense(256, activation='elu')(layer)
         layer = layers.Dense(256, activation='elu')(layer)
         layer = layers.Dense(256, activation='elu')(layer)
         layer = layers.Dense(128, activation='elu')(layer)
         layer = layers.Dense(128, activation='elu')(layer)
+
         policy = layers.Dense(self.prediction_shape, activation='linear', name="policy")(layer)
         
         self.model = tf.keras.Model(inputs=[units_input, extra_features_input], outputs=policy)
@@ -336,10 +340,10 @@ class RelationsPolicyNetwork(Model):
                 #loss='categorical_crossentropy',
                 #loss='kld',
                 loss = self.CCELogits,
-                metrics=['categorical_accuracy'])#, self.top_2_accuracy, self.accuracy])
+                metrics=['categorical_accuracy', self.top_2_accuracy, self.accuracy])
 
-    def train(self, iterator, epochs, steps_per_epoch, verbose):
-        return self.model.fit(iterator, epochs=epochs, steps_per_epoch=steps_per_epoch, verbose=verbose, 
+    def train(self, iterator, epochs, steps_per_epoch, verbose, validation_iterator, validation_steps):
+        return self.model.fit(iterator, epochs=epochs, steps_per_epoch=steps_per_epoch, verbose=verbose, validation_data=validation_iterator, validation_steps=validation_steps,
                                 callbacks=[CustomTensorBoard(self.model, log_dir=os.path.join(os.getcwd(), os.path.join("logs", self.model_name)), write_graph=False, batch_size=self.batch_size), 
                                         self.checkpoint, self.checkpoint_best])
 
