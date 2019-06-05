@@ -34,7 +34,7 @@ class Driver:
         self.validation_split = 0.10
         self.training_samples = 0
         self.validation_samples = 0
-        self.TRAINING_SAMPLES_LIMIT = 3500
+        self.TRAINING_SAMPLES_LIMIT = 350000
         self.VALIDATION_SAMPLES_LIMIT = int(self.validation_split * self.TRAINING_SAMPLES_LIMIT)
 
         with open(BIN_PATH + "/" + self.experiment_file_name + ".txt", 'r') as experiment_file:
@@ -59,12 +59,21 @@ class Driver:
     def create_teststrength_file(self, run):
         strength_exp_json = copy.deepcopy(self.experiment_data)
         with open(BIN_PATH + "/" + self.strengthtest_file_name + ".txt", 'w') as strength_exp_file:
-            strength_exp_json["Experiments"][self.experiment_name]["OutputDir"] = BIN_PATH + "/" + self.experiment_name + "/StrengthTest/" + str(run)
+            strength_exp_json["Experiments"][self.experiment_name]["OutputDir"] = BIN_PATH + "/" + self.experiment_name + "/StrengthTest/WithReset/" + str(run)
             strength_exp_json["Experiments"][self.experiment_name]["Run"][1] = 100
             strength_exp_json["Experiments"][self.experiment_name]["UsePolicyNetwork"] = True
             strength_exp_json["Experiments"][self.experiment_name]["SaveStates"] = False
             strength_exp_json["Experiments"][self.experiment_name]["ChangingRoot"]["Active"] = True
             strength_exp_json["Experiments"][self.experiment_name]["SearchParameters"]["TemperatureChangeFrame"] = 0
+
+            strength_exp_json["Experiments"][self.experiment_name + "_2"] = copy.deepcopy(strength_exp_json["Experiments"][self.experiment_name])
+            strength_exp_json["Experiments"][self.experiment_name + "_2"]["OutputDir"] = BIN_PATH + "/" + self.experiment_name + "/StrengthTest/WithoutReset20Seconds/" + str(run)
+            strength_exp_json["Experiments"][self.experiment_name + "_2"]["Run"][1] = 100
+            strength_exp_json["Experiments"][self.experiment_name + "_2"]["UsePolicyNetwork"] = True
+            strength_exp_json["Experiments"][self.experiment_name + "_2"]["SaveStates"] = False
+            strength_exp_json["Experiments"][self.experiment_name + "_2"]["ChangingRoot"]["Active"] = False
+            strength_exp_json["Experiments"][self.experiment_name + "_2"]["SearchParameters"]["TemperatureChangeFrame"] = 0
+            strength_exp_json["Experiments"][self.experiment_name + "_2"]["SearchParameters"]["Nodes"] = 6000000
             
             json.dump(strength_exp_json, strength_exp_file)
 
@@ -91,13 +100,13 @@ class Driver:
                 with open(os.path.join(DATA_PATH, self.train_file_name), "r+") as train_file:
                     all_data = train_file.readlines()
                     with open(os.path.join(DATA_PATH, self.train_file_name), "w") as train_file_overwrite:
-                        for sample in all_data[self.training_samples - self.TRAINING_SAMPLES_LIMIT:]:
-                            train_file_overwrite.write(sample)
+	                    for sample in all_data[self.training_samples - self.TRAINING_SAMPLES_LIMIT:]:
+	                        train_file_overwrite.write(sample)
                 with open(os.path.join(DATA_PATH, self.validation_file_name), "r+") as validation_file:
                     all_data = validation_file.readlines()
                     with open(os.path.join(DATA_PATH, self.validation_file_name), "w") as validation_file_overwrite:
-                        for sample in all_data[self.validation_samples - self.VALIDATION_SAMPLES_LIMIT:]:
-                            validation_file_overwrite.write(sample)
+                    	for sample in all_data[self.validation_samples - self.VALIDATION_SAMPLES_LIMIT:]:
+                        	validation_file_overwrite.write(sample)
 
                 self.training_samples = self.TRAINING_SAMPLES_LIMIT
                 self.validation_samples = self.VALIDATION_SAMPLES_LIMIT
