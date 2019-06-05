@@ -293,15 +293,16 @@ class RelationsPolicyNetwork(Model):
     #    reduce_every_epochs = 1.0
     #    return lr * pow(decay_rate, math.floor((epoch+1) / reduce_every_epochs))
 
-    def top_2_accuracy(self, y_true, y_pred):
-        return tf.keras.metrics.top_k_categorical_accuracy(y_true, y_pred, k=2)
+    def top_3_accuracy(self, y_true, y_pred):
+        return tf.keras.metrics.top_k_categorical_accuracy(y_true, y_pred, k=3)
 
     def CCELogits(self, y_true, y_pred):
         return tf.keras.backend.categorical_crossentropy(y_true, y_pred, from_logits=True)
 
     def accuracy(self, y_true, y_pred):
         indices = tf.concat([tf.convert_to_tensor([[i] for i in range(self.batch_size)], dtype=tf.int64),
-                             tf.expand_dims(tf.keras.backend.argmax(y_pred, axis=-1), 1)], 1)
+                              tf.expand_dims(tf.keras.backend.argmax(y_pred, axis=-1), 1)], 1)
+        #indices = tf.keras.backend.argmax(y_pred, axis=-1)
         nonzeros = tf.math.divide(tf.math.count_nonzero(tf.gather_nd(y_true, indices)),self.batch_size)
         return nonzeros 
 
@@ -357,8 +358,8 @@ class RelationsPolicyNetwork(Model):
         return np.ndarray.tolist(np.squeeze(softmax(self.model.predict_on_batch(nn_input))))
 
     def save(self, path):
-        tf.keras.models.save_model(self.model, path)
+        tf.keras.models.save_model(self.model, path,)
 
     def load(self, path):
-        self.model = tf.keras.models.load_model(path, 
-            custom_objects={"top_2_accuracy": self.top_2_accuracy, "CCELogits": self.CCELogits, "accuracy": self.accuracy})
+        self.model = tf.keras.models.load_model(path, compile=False,
+            custom_objects={"top_3_accuracy": self.top_3_accuracy, "CCELogits": self.CCELogits, "accuracy": self.accuracy})
