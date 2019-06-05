@@ -1,0 +1,16 @@
+Max eval found: 775071
+Finished build order eval: 775071
+Useful build order eval: 0
+Max value found: 92.5
+Finished build order value: 92.5
+Useful build order value: 0
+Best build order (all): Pylon Pylon Probe Probe Probe Probe Probe Probe Assimilator Gateway Probe Assimilator Nexus Probe Probe CyberneticsCore Gateway Probe Gateway Stargate Probe Pylon Adept Stalker Probe VoidRay Adept Assimilator Zealot FleetBeacon Pylon Mothership Tempest Probe Stargate Stalker Carrier VoidRay Stargate Pylon Probe Stargate RoboticsFacility Pylon Pylon Zealot Gateway Immortal Pylon VoidRay Immortal Zealot Carrier Immortal Adept Adept Assimilator Stargate RoboticsBay Stargate Pylon RoboticsFacility Tempest Stalker Stargate Nexus Zealot Colossus Pylon Stalker Immortal Pylon Carrier Gateway Probe VoidRay Tempest Stargate Gateway Stalker Gateway TwilightCouncil DarkShrine Stargate Probe Nexus Pylon Stargate Probe Gateway Probe Probe
+Best build order (finished): "Pylon","Pylon","Probe","Probe","Probe","Probe","Probe","Probe","Assimilator","Gateway","Probe","Assimilator","Nexus","Probe","Probe","CyberneticsCore","Gateway","Probe","Gateway","Stargate","Probe","Pylon","Adept","Stalker","Probe","VoidRay","Adept","Assimilator","Zealot","FleetBeacon","Pylon","Mothership","Tempest","Probe","Stargate","Stalker","Carrier","VoidRay","Stargate","Pylon","Probe","Stargate","RoboticsFacility","Pylon","Pylon","Zealot","Gateway","Immortal","Pylon","VoidRay","Immortal","Zealot","Carrier","Immortal","Adept","Adept","Assimilator","Stargate","RoboticsBay","Stargate","Pylon","RoboticsFacility","Tempest","Stalker","Stargate","Nexus","Zealot","Colossus","Pylon","Stalker","Immortal","Pylon","Carrier","Gateway","Probe","VoidRay","Tempest","Stargate","Gateway","Stalker","Gateway","TwilightCouncil"
+Best build order (useful): "Pylon","Pylon","Probe","Probe","Probe","Probe","Probe","Probe","Assimilator","Gateway","Probe","Assimilator","Nexus","Probe","Probe","CyberneticsCore","Gateway","Probe"
+Nodes expanded: 1401
+Nodes traversed: 6000000
+Leaf nodes expanded: 0
+Leaf nodes traversed: 86172
+Search real time in ms: 37720.8
+Search CPU time in ms: 35751.9
+Simulations: 86172

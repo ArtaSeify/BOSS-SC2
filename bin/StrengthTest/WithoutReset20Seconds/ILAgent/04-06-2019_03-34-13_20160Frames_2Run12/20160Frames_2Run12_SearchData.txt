@@ -1,0 +1,16 @@
+Max eval found: 763116
+Finished build order eval: 763116
+Useful build order eval: 582002
+Max value found: 91
+Finished build order value: 91
+Useful build order value: 48
+Best build order (all): Probe Pylon Gateway CyberneticsCore Probe Pylon Pylon Assimilator Probe Probe Gateway Adept Probe Pylon Probe Probe Stalker Stalker Pylon Assimilator Adept Pylon Stalker Stalker Pylon Zealot Stargate FleetBeacon VoidRay Probe RoboticsFacility Pylon Stalker VoidRay Gateway Adept Adept VoidRay Immortal VoidRay Immortal Pylon Immortal Carrier Gateway Stargate Carrier Stalker Gateway Pylon Stargate Stargate Immortal Zealot VoidRay Zealot Nexus Adept Pylon Stalker RoboticsBay Stalker VoidRay Stalker RoboticsFacility Zealot Tempest TwilightCouncil Pylon Immortal Tempest Probe RoboticsFacility Stalker RoboticsFacility DarkShrine Probe Nexus Assimilator Nexus Assimilator
+Best build order (finished): "Probe","Pylon","Gateway","CyberneticsCore","Probe","Pylon","Pylon","Assimilator","Probe","Probe","Gateway","Adept","Probe","Pylon","Probe","Probe","Stalker","Stalker","Pylon","Assimilator","Adept","Pylon","Stalker","Stalker","Pylon","Zealot","Stargate","FleetBeacon","VoidRay","Probe","RoboticsFacility","Pylon","Stalker","VoidRay","Gateway","Adept","Adept","VoidRay","Immortal","VoidRay","Immortal","Pylon","Immortal","Carrier","Gateway","Stargate","Carrier","Stalker","Gateway","Pylon","Stargate","Stargate","Immortal","Zealot","VoidRay","Zealot","Nexus","Adept","Pylon","Stalker","RoboticsBay","Stalker","VoidRay","Stalker","RoboticsFacility","Zealot","Tempest","TwilightCouncil","Pylon","Immortal","Tempest","Probe","RoboticsFacility","Stalker","RoboticsFacility"
+Best build order (useful): "Probe","Pylon","Gateway","CyberneticsCore","Probe","Pylon","Pylon","Assimilator","Probe","Probe","Gateway","Adept","Probe","Pylon","Probe","Probe","Stalker","Stalker","Pylon","Assimilator","Adept","Pylon","Stalker","Stalker","Pylon","Zealot","Stargate","FleetBeacon","VoidRay","Probe","RoboticsFacility","Pylon","Stalker","VoidRay","Gateway","Adept","Adept","VoidRay","Immortal","VoidRay","Immortal","Pylon","Immortal","Carrier","Gateway"
+Nodes expanded: 1159
+Nodes traversed: 6000000
+Leaf nodes expanded: 0
+Leaf nodes traversed: 78965
+Search real time in ms: 46156.5
+Search CPU time in ms: 36654.1
+Simulations: 78965

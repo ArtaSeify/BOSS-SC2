@@ -1,0 +1,16 @@
+Max eval found: 753007
+Finished build order eval: 753007
+Useful build order eval: 598184
+Max value found: 92.5
+Finished build order value: 92.5
+Useful build order value: 53
+Best build order (all): Probe Probe Pylon Pylon Pylon Assimilator Pylon Assimilator Probe Probe Pylon Probe Probe Probe Pylon Gateway Probe Probe Pylon Probe Zealot CyberneticsCore Stalker Stalker Stargate RoboticsFacility Immortal FleetBeacon VoidRay Zealot Pylon Zealot Tempest Stargate Tempest Zealot Pylon Zealot Zealot Tempest Tempest Immortal Immortal Tempest Carrier Zealot Stargate Pylon Pylon TwilightCouncil Immortal Zealot Mothership Nexus VoidRay RoboticsFacility Gateway Probe Stargate Carrier Immortal Nexus Gateway TemplarArchive Gateway Tempest Probe RoboticsBay Immortal Colossus DarkShrine Stargate Stargate Nexus Gateway Nexus Nexus Gateway Nexus Gateway Assimilator Assimilator Probe Pylon Assimilator
+Best build order (finished): "Probe","Probe","Pylon","Pylon","Pylon","Assimilator","Pylon","Assimilator","Probe","Probe","Pylon","Probe","Probe","Probe","Pylon","Gateway","Probe","Probe","Pylon","Probe","Zealot","CyberneticsCore","Stalker","Stalker","Stargate","RoboticsFacility","Immortal","FleetBeacon","VoidRay","Zealot","Pylon","Zealot","Tempest","Stargate","Tempest","Zealot","Pylon","Zealot","Zealot","Tempest","Tempest","Immortal","Immortal","Tempest","Carrier","Zealot","Stargate","Pylon","Pylon","TwilightCouncil","Immortal","Zealot","Mothership","Nexus","VoidRay","RoboticsFacility","Gateway","Probe","Stargate","Carrier","Immortal","Nexus","Gateway","TemplarArchive","Gateway","Tempest","Probe","RoboticsBay","Immortal","Colossus"
+Best build order (useful): "Probe","Probe","Pylon","Pylon","Pylon","Assimilator","Pylon","Assimilator","Probe","Probe","Pylon","Probe","Probe","Probe","Pylon","Gateway","Probe","Probe","Pylon","Probe","Zealot","CyberneticsCore","Stalker","Stalker","Stargate","RoboticsFacility","Immortal","FleetBeacon","VoidRay","Zealot","Pylon","Zealot","Tempest","Stargate","Tempest","Zealot","Pylon","Zealot","Zealot","Tempest","Tempest","Immortal","Immortal","Tempest","Carrier","Zealot"
+Nodes expanded: 1571
+Nodes traversed: 6000000
+Leaf nodes expanded: 0
+Leaf nodes traversed: 95043
+Search real time in ms: 35325.4
+Search CPU time in ms: 34098.3
+Simulations: 95043

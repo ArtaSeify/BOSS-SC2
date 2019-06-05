@@ -31,10 +31,10 @@ for data_file in data_files:
 			data = json.loads(json_data)
 			for run in data:
 				if len(data[run]) > 0:
-					bestValue = max(bestValue, float(data[run][0]["Best"]["UsefulEval"]))
+					bestValue = max(bestValue, float(data[run][0]["Best"]["Eval"]))
 					#print("run: " +str(run) + " " + str(data[run][0]["Best"]["UsefulEval"]))
-					avgValue += float(data[run][0]["Best"]["UsefulEval"])
-					squaredValues += (float(data[run][0]["Best"]["UsefulEval"]) * float(data[run][0]["Best"]["UsefulEval"]))
+					avgValue += float(data[run][0]["Best"]["Eval"])
+					squaredValues += (float(data[run][0]["Best"]["Eval"]) * float(data[run][0]["Best"]["Eval"]))
 					total_runs += 1
 
 			avgValue /= total_runs

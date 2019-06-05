@@ -1,0 +1,16 @@
+Max eval found: 895533
+Finished build order eval: 895533
+Useful build order eval: 342148
+Max value found: 123.5
+Finished build order value: 123.5
+Useful build order value: 24.5
+Best build order (all): Probe Probe Pylon Probe Probe Gateway Pylon CyberneticsCore Probe Probe Zealot Assimilator Assimilator Pylon Zealot RoboticsFacility Probe Probe Stalker Gateway Zealot Zealot Adept Pylon Probe Zealot Adept Pylon Adept TwilightCouncil Immortal Zealot Pylon Stalker Pylon Probe DarkShrine Immortal Immortal RoboticsBay TemplarArchive Nexus DarkTemplar Colossus Pylon DarkTemplar DarkTemplar Zealot Adept Adept Stalker Gateway Pylon Zealot Probe Pylon Colossus Zealot Stalker Stalker Probe DarkTemplar RoboticsFacility Pylon Zealot Pylon Immortal Probe Adept Pylon Probe Probe DarkTemplar Stalker Stalker Probe Assimilator Pylon DarkTemplar Zealot Immortal Stalker Pylon DarkTemplar Zealot DarkTemplar Adept Probe DarkTemplar Immortal Immortal Probe Pylon Immortal Immortal Adept Colossus Pylon Pylon DarkTemplar DarkTemplar Assimilator Immortal Gateway Adept Immortal Gateway Stargate Stargate DarkTemplar RoboticsFacility FleetBeacon Stargate Gateway Pylon Pylon
+Best build order (finished): "Probe","Probe","Pylon","Probe","Probe","Gateway","Pylon","CyberneticsCore","Probe","Probe","Zealot","Assimilator","Assimilator","Pylon","Zealot","RoboticsFacility","Probe","Probe","Stalker","Gateway","Zealot","Zealot","Adept","Pylon","Probe","Zealot","Adept","Pylon","Adept","TwilightCouncil","Immortal","Zealot","Pylon","Stalker","Pylon","Probe","DarkShrine","Immortal","Immortal","RoboticsBay","TemplarArchive","Nexus","DarkTemplar","Colossus","Pylon","DarkTemplar","DarkTemplar","Zealot","Adept","Adept","Stalker","Gateway","Pylon","Zealot","Probe","Pylon","Colossus","Zealot","Stalker","Stalker","Probe","DarkTemplar","RoboticsFacility","Pylon","Zealot","Pylon","Immortal","Probe","Adept","Pylon","Probe","Probe","DarkTemplar","Stalker","Stalker","Probe","Assimilator","Pylon","DarkTemplar","Zealot","Immortal","Stalker","Pylon","DarkTemplar","Zealot","DarkTemplar","Adept","Probe","DarkTemplar","Immortal","Immortal","Probe","Pylon","Immortal","Immortal","Adept","Colossus","Pylon","Pylon","DarkTemplar","DarkTemplar","Assimilator","Immortal","Gateway","Adept","Immortal","Gateway","Stargate","Stargate","DarkTemplar"
+Best build order (useful): "Probe","Probe","Pylon","Probe","Probe","Gateway","Pylon","CyberneticsCore","Probe","Probe","Zealot","Assimilator","Assimilator","Pylon","Zealot","RoboticsFacility","Probe","Probe","Stalker","Gateway","Zealot","Zealot","Adept","Pylon","Probe","Zealot","Adept","Pylon","Adept","TwilightCouncil","Immortal","Zealot","Pylon","Stalker","Pylon","Probe","DarkShrine","Immortal","Immortal","RoboticsBay"
+Nodes expanded: 7814
+Nodes traversed: 23189306
+Leaf nodes expanded: 15
+Leaf nodes traversed: 595001
+Search real time in ms: 175276
+Search CPU time in ms: 168920
+Simulations: 595000

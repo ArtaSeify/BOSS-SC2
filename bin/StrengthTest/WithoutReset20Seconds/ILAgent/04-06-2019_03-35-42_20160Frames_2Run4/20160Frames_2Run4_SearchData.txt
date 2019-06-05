@@ -1,0 +1,16 @@
+Max eval found: 806160
+Finished build order eval: 804120
+Useful build order eval: 551847
+Max value found: 89.75
+Finished build order value: 88.5
+Useful build order value: 43.5
+Best build order (all): Probe Probe Probe Assimilator Assimilator Pylon Probe Gateway Zealot CyberneticsCore Probe Stargate Pylon Probe Probe Probe Stargate Pylon VoidRay RoboticsFacility Probe Pylon Immortal Zealot Pylon Zealot Immortal RoboticsBay Probe VoidRay VoidRay Gateway Pylon VoidRay Pylon VoidRay Colossus VoidRay VoidRay TwilightCouncil Pylon FleetBeacon RoboticsFacility Adept Zealot Pylon VoidRay Colossus Pylon Carrier Gateway Pylon Gateway Gateway Pylon Zealot Adept Stalker Tempest Stalker Carrier Adept Gateway Nexus Nexus Nexus Tempest Probe Probe Adept Colossus Pylon Mothership Adept RoboticsFacility Gateway TemplarArchive Nexus Tempest Assimilator Pylon Pylon RoboticsFacility Probe Probe Probe Assimilator
+Best build order (finished): "Probe","Probe","Probe","Assimilator","Assimilator","Pylon","Probe","Gateway","Zealot","CyberneticsCore","Probe","Stargate","Pylon","Probe","Probe","Probe","Stargate","Pylon","VoidRay","RoboticsFacility","Probe","Pylon","Immortal","Zealot","Pylon","Zealot","Immortal","RoboticsBay","Probe","VoidRay","VoidRay","Gateway","Pylon","VoidRay","Pylon","VoidRay","Colossus","VoidRay","VoidRay","TwilightCouncil","Pylon","FleetBeacon","RoboticsFacility","Adept","Zealot","Pylon","VoidRay","Colossus","Pylon","Carrier","Gateway","Pylon","Gateway","Gateway","Pylon","Zealot","Adept","Stalker","Tempest","Stalker","Carrier","Adept","Gateway","Nexus","Nexus","Nexus","Tempest","Probe","Probe","Adept","Colossus","Pylon"
+Best build order (useful): "Probe","Probe","Probe","Assimilator","Assimilator","Pylon","Probe","Gateway","Zealot","CyberneticsCore","Probe","Stargate","Pylon","Probe","Probe","Probe","Stargate","Pylon","VoidRay","RoboticsFacility","Probe","Pylon","Immortal","Zealot","Pylon","Zealot","Immortal","RoboticsBay","Probe","VoidRay","VoidRay","Gateway","Pylon","VoidRay","Pylon","VoidRay","Colossus","VoidRay","VoidRay"
+Nodes expanded: 1102
+Nodes traversed: 6000000
+Leaf nodes expanded: 0
+Leaf nodes traversed: 80703
+Search real time in ms: 32686
+Search CPU time in ms: 26161.1
+Simulations: 80703

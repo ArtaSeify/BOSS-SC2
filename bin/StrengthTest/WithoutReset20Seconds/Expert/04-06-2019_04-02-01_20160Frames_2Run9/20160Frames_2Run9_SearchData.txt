@@ -1,0 +1,16 @@
+Max eval found: 796030
+Finished build order eval: 795352
+Useful build order eval: 748343
+Max value found: 98.5
+Finished build order value: 96
+Useful build order value: 74.75
+Best build order (all): Probe Pylon Probe Assimilator Probe Probe Probe Probe Probe Gateway Nexus Probe Zealot Probe Probe Pylon CyberneticsCore Assimilator Zealot Stargate RoboticsFacility Stargate Pylon Stargate Zealot VoidRay VoidRay VoidRay Pylon Assimilator Pylon Probe Zealot Probe Probe Probe Pylon Pylon Pylon Stalker Adept RoboticsFacility Immortal RoboticsFacility RoboticsBay Colossus Colossus VoidRay Adept Probe Stalker Colossus Immortal Adept Colossus Nexus Adept Colossus RoboticsFacility Pylon TwilightCouncil Colossus Immortal FleetBeacon Colossus Gateway Stargate Nexus Tempest Stargate VoidRay TemplarArchive Colossus DarkShrine Pylon Stargate Mothership Nexus Colossus DarkTemplar Carrier Gateway Stargate Stargate Assimilator Gateway RoboticsFacility Nexus Nexus Assimilator
+Best build order (finished): "Probe","Pylon","Probe","Assimilator","Probe","Probe","Probe","Probe","Probe","Gateway","Nexus","Probe","Zealot","Probe","Probe","Pylon","CyberneticsCore","Assimilator","Zealot","Stargate","RoboticsFacility","Stargate","Pylon","Stargate","Zealot","VoidRay","VoidRay","VoidRay","Pylon","Assimilator","Pylon","Probe","Zealot","Probe","Probe","Probe","Pylon","Pylon","Pylon","Stalker","Adept","RoboticsFacility","Immortal","RoboticsFacility","RoboticsBay","Colossus","Colossus","VoidRay","Adept","Probe","Stalker","Colossus","Immortal","Adept","Colossus","Nexus","Adept","Colossus","RoboticsFacility","Pylon","TwilightCouncil","Colossus","Immortal","FleetBeacon","Colossus","Gateway","Stargate","Nexus","Tempest","Stargate","VoidRay","TemplarArchive","Colossus","DarkShrine","Pylon","Stargate","Mothership","Nexus"
+Best build order (useful): "Probe","Pylon","Probe","Assimilator","Probe","Probe","Probe","Probe","Probe","Gateway","Nexus","Probe","Zealot","Probe","Probe","Pylon","CyberneticsCore","Assimilator","Zealot","Stargate","RoboticsFacility","Stargate","Pylon","Stargate","Zealot","VoidRay","VoidRay","VoidRay","Pylon","Assimilator","Pylon","Probe","Zealot","Probe","Probe","Probe","Pylon","Pylon","Pylon","Stalker","Adept","RoboticsFacility","Immortal","RoboticsFacility","RoboticsBay","Colossus","Colossus","VoidRay","Adept","Probe","Stalker","Colossus","Immortal","Adept","Colossus","Nexus","Adept","Colossus","RoboticsFacility","Pylon","TwilightCouncil","Colossus","Immortal","FleetBeacon","Colossus"
+Nodes expanded: 1491
+Nodes traversed: 6000000
+Leaf nodes expanded: 0
+Leaf nodes traversed: 93139
+Search real time in ms: 25166.2
+Search CPU time in ms: 25125.8
+Simulations: 93139

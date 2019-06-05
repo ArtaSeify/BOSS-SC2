@@ -1,0 +1,16 @@
+Max eval found: 1.23318e+06
+Finished build order eval: 1.23318e+06
+Useful build order eval: 523302
+Max value found: 147.25
+Finished build order value: 147.25
+Useful build order value: 45.75
+Best build order (all): Assimilator Probe Probe Probe Assimilator Pylon Probe Probe Probe Pylon Probe Probe Nexus Probe Pylon Probe Probe Probe Pylon Probe Pylon Probe Probe Gateway Assimilator Gateway Probe Probe Zealot Pylon Probe Probe Zealot CyberneticsCore Probe Probe Pylon Probe Stargate Pylon Zealot Probe RoboticsFacility Probe Probe Immortal FleetBeacon Stargate Stalker VoidRay Stalker Carrier Pylon Stalker Probe Mothership Carrier Zealot Immortal RoboticsFacility Pylon Immortal Stargate Adept Gateway Stalker Zealot Carrier Pylon Immortal Probe Pylon Carrier Immortal Pylon Adept Stalker Immortal Immortal Assimilator Pylon VoidRay Tempest Pylon Immortal VoidRay VoidRay Probe Pylon Pylon VoidRay Immortal Pylon Immortal VoidRay Probe Stalker Carrier Pylon VoidRay Pylon VoidRay Immortal Stalker Pylon Pylon VoidRay VoidRay VoidRay Stargate Gateway RoboticsBay Nexus Nexus Stargate Nexus Nexus RoboticsFacility Nexus Nexus Assimilator Assimilator Nexus Assimilator Nexus Nexus Nexus Nexus Gateway
+Best build order (finished): "Assimilator","Probe","Probe","Probe","Assimilator","Pylon","Probe","Probe","Probe","Pylon","Probe","Probe","Nexus","Probe","Pylon","Probe","Probe","Probe","Pylon","Probe","Pylon","Probe","Probe","Gateway","Assimilator","Gateway","Probe","Probe","Zealot","Pylon","Probe","Probe","Zealot","CyberneticsCore","Probe","Probe","Pylon","Probe","Stargate","Pylon","Zealot","Probe","RoboticsFacility","Probe","Probe","Immortal","FleetBeacon","Stargate","Stalker","VoidRay","Stalker","Carrier","Pylon","Stalker","Probe","Mothership","Carrier","Zealot","Immortal","RoboticsFacility","Pylon","Immortal","Stargate","Adept","Gateway","Stalker","Zealot","Carrier","Pylon","Immortal","Probe","Pylon","Carrier","Immortal","Pylon","Adept","Stalker","Immortal","Immortal","Assimilator","Pylon","VoidRay","Tempest","Pylon","Immortal","VoidRay","VoidRay","Probe","Pylon","Pylon","VoidRay","Immortal","Pylon","Immortal","VoidRay","Probe","Stalker","Carrier","Pylon","VoidRay","Pylon","VoidRay","Immortal","Stalker","Pylon","Pylon","VoidRay","VoidRay","VoidRay","Stargate","Gateway","RoboticsBay","Nexus","Nexus","Stargate","Nexus","Nexus","RoboticsFacility","Nexus","Nexus","Assimilator","Assimilator","Nexus","Assimilator","Nexus"
+Best build order (useful): "Assimilator","Probe","Probe","Probe","Assimilator","Pylon","Probe","Probe","Probe","Pylon","Probe","Probe","Nexus","Probe","Pylon","Probe","Probe","Probe","Pylon","Probe","Pylon","Probe","Probe","Gateway","Assimilator","Gateway","Probe","Probe","Zealot","Pylon","Probe","Probe","Zealot","CyberneticsCore","Probe","Probe","Pylon","Probe","Stargate","Pylon","Zealot","Probe","RoboticsFacility","Probe","Probe","Immortal","FleetBeacon","Stargate","Stalker","VoidRay","Stalker","Carrier","Pylon","Stalker","Probe","Mothership","Carrier","Zealot","Immortal","RoboticsFacility","Pylon","Immortal","Stargate","Adept"
+Nodes expanded: 7558
+Nodes traversed: 38925961
+Leaf nodes expanded: 11
+Leaf nodes traversed: 645001
+Search real time in ms: 282501
+Search CPU time in ms: 271789
+Simulations: 645000

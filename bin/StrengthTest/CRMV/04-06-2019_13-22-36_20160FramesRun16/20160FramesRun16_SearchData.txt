@@ -1,0 +1,16 @@
+Max eval found: 896346
+Finished build order eval: 896346
+Useful build order eval: 27062
+Max value found: 137.25
+Finished build order value: 137.25
+Useful build order value: 1.75
+Best build order (all): Assimilator Probe Pylon Probe Probe Assimilator Pylon Probe Probe Pylon Pylon Probe Probe Probe Gateway Pylon Probe Probe CyberneticsCore Stalker Stargate RoboticsFacility TwilightCouncil Stalker Stalker RoboticsBay Nexus Probe Nexus FleetBeacon Probe Adept Colossus Mothership Immortal VoidRay Nexus Tempest Immortal Immortal Probe VoidRay Pylon Probe Stalker Zealot Tempest Colossus Nexus VoidRay Immortal Tempest Zealot Pylon Assimilator Probe Pylon Immortal Colossus Probe Probe RoboticsFacility Pylon Adept Zealot Pylon Carrier Pylon Immortal Stalker Stalker Immortal Tempest Colossus Tempest Pylon Immortal Pylon Colossus Tempest Immortal Assimilator Stalker Immortal Pylon Immortal Stalker Probe Probe Pylon Probe Probe Zealot Probe Pylon Probe Probe Colossus
+Best build order (finished): "Assimilator","Probe","Pylon","Probe","Probe","Assimilator","Pylon","Probe","Probe","Pylon","Pylon","Probe","Probe","Probe","Gateway","Pylon","Probe","Probe","CyberneticsCore","Stalker","Stargate","RoboticsFacility","TwilightCouncil","Stalker","Stalker","RoboticsBay","Nexus","Probe","Nexus","FleetBeacon","Probe","Adept","Colossus","Mothership","Immortal","VoidRay","Nexus","Tempest","Immortal","Immortal","Probe","VoidRay","Pylon","Probe","Stalker","Zealot","Tempest","Colossus","Nexus","VoidRay","Immortal","Tempest","Zealot","Pylon","Assimilator","Probe","Pylon","Immortal","Colossus","Probe","Probe","RoboticsFacility","Pylon","Adept","Zealot","Pylon","Carrier","Pylon","Immortal","Stalker","Stalker","Immortal","Tempest","Colossus","Tempest","Pylon","Immortal","Pylon","Colossus","Tempest","Immortal","Assimilator","Stalker","Immortal","Pylon","Immortal","Stalker","Probe","Probe","Pylon","Probe","Probe"
+Best build order (useful): "Assimilator","Probe","Pylon","Probe","Probe","Assimilator","Pylon","Probe","Probe","Pylon","Pylon","Probe","Probe","Probe","Gateway","Pylon","Probe","Probe","CyberneticsCore","Stalker","Stargate","RoboticsFacility"
+Nodes expanded: 4322
+Nodes traversed: 19120855
+Leaf nodes expanded: 93
+Leaf nodes traversed: 490001
+Search real time in ms: 145647
+Search CPU time in ms: 139905
+Simulations: 490000

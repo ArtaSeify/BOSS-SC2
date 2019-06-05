@@ -1,0 +1,16 @@
+Max eval found: 1.04825e+06
+Finished build order eval: 1.04825e+06
+Useful build order eval: 1.00391e+06
+Max value found: 152.25
+Finished build order value: 152.25
+Useful build order value: 125.75
+Best build order (all): Probe Assimilator Probe Probe Assimilator Pylon Pylon Probe Probe Probe Gateway Probe Probe CyberneticsCore Probe Stargate Probe Nexus Probe Gateway Zealot Pylon Pylon FleetBeacon Stalker VoidRay Probe Probe Pylon Tempest Assimilator Mothership Probe Probe Pylon Stargate Tempest Zealot VoidRay Nexus Tempest Probe Adept Probe Stalker Pylon Stargate Pylon Carrier Pylon VoidRay Pylon Tempest Tempest Probe Stalker Pylon Zealot Adept VoidRay Pylon Carrier VoidRay Pylon Pylon Adept Carrier VoidRay Carrier Stalker Probe VoidRay Nexus Pylon Stalker Tempest Tempest Carrier VoidRay Adept Adept Probe VoidRay VoidRay Stargate Pylon VoidRay Stalker Stalker Pylon VoidRay Pylon Stalker VoidRay Stalker VoidRay Stalker Assimilator Stalker Probe Assimilator Nexus Nexus Nexus
+Best build order (finished): "Probe","Assimilator","Probe","Probe","Assimilator","Pylon","Pylon","Probe","Probe","Probe","Gateway","Probe","Probe","CyberneticsCore","Probe","Stargate","Probe","Nexus","Probe","Gateway","Zealot","Pylon","Pylon","FleetBeacon","Stalker","VoidRay","Probe","Probe","Pylon","Tempest","Assimilator","Mothership","Probe","Probe","Pylon","Stargate","Tempest","Zealot","VoidRay","Nexus","Tempest","Probe","Adept","Probe","Stalker","Pylon","Stargate","Pylon","Carrier","Pylon","VoidRay","Pylon","Tempest","Tempest","Probe","Stalker","Pylon","Zealot","Adept","VoidRay","Pylon","Carrier","VoidRay","Pylon","Pylon","Adept","Carrier","VoidRay","Carrier","Stalker","Probe","VoidRay","Nexus","Pylon","Stalker","Tempest","Tempest","Carrier","VoidRay","Adept","Adept","Probe","VoidRay","VoidRay","Stargate","Pylon","VoidRay","Stalker","Stalker","Pylon","VoidRay","Pylon","Stalker","VoidRay","Stalker","VoidRay","Stalker","Assimilator","Stalker","Probe","Assimilator"
+Best build order (useful): "Probe","Assimilator","Probe","Probe","Assimilator","Pylon","Pylon","Probe","Probe","Probe","Gateway","Probe","Probe","CyberneticsCore","Probe","Stargate","Probe","Nexus","Probe","Gateway","Zealot","Pylon","Pylon","FleetBeacon","Stalker","VoidRay","Probe","Probe","Pylon","Tempest","Assimilator","Mothership","Probe","Probe","Pylon","Stargate","Tempest","Zealot","VoidRay","Nexus","Tempest","Probe","Adept","Probe","Stalker","Pylon","Stargate","Pylon","Carrier","Pylon","VoidRay","Pylon","Tempest","Tempest","Probe","Stalker","Pylon","Zealot","Adept","VoidRay","Pylon","Carrier","VoidRay","Pylon","Pylon","Adept","Carrier","VoidRay","Carrier","Stalker","Probe","VoidRay","Nexus","Pylon","Stalker","Tempest","Tempest","Carrier","VoidRay","Adept","Adept","Probe","VoidRay","VoidRay"
+Nodes expanded: 6006
+Nodes traversed: 22818474
+Leaf nodes expanded: 55
+Leaf nodes traversed: 520001
+Search real time in ms: 170027
+Search CPU time in ms: 163536
+Simulations: 520000
