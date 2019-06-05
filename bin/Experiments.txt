@@ -24,6 +24,7 @@
             "SortActions"       : false,
             "SaveStates"        : true,
             "UsePolicyNetwork"  : true
+            "UsePolicyNetwork"  : true
         }
     },
 

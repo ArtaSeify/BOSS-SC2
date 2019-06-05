@@ -101,16 +101,9 @@ IntegralExperimentOMP::IntegralExperimentOMP(const std::string& experimentName, 
             m_params.setSDConstant(searchParameters["SDConst"]);
         }
 
-        if (searchParameters.count("TemperatureChangeFrame"))
-        {
-            BOSS_ASSERT(searchParameters["TemperatureChangeFrame"].is_number_integer(),
-                "SearchParameters must include an int TemperatureChangeFrame");
-            m_params.setTemperatureChange(searchParameters["TemperatureChangeFrame"]);
-        }
-        else
-        {
-            m_params.setTemperatureChange(0);
-        }
+        BOSS_ASSERT(searchParameters.count("TemperatureChangeFrame") && searchParameters["TemperatureChangeFrame"].is_number_integer(),
+            "SearchParameters must include an int TemperatureChangeFrame");
+        m_params.setTemperatureChange(searchParameters["TemperatureChangeFrame"]);
     }
 
     else if (searchType == "IntegralNMCS")

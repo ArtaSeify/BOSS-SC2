@@ -7,6 +7,7 @@ LIBS=-L /usr/lib64 \
 LIB=-lpython3.7m\
 	-lboost_filesystem \
 	-lboost_system \
+	-lboost_python \
 	-lboost_chrono \
 	-lpthread
 

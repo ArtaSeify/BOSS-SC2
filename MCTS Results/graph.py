@@ -20,7 +20,7 @@ def drawGraph(x, max_x, y, max_y, name):
 	# draw graph
 	plt.plot(x, y, label=name)
 	
-	plt.legend(loc="lower right")
+	plt.legend(loc="upper left")
 	plt.gca().set_xlim([0, max_x])
 	plt.gca().set_ylim([0, max_y])
 	#plt.show()
@@ -90,14 +90,9 @@ for data_file in data_files:
 all_data = sorted(all_data, reverse=True, key=lambda x: x[1][-1])
 topk = len(all_data) if args.topk is None else args.topk
 
-# all_data.sort(key=lambda x: int(x[2].split("_")[-1]))
-all_data.sort(key=lambda x: x[2])
-highestValues = []
 for i in range(int(topk)):
 	print(str(i + 1) + ": " + str(all_data[i][1][-1]) + " " + all_data[i][2])
-	highestValues.append(all_data[i][1][-1])
 	drawGraph(all_data[i][0], max_simulations, all_data[i][1], max_value, all_data[i][2])
-#drawGraph(range(int(topk)), topk-1, highestValues, 2*max(highestValues), "ExIt")
 
 if not os.path.isdir(args.save_dir):
 	os.makedirs(args.save_dir)
