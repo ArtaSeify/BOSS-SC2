@@ -1,0 +1,16 @@
+Max eval found: 776949
+Finished build order eval: 776949
+Useful build order eval: 776949
+Max value found: 119
+Finished build order value: 119
+Useful build order value: 119
+Best build order (all): Assimilator Assimilator Pylon Pylon Gateway Pylon CyberneticsCore Probe Probe Zealot Probe RoboticsFacility Probe Pylon Stalker Probe Pylon Probe Probe Stargate Adept FleetBeacon Probe VoidRay Pylon VoidRay VoidRay Probe Stargate Carrier Pylon Tempest Mothership Carrier Stalker Adept Pylon Carrier Adept Pylon Tempest Pylon Pylon Pylon Carrier Immortal VoidRay Immortal Adept VoidRay Pylon Pylon Stalker Tempest Pylon Tempest Carrier Pylon Stalker Immortal VoidRay Adept VoidRay Immortal Pylon VoidRay Stalker Pylon Probe Zealot Pylon Immortal Tempest
+Best build order (finished): "Assimilator","Assimilator","Pylon","Pylon","Gateway","Pylon","CyberneticsCore","Probe","Probe","Zealot","Probe","RoboticsFacility","Probe","Pylon","Stalker","Probe","Pylon","Probe","Probe","Stargate","Adept","FleetBeacon","Probe","VoidRay","Pylon","VoidRay","VoidRay","Probe","Stargate","Carrier","Pylon","Tempest","Mothership","Carrier","Stalker","Adept","Pylon","Carrier","Adept","Pylon","Tempest","Pylon","Pylon","Pylon","Carrier","Immortal","VoidRay","Immortal","Adept","VoidRay","Pylon","Pylon","Stalker","Tempest","Pylon","Tempest","Carrier","Pylon","Stalker","Immortal","VoidRay","Adept","VoidRay","Immortal","Pylon","VoidRay","Stalker","Pylon","Probe","Zealot","Pylon"
+Best build order (useful): "Assimilator","Assimilator","Pylon","Pylon","Gateway","Pylon","CyberneticsCore","Probe","Probe","Zealot","Probe","RoboticsFacility","Probe","Pylon","Stalker","Probe","Pylon","Probe","Probe","Stargate","Adept","FleetBeacon","Probe","VoidRay","Pylon","VoidRay","VoidRay","Probe","Stargate","Carrier","Pylon","Tempest","Mothership","Carrier","Stalker","Adept","Pylon","Carrier","Adept","Pylon","Tempest","Pylon","Pylon","Pylon","Carrier","Immortal","VoidRay","Immortal","Adept","VoidRay","Pylon","Pylon","Stalker","Tempest","Pylon","Tempest","Carrier","Pylon","Stalker","Immortal","VoidRay","Adept","VoidRay","Immortal","Pylon","VoidRay","Stalker","Pylon","Probe","Zealot","Pylon"
+Nodes expanded: 3663
+Nodes traversed: 12249935
+Leaf nodes expanded: 32
+Leaf nodes traversed: 370001
+Search real time in ms: 121528
+Search CPU time in ms: 88623.9
+Simulations: 370000
