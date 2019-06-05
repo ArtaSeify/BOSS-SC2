@@ -31,6 +31,8 @@ namespace BOSS
         BuildOrderAbilities m_promisingNodeBuildOrder;
     
         void recurse(const GameState & state, int depth);
+
+        void evaluatePolicyNetwork(std::shared_ptr<Node> root);
         
         // returns the node and isNodeJustCreated 
         std::pair<std::shared_ptr<Node>, bool> getPromisingNode(std::shared_ptr<Node> node);

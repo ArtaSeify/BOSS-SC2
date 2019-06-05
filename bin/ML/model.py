@@ -306,25 +306,25 @@ class RelationsPolicyNetwork(Model):
         return nonzeros 
 
     def create(self):
-        units_output_size = 256
+        units_output_size = 512
         
         units_input = tf.keras.Input(shape=(None, self.units_features_size), name="units_input")
 
-        layer_units = layers.Dense(256, activation='elu')(units_input)
-        layer_units = layers.Dense(256, activation='elu')(layer_units)
-        layer_units = layers.Dense(256, activation='elu')(layer_units)
+        layer_units = layers.Dense(1024, activation='elu')(units_input)
+        layer_units = layers.Dense(1024, activation='elu')(layer_units)
+        layer_units = layers.Dense(512, activation='elu')(layer_units)
         units_output = layers.Dense(units_output_size, activation='elu', name="units_output")(layer_units)
         units_output = layers.Lambda(lambda x: tf.keras.backend.mean(x, axis=1), name="average_units_output")(units_output)
         
         extra_features_input = tf.keras.Input(shape=(self.extra_features_size, ), name="extra_features_input")
         concatenate_layer = layers.Concatenate()([units_output, extra_features_input])
 
-        layer = layers.Dense(1024, activation='elu')(concatenate_layer)
+        layer = layers.Dense(2048, activation='elu')(concatenate_layer)
+        layer = layers.Dense(1024, activation='elu')(layer)
         layer = layers.Dense(1024, activation='elu')(layer)
         layer = layers.Dense(512, activation='elu')(layer)
         layer = layers.Dense(512, activation='elu')(layer)
         layer = layers.Dense(512, activation='elu')(layer)
-        layer = layers.Dense(256, activation='elu')(layer)
         layer = layers.Dense(256, activation='elu')(layer)
         layer = layers.Dense(256, activation='elu')(layer)
         layer = layers.Dense(128, activation='elu')(layer)
@@ -337,8 +337,10 @@ class RelationsPolicyNetwork(Model):
         #self.lrs = tf.keras.callbacks.LearningRateScheduler(self.exponential_decay)
 
         self.model.compile(optimizer=tf.keras.optimizers.Adam(self.learning_rate),
+                #loss='categorical_crossentropy',
+                #loss='kld',
                 loss = self.CCELogits,
-                metrics=['categorical_accuracy', self.top_2_accuracy, self.accuracy])
+                metrics=['categorical_accuracy', self.top_3_accuracy, self.accuracy])
 
     def train(self, iterator, epochs, steps_per_epoch, verbose, validation_iterator, validation_steps):
         return self.model.fit(iterator, epochs=epochs, steps_per_epoch=steps_per_epoch, verbose=verbose, validation_data=validation_iterator, validation_steps=validation_steps,
@@ -359,4 +361,4 @@ class RelationsPolicyNetwork(Model):
 
     def load(self, path):
         self.model = tf.keras.models.load_model(path, 
-         custom_objects={"top_2_accuracy": self.top_2_accuracy, "CCELogits": self.CCELogits, "accuracy": self.accuracy})
+            custom_objects={"top_2_accuracy": self.top_2_accuracy, "CCELogits": self.CCELogits, "accuracy": self.accuracy})

@@ -349,6 +349,17 @@ std::shared_ptr<Edge> Node::getHighestVisitedChild() const
     return *edge;
 }
 
+std::shared_ptr<Edge> Node::getHighestPolicyValueChild() const
+{
+    auto edge = std::max_element(m_edges.begin(), m_edges.end(),
+        [](const std::shared_ptr<Edge> & lhs, const std::shared_ptr<Edge> & rhs)
+        {
+            return lhs->getPolicyValue() < rhs->getPolicyValue();
+        });
+
+    return *edge;
+}
+
 std::shared_ptr<Edge> Node::getChildProportionalToVisitCount(std::mt19937& rnggen, const CombatSearchParameters& params) const
 {
     BOSS_ASSERT(params.getChangingRootReset(), "Must reset the tree after changing root to use this function");

@@ -49,6 +49,9 @@ namespace BOSS
         // returns the child with the highest visit count
         std::shared_ptr<Edge> getHighestVisitedChild() const;
 
+        // returns the child with the highest network policy value
+        std::shared_ptr<Edge> getHighestPolicyValueChild() const;
+
         // returns a child with probability proportional to visit count
         std::shared_ptr<Edge> getChildProportionalToVisitCount(std::mt19937& rnggen, const CombatSearchParameters& params) const;
 

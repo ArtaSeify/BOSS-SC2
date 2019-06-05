@@ -60,7 +60,7 @@ class Driver:
         strength_exp_json = copy.deepcopy(self.experiment_data)
         with open(BIN_PATH + "/" + self.strengthtest_file_name + ".txt", 'w') as strength_exp_file:
             strength_exp_json["Experiments"][self.experiment_name]["OutputDir"] = BIN_PATH + "/" + self.experiment_name + "/StrengthTest/WithReset/" + str(run)
-            strength_exp_json["Experiments"][self.experiment_name]["Run"][1] = 100
+            strength_exp_json["Experiments"][self.experiment_name]["Run"][1] = 50
             strength_exp_json["Experiments"][self.experiment_name]["UsePolicyNetwork"] = True
             strength_exp_json["Experiments"][self.experiment_name]["SaveStates"] = False
             strength_exp_json["Experiments"][self.experiment_name]["ChangingRoot"]["Active"] = True
@@ -68,16 +68,22 @@ class Driver:
 
             strength_exp_json["Experiments"][self.experiment_name + "_2"] = copy.deepcopy(strength_exp_json["Experiments"][self.experiment_name])
             strength_exp_json["Experiments"][self.experiment_name + "_2"]["OutputDir"] = BIN_PATH + "/" + self.experiment_name + "/StrengthTest/WithoutReset20Seconds/" + str(run)
-            strength_exp_json["Experiments"][self.experiment_name + "_2"]["Run"][1] = 100
+            strength_exp_json["Experiments"][self.experiment_name + "_2"]["Run"][1] = 50
             strength_exp_json["Experiments"][self.experiment_name + "_2"]["UsePolicyNetwork"] = True
             strength_exp_json["Experiments"][self.experiment_name + "_2"]["SaveStates"] = False
             strength_exp_json["Experiments"][self.experiment_name + "_2"]["ChangingRoot"]["Active"] = False
             strength_exp_json["Experiments"][self.experiment_name + "_2"]["SearchParameters"]["TemperatureChangeFrame"] = 0
             strength_exp_json["Experiments"][self.experiment_name + "_2"]["SearchParameters"]["Nodes"] = 6000000
+
+            strength_exp_json["Experiments"][self.experiment_name + "_3"] = copy.deepcopy(strength_exp_json["Experiments"][self.experiment_name])
+            strength_exp_json["Experiments"][self.experiment_name + "_3"]["OutputDir"] = BIN_PATH + "/" + self.experiment_name + "/StrengthTest/Network/" + str(run)
+            strength_exp_json["Experiments"][self.experiment_name + "_3"]["Run"][1] = 1
+            strength_exp_json["Experiments"][self.experiment_name + "_3"]["UsePolicyNetwork"] = True
+            strength_exp_json["Experiments"][self.experiment_name + "_3"]["SearchParameters"]["Simulations"] = -1
             
             json.dump(strength_exp_json, strength_exp_file)
 
-    def split_training_data(self):
+    def split_training_data(self, run):
         with open(os.path.join(DATA_PATH, self.experiment_name + ".csv"), 'r') as data_file:
             all_data = data_file.readlines()
             random.shuffle(all_data)
@@ -111,7 +117,7 @@ class Driver:
                 self.training_samples = self.TRAINING_SAMPLES_LIMIT
                 self.validation_samples = self.VALIDATION_SAMPLES_LIMIT
 
-        os.remove(os.path.join(DATA_PATH, self.experiment_name + ".csv"))
+        os.rename(os.path.join(DATA_PATH, self.experiment_name + ".csv"), os.path.join(DATA_PATH, self.experiment_name + "_" + str(run) + ".csv"))
 
     def start(self):
         for run in range(self.iterations):
@@ -127,7 +133,7 @@ class Driver:
                 print("calling command: ", BIN_PATH + "/BOSS_main.exe", self.experiment_file_name, self.model_name)
                 subprocess.call([BIN_PATH + "/BOSS_main", self.experiment_file_name, self.model_name])
 
-            self.split_training_data()
+            self.split_training_data(run)
 
             # rewrite the experiment file
             if run == 0:

@@ -55,165 +55,172 @@ CombatSearch_IntegralMCTS::~CombatSearch_IntegralMCTS()
 
 void CombatSearch_IntegralMCTS::recurse(const GameState& state, int depth)
 {
-    m_numTotalSimulations = 0;
-    m_numCurrentRootSimulations = 0;
-    int simulationsWritten = 0;
-    int rootDepth = 0;
-
     std::shared_ptr<Node> root = std::make_shared<Node>(state);
-    std::shared_ptr<Edge> root_parent = std::make_shared<Edge>();
-    root->setParentEdge(root_parent);
-    std::shared_ptr<Node> currentRoot = root;
-
-    while (!timeLimitReached() && m_numTotalSimulations < m_params.getNumberOfSimulations() && m_results.nodeVisits < m_params.getNumberOfNodes())
+    if (m_params.getNumberOfSimulations() == -1)
     {
-        // change the root of the tree. Remove all the nodes and edges that are now irrelevant
-        if (m_params.getChangingRoot() && m_numTotalSimulations > 0 && m_numCurrentRootSimulations == m_simulationsPerStep)
-        {
-            //std::cout << "simulations before root change: " << m_numCurrentRootSimulations << std::endl;
-            // reached a leaf node, we are done
-            if (currentRoot->isTerminal())
-            {
-                break;
-            }
+        evaluatePolicyNetwork(root);
+    }
+    else
+    {
+        m_numTotalSimulations = 0;
+        m_numCurrentRootSimulations = 0;
+        int simulationsWritten = 0;
+        int rootDepth = 0;
 
-            // write state data
-            if (m_params.getSaveStates())
+        std::shared_ptr<Edge> root_parent = std::make_shared<Edge>();
+        root->setParentEdge(root_parent);
+        std::shared_ptr<Node> currentRoot = root;
+
+        while (!timeLimitReached() && m_numTotalSimulations < m_params.getNumberOfSimulations() && m_results.nodeVisits < m_params.getNumberOfNodes())
+        {
+            // change the root of the tree. Remove all the nodes and edges that are now irrelevant
+            if (m_params.getChangingRoot() && m_numTotalSimulations > 0 && m_numCurrentRootSimulations == m_simulationsPerStep)
             {
-                currentRoot->getState().writeToSS(m_ssStates, m_params);
-                std::vector<float> MCTSPolicy = std::vector<float>(ActionTypes::GetRaceActionCount(Races::Protoss), 0.f);
-                int totalVisits = 0;
-                // policy is edge_i visit count / all edges visit count
-                for (int i = 0; i < currentRoot->getNumEdges(); ++i)
+                //std::cout << "simulations before root change: " << m_numCurrentRootSimulations << std::endl;
+                // reached a leaf node, we are done
+                if (currentRoot->isTerminal())
                 {
-                    const auto& edge = currentRoot->getEdge(i);
-                    MCTSPolicy[edge->getAction().first.getRaceActionID()] = static_cast<float>(edge->timesVisited());
-                    totalVisits += edge->timesVisited();
+                    break;
                 }
-                for (int i = 0; i < ActionTypes::GetRaceActionCount(Races::Protoss); ++i)
+
+                // write state data
+                if (m_params.getSaveStates())
                 {
-                    m_ssStates << "," << (MCTSPolicy[i] / totalVisits);
+                    currentRoot->getState().writeToSS(m_ssStates, m_params);
+                    std::vector<float> MCTSPolicy = std::vector<float>(ActionTypes::GetRaceActionCount(Races::Protoss), 0.f);
+                    int totalVisits = 0;
+                    // policy is edge_i visit count / all edges visit count
+                    for (int i = 0; i < currentRoot->getNumEdges(); ++i)
+                    {
+                        const auto& edge = currentRoot->getEdge(i);
+                        MCTSPolicy[edge->getAction().first.getRaceActionID()] = static_cast<float>(edge->timesVisited());
+                        totalVisits += edge->timesVisited();
+                    }
+                    for (int i = 0; i < ActionTypes::GetRaceActionCount(Races::Protoss); ++i)
+                    {
+                        m_ssStates << "," << (MCTSPolicy[i] / totalVisits);
+                    }
+                    m_ssStates << "\n";
                 }
-                m_ssStates << "\n";
-            }
 
-            m_numCurrentRootSimulations = 0;
+                m_numCurrentRootSimulations = 0;
 
-            //m_simulationsPerStep = (int)round(m_simulationsPerStep * m_params.getSimulationsPerStepDecay());
+                //m_simulationsPerStep = (int)round(m_simulationsPerStep * m_params.getSimulationsPerStepDecay());
 
-            std::shared_ptr<Edge> childEdge;
-            // take the highest value child, but if it has lower value than the best found, we take the
-            // action in the best found build order instead
-            if (!m_params.getChangingRootReset() || currentRoot->getState().getCurrentFrame() >= m_params.getTemperatureChange())
-            {
-                childEdge = currentRoot->getHighestValueChild(m_params);
-                BOSS_ASSERT(childEdge->getValue() <= m_bestIntegralFound.getCurrentStackValue(), "Value of a node can't be higher than the best build order found");
-                if (!m_params.getChangingRootReset() && childEdge->getValue() <= m_bestIntegralFound.getCurrentStackValue())
+                std::shared_ptr<Edge> childEdge;
+                // take the highest value child, but if it has lower value than the best found, we take the
+                // action in the best found build order instead
+                if (!m_params.getChangingRootReset() || currentRoot->getState().getCurrentFrame() >= m_params.getTemperatureChange())
                 {
-                    childEdge = currentRoot->getChild(m_bestBuildOrderFound[m_buildOrder.size()]);
+                    childEdge = currentRoot->getHighestValueChild(m_params);
+                    BOSS_ASSERT(childEdge->getValue() <= m_bestIntegralFound.getCurrentStackValue(), "Value of a node can't be higher than the best build order found");
+                    if (!m_params.getChangingRootReset() && childEdge->getValue() <= m_bestIntegralFound.getCurrentStackValue())
+                    {
+                        childEdge = currentRoot->getChild(m_bestBuildOrderFound[m_buildOrder.size()]);
+                    }
                 }
-            }
 
-            else
-            {
-                childEdge = currentRoot->getChildProportionalToVisitCount(m_rnggen, m_params);
-            }
-
-            // create the child node if it doesn't exist
-            if (childEdge->getChild() == nullptr)
-            {
-                currentRoot->notExpandedChild(childEdge, m_params, true);
-            }
-            BOSS_ASSERT(childEdge->getChild() != nullptr, "currentRoot has become null");
-
-            // we have made a choice, so we need to update the integral and build order permanently
-            updateBOIntegral(*(childEdge->getChild()), childEdge->getAction(), currentRoot->getState(), true);
-
-            currentRoot->removeEdges(childEdge);
-            currentRoot = childEdge->getChild();
-            if (m_params.getChangingRootReset())
-            {
-                currentRoot->removeEdges();
-                currentRoot->getParentEdge()->reset();
-            }
-            updateNodeVisits(false, isTerminalNode(*currentRoot));
-
-            ++rootDepth;
-
-            // search is over
-            if (isTerminalNode(*currentRoot) || m_numTotalSimulations >= m_params.getNumberOfSimulations())
-            {
-                break;
-            }
-        }
-        /*if ((m_numTotalSimulations % 1000) == 0)
-        {
-            std::cout << "have run : " << m_numTotalSimulations << " simulations thus far." << std::endl;
-        }*/
-        auto nodePair = getPromisingNode(currentRoot);
-        // we have reached node limit 
-        if (m_results.nodeVisits >= m_params.getNumberOfNodes())
-        {
-            break;
-        }
-        std::shared_ptr<Node> promisingNode = nodePair.first;
-
-        // a node that isn't part of the graph yet. We just simulate from this point
-        if (nodePair.second)
-        {
-            randomPlayout(*promisingNode);
-        }
-
-        // the node is part of the graph, so we create its edges and pick one at random
-        else
-        {
-            if (!isTerminalNode(*promisingNode))
-            {
-                ActionSetAbilities legalActions;
-                generateLegalActions(promisingNode->getState(), legalActions, m_params);
-                promisingNode->createChildrenEdges(legalActions, m_params);
-
-                // there might be no action possible, so createChildrenEdges creates 0 edges
-                if (isTerminalNode(*promisingNode))
-                {
-                    m_results.leafNodesExpanded++;
-                    m_results.leafNodesVisited++;
-                }
                 else
                 {
-                    //// get a child based on highest network value
-                    //if (m_params.useNetworkPrediction())
-                    //{
-                    //    const GameState& prevNodeState = promisingNode->getState();
-                    //    std::shared_ptr<Edge> action = promisingNode->getHighestValueChild(m_params);
-                    //    promisingNode = promisingNode->notExpandedChild(action, m_params);
-                    //    updateBOIntegral(*promisingNode, action->getAction(), prevNodeState, false);
-                    //}
-                    //// pick a child at random
-                    //else
-                    //{
+                    childEdge = currentRoot->getChildProportionalToVisitCount(m_rnggen, m_params);
+                }
+
+                // create the child node if it doesn't exist
+                if (childEdge->getChild() == nullptr)
+                {
+                    currentRoot->notExpandedChild(childEdge, m_params, true);
+                }
+                BOSS_ASSERT(childEdge->getChild() != nullptr, "currentRoot has become null");
+
+                // we have made a choice, so we need to update the integral and build order permanently
+                updateBOIntegral(*(childEdge->getChild()), childEdge->getAction(), currentRoot->getState(), true);
+
+                currentRoot->removeEdges(childEdge);
+                currentRoot = childEdge->getChild();
+                if (m_params.getChangingRootReset())
+                {
+                    currentRoot->removeEdges();
+                    currentRoot->getParentEdge()->reset();
+                }
+                updateNodeVisits(false, isTerminalNode(*currentRoot));
+
+                ++rootDepth;
+
+                // search is over
+                if (isTerminalNode(*currentRoot) || m_numTotalSimulations >= m_params.getNumberOfSimulations())
+                {
+                    break;
+                }
+            }
+            /*if ((m_numTotalSimulations % 1000) == 0)
+            {
+                std::cout << "have run : " << m_numTotalSimulations << " simulations thus far." << std::endl;
+            }*/
+            auto nodePair = getPromisingNode(currentRoot);
+            // we have reached node limit 
+            if (m_results.nodeVisits >= m_params.getNumberOfNodes())
+            {
+                break;
+            }
+            std::shared_ptr<Node> promisingNode = nodePair.first;
+
+            // a node that isn't part of the graph yet. We just simulate from this point
+            if (nodePair.second)
+            {
+                randomPlayout(*promisingNode);
+            }
+
+            // the node is part of the graph, so we create its edges and pick one at random
+            else
+            {
+                if (!isTerminalNode(*promisingNode))
+                {
+                    ActionSetAbilities legalActions;
+                    generateLegalActions(promisingNode->getState(), legalActions, m_params);
+                    promisingNode->createChildrenEdges(legalActions, m_params);
+
+                    // there might be no action possible, so createChildrenEdges creates 0 edges
+                    if (isTerminalNode(*promisingNode))
+                    {
+                        m_results.leafNodesExpanded++;
+                        m_results.leafNodesVisited++;
+                    }
+                    else
+                    {
+                        //// get a child based on highest network value
+                        //if (m_params.useNetworkPrediction())
+                        //{
+                        //    const GameState& prevNodeState = promisingNode->getState();
+                        //    std::shared_ptr<Edge> action = promisingNode->getHighestValueChild(m_params);
+                        //    promisingNode = promisingNode->notExpandedChild(action, m_params);
+                        //    updateBOIntegral(*promisingNode, action->getAction(), prevNodeState, false);
+                        //}
+                        //// pick a child at random
+                        //else
+                        //{
                         const GameState& prevNodeState = promisingNode->getState();
                         std::shared_ptr<Edge> action = promisingNode->getRandomEdge();
                         promisingNode = promisingNode->notExpandedChild(action, m_params);
                         updateBOIntegral(*promisingNode, action->getAction(), prevNodeState, false);
-                    //}
+                        //}
 
-                    updateNodeVisits(Edge::NODE_VISITS_BEFORE_EXPAND == 1, isTerminalNode(*promisingNode));
+                        updateNodeVisits(Edge::NODE_VISITS_BEFORE_EXPAND == 1, isTerminalNode(*promisingNode));
+                    }
+                    randomPlayout(*promisingNode);
                 }
-                randomPlayout(*promisingNode);
             }
-        }
 
-        if (m_results.nodeVisits < m_params.getNumberOfNodes())
-        {
-            backPropogation(promisingNode);
-
-            ++m_numTotalSimulations;
-            ++m_numCurrentRootSimulations;
-
-            if (m_needToWriteBestValue)
+            if (m_results.nodeVisits < m_params.getNumberOfNodes())
             {
-                writeResultsToFile(currentRoot);
+                backPropogation(promisingNode);
+
+                ++m_numTotalSimulations;
+                ++m_numCurrentRootSimulations;
+
+                if (m_needToWriteBestValue)
+                {
+                    writeResultsToFile(currentRoot);
+                }
             }
         }
     }
@@ -322,6 +329,42 @@ void CombatSearch_IntegralMCTS::recurse(const GameState& state, int depth)
     std::cout << std::endl;*/
 
     root->cleanUp();
+}
+
+void CombatSearch_IntegralMCTS::evaluatePolicyNetwork(std::shared_ptr<Node> root)
+{
+    BOSS_ASSERT(m_params.usePolicyNetwork(), "UsePolicyNetwork must be set to true when evaluating policy network");
+    
+    std::shared_ptr<Node> currentNode = root;
+    std::shared_ptr<Node> nextNode;
+    std::shared_ptr<Edge> bestAction;
+
+    while (!isTerminalNode(*currentNode))
+    {
+        ActionSetAbilities legalActions;
+        generateLegalActions(currentNode->getState(), legalActions, m_params);
+        currentNode->createChildrenEdges(legalActions, m_params);
+
+        if (currentNode->isTerminal())
+        {
+            updateIntegralTerminal(*currentNode, nextNode->getState());
+            updateNodeVisits(true, isTerminalNode(*currentNode));
+            writeResultsToFile(currentNode);
+            break;
+        }
+
+        bestAction = currentNode->getHighestPolicyValueChild();
+        nextNode = currentNode->notExpandedChild(bestAction, m_params, true);
+
+        updateBOIntegral(*(bestAction->getChild()), bestAction->getAction(), currentNode->getState(), false);
+        updateNodeVisits(true, isTerminalNode(*currentNode));
+        writeResultsToFile(currentNode);
+
+        currentNode = nextNode;
+    }
+
+    m_bestBuildOrderFound = m_promisingNodeBuildOrder;
+    m_bestIntegralFound = m_promisingNodeIntegral;
 }
 
 void CombatSearch_IntegralMCTS::test(const GameState & state)
