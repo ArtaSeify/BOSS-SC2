@@ -88,7 +88,6 @@ class GameState
     void                            addUnit(ActionType Unit, NumUnits builderID = -1);
 
     std::vector<std::pair<int, int>>getAbilityTargetUnit(const std::pair<ActionType, AbilityAction> & action) const;
-    bool                            fixBuildOrder(BuildOrderAbilities& buildOrder, int index) const;
   
     void                            setMinerals(FracType minerals) { m_minerals = minerals; }
     void                            setGas(FracType gas) { m_gas = gas; }
@@ -123,7 +122,7 @@ class GameState
     std::string                     toString()                          const;
     void                            printunitsbeingbuilt()              const;
     void                            printUnits()                        const;
-    void                            writeToSS(std::stringstream & ss, const CombatSearchParameters & params)   const;
+    void                            writeToSS(std::stringstream & ss, const CombatSearchParameters & params, const std::vector<int> & chronoboostTargets)   const;
     json                            writeToJson(const CombatSearchParameters & params)               const;
 };
 }

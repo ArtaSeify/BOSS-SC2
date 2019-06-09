@@ -3,27 +3,49 @@
 
     "Experiments" : 
     {   
-        "asdasd" :
+        "test_result" :
         {
-            "Run"               : [ true, 1 ],
+            "Run"               : [ true, 4 ],
             "UseTotalTimeLimit" : false,
             "SearchType"        : [ "IntegralMCTS" ],
-            "SearchParameters"  : { "ExplorationConstant" : 3.0, "UseMax" : true, "TemperatureChangeFrame" : 750, "Simulations" : -1},
-            "ChangingRoot"      : { "Active": false, "Simulations": 500, "Reset": true },
+            "SearchParameters"  : { "ExplorationConstant" : 3.0, "UseMax" : true, "TemperatureChangeFrame" : 0, "Nodes" : 22500000},
+            "ChangingRoot"      : { "Active": false, "Simulations": 5000, "Reset": false },
             "Threads"           : 7,
             "Race"              : "Protoss",
             "StartingState"     : "Protoss Start State",
             "PrintNewBest"      : false,
-            "OutputDir"         : "../bin/testingnetwork2",
+            "OutputDir"         : "../bin/test_result/6720/75SecondsPlain",
             "SearchTimeLimitMS" : 2000000,
-            "FrameTimeLimit"    : 7000,
-            "RelevantActions"   : ["Probe", "Pylon", "Nexus", "Assimilator", "Gateway", "CyberneticsCore", "Stalker", "Zealot", "Colossus", "FleetBeacon", "TwilightCouncil", "Stargate", "TemplarArchive", "DarkShrine", "RoboticsBay", "RoboticsFacility", "Zealot", "DarkTemplar", "Carrier", "VoidRay", "Immortal", "Adept", "Tempest", "Mothership"], 
+            "FrameTimeLimit"    : 6720,
+            "RelevantActions"   : [ "Probe", "Pylon", "Nexus", "Assimilator", "Gateway", "CyberneticsCore", "Stalker", "Zealot", "Colossus", "FleetBeacon", "TwilightCouncil", "Stargate", "TemplarArchive", "DarkShrine", "RoboticsBay", "RoboticsFacility", "Zealot", "DarkTemplar", "Carrier", "VoidRay", "Immortal", "Adept", "Tempest", "Mothership"], 
             "MaxActions"        : [ ["CyberneticsCore", 1], ["FleetBeacon", 1], ["TwilightCouncil", 1], ["TemplarArchive", 1], ["DarkShrine", 1], ["RoboticsBay", 1] ],
             "AlwaysMakeWorkers" : false,
             "OpeningBuildOrder" : "Empty",
             "SortActions"       : false,
             "SaveStates"        : false,
-            "UsePolicyNetwork"  : true
+            "UsePolicyNetwork"  : false
+        },
+        "test_result2" :
+        {
+            "Run"               : [ true, 4 ],
+            "UseTotalTimeLimit" : false,
+            "SearchType"        : [ "IntegralMCTS" ],
+            "SearchParameters"  : { "ExplorationConstant" : 3.0, "UseMax" : true, "TemperatureChangeFrame" : 0, "Nodes" : 22500000},
+            "ChangingRoot"      : { "Active": false, "Simulations": 5000, "Reset": false },
+            "Threads"           : 7,
+            "Race"              : "Protoss",
+            "StartingState"     : "Protoss Start State",
+            "PrintNewBest"      : false,
+            "OutputDir"         : "../bin/test_result/20160/75SecondsPlain",
+            "SearchTimeLimitMS" : 2000000,
+            "FrameTimeLimit"    : 20160,
+            "RelevantActions"   : [ "Probe", "Pylon", "Nexus", "Assimilator", "Gateway", "CyberneticsCore", "Stalker", "Zealot", "Colossus", "FleetBeacon", "TwilightCouncil", "Stargate", "TemplarArchive", "DarkShrine", "RoboticsBay", "RoboticsFacility", "Zealot", "DarkTemplar", "Carrier", "VoidRay", "Immortal", "Adept", "Tempest", "Mothership"], 
+            "MaxActions"        : [ ["CyberneticsCore", 1], ["FleetBeacon", 1], ["TwilightCouncil", 1], ["TemplarArchive", 1], ["DarkShrine", 1], ["RoboticsBay", 1] ],
+            "AlwaysMakeWorkers" : false,
+            "OpeningBuildOrder" : "Empty",
+            "SortActions"       : false,
+            "SaveStates"        : false,
+            "UsePolicyNetwork"  : false
         }
     },
 

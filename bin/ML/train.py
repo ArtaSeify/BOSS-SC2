@@ -55,6 +55,7 @@ network = model.RelationsPolicyNetwork(NUM_UNIT_FEATURES, EXTRA_FEATURES, policy
 # network = model.PolicyAndValueNetwork(feature_shape, policy_shape, value_shape, args.save_name, batch_size, learning_rate, "models/" + args.save_name + ".h5", True if args.load_model is None else False)
 if args.load_model:
     network.load("models/" + args.load_model + ".h5")
+    network.compile()
 
 evaluations = []
 # train and evaluate

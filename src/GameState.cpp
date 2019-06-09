@@ -1121,7 +1121,7 @@ void GameState::printUnits() const
     std::cout << std::endl;
 }
 
-void GameState::writeToSS(std::stringstream & ss, const CombatSearchParameters & params) const
+void GameState::writeToSS(std::stringstream & ss, const CombatSearchParameters & params, const std::vector<int>& chronoboostTargets) const
 {    
     //ss << "[";
     std::vector<int> unitCount = std::vector<int>(ActionTypes::GetRaceActionCount(m_race), 0);
@@ -1193,6 +1193,13 @@ void GameState::writeToSS(std::stringstream & ss, const CombatSearchParameters &
     ss << CONSTANTS::MPWPF << ",";
     ss << CONSTANTS::GPWPF << ",";
     ss << CONSTANTS::ERPF;
+
+    // chronoboost targets
+    for (int target : chronoboostTargets)
+    {
+        ss << "," << target;
+    }
+
     //ss << m_numRefineries << ",";
     //ss << m_numDepots;
     //ss << m_lastAction.getID() << ",";

@@ -27,6 +27,7 @@ class Driver:
     def __init__(self, args):
         self.model_name = args.save_name
         self.load_name = args.load_model
+        self.start_run = args.run if args.run is not None else 0
         self.iterations = int(args.iterations)
         self.experiment_file_name = "Experiments"
         self.change_dataset_runs = 5
@@ -58,10 +59,12 @@ class Driver:
 
     def create_teststrength_file(self, run):
         strength_exp_json = copy.deepcopy(self.experiment_data)
+        usePolicy = True if run != "InitialTest" else False
+        
         with open(BIN_PATH + "/" + self.strengthtest_file_name + ".txt", 'w') as strength_exp_file:
             strength_exp_json["Experiments"][self.experiment_name]["OutputDir"] = BIN_PATH + "/" + self.experiment_name + "/StrengthTest/WithReset/" + str(run)
             strength_exp_json["Experiments"][self.experiment_name]["Run"][1] = 50
-            strength_exp_json["Experiments"][self.experiment_name]["UsePolicyNetwork"] = True
+            strength_exp_json["Experiments"][self.experiment_name]["UsePolicyNetwork"] = usePolicy
             strength_exp_json["Experiments"][self.experiment_name]["SaveStates"] = False
             strength_exp_json["Experiments"][self.experiment_name]["ChangingRoot"]["Active"] = True
             strength_exp_json["Experiments"][self.experiment_name]["SearchParameters"]["TemperatureChangeFrame"] = 0
@@ -69,17 +72,18 @@ class Driver:
             strength_exp_json["Experiments"][self.experiment_name + "_2"] = copy.deepcopy(strength_exp_json["Experiments"][self.experiment_name])
             strength_exp_json["Experiments"][self.experiment_name + "_2"]["OutputDir"] = BIN_PATH + "/" + self.experiment_name + "/StrengthTest/WithoutReset20Seconds/" + str(run)
             strength_exp_json["Experiments"][self.experiment_name + "_2"]["Run"][1] = 50
-            strength_exp_json["Experiments"][self.experiment_name + "_2"]["UsePolicyNetwork"] = True
+            strength_exp_json["Experiments"][self.experiment_name + "_2"]["UsePolicyNetwork"] = usePolicy
             strength_exp_json["Experiments"][self.experiment_name + "_2"]["SaveStates"] = False
             strength_exp_json["Experiments"][self.experiment_name + "_2"]["ChangingRoot"]["Active"] = False
             strength_exp_json["Experiments"][self.experiment_name + "_2"]["SearchParameters"]["TemperatureChangeFrame"] = 0
             strength_exp_json["Experiments"][self.experiment_name + "_2"]["SearchParameters"]["Nodes"] = 6000000
 
-            strength_exp_json["Experiments"][self.experiment_name + "_3"] = copy.deepcopy(strength_exp_json["Experiments"][self.experiment_name])
-            strength_exp_json["Experiments"][self.experiment_name + "_3"]["OutputDir"] = BIN_PATH + "/" + self.experiment_name + "/StrengthTest/Network/" + str(run)
-            strength_exp_json["Experiments"][self.experiment_name + "_3"]["Run"][1] = 1
-            strength_exp_json["Experiments"][self.experiment_name + "_3"]["UsePolicyNetwork"] = True
-            strength_exp_json["Experiments"][self.experiment_name + "_3"]["SearchParameters"]["Simulations"] = -1
+            if run != "InitialTest":
+                strength_exp_json["Experiments"][self.experiment_name + "_3"] = copy.deepcopy(strength_exp_json["Experiments"][self.experiment_name])
+                strength_exp_json["Experiments"][self.experiment_name + "_3"]["OutputDir"] = BIN_PATH + "/" + self.experiment_name + "/StrengthTest/Network/" + str(run)
+                strength_exp_json["Experiments"][self.experiment_name + "_3"]["Run"][1] = 1
+                strength_exp_json["Experiments"][self.experiment_name + "_3"]["UsePolicyNetwork"] = True
+                strength_exp_json["Experiments"][self.experiment_name + "_3"]["SearchParameters"]["Simulations"] = -1
             
             json.dump(strength_exp_json, strength_exp_file)
 
@@ -112,7 +116,7 @@ class Driver:
                     all_data = validation_file.readlines()
                     with open(os.path.join(DATA_PATH, self.validation_file_name), "w") as validation_file_overwrite:
                     	for sample in all_data[self.validation_samples - self.VALIDATION_SAMPLES_LIMIT:]:
-                        	validation_file_overwrite.write(sample)
+                            validation_file_overwrite.write(sample)
 
                 self.training_samples = self.TRAINING_SAMPLES_LIMIT
                 self.validation_samples = self.VALIDATION_SAMPLES_LIMIT
@@ -120,7 +124,12 @@ class Driver:
         os.rename(os.path.join(DATA_PATH, self.experiment_name + ".csv"), os.path.join(DATA_PATH, self.experiment_name + "_" + str(run) + ".csv"))
 
     def start(self):
-        for run in range(self.iterations):
+        # initial strength test
+        if self.start_run == 0:
+            self.create_teststrength_file("InitialTest")
+            subprocess.call([BIN_PATH + "/BOSS_main", self.strengthtest_file_name, self.model_name])
+
+        for run in range(self.start_run, self.iterations):
             if run == 0 and self.load_name is None:
                 print("calling command: ", BIN_PATH + "/BOSS_main.exe", self.experiment_file_name)
                 subprocess.call([BIN_PATH + "/BOSS_main", self.experiment_file_name])
@@ -167,6 +176,7 @@ def main():
     parser.add_argument("save_name", help="Name of model to save")
     parser.add_argument("iterations", help="Number of times to iterate search and train")
     parser.add_argument("--load_model", help="Name of model to load")
+    parser.add_argument("--run", help="The run to start from")
     args = parser.parse_args()
 
     driver = Driver(args)

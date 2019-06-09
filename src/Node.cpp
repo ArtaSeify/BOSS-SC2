@@ -87,7 +87,7 @@ void Node::createChildrenEdges(ActionSetAbilities & legalActions, const CombatSe
     if (params.usePolicyNetwork())
     {
         std::stringstream ss;
-        m_state.writeToSS(ss, params);
+        m_state.writeToSS(ss, params, getChronoboostTargets());
 
         PyGILState_STATE gstate;
         gstate = PyGILState_Ensure();
@@ -399,4 +399,17 @@ std::shared_ptr<Edge> Node::getChild(const ActionAbilityPair & action)
 
     BOSS_ASSERT(false, "Tried to get edge with action %s, but it doesn't exist", action.first.getName().c_str());
     return std::make_shared<Edge>(ActionAbilityPair(ActionTypes::None, AbilityAction()), nullptr);
+}
+
+std::vector<int> Node::getChronoboostTargets() const
+{
+    std::vector<int> targets;
+    for (const auto& edge : m_edges)
+    {
+        if (edge->getAction().first == ActionTypes::GetSpecialAction(Races::Protoss))
+        {
+            targets.push_back(edge->getAction().second.targetID);
+        }
+    }
+    return targets;
 }

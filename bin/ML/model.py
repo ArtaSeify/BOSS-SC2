@@ -363,3 +363,10 @@ class RelationsPolicyNetwork(Model):
     def load(self, path):
         self.model = tf.keras.models.load_model(path, compile=False,
             custom_objects={"top_3_accuracy": self.top_3_accuracy, "CCELogits": self.CCELogits, "accuracy": self.accuracy})
+
+    def compile(self):
+        self.model.compile(optimizer=tf.keras.optimizers.Adam(self.learning_rate),
+                #loss='categorical_crossentropy',
+                #loss='kld',
+                loss = self.CCELogits,
+                metrics=['categorical_accuracy', self.top_3_accuracy, self.accuracy])

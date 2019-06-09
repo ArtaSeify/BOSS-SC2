@@ -86,7 +86,7 @@ void CombatSearch_IntegralMCTS::recurse(const GameState& state, int depth)
                 // write state data
                 if (m_params.getSaveStates())
                 {
-                    currentRoot->getState().writeToSS(m_ssStates, m_params);
+                    currentRoot->getState().writeToSS(m_ssStates, m_params, currentRoot->getChronoboostTargets());
                     std::vector<float> MCTSPolicy = std::vector<float>(ActionTypes::GetRaceActionCount(Races::Protoss), 0.f);
                     int totalVisits = 0;
                     // policy is edge_i visit count / all edges visit count
@@ -96,10 +96,12 @@ void CombatSearch_IntegralMCTS::recurse(const GameState& state, int depth)
                         MCTSPolicy[edge->getAction().first.getRaceActionID()] = static_cast<float>(edge->timesVisited());
                         totalVisits += edge->timesVisited();
                     }
+                    // write the policy values
                     for (int i = 0; i < ActionTypes::GetRaceActionCount(Races::Protoss); ++i)
                     {
                         m_ssStates << "," << (MCTSPolicy[i] / totalVisits);
                     }
+
                     m_ssStates << "\n";
                 }
 
@@ -124,6 +126,8 @@ void CombatSearch_IntegralMCTS::recurse(const GameState& state, int depth)
                 {
                     childEdge = currentRoot->getChildProportionalToVisitCount(m_rnggen, m_params);
                 }
+
+                //std::cout << "taking action: " << childEdge->getAction().first.getName() << std::endl;
 
                 // create the child node if it doesn't exist
                 if (childEdge->getChild() == nullptr)
@@ -349,6 +353,8 @@ void CombatSearch_IntegralMCTS::evaluatePolicyNetwork(std::shared_ptr<Node> root
         {
             updateIntegralTerminal(*currentNode, nextNode->getState());
             updateNodeVisits(true, isTerminalNode(*currentNode));
+            m_bestBuildOrderFound = m_promisingNodeBuildOrder;
+            m_bestIntegralFound = m_promisingNodeIntegral;
             writeResultsToFile(currentNode);
             break;
         }
@@ -358,6 +364,8 @@ void CombatSearch_IntegralMCTS::evaluatePolicyNetwork(std::shared_ptr<Node> root
 
         updateBOIntegral(*(bestAction->getChild()), bestAction->getAction(), currentNode->getState(), false);
         updateNodeVisits(true, isTerminalNode(*currentNode));
+        m_bestBuildOrderFound = m_promisingNodeBuildOrder;
+        m_bestIntegralFound = m_promisingNodeIntegral;
         writeResultsToFile(currentNode);
 
         currentNode = nextNode;

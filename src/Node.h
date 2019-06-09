@@ -67,6 +67,8 @@ namespace BOSS
             return *m_edges[index]->getChild(); 
         }
 
+        std::vector<int> getChronoboostTargets() const;
+
         std::shared_ptr<Edge> getParentEdge() { return m_parentEdge; }
         void setParentEdge(std::shared_ptr<Edge> edge) { edge.swap(m_parentEdge); }
         const GameState & getState() const { return m_state; }

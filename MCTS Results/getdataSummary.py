@@ -18,9 +18,9 @@ strings_in_data = args.strings_in_data.split(",")
 
 data_files = os.listdir(args.files_dir)
 
-
+all_data = []
 for data_file in data_files:
-	if all(s in data_file for s in strings_in_data):
+	if any(s in data_file for s in strings_in_data):
 		with open(os.path.join(args.files_dir, data_file), "r") as json_file:
 			bestValue = 0
 			avgValue = 0
@@ -38,4 +38,11 @@ for data_file in data_files:
 					total_runs += 1
 
 			avgValue /= total_runs
-			print("Data: {}. Highest value found: {}, Average value: {}, SD: {}".format(data_file, bestValue, avgValue, sqrt((squaredValues - (total_runs * avgValue * avgValue))/(total_runs - 1))))
+			SD = sqrt((squaredValues - (total_runs * avgValue * avgValue))/(total_runs - 1))
+			all_data.append((data_file, bestValue, avgValue, SD))
+			#print("Data: {}. Highest value found: {}, Average value: {}, SD: {}".format(data_file, bestValue, avgValue, sqrt((squaredValues - (total_runs * avgValue * avgValue))/(total_runs - 1))))
+
+all_data.sort(key=lambda x: x[2], reverse=True)
+
+for d in all_data:
+	print(d)

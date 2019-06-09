@@ -55,6 +55,8 @@ namespace BOSS
         { 
         
         }
+
+        void operator = (const ActionValue& action) { this->action = action.action; this->evaluation = action.evaluation; }
     };
 }
 
