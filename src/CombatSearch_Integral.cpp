@@ -123,7 +123,8 @@ FracType CombatSearch_Integral::recurseReturnValue(const GameState & state, int 
                 }
             }
 
-            state.writeToSS(m_ssStates, m_params, std::vector<int>());
+            // THIS IS WRONG
+            //state.writeToSS(m_ssStates, m_params, 0, std::vector<int>());
 
             m_ssStates << ",";
             for (int index = 0; index < tiedActionValues.size(); ++index)

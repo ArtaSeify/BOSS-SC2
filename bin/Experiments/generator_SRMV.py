@@ -1,8 +1,8 @@
 import json
 
 total_runs = 20
-cValues = [1.0, 1.25, 1.5, 1.75, 2.0, 3.0, 4.0, 5.0]
-startingStates = [0, 1, 2, 3]
+cValues = [0.50, 0.75, 1.0, 1.25, 1.50]
+startingStates = [ "Start State" ]
 
 MCTS_experiment = dict()
 MCTS_experiment["Experiments"] = dict()
@@ -29,6 +29,8 @@ for cValue in cValues:
             SearchParameters_list = dict()
             SearchParameters_list["ExplorationConstant"] = cValue
             SearchParameters_list["UseMax"] = True
+            SearchParameters_list["ValueNormalization"] = 1
+            SearchParameters_list["VisitsBeforeExpand"] = 2
             MCTS_experiment["Experiments"][exp_name]["SearchParameters"] = SearchParameters_list
 
             ChangingRoot = dict()
@@ -64,9 +66,12 @@ for cValue in cValues:
 
             MCTS_experiment["Experiments"][exp_name]["UsePolicyNetwork"] = False
 
+            MCTS_experiment["Experiments"][exp_name]["UsePolicyValueNetwork"] = False
+
 print("number of experiments: {}".format(len(MCTS_experiment["Experiments"])))
 
 MCTS_experiment["States"] = dict()
+MCTS_experiment["States"]["Protoss Start State"] = { "race" : "Protoss", "minerals" : 50, "gas" : 0, "units" : [ ["Probe", 12], ["Nexus", 1] ] }
 MCTS_experiment["States"]["Protoss 0"] = {"race": "Protoss", "units": [["Nexus", 3], ["Probe", 68], ["Pylon", 20], ["Gateway", 9], ["Assimilator", 6], ["CyberneticsCore", 1], ["Stargate", 1], ["RoboticsFacility", 1], ["Stalker", 3], ["Observer", 2], ["Sentry", 1], ["Phoenix", 5], ["Immortal", 5], ["Zealot", 17], ["Forge", 1], ["TwilightCouncil", 1], ["RoboticsBay", 1], ["TemplarArchive", 1], ["PhotonCannon", 3], ["Disruptor", 3]], "minerals": 1065, "gas": 436}
 MCTS_experiment["States"]["Protoss 1"] = {"race": "Protoss", "units": [["Nexus", 3], ["Probe", 54], ["Pylon", 17], ["Gateway", 14], ["Assimilator", 6], ["CyberneticsCore", 1], ["Stargate", 1], ["TwilightCouncil", 1], ["RoboticsFacility", 1], ["Immortal", 4], ["Forge", 1], ["Adept", 1], ["TemplarArchive", 1], ["Zealot", 14], ["PhotonCannon", 3], ["Observer", 2]], "minerals": 15, "gas": 592}
 MCTS_experiment["States"]["Protoss 2"] = {"race": "Protoss", "units": [["Nexus", 2], ["Probe", 19], ["Pylon", 1], ["Gateway", 1], ["Assimilator", 1]], "minerals": 185, "gas": 36}

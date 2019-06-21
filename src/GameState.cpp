@@ -185,8 +185,8 @@ bool GameState::isLegal(ActionType action) const
     // we don't need to go over the maximum supply limit with supply providers
     if (ActionTypes::GetSupplyProvider(m_race) == action && (totalSupply >= 200)) { return false; }
 
-    // need to have at least 1 Pylon to build Protoss buildings, except if it's an Assimilator
-    if (m_race == Races::Protoss && action.isBuilding() && !action.isSupplyProvider() && !action.isRefinery() 
+    // need to have at least 1 Pylon to build Protoss buildings, except if it's an Assimilator or Nexus
+    if (m_race == Races::Protoss && action.isBuilding() && !action.isSupplyProvider() && !action.isRefinery() && !action.isDepot()
            && m_unitTypes[ActionTypes::GetSupplyProvider(m_race).getRaceActionID()].size() == 0) { return false; }
 
     // Don't build a supply depot if we have 16 or over free supply
@@ -797,7 +797,7 @@ int GameState::whenPrerequisitesReady(ActionType action) const
     // Protoss needs to have a Pylon to be able to produce buildings
     if (m_race == Races::Protoss)
     {
-        if (action.isBuilding() && !action.isRefinery() && !action.isSupplyProvider())
+        if (action.isBuilding() && !action.isRefinery() && !action.isSupplyProvider() && !action.isDepot())
         {
             whenPrereqReady = timeUntilFirstPylonDone();
 
@@ -816,7 +816,7 @@ int GameState::whenPrerequisitesReady(ActionType action) const
         for (int unitID : m_unitTypes[req.getRaceActionID()])
         {
             const Unit& unit = getUnit(unitID);
-            BOSS_ASSERT(unit.getType() == req, "Change inside prereq causes error!");
+            BOSS_ASSERT(unit.getType() == req, "Unit type %s must equal prereq type %s", unit.getType().getName().c_str(), req.getName().c_str());
             minReady = std::min(minReady, unit.getTimeUntilBuilt());
             if (unit.getTimeUntilBuilt() == 0) { break; }
         }
@@ -1121,7 +1121,7 @@ void GameState::printUnits() const
     std::cout << std::endl;
 }
 
-void GameState::writeToSS(std::stringstream & ss, const CombatSearchParameters & params, const std::vector<int>& chronoboostTargets) const
+void GameState::writeToSS(std::stringstream & ss, const CombatSearchParameters & params, FracType currentValue, const std::vector<int>& chronoboostTargets) const
 {    
     //ss << "[";
     std::vector<int> unitCount = std::vector<int>(ActionTypes::GetRaceActionCount(m_race), 0);
@@ -1129,7 +1129,7 @@ void GameState::writeToSS(std::stringstream & ss, const CombatSearchParameters &
     {
         const auto& unit = m_units[index];
         ActionType type = unit.getType();
-        if (unit.getTimeUntilBuilt() == 0 && (type.isWorker() || (!type.isBuilding() && !type.isSupplyProvider()
+        if (unit.getTimeUntilBuilt() == 0 && (type.isWorker() || type.isRefinery() || type.isSupplyProvider() || (!type.isBuilding() && !type.isSupplyProvider()
             && !type.isUpgrade() && !type.isAbility())))
         {
             ++unitCount[type.getRaceActionID()];
@@ -1190,6 +1190,7 @@ void GameState::writeToSS(std::stringstream & ss, const CombatSearchParameters &
     ss << m_mineralWorkers << ",";
     ss << m_gasWorkers << ",";
     ss << m_buildingWorkers << ",";
+    ss << currentValue << ",";
     ss << CONSTANTS::MPWPF << ",";
     ss << CONSTANTS::GPWPF << ",";
     ss << CONSTANTS::ERPF;

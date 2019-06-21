@@ -5,9 +5,10 @@
 #include "CombatSearch_Integral.h"
 #include "CombatSearch_Bucket.h"
 #include "CombatSearch_BestResponse.h"
-#include "CombatSearch_IntegralMCTS.h"
-#include "NMCS.h"
-#include "NMCTS.h"
+//#include "CombatSearch_IntegralMCTS.h"
+#include "CombatSearch_ParallelIntegralMCTS.h"
+//#include "NMCS.h"
+//#include "NMCTS.h"
 //#include "DFSPolicy.h"
 //#include "DFSValue.h"
 //#include "DFSPolicyAndValue.h"
@@ -58,6 +59,9 @@ IntegralExperimentOMP::IntegralExperimentOMP(const std::string& experimentName, 
     BOSS_ASSERT(exp.count("UsePolicyNetwork") && exp["UsePolicyNetwork"].is_boolean(), "IntegralSearch must have a UsePolicyNetwork bool");
     m_params.setUsePolicyNetwork(exp["UsePolicyNetwork"]);
 
+    BOSS_ASSERT(exp.count("UsePolicyValueNetwork") && exp["UsePolicyValueNetwork"].is_boolean(), "IntegralSearch must have a UsePolicyValueNetwork bool");
+    m_params.setUsePolicyValueNetwork(exp["UsePolicyValueNetwork"]);
+
     const std::string& searchType = exp["SearchType"][0].get<std::string>();
     m_searchType = searchType;
 
@@ -67,7 +71,7 @@ IntegralExperimentOMP::IntegralExperimentOMP(const std::string& experimentName, 
             ((searchType == "IntegralDFSVN" || searchType == "IntegralDFSPN" || searchType == "IntegralDFSPVN") && m_params.useNetworkPrediction()), "Turn off UseNetwork flag for standard DFS search");
     }*/
 
-    if (searchType == "IntegralMCTS")
+    if (searchType == "IntegralMCTS" || searchType == "ParallelIntegralMCTS")
     {
         auto& searchParameters = exp["SearchParameters"];
         BOSS_ASSERT(searchParameters.count("ExplorationConstant") && searchParameters["ExplorationConstant"].is_number_float(),
@@ -78,27 +82,36 @@ IntegralExperimentOMP::IntegralExperimentOMP(const std::string& experimentName, 
             "SearchParameters must include a bool UseMax");
         m_params.setUseMaxValue(searchParameters["UseMax"]);
 
+        BOSS_ASSERT(searchParameters.count("VisitsBeforeExpand") && searchParameters["VisitsBeforeExpand"].is_number_integer(),
+            "SearchParameters must incldue an int VisitsBeforeExpand");
+        m_params.setNodeVisitsBeforeExpand(searchParameters["VisitsBeforeExpand"]);
+
+        BOSS_ASSERT(searchParameters.count("ValueNormalization") && searchParameters["ValueNormalization"].is_number_integer(),
+            "SearchParameters must incldue an int ValueNormalization");
+        m_params.setValueNormalization(searchParameters["ValueNormalization"]);
+
         if (searchParameters.count("Simulations"))
         {
+            BOSS_ASSERT(searchParameters["Simulations"].is_number_integer(), "Simulations must be an integer");
             m_params.setNumberOfSimulations(searchParameters["Simulations"]);
-        }
-        else
-        {
-            m_params.setNumberOfSimulations(std::numeric_limits<int>::max());
         }
 
         if (searchParameters.count("Nodes"))
         {
+            BOSS_ASSERT(searchParameters["Nodes"].is_number_integer(), "Nodes must be an integer");
             m_params.setNumberOfNodes(searchParameters["Nodes"]);
         }
-        else
+
+        if (searchParameters.count("Threads"))
         {
-            m_params.setNumberOfNodes(std::numeric_limits<int>::max());
+            BOSS_ASSERT(searchParameters["Threads"].is_number_integer(), "Threads must be an integer");
+            m_params.setThreadsForMCTS(searchParameters["Threads"]);
         }
 
-        if (searchParameters.count("SDConst"))
+        if (m_params.usePolicyValueNetwork())
         {
-            m_params.setSDConstant(searchParameters["SDConst"]);
+            BOSS_ASSERT(searchParameters.count("MixingValue") && searchParameters["MixingValue"].is_number_float(), "Must include a MixingValue float if using a value network");
+            m_params.setMixingValue(searchParameters["MixingValue"]);
         }
 
         if (searchParameters.count("TemperatureChangeFrame"))
@@ -286,26 +299,30 @@ void IntegralExperimentOMP::runExperimentThread(int run)
     else if (m_searchType == "IntegralMCTS")
     {
         //resultsFile += "_IntegralMCTS";
-        combatSearch = std::unique_ptr<CombatSearch>(new CombatSearch_IntegralMCTS(m_params, outputDir, resultsFile, m_name));
+        //combatSearch = std::unique_ptr<CombatSearch>(new CombatSearch_IntegralMCTS(m_params, outputDir, resultsFile, m_name));
     }
-    else if (m_searchType == "IntegralNMCS")
+    else if (m_searchType == "ParallelIntegralMCTS")
+    {
+        //resultsFile += "_IntegralMCTS";
+        combatSearch = std::unique_ptr<CombatSearch>(new CombatSearch_ParallelIntegralMCTS(m_params, outputDir, resultsFile, m_name));
+    }
+    /*else if (m_searchType == "IntegralNMCS")
     {
         combatSearch = std::unique_ptr<CombatSearch>(new NMCS(m_params, outputDir, resultsFile, m_name));
     }
     else if (m_searchType == "IntegralNMCTS")
     {
         combatSearch = std::unique_ptr<CombatSearch>(new NMCTS(m_params, outputDir, resultsFile, m_name));
-    }
+    }*/
     else
     {
         BOSS_ASSERT(false, "CombatSearch type not found: %s", m_searchType.c_str());
     }
 
     combatSearch->search();
-    #pragma omp critical
+    //#pragma omp critical
     //combatSearch->printResults();
     combatSearch->writeResultsFile(outputDir, resultsFile);
-    const CombatSearchResults& results = combatSearch->getResults();
 }
 
 void IntegralExperimentOMP::runTotalTimeExperiment(int run)
@@ -352,7 +369,7 @@ void IntegralExperimentOMP::runTotalTimeExperiment(int run)
         FileTools::MakeDirectory(dir);
 
         //std::cout << "search time limit: " << params.getSearchTimeLimit() << std::endl;
-        std::unique_ptr<CombatSearch> combatSearch = std::unique_ptr<CombatSearch>(new CombatSearch_IntegralMCTS(params, dir, resultsFile, m_name));
+        std::unique_ptr<CombatSearch> combatSearch = std::unique_ptr<CombatSearch>(new CombatSearch_ParallelIntegralMCTS(params, dir, resultsFile, m_name));
 
         combatSearch->search();
         //combatSearch->printResults();
@@ -481,16 +498,37 @@ void IntegralExperimentOMP::runTotalTimeExperiment(int run)
 void IntegralExperimentOMP::run(int numberOfRuns)
 {
     FileTools::MakeDirectory(m_outputDir);
-    #pragma omp parallel for
-    for (int run = 0; run < numberOfRuns; ++run)
+    
+    if (m_params.usePolicyNetwork() || m_params.usePolicyValueNetwork())
     {
-        if (m_params.getUseTotalTimeLimit())
+        int threads = (int)std::ceil(std::thread::hardware_concurrency() / 3.f);
+        #pragma omp parallel for num_threads(threads)
+        for (int run = 0; run < numberOfRuns; ++run)
         {
-            runTotalTimeExperiment(run);
+            if (m_params.getUseTotalTimeLimit())
+            {
+                runTotalTimeExperiment(run);
+            }
+            else
+            {
+                runExperimentThread(run);
+            }
         }
-        else
+    }
+    else
+    {
+        int threads = std::max(1, int(float(std::thread::hardware_concurrency()) / m_params.getThreadsForMCTS()));
+        #pragma omp parallel for num_threads(threads)
+        for (int run = 0; run < numberOfRuns; ++run)
         {
-            runExperimentThread(run);
+            if (m_params.getUseTotalTimeLimit())
+            {
+                runTotalTimeExperiment(run);
+            }
+            else
+            {
+                runExperimentThread(run);
+            }
         }
-    } 
+    }
 }

@@ -122,7 +122,7 @@ class GameState
     std::string                     toString()                          const;
     void                            printunitsbeingbuilt()              const;
     void                            printUnits()                        const;
-    void                            writeToSS(std::stringstream & ss, const CombatSearchParameters & params, const std::vector<int> & chronoboostTargets)   const;
+    void                            writeToSS(std::stringstream & ss, const CombatSearchParameters & params, FracType currentValue, const std::vector<int> & chronoboostTargets)   const;
     json                            writeToJson(const CombatSearchParameters & params)               const;
 };
 }

@@ -14,6 +14,7 @@ parser.add_argument("strings_in_data", help="The strings the data file name must
 parser.add_argument("--topk", help="Top k results to show")
 args = parser.parse_args()
 
+args.files_dir = os.path.join("parsed data", args.files_dir)
 strings_in_data = args.strings_in_data.split(",")
 
 data_files = os.listdir(args.files_dir)
@@ -22,27 +23,36 @@ all_data = []
 for data_file in data_files:
 	if any(s in data_file for s in strings_in_data):
 		with open(os.path.join(args.files_dir, data_file), "r") as json_file:
+			bestAvgValue = 0
 			bestValue = 0
-			avgValue = 0
-			squaredValues = 0
+			avgAvgValue = 0
+			avgSquaredValues = 0
+			avgBest = 0
+			bestSquaredValues = 0
 			total_runs = 0
 			#print(data_file)
 			json_data = json_file.read()
 			data = json.loads(json_data)
 			for run in data:
 				if len(data[run]) > 0:
+					bestAvgValue = max(bestAvgValue, float(data[run][0]["Average"]["Eval"]))
 					bestValue = max(bestValue, float(data[run][0]["Best"]["Eval"]))
 					#print("run: " +str(run) + " " + str(data[run][0]["Best"]["UsefulEval"]))
-					avgValue += float(data[run][0]["Best"]["Eval"])
-					squaredValues += (float(data[run][0]["Best"]["Eval"]) * float(data[run][0]["Best"]["Eval"]))
+					avgAvgValue += float(data[run][0]["Average"]["Eval"])
+					avgSquaredValues += (float(data[run][0]["Average"]["Eval"]) * float(data[run][0]["Average"]["Eval"]))
+					avgBest += float(data[run][0]["Best"]["Eval"])
+					bestSquaredValues += (float(data[run][0]["Best"]["Eval"]) * float(data[run][0]["Best"]["Eval"]))
 					total_runs += 1
 
-			avgValue /= total_runs
-			SD = sqrt((squaredValues - (total_runs * avgValue * avgValue))/(total_runs - 1))
-			all_data.append((data_file, bestValue, avgValue, SD))
+			avgAvgValue /= total_runs
+			avgBest /= total_runs
+			SDAvg = sqrt((avgSquaredValues - (total_runs * avgAvgValue * avgAvgValue))/(total_runs - 1))
+			SDBest = sqrt((bestSquaredValues - (total_runs * avgBest * avgBest))/(total_runs - 1))
+			
+			all_data.append((data_file, bestAvgValue, avgAvgValue, SDAvg, bestValue, avgBest, SDBest))
 			#print("Data: {}. Highest value found: {}, Average value: {}, SD: {}".format(data_file, bestValue, avgValue, sqrt((squaredValues - (total_runs * avgValue * avgValue))/(total_runs - 1))))
 
-all_data.sort(key=lambda x: x[2], reverse=True)
+all_data.sort(key=lambda x: x[5], reverse=True)
 
 for d in all_data:
 	print(d)

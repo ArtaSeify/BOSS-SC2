@@ -64,7 +64,7 @@ void ExperimentsArta::runExperimentsThread(const json & j, int thread, int exper
         {
             BOSS_ASSERT(val.count("SearchType"), "Experiment has no SearchType value");
             BOSS_ASSERT(val["SearchType"].is_array() && val["SearchType"][0].is_string(), "SearchType must an array with first element a string");
-            if (val["SearchType"] == "IntegralMCTS")
+            if (val["SearchType"] == "IntegralMCTS" || val["SearchType"] == "ParallelIntegralMCTS")
             {
                 auto & searchParameters = val["SearchParameters"];
                 BOSS_ASSERT(searchParameters.count("ExplorationConstant") && searchParameters["ExplorationConstant"].is_number_float(), "There must be a float ExplorationConstant");
@@ -93,7 +93,7 @@ void ExperimentsArta::runExperimentsThread(const json & j, int thread, int exper
             {
                 RunDFSExperiment(experimentName, val, val["Run"][1]);
             }
-            else if (searchType == "IntegralMCTS")
+            else if (searchType == "IntegralMCTS" || searchType == "ParallelIntegralMCTS")
             {
                 RunMCTSExperiment(experimentName, val, val["Run"][1]);
             }

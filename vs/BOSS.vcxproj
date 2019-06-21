@@ -41,23 +41,22 @@
     <ClCompile Include="..\src\CombatSearch_Integral.cpp" />
     <ClCompile Include="..\src\CombatSearch_IntegralData.cpp" />
     <ClCompile Include="..\src\CombatSearch_IntegralDataFinishedUnits.cpp" />
-    <ClCompile Include="..\src\CombatSearch_IntegralMCTS.cpp" />
+    <ClCompile Include="..\src\CombatSearch_ParallelIntegralMCTS.cpp" />
     <ClCompile Include="..\src\DFBB_BuildOrderSearchParameters.cpp" />
     <ClCompile Include="..\src\DFBB_BuildOrderSearchResults.cpp" />
     <ClCompile Include="..\src\DFBB_BuildOrderSearchSaveState.cpp" />
     <ClCompile Include="..\src\DFBB_BuildOrderSmartSearch.cpp" />
     <ClCompile Include="..\src\DFBB_BuildOrderStackSearch.cpp" />
-    <ClCompile Include="..\src\Edge.cpp" />
     <ClCompile Include="..\src\Eval.cpp" />
     <ClCompile Include="..\src\ExternalInterface.cpp" />
     <ClCompile Include="..\src\BuildOrder.cpp" />
     <ClCompile Include="..\src\Common.cpp" />
     <ClCompile Include="..\src\FileTools.cpp" />
     <ClCompile Include="..\src\GameState.cpp" />
+    <ClCompile Include="..\src\GPUQueue.cpp" />
     <ClCompile Include="..\src\JSONTools.cpp" />
     <ClCompile Include="..\src\NaiveBuildOrderSearch.cpp" />
-    <ClCompile Include="..\src\NMCS.cpp" />
-    <ClCompile Include="..\src\NMCTS.cpp" />
+    <ClCompile Include="..\src\Edge.cpp" />
     <ClCompile Include="..\src\Node.cpp" />
     <ClCompile Include="..\src\Tools.cpp" />
     <ClCompile Include="..\src\Unit.cpp" />
@@ -87,22 +86,21 @@
     <ClInclude Include="..\src\CombatSearch_Integral.h" />
     <ClInclude Include="..\src\CombatSearch_IntegralData.h" />
     <ClInclude Include="..\src\CombatSearch_IntegralDataFinishedUnits.h" />
-    <ClInclude Include="..\src\CombatSearch_IntegralMCTS.h" />
+    <ClInclude Include="..\src\CombatSearch_ParallelIntegralMCTS.h" />
     <ClInclude Include="..\src\Common.h" />
     <ClInclude Include="..\src\DFBB_BuildOrderSearchParameters.h" />
     <ClInclude Include="..\src\DFBB_BuildOrderSearchResults.h" />
     <ClInclude Include="..\src\DFBB_BuildOrderSearchSaveState.h" />
     <ClInclude Include="..\src\DFBB_BuildOrderSmartSearch.h" />
     <ClInclude Include="..\src\DFBB_BuildOrderStackSearch.h" />
-    <ClInclude Include="..\src\Edge.h" />
     <ClInclude Include="..\src\Eval.h" />
     <ClInclude Include="..\src\FileTools.h" />
     <ClInclude Include="..\src\GameState.h" />
+    <ClInclude Include="..\src\GPUQueue.h" />
     <ClInclude Include="..\src\JSONTools.h" />
     <ClInclude Include="..\src\json\json.hpp" />
     <ClInclude Include="..\src\NaiveBuildOrderSearch.h" />
-    <ClInclude Include="..\src\NMCS.h" />
-    <ClInclude Include="..\src\NMCTS.h" />
+    <ClInclude Include="..\src\Edge.h" />
     <ClInclude Include="..\src\Node.h" />
     <ClInclude Include="..\src\Timer.hpp" />
     <ClInclude Include="..\src\Tools.h" />
@@ -223,6 +221,7 @@
       <MinimalRebuild>false</MinimalRebuild>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -286,6 +285,7 @@
       <MinimalRebuild>false</MinimalRebuild>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>true</WholeProgramOptimization>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

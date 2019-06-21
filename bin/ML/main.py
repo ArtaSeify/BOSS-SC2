@@ -27,15 +27,15 @@ class Driver:
     def __init__(self, args):
         self.model_name = args.save_name
         self.load_name = args.load_model
-        self.start_run = args.run if args.run is not None else 0
+        self.start_run = int(args.run) if args.run is not None else 0
         self.iterations = int(args.iterations)
         self.experiment_file_name = "Experiments"
-        self.change_dataset_runs = 5
+        self.twoHeads = True
 
         self.validation_split = 0.10
         self.training_samples = 0
         self.validation_samples = 0
-        self.TRAINING_SAMPLES_LIMIT = 350000
+        self.TRAINING_SAMPLES_LIMIT = 250000
         self.VALIDATION_SAMPLES_LIMIT = int(self.validation_split * self.TRAINING_SAMPLES_LIMIT)
 
         with open(BIN_PATH + "/" + self.experiment_file_name + ".txt", 'r') as experiment_file:
@@ -50,35 +50,47 @@ class Driver:
             with open(BIN_PATH + "/" + self.experiment_file_name + "_modified.txt", 'w') as modified_exp_file:
                 if self.load_name is None:
                     self.experiment_data["Experiments"][self.experiment_name]["UsePolicyNetwork"] = False
+                    self.experiment_data["Experiments"][self.experiment_name]["UsePolicyValueNetwork"] = False
                 else:
-                    self.experiment_data["Experiments"][self.experiment_name]["UsePolicyNetwork"] = True
-                self.experiment_data["Experiments"][self.experiment_name]["OutputDir"] = BIN_PATH + "/" + self.experiment_name + "/0"
+                    if self.twoHeads:
+                        strength_exp_json["Experiments"][self.experiment_name]["UsePolicyValueNetwork"] = True
+                        strength_exp_json["Experiments"][self.experiment_name]["UsePolicyNetwork"] = False
+                    else:
+                        strength_exp_json["Experiments"][self.experiment_name]["UsePolicyValueNetwork"] = False
+                        strength_exp_json["Experiments"][self.experiment_name]["UsePolicyNetwork"] = True
+                self.experiment_data["Experiments"][self.experiment_name]["OutputDir"] = BIN_PATH + "/" + self.experiment_name + "/" + str(self.start_run)
 
                 json.dump(self.experiment_data, modified_exp_file)
                 self.experiment_file_name = "Experiments_modified"
 
     def create_teststrength_file(self, run):
         strength_exp_json = copy.deepcopy(self.experiment_data)
-        usePolicy = True if run != "InitialTest" else False
+        usePolicy = True if (run != "-1" or self.load_name is not None) else False
+        numTestRuns = 20
         
         with open(BIN_PATH + "/" + self.strengthtest_file_name + ".txt", 'w') as strength_exp_file:
             strength_exp_json["Experiments"][self.experiment_name]["OutputDir"] = BIN_PATH + "/" + self.experiment_name + "/StrengthTest/WithReset/" + str(run)
-            strength_exp_json["Experiments"][self.experiment_name]["Run"][1] = 50
-            strength_exp_json["Experiments"][self.experiment_name]["UsePolicyNetwork"] = usePolicy
+            strength_exp_json["Experiments"][self.experiment_name]["Run"][1] = numTestRuns
+            if self.twoHeads:
+                strength_exp_json["Experiments"][self.experiment_name]["UsePolicyValueNetwork"] = usePolicy
+                strength_exp_json["Experiments"][self.experiment_name]["UsePolicyNetwork"] = False
+            else:
+                strength_exp_json["Experiments"][self.experiment_name]["UsePolicyValueNetwork"] = False
+                strength_exp_json["Experiments"][self.experiment_name]["UsePolicyNetwork"] = usePolicy
             strength_exp_json["Experiments"][self.experiment_name]["SaveStates"] = False
             strength_exp_json["Experiments"][self.experiment_name]["ChangingRoot"]["Active"] = True
             strength_exp_json["Experiments"][self.experiment_name]["SearchParameters"]["TemperatureChangeFrame"] = 0
 
-            strength_exp_json["Experiments"][self.experiment_name + "_2"] = copy.deepcopy(strength_exp_json["Experiments"][self.experiment_name])
-            strength_exp_json["Experiments"][self.experiment_name + "_2"]["OutputDir"] = BIN_PATH + "/" + self.experiment_name + "/StrengthTest/WithoutReset20Seconds/" + str(run)
-            strength_exp_json["Experiments"][self.experiment_name + "_2"]["Run"][1] = 50
-            strength_exp_json["Experiments"][self.experiment_name + "_2"]["UsePolicyNetwork"] = usePolicy
-            strength_exp_json["Experiments"][self.experiment_name + "_2"]["SaveStates"] = False
-            strength_exp_json["Experiments"][self.experiment_name + "_2"]["ChangingRoot"]["Active"] = False
-            strength_exp_json["Experiments"][self.experiment_name + "_2"]["SearchParameters"]["TemperatureChangeFrame"] = 0
-            strength_exp_json["Experiments"][self.experiment_name + "_2"]["SearchParameters"]["Nodes"] = 6000000
+            #strength_exp_json["Experiments"][self.experiment_name + "_2"] = copy.deepcopy(strength_exp_json["Experiments"][self.experiment_name])
+            #strength_exp_json["Experiments"][self.experiment_name + "_2"]["OutputDir"] = BIN_PATH + "/" + self.experiment_name + "/StrengthTest/WithoutReset/" + str(run)
+            #strength_exp_json["Experiments"][self.experiment_name + "_2"]["Run"][1] = numTestRuns
+            #strength_exp_json["Experiments"][self.experiment_name + "_2"]["UsePolicyValueNetwork"] = usePolicy
+            #strength_exp_json["Experiments"][self.experiment_name + "_2"]["SaveStates"] = False
+            #strength_exp_json["Experiments"][self.experiment_name + "_2"]["ChangingRoot"]["Active"] = False
+            #strength_exp_json["Experiments"][self.experiment_name + "_2"]["SearchParameters"]["TemperatureChangeFrame"] = 0
+            #strength_exp_json["Experiments"][self.experiment_name + "_2"]["SearchParameters"]["Nodes"] = 6000000
 
-            if run != "InitialTest":
+            if run != "-1" or self.load_name is not None:
                 strength_exp_json["Experiments"][self.experiment_name + "_3"] = copy.deepcopy(strength_exp_json["Experiments"][self.experiment_name])
                 strength_exp_json["Experiments"][self.experiment_name + "_3"]["OutputDir"] = BIN_PATH + "/" + self.experiment_name + "/StrengthTest/Network/" + str(run)
                 strength_exp_json["Experiments"][self.experiment_name + "_3"]["Run"][1] = 1
@@ -110,12 +122,12 @@ class Driver:
                 with open(os.path.join(DATA_PATH, self.train_file_name), "r+") as train_file:
                     all_data = train_file.readlines()
                     with open(os.path.join(DATA_PATH, self.train_file_name), "w") as train_file_overwrite:
-	                    for sample in all_data[self.training_samples - self.TRAINING_SAMPLES_LIMIT:]:
-	                        train_file_overwrite.write(sample)
+                        for sample in all_data[self.training_samples - self.TRAINING_SAMPLES_LIMIT:]:
+                            train_file_overwrite.write(sample)
                 with open(os.path.join(DATA_PATH, self.validation_file_name), "r+") as validation_file:
                     all_data = validation_file.readlines()
                     with open(os.path.join(DATA_PATH, self.validation_file_name), "w") as validation_file_overwrite:
-                    	for sample in all_data[self.validation_samples - self.VALIDATION_SAMPLES_LIMIT:]:
+                        for sample in all_data[self.validation_samples - self.VALIDATION_SAMPLES_LIMIT:]:
                             validation_file_overwrite.write(sample)
 
                 self.training_samples = self.TRAINING_SAMPLES_LIMIT
@@ -126,10 +138,14 @@ class Driver:
     def start(self):
         # initial strength test
         if self.start_run == 0:
-            self.create_teststrength_file("InitialTest")
-            subprocess.call([BIN_PATH + "/BOSS_main", self.strengthtest_file_name, self.model_name])
+            self.create_teststrength_file("-1")
+            print("calling command: ", BIN_PATH + "/BOSS_main", self.strengthtest_file_name, self.load_name)
+            if self.load_name:
+                subprocess.call([BIN_PATH + "/BOSS_main", self.strengthtest_file_name, self.load_name])
+            else:
+                subprocess.call([BIN_PATH + "/BOSS_main", self.strengthtest_file_name])
 
-        for run in range(self.start_run, self.iterations):
+        for run in range(self.start_run, self.iterations + self.start_run):
             if run == 0 and self.load_name is None:
                 print("calling command: ", BIN_PATH + "/BOSS_main.exe", self.experiment_file_name)
                 subprocess.call([BIN_PATH + "/BOSS_main", self.experiment_file_name])
@@ -146,19 +162,24 @@ class Driver:
 
             # rewrite the experiment file
             if run == 0:
-                self.experiment_data["Experiments"][self.experiment_name]["UsePolicyNetwork"] = True
+                if self.twoHeads:
+                    self.experiment_data["Experiments"][self.experiment_name]["UsePolicyValueNetwork"] = True
+                    self.experiment_data["Experiments"][self.experiment_name]["UsePolicyNetwork"] = False
+                else:
+                    self.experiment_data["Experiments"][self.experiment_name]["UsePolicyNetwork"] = True
+                    self.experiment_data["Experiments"][self.experiment_name]["UsePolicyValueNetwork"] = False
                 with open(BIN_PATH + "/" + self.experiment_file_name + ".txt", 'w') as experiment_file:
                     json.dump(self.experiment_data, experiment_file)
 
                 if self.load_name is not None:
-                    print("calling command: ", python, BIN_PATH + "/ML/train.py", self.model_name, DATA_PATH + "/" + self.train_file_name, DATA_PATH + "/" + self.validation_file_name, "--load_model=" + self.load_name)
-                    subprocess.call([python, BIN_PATH + "/ML/train.py", self.model_name, DATA_PATH + "/" + self.train_file_name, DATA_PATH + "/" + self.validation_file_name, "--load_model=" + self.load_name])
+                    print("calling command: ", python, BIN_PATH + "/ML/train.py", self.model_name, DATA_PATH + "/" + self.train_file_name, DATA_PATH + "/" + self.validation_file_name)
+                    subprocess.call([python, BIN_PATH + "/ML/train.py", self.model_name, DATA_PATH + "/" + self.train_file_name, DATA_PATH + "/" + self.validation_file_name])
                 else:
                     print("calling command: ", python, BIN_PATH + "/ML/train.py", self.model_name, DATA_PATH + "/" + self.train_file_name, DATA_PATH + "/" + self.validation_file_name)
                     subprocess.call([python, BIN_PATH + "/ML/train.py", self.model_name, DATA_PATH + "/" + self.train_file_name, DATA_PATH + "/" + self.validation_file_name])
             else:
-                print("calling command: ", python, BIN_PATH + "/ML/train.py", self.model_name, DATA_PATH + "/" + self.train_file_name, DATA_PATH + "/" + self.validation_file_name, "--load_model=" + self.model_name)
-                subprocess.call([python, BIN_PATH + "/ML/train.py", self.model_name, DATA_PATH + "/" + self.train_file_name, DATA_PATH + "/" + self.validation_file_name, "--load_model=" + self.model_name])
+                print("calling command: ", python, BIN_PATH + "/ML/train.py", self.model_name, DATA_PATH + "/" + self.train_file_name, DATA_PATH + "/" + self.validation_file_name)
+                subprocess.call([python, BIN_PATH + "/ML/train.py", self.model_name, DATA_PATH + "/" + self.train_file_name, DATA_PATH + "/" + self.validation_file_name])
             
             # Test strength
             self.create_teststrength_file(run)

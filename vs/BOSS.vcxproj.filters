@@ -100,20 +100,17 @@
       <Filter>search\BuildOrderSearch</Filter>
     </ClCompile>
     <ClCompile Include="..\src\BuildOrderAbilities.cpp" />
-    <ClCompile Include="..\src\CombatSearch_IntegralMCTS.cpp">
-      <Filter>search\CombatSearch\Integral\MCTS</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Node.cpp">
-      <Filter>search\CombatSearch\Integral\MCTS</Filter>
+    <ClCompile Include="..\src\CombatSearch_ParallelIntegralMCTS.cpp">
+      <Filter>search\CombatSearch\Integral\ParallelMCTS</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Edge.cpp">
-      <Filter>search\CombatSearch\Integral\MCTS</Filter>
+      <Filter>search\CombatSearch\Integral\ParallelMCTS</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\NMCS.cpp">
-      <Filter>search\CombatSearch\Integral\NMCS</Filter>
+    <ClCompile Include="..\src\Node.cpp">
+      <Filter>search\CombatSearch\Integral\ParallelMCTS</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\NMCTS.cpp">
-      <Filter>search\CombatSearch\Integral\NMCTS</Filter>
+    <ClCompile Include="..\src\GPUQueue.cpp">
+      <Filter>search\CombatSearch\Integral\ParallelMCTS</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -222,20 +219,17 @@
     <ClInclude Include="..\src\BoundedVector.h">
       <Filter>util</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\CombatSearch_IntegralMCTS.h">
-      <Filter>search\CombatSearch\Integral\MCTS</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Node.h">
-      <Filter>search\CombatSearch\Integral\MCTS</Filter>
+    <ClInclude Include="..\src\CombatSearch_ParallelIntegralMCTS.h">
+      <Filter>search\CombatSearch\Integral\ParallelMCTS</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Edge.h">
-      <Filter>search\CombatSearch\Integral\MCTS</Filter>
+      <Filter>search\CombatSearch\Integral\ParallelMCTS</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\NMCS.h">
-      <Filter>search\CombatSearch\Integral\NMCS</Filter>
+    <ClInclude Include="..\src\Node.h">
+      <Filter>search\CombatSearch\Integral\ParallelMCTS</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\NMCTS.h">
-      <Filter>search\CombatSearch\Integral\NMCTS</Filter>
+    <ClInclude Include="..\src\GPUQueue.h">
+      <Filter>search\CombatSearch\Integral\ParallelMCTS</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -283,6 +277,9 @@
     </Filter>
     <Filter Include="search\CombatSearch\Integral\MCTS">
       <UniqueIdentifier>{d4bca63e-59b7-4207-848f-9cc0d95f7013}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="search\CombatSearch\Integral\ParallelMCTS">
+      <UniqueIdentifier>{86e77afc-3a62-484d-91c5-d3c77e2dbf8c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

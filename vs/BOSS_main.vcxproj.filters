@@ -2,8 +2,6 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="..\src\BOSSConfig.cpp" />
-    <ClCompile Include="..\src\BOSSExperiments.cpp" />
-    <ClCompile Include="..\src\CombatSearchExperiment.cpp" />
     <ClCompile Include="..\src\main.cpp" />
     <ClCompile Include="..\src\Experiments.cpp">
       <Filter>Experiments - Arta</Filter>
@@ -17,8 +15,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\BOSSConfig.h" />
-    <ClInclude Include="..\src\BOSSExperiments.h" />
-    <ClInclude Include="..\src\CombatSearchExperiment.h" />
     <ClInclude Include="..\src\Experiments.h">
       <Filter>Experiments - Arta</Filter>
     </ClInclude>

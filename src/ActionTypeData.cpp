@@ -30,7 +30,7 @@ const std::vector<ActionTypeData> & ActionTypeData::GetAllActionTypeData()
 
 void ActionTypeData::CreateActionTypeData(const json & actions, RaceID race)
 {
-    int raceActionID = 0;
+    int raceActionID = 1;
 
     for (ActionID a(1); a < actions.size() + 1; ++a)
     {

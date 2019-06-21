@@ -105,3 +105,10 @@ emscripten/BOSS.data
 /bin/7000Frames
 /bin/testingnetwork2
 /bin/test_result
+/bin/6720NetworkTest
+/bin/6720Frames2_2000P_FromScratch/Network20Seconds
+/bin/6720Frames2_2000PV
+/bin/20160Frames_2KParallel/20-06-2019_23-24-11_20160Frames_2KParallelRun0
+/bin/HyperParameterTuning/Start State/Integral
+/bin/test_everything
+/bin/TestValueNetwork

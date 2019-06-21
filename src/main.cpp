@@ -2,19 +2,15 @@
 //
 //#define _CRT_NO_VA_START_VALIDATION
 //
-#ifdef _DEBUG
-    #undef _DEBUG
-    #include <Python.h>
-    #define _DEBUG
-#else
-    #include <Python.h>
-#endif
+#include <Python.h>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>
+
 #include "BOSS.h"
 #include "GameState.h"
-#include "BOSSExperiments.h"
 #include "Experiments.h"
+#include "GPUQueue.h"
+
 #include <chrono>
 #include <thread>
 #include <string>
@@ -40,6 +36,19 @@ int main(int argc, char * argv[])
     {
         int expectedArguments = 2;
 
+        std::ifstream file(parent_path + "/" + argv[1] + ".txt");
+        json j;
+        file >> j;
+        std::string networkType;
+        if (j["Experiments"].back()["UsePolicyNetwork"])
+        {
+            networkType = "policy";
+        }
+        if (j["Experiments"].back()["UsePolicyValueNetwork"])
+        {
+            networkType = "both";
+        }
+
         BOSS_ASSERT(argc == expectedArguments+1, "must provide %i argument, but got %i", expectedArguments, argc);
         std::string command = "import sys\nsys.path.append(\"" + path_string + "\")\n";
 
@@ -50,8 +59,9 @@ int main(int argc, char * argv[])
 
         PyObject* PyModule = PyImport_ImportModule("predictor");
         PyObject* PyClass = PyObject_GetAttrString(PyModule, "Network");
-        BOSS::CONSTANTS::Predictor = PyObject_CallFunction(PyClass, "ssi", std::string(argv[2]).c_str(), "policy", true);
+        GPUQueue::getInstance().setPredictorFunction(PyObject_CallFunction(PyClass, "ssi", std::string(argv[2]).c_str(), networkType.c_str(), true));
         PythonState = PyEval_SaveThread();
+        GPUQueue::getInstance().getPythonInterpretor();
     }
 
     // Initialize all the BOSS internal data
@@ -62,6 +72,7 @@ int main(int argc, char * argv[])
 
     if (argc > 2)
     {
+        GPUQueue::getInstance().releasePythonInterpretor();
         PyEval_RestoreThread(PythonState);
         Py_DECREF(PyImport_ImportModule("threading"));
         Py_Finalize();

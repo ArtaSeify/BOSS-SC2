@@ -48,18 +48,17 @@ namespace BOSS
     using FracType = float;
 
     // constants declared in data file
+    class GPUQueue;
     class CONSTANTS
     {
     public:
-        static FracType MPWPF;               // minerals per worker per frame
-        static FracType GPWPF;               // gas per worker per frame
-        static FracType ERPF;                // energy regen per frame
-        static FracType HRPF;                // health regen per frame
-        static FracType SRPF;                // shield regen per frame
-        static NumUnits WorkersPerRefinery;  // number of workers per refinery
-        static NumUnits WorkersPerDepot;     // number of workers gathering minerals per depot
-        //static boost::python::object Predictor; // reference to module that contains the network used for evaluations
-        static PyObject* Predictor; // reference to module that contains the network used for evaluations
+        static FracType MPWPF;                  // minerals per worker per frame
+        static FracType GPWPF;                  // gas per worker per frame
+        static FracType ERPF;                   // energy regen per frame
+        static FracType HRPF;                   // health regen per frame
+        static FracType SRPF;                   // shield regen per frame
+        static NumUnits WorkersPerRefinery;     // number of workers per refinery
+        static NumUnits WorkersPerDepot;        // number of workers allowed to gather minerals per depot
         static std::string ExecutablePath;      // path to this executable
     };
 

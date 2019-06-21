@@ -5,9 +5,9 @@
 #include "CombatSearch_Integral.h"
 #include "CombatSearch_Bucket.h"
 #include "CombatSearch_BestResponse.h"
-#include "CombatSearch_IntegralMCTS.h"
-#include "NMCS.h"
-#include "NMCTS.h"
+#include "CombatSearch_ParallelIntegralMCTS.h"
+//#include "NMCS.h"
+//#include "NMCTS.h"
 //#include "DFSPolicy.h"
 //#include "DFSValue.h"
 //#include "DFSPolicyAndValue.h"
@@ -262,16 +262,16 @@ void IntegralExperiment::runExperimentThread(int thread, int numRuns, int starti
         else if (m_searchType == "IntegralMCTS")
         {
             //resultsFile += "_IntegralMCTS";
-            combatSearch = std::unique_ptr<CombatSearch>(new CombatSearch_IntegralMCTS(m_params, outputDir, resultsFile, m_name));
+            //combatSearch = std::unique_ptr<CombatSearch>(new CombatSearch_IntegralMCTS(m_params, outputDir, resultsFile, m_name));
         }
-        else if (m_searchType == "IntegralNMCS")
+        /*else if (m_searchType == "IntegralNMCS")
         {
             combatSearch = std::unique_ptr<CombatSearch>(new NMCS(m_params, outputDir, resultsFile, m_name));
         }
         else if (m_searchType == "IntegralNMCTS")
         {
             combatSearch = std::unique_ptr<CombatSearch>(new NMCTS(m_params, outputDir, resultsFile, m_name));
-        }
+        }*/
         else
         {
             BOSS_ASSERT(false, "CombatSearch type not found: %s", m_searchType.c_str());
@@ -326,7 +326,7 @@ void IntegralExperiment::runExperimentsTotalTimeThread(int thread, int numRuns, 
             FileTools::MakeDirectory(dir);
 
             std::cout << "search time limit: " << params.getSearchTimeLimit() << std::endl;
-            std::unique_ptr<CombatSearch> combatSearch = std::unique_ptr<CombatSearch>(new CombatSearch_IntegralMCTS(params, dir, resultsFile, m_name));
+            std::unique_ptr<CombatSearch> combatSearch = std::unique_ptr<CombatSearch>(new CombatSearch_ParallelIntegralMCTS(params, dir, resultsFile, m_name));
 
             combatSearch->search();
             //combatSearch->printResults();

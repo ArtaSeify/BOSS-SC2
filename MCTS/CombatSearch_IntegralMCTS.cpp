@@ -19,6 +19,12 @@ CombatSearch_IntegralMCTS::CombatSearch_IntegralMCTS(const CombatSearchParameter
 {
     m_params = p;
     Edge::USE_MAX_VALUE = m_params.getUseMaxValue();
+    if (m_params.usePolicyValueNetwork())
+    {
+        Edge::MIXING_VALUE = m_params.getMixingValue();
+    }
+    Edge::MAX_EDGE_VALUE_EXPECTED = m_params.getValueNormalization();
+    Edge::NODE_VISITS_BEFORE_EXPAND = m_params.getNodeVisitsBeforeExpand();
     m_simulationsPerStep = m_params.getSimulationsPerStep();
 
     m_writeEveryKSimulations = 1;
@@ -29,15 +35,6 @@ CombatSearch_IntegralMCTS::CombatSearch_IntegralMCTS(const CombatSearchParameter
 
     std::random_device rd; // obtain a random number from hardware
     m_rnggen.seed(rd());
-
-    /*if (m_params.useNetworkPrediction())
-    {
-        Edge::MIXING_PARAMETER = 0.5f;
-    }
-    else
-    {
-        Edge::MIXING_PARAMETER = 0.0f;
-    }*/
 }
 
 CombatSearch_IntegralMCTS::~CombatSearch_IntegralMCTS()
@@ -55,7 +52,8 @@ CombatSearch_IntegralMCTS::~CombatSearch_IntegralMCTS()
 
 void CombatSearch_IntegralMCTS::recurse(const GameState& state, int depth)
 {
-    std::shared_ptr<Node> root = std::make_shared<Node>(state);
+    std::shared_ptr<Node> root = std::make_shared<Node>(state, std::make_shared<Edge>());
+
     if (m_params.getNumberOfSimulations() == -1)
     {
         evaluatePolicyNetwork(root);
@@ -67,8 +65,6 @@ void CombatSearch_IntegralMCTS::recurse(const GameState& state, int depth)
         int simulationsWritten = 0;
         int rootDepth = 0;
 
-        std::shared_ptr<Edge> root_parent = std::make_shared<Edge>();
-        root->setParentEdge(root_parent);
         std::shared_ptr<Node> currentRoot = root;
 
         while (!timeLimitReached() && m_numTotalSimulations < m_params.getNumberOfSimulations() && m_results.nodeVisits < m_params.getNumberOfNodes())
@@ -93,14 +89,19 @@ void CombatSearch_IntegralMCTS::recurse(const GameState& state, int depth)
                     for (int i = 0; i < currentRoot->getNumEdges(); ++i)
                     {
                         const auto& edge = currentRoot->getEdge(i);
+                        //std::cout << "edge: " << edge->getAction().first.getName() << ", id: " << edge->getAction().first.getRaceActionID() << std::endl;
+                        //std::cout << "visits: " << edge->timesVisited() << std::endl;
                         MCTSPolicy[edge->getAction().first.getRaceActionID()] = static_cast<float>(edge->timesVisited());
                         totalVisits += edge->timesVisited();
                     }
+                    //std::cout << std::endl;
                     // write the policy values
                     for (int i = 0; i < ActionTypes::GetRaceActionCount(Races::Protoss); ++i)
                     {
                         m_ssStates << "," << (MCTSPolicy[i] / totalVisits);
                     }
+                    // write the value of state
+                    m_ssStates << "," << currentRoot->getParentEdge()->getMax()/Edge::MAX_EDGE_VALUE_EXPECTED;
 
                     m_ssStates << "\n";
                 }
@@ -115,8 +116,8 @@ void CombatSearch_IntegralMCTS::recurse(const GameState& state, int depth)
                 if (!m_params.getChangingRootReset() || currentRoot->getState().getCurrentFrame() >= m_params.getTemperatureChange())
                 {
                     childEdge = currentRoot->getHighestValueChild(m_params);
-                    BOSS_ASSERT(childEdge->getValue() <= m_bestIntegralFound.getCurrentStackValue(), "Value of a node can't be higher than the best build order found");
-                    if (!m_params.getChangingRootReset() && childEdge->getValue() <= m_bestIntegralFound.getCurrentStackValue())
+                    BOSS_ASSERT(childEdge->getMax() <= m_bestIntegralFound.getCurrentStackValue(), "Value of a node can't be higher than the best build order found");
+                    if (!m_params.getChangingRootReset() && childEdge->getMax() <= m_bestIntegralFound.getCurrentStackValue())
                     {
                         childEdge = currentRoot->getChild(m_bestBuildOrderFound[m_buildOrder.size()]);
                     }
@@ -133,6 +134,11 @@ void CombatSearch_IntegralMCTS::recurse(const GameState& state, int depth)
                 if (childEdge->getChild() == nullptr)
                 {
                     currentRoot->notExpandedChild(childEdge, m_params, true);
+                    updateNodeVisits(true, isTerminalNode(*currentRoot));
+                }
+                else
+                {
+                    updateNodeVisits(false, isTerminalNode(*currentRoot));
                 }
                 BOSS_ASSERT(childEdge->getChild() != nullptr, "currentRoot has become null");
 
@@ -143,10 +149,9 @@ void CombatSearch_IntegralMCTS::recurse(const GameState& state, int depth)
                 currentRoot = childEdge->getChild();
                 if (m_params.getChangingRootReset())
                 {
-                    currentRoot->removeEdges();
+                    currentRoot->cleanUp();
                     currentRoot->getParentEdge()->reset();
                 }
-                updateNodeVisits(false, isTerminalNode(*currentRoot));
 
                 ++rootDepth;
 
@@ -203,7 +208,7 @@ void CombatSearch_IntegralMCTS::recurse(const GameState& state, int depth)
                         //else
                         //{
                         const GameState& prevNodeState = promisingNode->getState();
-                        std::shared_ptr<Edge> action = promisingNode->getRandomEdge();
+                        std::shared_ptr<Edge> action = promisingNode->selectChildEdge(m_exploration_parameter, m_rnggen, m_params);
                         promisingNode = promisingNode->notExpandedChild(action, m_params);
                         updateBOIntegral(*promisingNode, action->getAction(), prevNodeState, false);
                         //}
@@ -332,12 +337,14 @@ void CombatSearch_IntegralMCTS::recurse(const GameState& state, int depth)
     }
     std::cout << std::endl;*/
 
+    //std::cout << "edge value at end: " << root->getParentEdge()->getValue() << std::endl;
+
     root->cleanUp();
 }
 
 void CombatSearch_IntegralMCTS::evaluatePolicyNetwork(std::shared_ptr<Node> root)
 {
-    BOSS_ASSERT(m_params.usePolicyNetwork(), "UsePolicyNetwork must be set to true when evaluating policy network");
+    BOSS_ASSERT(m_params.usePolicyNetwork() || m_params.usePolicyValueNetwork(), "UsePolicyNetwork or UsePolicyValueNetwork must be set to true when evaluating policy network");
     
     std::shared_ptr<Node> currentNode = root;
     std::shared_ptr<Node> nextNode;
@@ -651,7 +658,6 @@ void CombatSearch_IntegralMCTS::backPropogation(std::shared_ptr<Node> node)
     }
 
     //std::cout << "Simulation: " << m_numTotalSimulations << ". Value of search: " << m_promisingNodeIntegral.getCurrentStackValue() << std::endl;
-
     while (true)
     {
         parent_edge->updateEdge(m_promisingNodeIntegral.getCurrentStackValue());

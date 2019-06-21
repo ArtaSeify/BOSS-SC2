@@ -14,6 +14,8 @@ parser.add_argument("strings_not_in_data", help="The strings the data file must 
 parser.add_argument("--topk", help="Top k results to show")
 args = parser.parse_args()
 
+args.files_dir = os.path.join("parsed data", args.files_dir)
+
 strings_in_data = args.strings_in_data.split(",")
 strings_not_in_data = args.strings_not_in_data.split(",")
 plt.figure(figsize=(18.5, 10))
@@ -67,6 +69,7 @@ for data_file in data_files:
 	if any(s in data_file for s in strings_in_data) and not any(s in data_file for s in strings_not_in_data):
 		with open(os.path.join(args.files_dir, data_file), "rb") as pickle_in:
 			data = pickle.load(pickle_in)
+			print(data_file)
 			for run in data:
 				max_simulations = max(max_simulations, data[run][-1]["NodeVisits"])
 				max_value = max(max_value, data[run][-1]["SearchIntegral"])
@@ -104,8 +107,8 @@ highestValues = []
 for i in range(int(topk)):
 	print("{}: File: {}, Average: {}, SD: {}".format(str(i + 1), all_data[i][3], all_data[i][1][-1], all_data[i][2][-1]))
 	highestValues.append(all_data[i][1][-1])
-	#drawGraph(all_data[i][0], max_simulations, all_data[i][1], max_value, all_data[i][2])
-drawGraph(range(int(topk)), topk-1, highestValues, (5/4)*max(highestValues), "ExIt")
+	drawGraph(all_data[i][0], max_simulations, all_data[i][1], max_value, all_data[i][2])
+#drawGraph(range(int(topk)), topk-1, highestValues, (5/4)*max(highestValues), "ExIt")
 print("Highest value found in any search: {}".format(max_value))
 
 if not os.path.isdir(args.save_dir):

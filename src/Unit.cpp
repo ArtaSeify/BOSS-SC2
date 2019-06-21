@@ -300,7 +300,7 @@ std::string Unit::toString() const
 void Unit::writeToSS(std::stringstream & ss) const
 {    
     //ss << "[";
-    //ss << m_id << ",";
+    ss << m_id << ",";
     //ss << m_frameStarted << ",";
     //ss << m_frameFinished << ",";
     //ss << m_builderID << ",";
@@ -310,12 +310,12 @@ void Unit::writeToSS(std::stringstream & ss) const
     ss << m_buildID << ",";
     //ss << m_job << ",";
     ss << m_timeUntilBuilt << ",";
-    ss << m_timeUntilFree << ",";
+    ss << m_timeUntilFree;
     //ss << m_timeChronoBoost << ",";
-    //ss << m_timeChronoBoostAgain << ",";
+    //ss << m_timeChronoBoostAgain;
     //ss << m_numLarva << ", ";
-    ss << m_maxEnergyAllowed << ",";
-    ss << m_energy;
+    //ss << m_maxEnergyAllowed << ",";
+    //ss << m_energy;
     //ss << m_morphID << ",";
     //ss << m_morphed;
     //ss << "]";

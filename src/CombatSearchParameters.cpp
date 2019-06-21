@@ -34,18 +34,21 @@ CombatSearchParameters::CombatSearchParameters()
     , m_useMaxValue(false)
     , m_maximizeValue(false)
     , m_numberOfSimulations(std::numeric_limits<int>::max())
-    , m_numberOfNodes(std::numeric_limits<int>::max())
-    , m_simulationsPerStep(0)
+    , m_numberOfNodes(std::numeric_limits<uint8>::max())
+    , m_simulationsPerStep(std::numeric_limits<int>::max())
     , m_simulationsPerStepDecay(1)
     , m_usePolicyNetwork(0)
-    , m_threadsForExperiment(1)
+    , m_usePolicyValueNetwork(0)
+    , m_mixingValue(0)
+    , m_threadsForMCTS(1)
     , m_numPlayouts(0)
     , m_level(0)
     , m_enemyUnits()
     , m_enemyRace(Races::None)
     , m_useTotalTimeLimit(false)
-    , m_SDConstant(0)
     , m_temperatureChange(0)
+    , m_nodeVisitsBeforeExpand(0)
+    , m_valueNormalization(1)
 {
     
 }
@@ -299,14 +302,34 @@ bool CombatSearchParameters::usePolicyNetwork() const
     return m_usePolicyNetwork;
 }
 
-void CombatSearchParameters::setThreadsForExperiment(int threads)
+void CombatSearchParameters::setUsePolicyValueNetwork(bool value)
 {
-    m_threadsForExperiment = threads;
+    m_usePolicyValueNetwork = value;
 }
 
-int CombatSearchParameters::getThreadsForExperiment() const
+bool CombatSearchParameters::usePolicyValueNetwork() const
 {
-    return m_threadsForExperiment;
+    return m_usePolicyValueNetwork;
+}
+
+void CombatSearchParameters::setMixingValue(FracType value)
+{
+    m_mixingValue = value;
+}
+
+FracType CombatSearchParameters::getMixingValue() const
+{
+    return m_mixingValue;
+}
+
+void CombatSearchParameters::setThreadsForMCTS(int threads)
+{
+    m_threadsForMCTS = threads;
+}
+
+int CombatSearchParameters::getThreadsForMCTS() const
+{
+    return m_threadsForMCTS;
 }
 
 void CombatSearchParameters::setNumPlayouts(int value)
@@ -337,16 +360,6 @@ bool CombatSearchParameters::getUseTotalTimeLimit() const
     return m_useTotalTimeLimit;
 }
 
-void CombatSearchParameters::setSDConstant(FracType value)
-{
-    m_SDConstant = value;
-}
-
-FracType CombatSearchParameters::getSDConstant() const
-{
-    return m_SDConstant;
-}
-
 void CombatSearchParameters::setTemperatureChange(int value)
 {
     m_temperatureChange = value;
@@ -355,6 +368,26 @@ void CombatSearchParameters::setTemperatureChange(int value)
 int CombatSearchParameters::getTemperatureChange() const
 {
     return m_temperatureChange;
+}
+
+void CombatSearchParameters::setValueNormalization(int value)
+{
+    m_valueNormalization = value;
+}
+
+int CombatSearchParameters::getValueNormalization() const
+{
+    return m_valueNormalization;
+}
+
+void CombatSearchParameters::setNodeVisitsBeforeExpand(int value)
+{
+    m_nodeVisitsBeforeExpand = value;
+}
+
+int CombatSearchParameters::getNodeVisitsBeforeExpand() const
+{
+    return m_nodeVisitsBeforeExpand;
 }
 
 void CombatSearchParameters::print()

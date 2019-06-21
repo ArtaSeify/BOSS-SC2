@@ -28,17 +28,17 @@ tf.keras.backend.set_session(sess)
 
 # constants
 NUM_PROTOSS_UNITS = 70
-NUM_UNIT_FEATURES = 6
-EXTRA_FEATURES = 12 + NUM_PROTOSS_UNITS
+NUM_UNIT_FEATURES = 5
+EXTRA_FEATURES = 13 + NUM_PROTOSS_UNITS
 cpu_workers = 6
 policy_shape = NUM_PROTOSS_UNITS
-value_shape = 0
+value_shape = 1
 learning_rate = 1e-4
-epochs = 20 if not args.epochs else int(args.epochs)
+epochs = 200 if not args.epochs else int(args.epochs)
 verbose = 1
 batch_size = 32
 shuffle = True
-twoHeads = False
+twoHeads = True
 
 trainset_samples = sum(1 for line in open(args.trainset))
 validset_samples = sum(1 for line in open(args.validset))
@@ -51,8 +51,11 @@ valid_iterator = validation_dataset.make_iterator(sess, [args.validset])
 if not os.path.isdir("models"):
     os.makedirs("models")
 
-network = model.RelationsPolicyNetwork(NUM_UNIT_FEATURES, EXTRA_FEATURES, policy_shape, args.save_name, batch_size, learning_rate, "models/" + args.save_name + ".h5", True if args.load_model is None else False)
-# network = model.PolicyAndValueNetwork(feature_shape, policy_shape, value_shape, args.save_name, batch_size, learning_rate, "models/" + args.save_name + ".h5", True if args.load_model is None else False)
+if twoHeads:
+    network = model.RelationsPolicyAndValueNetwork(NUM_UNIT_FEATURES, EXTRA_FEATURES, policy_shape, args.save_name, batch_size, learning_rate, "models/" + args.save_name + ".h5", True if args.load_model is None else False)
+else:
+    network = model.RelationsPolicyNetwork(NUM_UNIT_FEATURES, EXTRA_FEATURES, policy_shape, args.save_name, batch_size, learning_rate, "models/" + args.save_name + ".h5", True if args.load_model is None else False)
+#network = model.PolicyAndValueNetwork(feature_shape, policy_shape, value_shape, args.save_name, batch_size, learning_rate, "models/" + args.save_name + ".h5", True if args.load_model is None else False)
 if args.load_model:
     network.load("models/" + args.load_model + ".h5")
     network.compile()

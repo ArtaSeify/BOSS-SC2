@@ -29,14 +29,11 @@ class Network:
         else:
             self.sess = tf.Session()
         tf.keras.backend.set_session(self.sess)
-
         NUM_PROTOSS_UNITS = 70
-        self.num_unit_features = 6
+        self.num_unit_features = 5
         cpu_workers = 6
-        self.extra_features = 12 + NUM_PROTOSS_UNITS
-        #self.feature_shape = (MAX_NUM_UNITS * NUM_UNIT_FEATURES) + EXTRA_FEATURES
+        self.extra_features = 13 + NUM_PROTOSS_UNITS
         self.policy_shape = NUM_PROTOSS_UNITS
-        self.value_shape = 0
         self.name = network_name
         self.learning_rate = 1e-4
         self.batch_size = 1
@@ -47,48 +44,83 @@ class Network:
 
     def loadNetwork(self, network_type):      
         if network_type == "policy":
+            self.value_shape = 0
             self.network = model.RelationsPolicyNetwork(self.num_unit_features, self.extra_features, self.policy_shape, self.name, 
                                                 self.batch_size, self.learning_rate, MODELS_PATH + "\\" + self.name, False)
         elif network_type == "value":
+            self.value_shape = 1
             self.network = model.IntegralValueNN(self.feature_shape, self.value_shape, self.name, 
                                                 self.batch_size, self.learning_rate, MODELS_PATH + "\\" + self.name, False)
         elif network_type == "both":
-            self.network = model.PolicyAndValueNetwork(self.feature_shape, self.policy_shape, self.value_shape,
-                self.name, self.batch_size, self.learning_rate, MODELS_PATH + "\\" + self.name, False)
+            self.value_shape = 1
+            self.network = model.RelationsPolicyAndValueNetwork(self.num_unit_features, self.extra_features, self.policy_shape, self.name, 
+                                                self.batch_size, self.learning_rate, MODELS_PATH + "\\" + self.name, False)
         else:
             print("invalid network type")
             assert False
         self.network.load(MODELS_PATH + "/" + self.name + ".h5")
 
-    #def parseString(self, csv_string, shape):
-    #    split_string = tf.string_split(tf.expand_dims(csv_string, axis=0), ",")
-    #    data = tf.string_to_number(tf.sparse_tensor_to_dense(split_string, default_value=''), tf.float32)
-    #    d = tf.squeeze(data)
-    #    x = d[-(shape+1):]
-    #    return x
+    def parseStringWithY(self, csv_strings):
+        batch_string = csv_strings.split("\n")
+        split_strings = np.array([x.split(",") for x in batch_string])
 
-    #def parseStringPolicy(self, csv_string):
-    #    split_string = tf.string_split(tf.expand_dims(csv_string, axis=0), ",")
-    #    data = tf.string_to_number(tf.sparse_tensor_to_dense(split_string, default_value=''), tf.float32)
-    #    x = tf.squeeze(data)
-    #    # adds zeroes for missing units
-    #    x = tf.expand_dims(tf.concat([x, tf.zeros(self.feature_shape - tf.size(x))], 0), axis=0)
-    #    #x.set_shape(self.feature_shape,)
-    #    return x      
-
-    def parseStringPolicy(self, csv_string, have_policy=False):
-        split_string = csv_string.split(",")
-        if have_policy:
+        # policy only
+        if self.value_shape == 0:
             units = split_string[:-(self.extra_features + self.policy_shape)]
             units = np.expand_dims(np.reshape(units, (int(len(units)/self.num_unit_features), self.num_unit_features)), axis=0)
             extra_features = np.expand_dims(split_string[-(self.extra_features + self.policy_shape):-self.policy_shape], axis=0)
             policy = np.expand_dims(split_string[-self.policy_shape:], axis=0)
             return (units, extra_features), policy
+
+        # policy and value
         else:
-            units = split_string[:-self.extra_features]
+            units = split_strings[:-(self.extra_features + self.policy_shape + self.value_shape)]
             units = np.expand_dims(np.reshape(units, (int(len(units)/self.num_unit_features), self.num_unit_features)), axis=0)
-            extra_features = np.expand_dims(split_string[-self.extra_features:], axis=0)
+            extra_features = np.expand_dims(split_strings[-(self.extra_features + self.policy_shape + self.value_shape):-(self.policy_shape + self.value_shape)], axis=0)
+            policy = np.expand_dims(split_strings[-self.policy_shape:-self.value_shape], axis=0)
+            value = np.expand_dims(split_strings[-self.value_shape:], axis=0)
+
+            return (units, extra_features), (policy, value)
+
+    def parseStringWithoutY(self, csv_strings):
+        batch_string = csv_strings.split("\n")
+        split_strings = np.array([x.split(",") for x in batch_string])
+
+        # batch size 1
+        if len(split_strings) == 1:
+            units = split_strings[0][:-self.extra_features]
+            units = np.reshape(units, (1, int(len(units)/self.num_unit_features), self.num_unit_features))
+            extra_features = np.expand_dims(split_strings[0][-self.extra_features:], axis=0)
             return (units, extra_features)
+        
+        else:
+            all_units = []
+            all_extra_features = np.array([]).reshape(0,self.extra_features)
+            highest_unit_count = 0
+            for x in split_strings:
+                units = x[:-self.extra_features]
+                num_units = int(len(units)/self.num_unit_features)
+                highest_unit_count = max(highest_unit_count, num_units)
+                units = np.reshape(units, (num_units, self.num_unit_features))
+
+                all_units.append(units)
+                extra_features = np.expand_dims(x[-self.extra_features:], axis=0)
+                all_extra_features = np.concatenate([all_extra_features,extra_features], axis=0)
+
+            corrected_units = np.array([]).reshape(0,highest_unit_count,self.num_unit_features)
+            for unit_list in all_units:
+                pad = np.zeros((highest_unit_count - unit_list.shape[0],self.num_unit_features))
+                corrected_units = np.concatenate([corrected_units, 
+                                                    np.expand_dims(np.concatenate([unit_list, pad], axis=0), axis=0)],
+                                                axis=0)
+
+            return (corrected_units, all_extra_features)
+
+    def parseString(self, csv_strings, have_y=False):
+        if have_y:
+            return self.parseStringWithY(csv_strings)
+        else:
+            return self.parseStringWithoutY(csv_strings)
         
     def evaluate(self, data):
         nn_input, policy = self.parseStringPolicy(data, True)
@@ -102,27 +134,56 @@ class Network:
         for actual, predicted in zip(actual_policy, predicted_policy):
             print(actual + "\t\t", predicted)
 
-    def predict(self, data):
+    def predict(self, data, have_y=False):
         with self.sess.as_default():
-            #parse_start = time.clock()
-            nn_input = self.parseStringPolicy(data)
-            #parse_end = time.clock()
+            if self.value_shape == 0:
+                #parse_start = time.clock()
+                nn_input = self.parseString(data, have_y)
+                #parse_end = time.clock()
 
-            #prediction_start = time.clock
-            output = np.ndarray.tolist(np.squeeze(self.network.predict(nn_input), axis=0))
-            #prediction_end = time.clock()
+                #prediction_start = time.clock()
+                output = self.network.predict(nn_input)
+                #prediction_end = time.clock()
 
+                #fix_output_start = time.clock()
+                output = np.ndarray.tolist(np.squeeze(output, axis=0))
+                #fix_output_end = time.clock()
+
+            else:
+                
+                #parse_start = time.clock()
+                nn_input = self.parseString(data, have_y)
+                #parse_end = time.clock()
+
+                #prediction_start = time.clock()
+                output = self.network.predict(nn_input)  
+                #prediction_end = time.clock()
+
+                #fix_output_start = time.clock()
+                #output = [np.ndarray.tolist(np.squeeze(output[0], axis=0)), np.ndarray.tolist(np.squeeze(output[1], axis=0))]
+                #fix_output_end = time.clock()
+
+            #print(output)
             #print("{} time to parse, {} time to predict".format(parse_end - parse_start, prediction_end - prediction_start))
+
             return output
 
 def test():
-    network = Network("20160Frames3", "policy", False)
+    network = Network("test", "both", True)
 
-    # 0,0,0.002,0.006,0.002,0.002,0,0,0.002,0,0.002,0,0,0,0.002,0,0,0.012,0,0.944,0,0,0,0,0,0,0,0,0,0,0,0,0.004,0,0,0,0,0.022,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-    line = "2,0,0,0,200,145.4,4,-1,0,0,0,0,3,-1,0,0,0,0,5,23,0,672,0,0,5,-1,0,0,0,0,3,-1,0,0,0,0,15,-1,0,0,0,0,19,-1,672,672,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,15,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,295.9,246.9,19,31,2727,4273,12,3,0,0.0438,0.045,0.035"
-    print(network.predict(line))
+    lines = "12,3,0,0,0,15,6,28,0,608,26,6,-1,432,432,28,18,-1,608,608,0,0,0,0,3,2,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,17,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,704.965,34.56,25,39,3435,3285,11,6,0,0.0438,0.045,0.035\
+            \n12,3,0,0,0,15,6,27,0,176,26,6,28,0,608,27,18,-1,176,176,28,18,-1,608,608,0,0,0,0,3,1,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,17,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,961.686,75.6,27,39,3867,2853,14,3,0,0.0438,0.045,0.035\
+            \n12,3,0,0,0,15,6,28,0,608,26,6,-1,432,432,28,18,-1,608,608,0,0,0,0,3,1,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,18,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,749.587,17.28,26,39,3435,3285,15,3,0,0.0438,0.045,0.035\
+            \n12,3,0,0,0,15,6,27,0,608,26,6,-1,432,432,27,18,-1,608,608,28,5,-1,480,480,0,0,0,0,3,1,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,17,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,721.784,17.28,25,39,3435,3285,14,3,0,0.0438,0.045,0.035\
+            \n12,3,24,0,272,15,6,22,0,608,22,18,-1,608,608,23,5,-1,480,480,24,33,-1,272,272,25,4,-1,400,400,26,6,-1,1040,1040,27,6,-1,1040,1040,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,331.91,0,23,31,2827,3893,16,0,0,0.0438,0.045,0.035\
+            \n12,3,24,0,272,15,6,22,0,608,22,18,-1,608,608,23,5,-1,480,480,24,33,-1,272,272,25,4,-1,400,400,26,6,-1,1040,1040,27,3,-1,1600,1600,28,5,-1,480,480,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6.91022,0,23,31,2827,3893,16,0,0,0.0438,0.045,0.035\
+            \n12,3,24,0,272,15,6,22,0,608,22,18,-1,608,608,23,5,-1,480,480,24,33,-1,272,272,25,4,-1,400,400,26,6,-1,1040,1040,27,5,-1,480,480,28,3,-1,1600,1600,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6.91022,0,23,31,2827,3893,16,0,0,0.0438,0.045,0.035\
+            \n12,3,0,0,0,15,6,27,0,608,26,6,-1,432,432,27,18,-1,608,608,28,3,-1,1600,1600,0,0,0,0,3,1,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,17,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,396.784,17.28,25,39,3435,3285,14,3,0,0.0438,0.045,0.035"
 
-    #line = "2,31,0,5,200,59.35,2,-1,0,0,200,59.35,32,33,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,32,-1,0,0,0,0,3,-1,0,0,0,0,3,-1,0,0,0,0,5,32,0,405,0,0,4,-1,0,0,0,0,4,-1,0,0,0,0,15,-1,0,0,0,0,32,-1,5,5,0,0,19,-1,405,405,0,0,10,-1,960,960,0,0,98.81,0.09,26,46,267,3733,17,6,0,0.0438,0.045,0.035"
-    #print(network.predict(line))
+    # ,0,0,0,0.49,0.22,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.29,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.017
+    line = "12,3,15,0,272,14,4,-1,306,306,15,33,-1,272,272,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,13,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.3654,0,14,15,285,6435,13,0,0,0.0438,0.045,0.035"
+    #print(network.predict(line, False))
+    #print(len(lines))
+    network.predict(lines, False)
 
 #test()

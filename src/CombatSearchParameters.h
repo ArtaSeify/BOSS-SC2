@@ -115,12 +115,15 @@ namespace BOSS
         int m_simulationsPerStep;
         FracType m_simulationsPerStepDecay;
         bool m_usePolicyNetwork;
-        int m_threadsForExperiment;
+        bool m_usePolicyValueNetwork;
+        FracType m_mixingValue;
+        int m_threadsForMCTS;
         int m_numPlayouts;
         int m_level;
         bool m_useTotalTimeLimit;
-        FracType m_SDConstant;
         int m_temperatureChange;
+        int m_valueNormalization;
+        int m_nodeVisitsBeforeExpand;
 
     public:
 
@@ -202,8 +205,14 @@ namespace BOSS
         void setUsePolicyNetwork(bool value);
         bool usePolicyNetwork() const;
 
-        void setThreadsForExperiment(int threads);
-        int getThreadsForExperiment() const;
+        void setUsePolicyValueNetwork(bool value);
+        bool usePolicyValueNetwork() const;
+
+        void setMixingValue(FracType value);
+        FracType getMixingValue() const;
+
+        void setThreadsForMCTS(int threads);
+        int getThreadsForMCTS() const;
 
         void setNumPlayouts(int value);
         int getNumPlayouts() const;
@@ -214,11 +223,14 @@ namespace BOSS
         void setUseTotalTimeLimit(bool value);
         bool getUseTotalTimeLimit() const;
 
-        void setSDConstant(FracType value);
-        FracType getSDConstant() const;
-
         void setTemperatureChange(int value);
         int getTemperatureChange() const;
+
+        void setValueNormalization(int value);
+        int getValueNormalization() const;
+
+        void setNodeVisitsBeforeExpand(int value);
+        int getNodeVisitsBeforeExpand() const;
     
         void print();
     };
