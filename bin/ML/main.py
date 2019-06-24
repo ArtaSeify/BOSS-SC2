@@ -30,7 +30,9 @@ class Driver:
         self.start_run = int(args.run) if args.run is not None else 0
         self.iterations = int(args.iterations)
         self.experiment_file_name = "Experiments"
-        self.twoHeads = True
+        self.twoHeads = True if args.two_heads=="True" else False
+
+        self.numTestRuns = 20
 
         self.validation_split = 0.10
         self.training_samples = 0
@@ -53,11 +55,11 @@ class Driver:
                     self.experiment_data["Experiments"][self.experiment_name]["UsePolicyValueNetwork"] = False
                 else:
                     if self.twoHeads:
-                        strength_exp_json["Experiments"][self.experiment_name]["UsePolicyValueNetwork"] = True
-                        strength_exp_json["Experiments"][self.experiment_name]["UsePolicyNetwork"] = False
+                        self.experiment_data["Experiments"][self.experiment_name]["UsePolicyValueNetwork"] = True
+                        self.experiment_data["Experiments"][self.experiment_name]["UsePolicyNetwork"] = False
                     else:
-                        strength_exp_json["Experiments"][self.experiment_name]["UsePolicyValueNetwork"] = False
-                        strength_exp_json["Experiments"][self.experiment_name]["UsePolicyNetwork"] = True
+                        self.experiment_data["Experiments"][self.experiment_name]["UsePolicyValueNetwork"] = False
+                        self.experiment_data["Experiments"][self.experiment_name]["UsePolicyNetwork"] = True
                 self.experiment_data["Experiments"][self.experiment_name]["OutputDir"] = BIN_PATH + "/" + self.experiment_name + "/" + str(self.start_run)
 
                 json.dump(self.experiment_data, modified_exp_file)
@@ -66,11 +68,10 @@ class Driver:
     def create_teststrength_file(self, run):
         strength_exp_json = copy.deepcopy(self.experiment_data)
         usePolicy = True if (run != "-1" or self.load_name is not None) else False
-        numTestRuns = 20
         
         with open(BIN_PATH + "/" + self.strengthtest_file_name + ".txt", 'w') as strength_exp_file:
             strength_exp_json["Experiments"][self.experiment_name]["OutputDir"] = BIN_PATH + "/" + self.experiment_name + "/StrengthTest/WithReset/" + str(run)
-            strength_exp_json["Experiments"][self.experiment_name]["Run"][1] = numTestRuns
+            strength_exp_json["Experiments"][self.experiment_name]["Run"][1] = self.numTestRuns
             if self.twoHeads:
                 strength_exp_json["Experiments"][self.experiment_name]["UsePolicyValueNetwork"] = usePolicy
                 strength_exp_json["Experiments"][self.experiment_name]["UsePolicyNetwork"] = False
@@ -83,7 +84,7 @@ class Driver:
 
             #strength_exp_json["Experiments"][self.experiment_name + "_2"] = copy.deepcopy(strength_exp_json["Experiments"][self.experiment_name])
             #strength_exp_json["Experiments"][self.experiment_name + "_2"]["OutputDir"] = BIN_PATH + "/" + self.experiment_name + "/StrengthTest/WithoutReset/" + str(run)
-            #strength_exp_json["Experiments"][self.experiment_name + "_2"]["Run"][1] = numTestRuns
+            #strength_exp_json["Experiments"][self.experiment_name + "_2"]["Run"][1] = self.numTestRuns
             #strength_exp_json["Experiments"][self.experiment_name + "_2"]["UsePolicyValueNetwork"] = usePolicy
             #strength_exp_json["Experiments"][self.experiment_name + "_2"]["SaveStates"] = False
             #strength_exp_json["Experiments"][self.experiment_name + "_2"]["ChangingRoot"]["Active"] = False
@@ -172,14 +173,14 @@ class Driver:
                     json.dump(self.experiment_data, experiment_file)
 
                 if self.load_name is not None:
-                    print("calling command: ", python, BIN_PATH + "/ML/train.py", self.model_name, DATA_PATH + "/" + self.train_file_name, DATA_PATH + "/" + self.validation_file_name)
-                    subprocess.call([python, BIN_PATH + "/ML/train.py", self.model_name, DATA_PATH + "/" + self.train_file_name, DATA_PATH + "/" + self.validation_file_name])
+                    print("calling command: ", python, BIN_PATH + "/ML/train.py", self.model_name, DATA_PATH + "/" + self.train_file_name, DATA_PATH + "/" + self.validation_file_name, "--two_heads={}".format(self.twoHeads))
+                    subprocess.call([python, BIN_PATH + "/ML/train.py", self.model_name, DATA_PATH + "/" + self.train_file_name, DATA_PATH + "/" + self.validation_file_name, "--two_heads={}".format(self.twoHeads)])
                 else:
-                    print("calling command: ", python, BIN_PATH + "/ML/train.py", self.model_name, DATA_PATH + "/" + self.train_file_name, DATA_PATH + "/" + self.validation_file_name)
-                    subprocess.call([python, BIN_PATH + "/ML/train.py", self.model_name, DATA_PATH + "/" + self.train_file_name, DATA_PATH + "/" + self.validation_file_name])
+                    print("calling command: ", python, BIN_PATH + "/ML/train.py", self.model_name, DATA_PATH + "/" + self.train_file_name, DATA_PATH + "/" + self.validation_file_name, "--two_heads={}".format(self.twoHeads))
+                    subprocess.call([python, BIN_PATH + "/ML/train.py", self.model_name, DATA_PATH + "/" + self.train_file_name, DATA_PATH + "/" + self.validation_file_name, "--two_heads={}".format(self.twoHeads)])
             else:
-                print("calling command: ", python, BIN_PATH + "/ML/train.py", self.model_name, DATA_PATH + "/" + self.train_file_name, DATA_PATH + "/" + self.validation_file_name)
-                subprocess.call([python, BIN_PATH + "/ML/train.py", self.model_name, DATA_PATH + "/" + self.train_file_name, DATA_PATH + "/" + self.validation_file_name])
+                print("calling command: ", python, BIN_PATH + "/ML/train.py", self.model_name, DATA_PATH + "/" + self.train_file_name, DATA_PATH + "/" + self.validation_file_name, "--two_heads={}".format(self.twoHeads))
+                subprocess.call([python, BIN_PATH + "/ML/train.py", self.model_name, DATA_PATH + "/" + self.train_file_name, DATA_PATH + "/" + self.validation_file_name, "--two_heads={}".format(self.twoHeads)])
             
             # Test strength
             self.create_teststrength_file(run)
@@ -198,6 +199,7 @@ def main():
     parser.add_argument("iterations", help="Number of times to iterate search and train")
     parser.add_argument("--load_model", help="Name of model to load")
     parser.add_argument("--run", help="The run to start from")
+    parser.add_argument("--two_heads", default=False, help="Policy and Value network or just policy")
     args = parser.parse_args()
 
     driver = Driver(args)

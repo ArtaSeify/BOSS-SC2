@@ -3,7 +3,7 @@
 
 using namespace BOSS;
 
-const size_t GPUQueue::MAX_SIZE = 24;
+const size_t GPUQueue::MAX_SIZE = 32;
 const int GPUQueue::TIMEOUT = 1;
 
 GPUQueue::GPUQueue()
@@ -20,6 +20,7 @@ GPUQueue::GPUQueue()
     , m_predictorThread()
     , m_waitingThreads()
     , m_waitTilPredictionsTaken()
+    , m_inputQueueFull()
     , m_predictionsDone(false)
     , m_predictionsTaken(0)
     , m_threadsWaiting(0)
@@ -30,13 +31,16 @@ GPUQueue::GPUQueue()
 int GPUQueue::push_back(const std::string & str)
 {
     //std::cout << "push_back called" << std::endl;
-    std::scoped_lock<std::mutex> lgOverload(m_inputOverloadLock);
+    std::unique_lock<std::mutex> ulOverload(m_inputOverloadLock);
+
+    m_inputQueueFull.wait(ulOverload, [this] { return m_inputsAdded != MAX_SIZE; });
+    //while (m_inputsAdded == MAX_SIZE);
+
+    //std::cout << "push_back called" << std::endl;
+    std::scoped_lock<std::mutex> ul(m_inputLock);
 
     // wait until we have space in queue
-    while (m_inputsAdded == MAX_SIZE);
-    
-    //std::cout << "push_back called" << std::endl;
-    std::scoped_lock<std::mutex> lg(m_inputLock);
+    //m_inputQueueFull.wait(ul, [this] { return m_inputsAdded != MAX_SIZE; });
 
     BOSS_ASSERT(m_networkInput.size() < MAX_SIZE, "Trying to push into vector with size %i, but max size is %i", m_networkInput.size(), MAX_SIZE);
 
@@ -56,21 +60,16 @@ int GPUQueue::push_back(const std::string & str)
 
 void GPUQueue::makePrediction()
 {
-    //std::cout << "makePrediction called" << std::endl;
-    // wait until all the predictions are taken
-    while (m_predictionsTaken != m_networkOutput.size());
-    //std::cout << "predictions taken match" << std::endl;
     // wait until all the threads expecting a prediction have called the wait function
-    //std::cout << "waiting: " << m_threadsWaiting << std::endl;
-    //std::cout << "network input size: " << m_networkInput.size() << std::endl;
     while (m_threadsWaiting != m_inputsAdded);
-    //std::cout << "threads waiting match" << std::endl;
 
     {
-        std::scoped_lock<std::mutex> lg_input(m_inputLock);
+        std::scoped_lock<std::mutex> sl_output(m_outputLock);
+        //m_waitTilPredictionsTaken.wait(ul, [this] { return m_predictionsTaken == m_networkOutput.size(); });
+
+        std::scoped_lock<std::mutex> sl_input(m_inputLock);
         //std::cout << "took input lock" << std::endl;
 
-        std::scoped_lock<std::mutex> lg_output(m_outputLock);
         //std::cout << "took output lock" << std::endl;
         
         if (m_networkOutput.size() > 0)
@@ -104,25 +103,28 @@ void GPUQueue::makePrediction()
 
         // we can add to the input queue again
         m_networkInput.clear();
+        m_inputQueueFull.notify_all();
         m_inputsAdded = 0;
 
         m_predictionsTaken = 0;
         m_predictionsDone = true;
     }
+    //m_inputQueueFull.notify_all();
     m_waitingThreads.notify_all();
     //std::cout << "predictions done" << std::endl;
 }
 
 void GPUQueue::wait()
 {
-    while (m_predictionsTaken != m_networkOutput.size());
+    //while (m_predictionsTaken != m_networkOutput.size());
 
+    std::unique_lock<std::mutex> ulPredictions(m_predictionsTakenLock);
+    while(!m_waitTilPredictionsTaken.wait_for(ulPredictions, std::chrono::microseconds(100), [this] { return m_predictionsTaken == m_networkOutput.size(); }));
+    ulPredictions.unlock();
     //std::cout << "wait called" << std::endl;
     std::unique_lock<std::mutex> ul(m_outputLock);    
     //std::cout << "waiting for predictions to be taken" << std::endl;
     // wait until all the predictions are taken
-    
-    //m_waitTilPredictionsTaken.wait(ul, [this] { return m_predictionsTaken == m_networkOutput.size(); });
     //std::cout << "finished waiting for predictions to be taken" << std::endl;
 
     ++m_threadsWaiting;
@@ -153,17 +155,19 @@ void GPUQueue::wait()
 PyObject* GPUQueue::operator [] (int i)
 {
     //std::cout << "operator [] called" << std::endl;
-    std::scoped_lock<std::mutex> lg_input(m_outputLock);
+    std::scoped_lock<std::mutex> sl_output(m_outputLock);
 
     BOSS_ASSERT(i < m_networkOutput.size(), "Trying to access an out of bounds index %i", i);
     ++m_predictionsTaken;
     ++m_predictionsReferences;
-    
+
     // we have taken all the predictions
     if (m_predictionsTaken == m_networkOutput.size())
     {
         m_predictionsDone = false;
+        m_waitTilPredictionsTaken.notify_all();
     }
+
     //std::cout << "predictions taken from queue: " << m_predictionsTaken << std::endl;
     return m_networkOutput[i];
 }

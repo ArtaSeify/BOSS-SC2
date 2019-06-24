@@ -501,8 +501,8 @@ void IntegralExperimentOMP::run(int numberOfRuns)
     
     if (m_params.usePolicyNetwork() || m_params.usePolicyValueNetwork())
     {
-        int threads = (int)std::ceil(std::thread::hardware_concurrency() / 3.f);
-        #pragma omp parallel for num_threads(threads)
+        //int threads = (int)std::ceil(std::thread::hardware_concurrency() / 3.f);
+        #pragma omp parallel for
         for (int run = 0; run < numberOfRuns; ++run)
         {
             if (m_params.getUseTotalTimeLimit())

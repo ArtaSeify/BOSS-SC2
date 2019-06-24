@@ -272,18 +272,19 @@ class PolicyAndValueNetwork(Model):
 
 
 class RelationsPolicyNetwork(Model):
-    def __init__(self, units_features_size, extra_features_size, output_shape, model_name, batch_size, learning_rate, model_path, create_network=True):
+    def __init__(self, units_features_size, extra_features_size, policy_shape, model_name, batch_size, learning_rate, model_path, create_network=True):
         self.model_name = model_name
         self.model_path = model_path
         self.units_features_size = units_features_size
         self.extra_features_size = extra_features_size
-        self.prediction_shape = output_shape
+        self.policy_shape = policy_shape
         self.batch_size = batch_size
         self.learning_rate = learning_rate
         self.epochs = 0
 
-        self.checkpoint_best = tf.keras.callbacks.ModelCheckpoint(self.model_path.split(".")[0] + "_bestCA.h5", monitor='categorical_accuracy', save_best_only=True, mode='max')
+        #self.checkpoint_best = tf.keras.callbacks.ModelCheckpoint(self.model_path.split(".")[0] + "_bestCA.h5", monitor='categorical_accuracy', save_best_only=True, mode='max')
         self.checkpoint = tf.keras.callbacks.ModelCheckpoint(self.model_path)
+        self.early_stop = tf.keras.callbacks.EarlyStopping(monitor="val_loss", patience=20, mode="min")
         
         if create_network:
             self.create()
@@ -312,7 +313,7 @@ class RelationsPolicyNetwork(Model):
         units_input = tf.keras.Input(shape=(None, self.units_features_size), name="units_input")
 
         layer_units = layers.Dense(1024, activation='elu', name="units_layer1")(units_input)
-        layer_units = layers.Dense(1024, activation='elu', name="units_layer2")(layer_units)
+        layer_units = layers.Dense(512, activation='elu', name="units_layer2")(layer_units)
         layer_units = layers.Dense(512, activation='elu', name="units_layer3")(layer_units)
         units_output = layers.Dense(units_output_size, activation='elu', name="units_output")(layer_units)
         units_output = layers.Lambda(lambda x: tf.keras.backend.mean(x, axis=1), name="average_units_output")(units_output)
@@ -322,37 +323,39 @@ class RelationsPolicyNetwork(Model):
 
         layer = layers.Dense(2048, activation='elu', name="state_layer1")(concatenate_layer)
         layer = layers.Dense(1024, activation='elu', name="state_layer2")(layer)
-        layer = layers.Dense(1024, activation='elu', name="state_layer3")(layer)
+        layer = layers.Dense(512, activation='elu', name="state_layer3")(layer)
         layer = layers.Dense(512, activation='elu', name="state_layer4")(layer)
-        layer = layers.Dense(512, activation='elu', name="state_layer5")(layer)
-        layer = layers.Dense(512, activation='elu', name="state_layer6")(layer)
+        layer = layers.Dense(256, activation='elu', name="state_layer5")(layer)
+        layer = layers.Dense(256, activation='elu', name="state_layer6")(layer)
         layer = layers.Dense(256, activation='elu', name="state_layer7")(layer)
-        layer = layers.Dense(256, activation='elu', name="state_layer8")(layer)
+        layer = layers.Dense(128, activation='elu', name="state_layer8")(layer)
         layer = layers.Dense(128, activation='elu', name="state_layer9")(layer)
         layer = layers.Dense(128, activation='elu', name="state_layer10")(layer)
 
-        policy = layers.Dense(self.prediction_shape, activation='linear', name="policy")(layer)
+        policy = layers.Dense(self.policy_shape, activation='linear', name="policy")(layer)
         
         self.model = tf.keras.Model(inputs=[units_input, extra_features_input], outputs=policy)
         
         #self.lrs = tf.keras.callbacks.LearningRateScheduler(self.exponential_decay)
 
         self.model.compile(optimizer=tf.keras.optimizers.Adam(self.learning_rate),
-                #loss='categorical_crossentropy',
-                #loss='kld',
-                loss = self.CCELogits,
-                metrics=['categorical_accuracy', self.top_3_accuracy, self.accuracy])
+                loss = {"policy" : self.CCELogits},
+                metrics= {"policy" : ['categorical_accuracy', self.top_3_accuracy, self.accuracy]})
 
     def train(self, iterator, epochs, steps_per_epoch, verbose, validation_iterator, validation_steps):
         return self.model.fit(iterator, epochs=epochs, steps_per_epoch=steps_per_epoch, verbose=verbose, validation_data=validation_iterator, validation_steps=validation_steps,
                                 callbacks=[CustomTensorBoard(self.model, log_dir=os.path.join(os.getcwd(), os.path.join("logs", self.model_name)), write_graph=False, batch_size=self.batch_size), 
-                                        self.checkpoint, self.checkpoint_best])
+                                        self.checkpoint, self.early_stop]) #self.checkpoint_best])
 
     def evaluate(self, iterator, steps, verbose):
         return self.model.evaluate(iterator, steps=steps, verbose=verbose)
 
     def predict(self, nn_input, batch_size=None, steps=1, verbose=0):
-        return softmax(self.model.predict(nn_input, batch_size=batch_size, steps=steps, verbose=verbose))
+        predictions = softmax(self.model.predict(nn_input, batch_size=batch_size, steps=steps, verbose=verbose), axis=1)
+        output = []
+        for i in range(len(predictions)):
+            output.append(np.ndarray.tolist(predictions[i]))
+        return output
 
     def predict_on_batch(self, nn_input):
         return np.ndarray.tolist(np.squeeze(softmax(self.model.predict_on_batch(nn_input))))
@@ -366,10 +369,9 @@ class RelationsPolicyNetwork(Model):
 
     def compile(self):
         self.model.compile(optimizer=tf.keras.optimizers.Adam(self.learning_rate),
-                #loss='categorical_crossentropy',
-                #loss='kld',
-                loss = self.CCELogits,
-                metrics=['categorical_accuracy', self.top_3_accuracy, self.accuracy])
+                loss = {"policy" : self.CCELogits},
+                metrics= {"policy" : ['categorical_accuracy', self.top_3_accuracy, self.accuracy]})
+                        
 
 class RelationsPolicyAndValueNetwork(Model):
     def __init__(self, units_features_size, extra_features_size, policy_shape, model_name, batch_size, learning_rate, model_path, create_network=True):

@@ -462,6 +462,11 @@ CombatSearch_ParallelIntegralMCTS::NewNode
 
 void CombatSearch_ParallelIntegralMCTS::randomPlayout(Node node, BuildOrderIntegral & buildOrderIntegral)
 {
+    // mixing value of 1 means we only use network prediction
+    if (m_params.getMixingValue() == 1)
+    {
+        return;
+    }
     bool leafNode = false;
     // do a rollout until we reach a terminal state
     while (!leafNode && m_nodeVisits < m_params.getNumberOfNodes())
