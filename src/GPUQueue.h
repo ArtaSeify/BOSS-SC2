@@ -24,10 +24,12 @@ namespace BOSS
         PyObject *                  m_predictedValues;
         std::atomic_int             m_predictionsReferences;
         std::mutex                  m_outputLock;
+        std::mutex                  m_predictionsTakenLock;
 
         std::condition_variable     m_predictorThread;
         std::condition_variable     m_waitingThreads;
         std::condition_variable     m_waitTilPredictionsTaken;
+        std::condition_variable     m_inputQueueFull;
         bool                        m_predictionsDone;
         std::atomic_int             m_predictionsTaken;
         std::atomic_int             m_threadsWaiting;

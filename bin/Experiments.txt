@@ -3,19 +3,19 @@
 
     "Experiments" : 
     {   
-        "20160Frames_2KParallel" :
+        "test" :
         {
-            "Run"               : [ true, 200 ],
+            "Run"               : [ true, 8 ],
             "UseTotalTimeLimit" : false,
             "SearchType"        : [ "ParallelIntegralMCTS" ],
             "SearchParameters"  : { "ExplorationConstant" : 1.25, "UseMax" : true, "TemperatureChangeFrame" : 7000, "MixingValue" : 0.50, 
                                     "VisitsBeforeExpand" : 1, "ValueNormalization" : 1500000, "Threads" : 8 },
-            "ChangingRoot"      : { "Active": true, "Simulations": 2000, "Reset": true },
+            "ChangingRoot"      : { "Active": true, "Simulations": 1000, "Reset": true },
             "Threads"           : 7,
             "Race"              : "Protoss",
             "StartingState"     : "Protoss Start State",
             "PrintNewBest"      : false,
-            "OutputDir"         : "../bin/20160Frames_2KParallel",
+            "OutputDir"         : "../bin/test",
             "SearchTimeLimitMS" : 200000000,
             "FrameTimeLimit"    : 20160,
             "RelevantActions"   : [ "Probe", "Pylon", "Nexus", "Assimilator", "Gateway", "CyberneticsCore", "Stalker", "Zealot", "Colossus", "FleetBeacon", "TwilightCouncil", "Stargate", "TemplarArchive", "DarkShrine", "RoboticsBay", "RoboticsFacility", "Zealot", "DarkTemplar", "Carrier", "VoidRay", "Immortal", "Adept", "Tempest", "Mothership"], 
@@ -25,7 +25,7 @@
             "SortActions"       : false,
             "SaveStates"        : true,
             "UsePolicyNetwork"  : false,
-            "UsePolicyValueNetwork" : false
+            "UsePolicyValueNetwork" : true
         }
     },
 
