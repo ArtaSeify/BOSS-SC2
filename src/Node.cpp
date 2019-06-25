@@ -69,23 +69,26 @@ void Node::cleanUp(int threads)
     //std::cout << "all edges of this node cleaned up!" << std::endl;
 }
 
-void Node::createChildrenEdges(ActionSetAbilities & legalActions, const CombatSearchParameters & params, FracType currentValue)
+void Node::createChildrenEdges(const CombatSearchParameters & params, FracType currentValue)
 {
     //std::scoped_lock sl(m_mutex);
-    m_mutex.lock();
+    //m_mutex.lock();
     // if we already know it's a terminal node, just return
     if (m_isTerminalNode)
     {
-        m_mutex.unlock();
+        //m_mutex.unlock();
         return;
     }
 
     // function already called by another thread
     if (m_edges.size() > 0)
     {
-        m_mutex.unlock();
+        //m_mutex.unlock();
         return;
     }
+
+    ActionSetAbilities legalActions;
+    generateLegalActions(m_state, legalActions, params);
 
     std::shared_ptr<Node> thisNode = shared_from_this();
     for (int index = 0; index < legalActions.size(); ++index)
@@ -113,7 +116,7 @@ void Node::createChildrenEdges(ActionSetAbilities & legalActions, const CombatSe
     if (m_edges.size() == 0)
     {
         m_isTerminalNode = true;
-        m_mutex.unlock();
+        //m_mutex.unlock();
         return;
     }
 
@@ -124,9 +127,9 @@ void Node::createChildrenEdges(ActionSetAbilities & legalActions, const CombatSe
 
         // push state into queue and wait until predictions are made
         int predictionIndex = GPUQueue::getInstance().push_back(ss.str());
-        m_mutex.unlock();
+        //m_mutex.unlock();
         GPUQueue::getInstance().wait();
-        m_mutex.lock();
+        //m_mutex.lock();
         PyObject* values = GPUQueue::getInstance()[predictionIndex];
         //std::cout << "grabbing value" << std::endl;
         PyObject* policyValues;
@@ -169,7 +172,130 @@ void Node::createChildrenEdges(ActionSetAbilities & legalActions, const CombatSe
         }
     }
     //std::cout << "node finished and unlocking" << std::endl;
-    m_mutex.unlock();
+    //m_mutex.unlock();
+}
+
+void Node::generateLegalActions(const GameState& state, ActionSetAbilities& legalActions, const CombatSearchParameters& params)
+{
+    // prune actions we have too many of already
+    const ActionSetAbilities& allActions = params.getRelevantActions();
+    for (auto it = allActions.begin(); it != allActions.end(); ++it)
+    {
+        ActionType action = it->first;
+
+        bool isLegal = state.isLegal(action);
+
+        if (!isLegal)
+        {
+            continue;
+        }
+
+        // prune the action if we have too many of them already
+        if ((params.getMaxActions(action) != -1) && ((int)state.getNumTotal(action) >= params.getMaxActions(action)))
+        {
+            continue;
+        }
+
+        legalActions.add(action);
+
+        if (action.isAbility())
+        {
+            state.getSpecialAbilityTargets(legalActions, legalActions.size() - 1);
+        }
+    }
+
+    //std::cout << legalActions.toString() << std::endl;
+
+    // if we enabled the always make workers flag, and workers are legal
+    ActionType worker = ActionTypes::GetWorker(state.getRace());
+    ActionSetAbilities illegalActions;
+    if (params.getAlwaysMakeWorkers() && legalActions.contains(worker))
+    {
+        bool actionLegalBeforeWorker = false;
+
+        // when can we make a worker
+        int workerReady = state.whenCanBuild(worker);
+
+        if (workerReady > params.getFrameTimeLimit())
+        {
+            illegalActions.add(worker);
+        }
+        // if we can make a worker in the next couple of frames, do it
+        else if (workerReady <= state.getCurrentFrame() + 2)
+        {
+            legalActions.clear();
+            legalActions.add(worker);
+            return;
+        }
+
+        // figure out if anything can be made before a worker
+        for (auto it = legalActions.begin(); it != legalActions.end(); ++it)
+        {
+            ActionType actionType = it->first;
+
+            int whenCanPerformAction = state.whenCanBuild(actionType, it->second);
+
+            // if action goes past the time limit, it is illegal
+            if (whenCanPerformAction > params.getFrameTimeLimit())
+            {
+                illegalActions.add(actionType);
+            }
+
+            if (!actionType.isAbility() && whenCanPerformAction < workerReady)
+            {
+                actionLegalBeforeWorker = true;
+            }
+        }
+
+        // no legal action
+        if (illegalActions.size() == legalActions.size())
+        {
+            legalActions.clear();
+            return;
+        }
+
+        // if something can be made before a worker, then don't consider workers
+        if (actionLegalBeforeWorker)
+        {
+            // remove illegal actions, which now includes worker
+            illegalActions.add(worker);
+            legalActions.remove(illegalActions);
+        }
+        // otherwise we can make a worker next so don't consider anything else
+        else
+        {
+            legalActions.clear();
+            if (workerReady <= params.getFrameTimeLimit())
+            {
+                legalActions.add(worker);
+            }
+        }
+    }
+
+    else
+    {
+        // figure out if any action goes past the time limit
+        for (auto it = legalActions.begin(); it != legalActions.end(); ++it)
+        {
+            ActionType actionType = it->first;
+            int whenCanPerformAction = state.whenCanBuild(actionType, it->second);
+
+            // if action goes past the time limit, it is illegal
+            if (whenCanPerformAction > params.getFrameTimeLimit())
+            {
+                illegalActions.add(actionType);
+            }
+        }
+
+        // remove illegal actions
+        legalActions.remove(illegalActions);
+    }
+
+    // sort the actions
+    if (params.getSortActions())
+    {
+        legalActions.sort(state, params);
+    }
 }
 
 void Node::removeEdges(const Edge & edge)
@@ -215,7 +341,8 @@ bool Node::doAction(Edge & edge, const CombatSearchParameters & params, bool mak
     {
         m_state.doAction(action.first);
     }
-        
+    
+    // expand node
     if (edge.getChild() == nullptr && ((edge.realTimesVisited() == Edge::NODE_VISITS_BEFORE_EXPAND) || makeNode))
     {
         edge.setChild(shared_from_this());
@@ -322,7 +449,7 @@ Edge & Node::selectChildEdge(FracType exploration_param, std::mt19937 & rnggen, 
     return edge;
 }
 
-std::shared_ptr<Node> Node::notExpandedChild(Edge& edge, const CombatSearchParameters& params, bool makeNode) const
+std::shared_ptr<Node> Node::notExpandedChild(Edge& edge, const CombatSearchParameters& params, FracType currentValue, bool makeNode)
 {
     std::scoped_lock sl(m_mutex);
 
@@ -333,13 +460,19 @@ std::shared_ptr<Node> Node::notExpandedChild(Edge& edge, const CombatSearchParam
     }
     // create a temporary node
     std::shared_ptr<Node> node = std::make_shared<Node>(m_state, edge);
-    node->doAction(edge, params, makeNode);
+
+    // if the node is expanded, we create the edges of the node
+    if (node->doAction(edge, params, makeNode))
+    {
+        node->createChildrenEdges(params, currentValue);
+    }
+
     return node;
 }
 
 Edge & Node::getHighestValueChild(const CombatSearchParameters & params) const
 {
-    //std::scoped_lock sl(m_mutex);
+    std::scoped_lock sl(m_mutex);
 
     // get the node with the highest action value
     auto edge = std::max_element(m_edges.begin(), m_edges.end(),
@@ -347,17 +480,17 @@ Edge & Node::getHighestValueChild(const CombatSearchParameters & params) const
         { 
             if (lhs->getValue() == rhs->getValue())
             {
-                std::shared_ptr<Node> lhsNode(lhs->getChild());
-                std::shared_ptr<Node> rhsNode(rhs->getChild());
-                if (lhsNode == nullptr)
+                std::unique_ptr<Node> lhsNode = std::make_unique<Node>(*lhs->getParent());
+                std::unique_ptr<Node> rhsNode = std::make_unique<Node>(*rhs->getParent());
+                if (lhs->getChild() == nullptr)
                 {
-                    lhsNode = notExpandedChild(*lhs, params);
+                    lhsNode->doAction(*lhs, params);
                 }
                 if (rhs->getChild() == nullptr)
                 {
-                    rhsNode = notExpandedChild(*rhs, params);
+                    rhsNode->doAction(*rhs, params);
                 }
-                return Eval::StateBetter(rhsNode->getState(), lhsNode->getState());
+                return Eval::StateBetter(rhsNode->getState(), lhsNode->getState());;
             }
         
             return lhs->getValue() < rhs->getValue();

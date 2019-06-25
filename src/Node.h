@@ -29,9 +29,6 @@ namespace BOSS
         // cleans up the entire search tree
         void cleanUp(int threads);
 
-        // creates edges pointing to the states we can get to from this state
-        void createChildrenEdges(ActionSetAbilities & legalActions, const CombatSearchParameters & params, FracType currentValue);
-
         // removes all edges except the one passed as a parameter
         void removeEdges(const Edge & edge);
         void removeEdges();
@@ -40,6 +37,9 @@ namespace BOSS
         // and the state is valid (doesn't go past the time limit). Otherwise returns false
         bool doAction(Edge & edge, const CombatSearchParameters & params, bool makeNode = false);
         void doAction(const Action & action, const CombatSearchParameters & params);
+
+        // creates edges for this node
+        void createChildrenEdges(const CombatSearchParameters& params, FracType currentValue);
         
         void printChildren() const;
         
@@ -47,7 +47,7 @@ namespace BOSS
         Edge & selectChildEdge(FracType exploration_param, std::mt19937& rnggen, const CombatSearchParameters & params);
 
         // creates a node that hasn't been expanded in the tree yet 
-        std::shared_ptr<Node> notExpandedChild(Edge & edge, const CombatSearchParameters & params, bool makeNode = false) const;
+        std::shared_ptr<Node> notExpandedChild(Edge& edge, const CombatSearchParameters& params, FracType currentValue, bool makeNode = false);
         
         // returns the child with the highest action value
         Edge & getHighestValueChild(const CombatSearchParameters & params) const;
@@ -86,5 +86,7 @@ namespace BOSS
 
     private:
         std::vector<std::shared_ptr<Edge>> getAllEdges() const { std::scoped_lock sl(m_mutex); return m_edges; }
+
+        void generateLegalActions(const GameState& state, ActionSetAbilities& legalActions, const CombatSearchParameters& params);
     };
 }

@@ -62,6 +62,7 @@ CombatSearch_ParallelIntegralMCTS::~CombatSearch_ParallelIntegralMCTS()
 void CombatSearch_ParallelIntegralMCTS::recurse(const GameState& state, int depth)
 {
     m_currentRoot = std::make_shared<Node>(state, *std::make_shared<Edge>());
+    m_currentRoot->createChildrenEdges(m_params, 0);
 
     if (m_params.getNumberOfSimulations() == -1)
     {
@@ -80,6 +81,7 @@ void CombatSearch_ParallelIntegralMCTS::recurse(const GameState& state, int dept
         {
             thread.wait();
         }
+        //MCTSSearch(0);
 
         if (!m_params.getChangingRoot())
         {
@@ -158,7 +160,7 @@ void CombatSearch_ParallelIntegralMCTS::MCTSSearch(int threadID)
         }*/
         //std::cout << m_threadsWaitingForChangeRoot << std::endl;
         // change the root of the tree. Remove all the nodes and edges that are now irrelevant
-        if (m_params.getChangingRoot() && m_numCurrentRootSimulations >= m_simulationsPerRoot)
+        if (m_params.getChangingRoot() && m_numCurrentRootSimulations == m_simulationsPerRoot)
         {
             // All threads wait for thread 0 to change the root
             if (threadID != 0)
@@ -187,14 +189,13 @@ void CombatSearch_ParallelIntegralMCTS::MCTSSearch(int threadID)
             else
             {
                 // wait until all the threads finish fixing the values for extra simulations
-                while (m_threadsWaitingForChangeRoot < m_params.getThreadsForMCTS() - 1);
-                
+                while (m_threadsWaitingForChangeRoot != m_params.getThreadsForMCTS() - 1);
+                //std::cout << m_threadsWaitingForChangeRoot << std::endl;
                 {
                     std::lock_guard<std::mutex> lg(m_changeRootMutex);
 
-                    int simulations = m_numCurrentRootSimulations;
-                    BOSS_ASSERT(simulations == m_simulationsPerRoot,
-                        "Number of simulations %i for a root must equal to the limit of simulations per root %i", simulations, m_simulationsPerRoot);
+                    BOSS_ASSERT(m_numCurrentRootSimulations == m_simulationsPerRoot,
+                        "Number of simulations for a root %i must equal to the limit of simulations per root %i", m_numCurrentRootSimulations.load(), m_simulationsPerRoot);
 
                     //std::cout << "simulations before root change: " << simulations << std::endl;
 
@@ -213,9 +214,9 @@ void CombatSearch_ParallelIntegralMCTS::MCTSSearch(int threadID)
                         BOSS_ASSERT(m_currentRoot->getEdge(i).virtualLoss() == 0, "Virtual loss should be 0 when changing root");
                         timesVisited += m_currentRoot->getEdge(i).realTimesVisited();
                     }
-                    int testCRSimulations = m_numCurrentRootSimulations;
-                    BOSS_ASSERT((!m_params.getChangingRootReset() && timesVisited >= m_simulationsPerRoot) || timesVisited == testCRSimulations,
-                        "The number of times the edges are visited %i should equal to the number of simulations before changing the root %i", timesVisited, testCRSimulations);
+
+                    BOSS_ASSERT((!m_params.getChangingRootReset() && timesVisited >= m_simulationsPerRoot) || timesVisited == m_numCurrentRootSimulations,
+                        "The number of times the edges are visited %i should equal to the number of simulations before changing the root %i", timesVisited, m_numCurrentRootSimulations.load());
 
                     // write state data
                     if (m_params.getSaveStates())
@@ -262,12 +263,6 @@ void CombatSearch_ParallelIntegralMCTS::MCTSSearch(int threadID)
                     {
                         if (!m_params.getChangingRootReset())
                         {
-                            //m_buildOrderIntegralChangedRoot.buildOrder.print();
-                            //m_bestResultFound.buildOrder.print();
-                            ////std::cout << m_currentRoot->getNumEdges() << std::endl;
-                            ////std::cout << m_buildOrderIntegralChangedRoot.integral.getCurrentStackValue() << std::endl;
-                            ////std::cout << m_bestResultFound.integral.getCurrentStackValue() << std::endl;
-                            //std::cout << std::endl;
                             
                             childEdge = m_currentRoot->getChild(m_bestResultFound.buildOrder[m_buildOrderIntegralChangedRoot.buildOrder.size()]).shared_from_this();
                         }
@@ -292,7 +287,7 @@ void CombatSearch_ParallelIntegralMCTS::MCTSSearch(int threadID)
                     // create the child node if it doesn't exist
                     if (childEdge->getChild() == nullptr)
                     {
-                        m_currentRoot->notExpandedChild(*childEdge, m_params, true);
+                        m_currentRoot->notExpandedChild(*childEdge, m_params, m_buildOrderIntegralChangedRoot.integral.getValueToThisPoint(), true);
                         updateNodeVisits(true, m_currentRoot->isTerminal());
                     }
                     else
@@ -311,6 +306,7 @@ void CombatSearch_ParallelIntegralMCTS::MCTSSearch(int threadID)
                     {
                         m_currentRoot->cleanUp(m_params.getThreadsForMCTS());
                         m_currentRoot->getParentEdge()->reset();
+                        m_currentRoot->createChildrenEdges(m_params, m_buildOrderIntegralChangedRoot.integral.getValueToThisPoint());
                     }
 
                     // search is over
@@ -329,72 +325,53 @@ void CombatSearch_ParallelIntegralMCTS::MCTSSearch(int threadID)
             }
         }
 
-        BuildOrderIntegral buildOrderIntegral(m_buildOrderIntegralChangedRoot);
-
-        /*if ((m_numTotalSimulations % 1000) == 0)
+        if (m_numTotalSimulations < m_params.getNumberOfSimulations() && m_numCurrentRootSimulations < m_simulationsPerRoot)
         {
-            std::cout << "have run : " << m_numTotalSimulations << " simulations thus far." << std::endl;
-        }*/
+            // we increase the simulation count at the beginning to avoid doing extra simulations due to multithreading
+            int thisThreadSims = ++m_numTotalSimulations;
+            int thisThreadCRSims = ++m_numCurrentRootSimulations;
 
-        NewNode newNode = getPromisingNode(*m_currentRoot, buildOrderIntegral);
-
-        // we have reached node limit 
-        if (m_nodeVisits >= m_params.getNumberOfNodes())
-        {
-            std::cout << "search done" << std::endl;
-            break;
-        }
-        std::shared_ptr<Node> promisingNode(std::move(newNode.node));
-
-        // a node that isn't part of the graph yet. We just simulate from this point
-        if (newNode.isNewNode)
-        {
-            randomPlayout(*promisingNode, buildOrderIntegral);
-        }
-
-        // the node is part of the graph, so we create its edges and pick one at random
-        else
-        {
-            if (!promisingNode->isTerminal())
+            // reached the limit, decrease the count
+            if (thisThreadSims > m_params.getNumberOfSimulations() || thisThreadCRSims > m_simulationsPerRoot)
             {
-                ActionSetAbilities legalActions;
-                generateLegalActions(promisingNode->getState(), legalActions, m_params);
-                promisingNode->createChildrenEdges(legalActions, m_params, buildOrderIntegral.integral.getValueToThisPoint());
+                --m_numTotalSimulations;
+                --m_numCurrentRootSimulations;
+            }
 
-                // there might be no action possible, so createChildrenEdges creates 0 edges
-                if (promisingNode->isTerminal())
+            else
+            {
+                /*if ((m_numTotalSimulations % 1000) == 0)
                 {
-                    m_leafNodesExpanded++;
-                    m_leafNodesVisited++;
-                    updateIntegralTerminal(*promisingNode, buildOrderIntegral);
+                    std::cout << "have run : " << m_numTotalSimulations << " simulations thus far." << std::endl;
+                }*/
+
+                BuildOrderIntegral buildOrderIntegral(m_buildOrderIntegralChangedRoot);
+
+                std::shared_ptr<Node> promisingNode = getPromisingNode(*m_currentRoot, buildOrderIntegral);
+
+                // we have reached node limit 
+                if (m_nodeVisits > m_params.getNumberOfNodes())
+                {
+                    break;
                 }
-                else
+
+                // if the best node is a leaf node, we don't need to do a rollout
+                if (!promisingNode->isTerminal() && Edge::MIXING_VALUE != 1)
                 {
-                    Edge & action = promisingNode->selectChildEdge(m_exploration_parameter, m_rnggen, m_params);
-
-                    promisingNode = promisingNode->notExpandedChild(action, m_params);
-                    updateBOIntegral(*promisingNode, action.getAction(), buildOrderIntegral);
-                    updateNodeVisits(Edge::NODE_VISITS_BEFORE_EXPAND == 1, promisingNode->isTerminal());
-
                     randomPlayout(*promisingNode, buildOrderIntegral);
                 }
-            }
-        }
 
-        m_backPropMutex.lock();
-        if (m_nodeVisits < m_params.getNumberOfNodes() && m_numTotalSimulations < m_params.getNumberOfSimulations()
-            && m_numCurrentRootSimulations < m_simulationsPerRoot)
-        {
-            ++m_numTotalSimulations;
-            ++m_numCurrentRootSimulations;
-            //std::cout << "num simulations: " << m_numTotalSimulations << std::endl;
-            m_backPropMutex.unlock();
-            backPropogation(*promisingNode, buildOrderIntegral);
-        }
-        else
-        {
-            m_backPropMutex.unlock();
-            fixEdgeVisits(*promisingNode);
+                // we have reached node limit 
+                if (m_nodeVisits > m_params.getNumberOfNodes())
+                {
+                    break;
+                }
+
+                BOSS_ASSERT(thisThreadSims <= m_params.getNumberOfSimulations(), "Total simulations done: %i, limit: %i", thisThreadSims, m_params.getNumberOfSimulations());
+                BOSS_ASSERT(thisThreadCRSims <= m_simulationsPerRoot, "Current root simulations done: %i, limit: %i", thisThreadCRSims, m_simulationsPerRoot);
+
+                backPropogation(*promisingNode, buildOrderIntegral);
+            }
         }
     }
 }
@@ -404,35 +381,25 @@ void CombatSearch_ParallelIntegralMCTS::evaluatePolicyNetwork()
     BOSS_ASSERT(m_params.usePolicyNetwork() || m_params.usePolicyValueNetwork(), "UsePolicyNetwork or UsePolicyValueNetwork must be set to true when evaluating policy network");
     
     std::shared_ptr<Node> currentNode = m_currentRoot;
-    std::shared_ptr<Node> nextNode;
     std::shared_ptr<Edge> bestAction;
 
     while (!currentNode->isTerminal())
     {
-        ActionSetAbilities legalActions;
-        generateLegalActions(currentNode->getState(), legalActions, m_params);
-        currentNode->createChildrenEdges(legalActions, m_params, m_bestResultFound.integral.getValueToThisPoint());
-
-        if (currentNode->isTerminal())
-        {
-            updateIntegralTerminal(*currentNode, m_bestResultFound);
-            writeSummaryToQueue();
-            updateNodeVisits(true, true);
-            break;
-        }
-
         bestAction = currentNode->getHighestPolicyValueChild().shared_from_this();
-        nextNode = currentNode->notExpandedChild(*bestAction, m_params, true);
+        currentNode = currentNode->notExpandedChild(*bestAction, m_params, m_bestResultFound.integral.getValueToThisPoint(), true);
 
-        updateBOIntegral(*nextNode, bestAction->getAction(), m_bestResultFound);
+        updateBOIntegral(*currentNode, bestAction->getAction(), m_bestResultFound);
         writeSummaryToQueue();
         updateNodeVisits(true, false);
-        currentNode = nextNode;
     }
+
+    // need to do one last update
+    updateIntegralTerminal(*currentNode, m_bestResultFound);
+    writeSummaryToQueue();
+    updateNodeVisits(true, true);
 }
 
-CombatSearch_ParallelIntegralMCTS::NewNode 
-    CombatSearch_ParallelIntegralMCTS::getPromisingNode (Node & node, BuildOrderIntegral & buildOrderIntegral)
+std::shared_ptr<Node> CombatSearch_ParallelIntegralMCTS::getPromisingNode(Node & node, BuildOrderIntegral & buildOrderIntegral)
 {    
     std::shared_ptr<Node> currentNode = node.shared_from_this();
 
@@ -444,10 +411,10 @@ CombatSearch_ParallelIntegralMCTS::NewNode
         // the node doesn't exist in memory
         if (edge.getChild() == nullptr)
         {
-            currentNode = currentNode->notExpandedChild(edge, m_params);
+            currentNode = currentNode->notExpandedChild(edge, m_params, buildOrderIntegral.integral.getValueToThisPoint(), false);
             updateNodeVisits(edge.getChild() != nullptr, currentNode->isTerminal());
             updateBOIntegral(*currentNode, edge.getAction(), buildOrderIntegral);
-            return NewNode(currentNode, true);
+            return currentNode;
         }
 
         // the node exists and is pointed to by the edge
@@ -457,7 +424,7 @@ CombatSearch_ParallelIntegralMCTS::NewNode
         // update build order and integral
         updateBOIntegral(*currentNode, edge.getAction(), buildOrderIntegral);
     }
-    return NewNode(currentNode, false);
+    return currentNode;
 }
 
 void CombatSearch_ParallelIntegralMCTS::randomPlayout(Node node, BuildOrderIntegral & buildOrderIntegral)
@@ -582,46 +549,6 @@ void CombatSearch_ParallelIntegralMCTS::fixEdgeVisits(Node & node)
         parentEdge = parentEdge->getParent()->getParentEdge();
     }
 }
-
-//std::pair<BuildOrderAbilities, CombatSearch_IntegralDataFinishedUnits> CombatSearch_ParallelIntegralMCTS::pickBestBuildOrder(std::shared_ptr<Node> root,  bool useVisitCount)
-//{
-//    BuildOrderAbilities buildOrder;
-//    CombatSearch_IntegralDataFinishedUnits integral;
-//
-//    std::shared_ptr<Node> bestNode = root;
-//    Edge * bestEdge;
-//
-//    // pick the child node with the highest action value until we reach a leaf node
-//    while (bestNode->getNumEdges() > 0)
-//    {
-//        if (useVisitCount)
-//        {
-//            bestEdge = bestNode->getHighestVisitedChild();
-//        }
-//        else
-//        {
-//            bestEdge = bestNode->getHighestValueChild(m_params);
-//        }
-//        if (bestEdge->getChild() == nullptr)
-//        {
-//            break;
-//        }
-//        bestNode = bestEdge->getChild();
-//
-//        //std::cout << "edge value: " << bestEdge->getValue() << std::endl;
-//
-//        buildOrder.add(bestEdge->getAction());
-//        integral.update(bestNode->getState(), buildOrder, m_params, m_searchTimer, false);
-//    }
-//
-//    // there are no more actions, but we still need to fast forward to the time
-//    // limit to properly calculate the integral
-//    GameState finalState(bestNode->getState());
-//    finalState.fastForward(m_params.getFrameTimeLimit());
-//    integral.update(finalState, buildOrder, m_params, m_searchTimer, false);
-//
-//    return std::make_pair(buildOrder, integral);
-//}
 
 void CombatSearch_ParallelIntegralMCTS::updateNodeVisits(bool nodeExpanded, bool isTerminal)
 {

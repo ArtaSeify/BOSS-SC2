@@ -150,6 +150,7 @@ void GPUQueue::wait()
     
     --m_threadsWaiting;
     //std::cout << "removed from threads waiting. There are now " << m_threadsWaiting << std::endl;
+    
 }
 
 PyObject* GPUQueue::operator [] (int i)
