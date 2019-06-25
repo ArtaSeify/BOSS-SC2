@@ -13,9 +13,11 @@ parser.add_argument("trainset", help="Path to datafile to use for training")
 parser.add_argument("validset", help="Path to datafile for validation")
 parser.add_argument("--load_model", help="Name of model to load")
 parser.add_argument("--epochs", help="Number of epochs to train")
+parser.add_argument("--two_heads", default=True, help="Policy and Value network or just policy")
 args = parser.parse_args()
 
 use_gpu = True
+print(args.two_heads)
 
 if not use_gpu:
     config = tf.ConfigProto(
@@ -38,7 +40,7 @@ epochs = 200 if not args.epochs else int(args.epochs)
 verbose = 1
 batch_size = 32
 shuffle = True
-twoHeads = True
+twoHeads = True if args.two_heads=="True" else False
 
 trainset_samples = sum(1 for line in open(args.trainset))
 validset_samples = sum(1 for line in open(args.validset))

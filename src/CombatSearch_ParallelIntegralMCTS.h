@@ -113,7 +113,7 @@ namespace BOSS
 
         void evaluatePolicyNetwork();
         
-        NewNode getPromisingNode(Node & node, BuildOrderIntegral& buildOrderIntegral);
+        std::shared_ptr<Node> getPromisingNode(Node & node, BuildOrderIntegral& buildOrderIntegral);
         
         void randomPlayout(Node node, BuildOrderIntegral& buildOrderIntegral);
         

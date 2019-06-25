@@ -30,6 +30,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Network", "Network", "{7829
 		..\bin\ML\train_model.py = ..\bin\ML\train_model.py
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Graph", "Graph", "{A3E944F3-E393-46F8-AF1F-C92946A56D54}"
+	ProjectSection(SolutionItems) = preProject
+		..\MCTS Results\getdataSummary.py = ..\MCTS Results\getdataSummary.py
+		..\MCTS Results\graph.py = ..\MCTS Results\graph.py
+		..\MCTS Results\parse.py = ..\MCTS Results\parse.py
+		..\MCTS Results\parseSummary.py = ..\MCTS Results\parseSummary.py
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64

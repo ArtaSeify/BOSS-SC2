@@ -1123,7 +1123,6 @@ void GameState::printUnits() const
 
 void GameState::writeToSS(std::stringstream & ss, const CombatSearchParameters & params, FracType currentValue, const std::vector<int>& chronoboostTargets) const
 {    
-    //ss << "[";
     std::vector<int> unitCount = std::vector<int>(ActionTypes::GetRaceActionCount(m_race), 0);
     for (int index = 0; index < m_units.size(); ++index)
     {
@@ -1144,40 +1143,6 @@ void GameState::writeToSS(std::stringstream & ss, const CombatSearchParameters &
     {
         ss << unitCount[i] << ",";
     }
-    //ss << "],";
-
-    /*ss << "[";
-    for (int index = 0; index < m_unitsBeingBuilt.size(); ++index)
-    {
-        ss << m_unitsBeingBuilt[index];
-        if (index != m_unitsBeingBuilt.size() - 1)
-        {
-            ss << ",";
-        }
-    }
-    ss << "],";
-
-    ss << "[";
-    for (int index = 0; index < m_unitsSortedEndFrame.size(); ++index)
-    {
-        ss << m_unitsSortedEndFrame[index];
-        if (index != m_unitsSortedEndFrame.size() - 1)
-        {
-            ss << ",";
-        }
-    }
-    ss << "],";*/
-
-    /*ss << "[";
-    for (int index = 0; index < m_chronoBoosts.size(); ++index)
-    {
-        m_chronoBoosts[index].writeToSS(ss);
-        if (index != m_chronoBoosts.size() - 1)
-        {
-            ss << ",";
-        }
-    }
-    ss << "],";*/
 
     //ss << int(m_race) << ",";
     ss << m_minerals << ",";
@@ -1200,11 +1165,6 @@ void GameState::writeToSS(std::stringstream & ss, const CombatSearchParameters &
     {
         ss << "," << target;
     }
-
-    //ss << m_numRefineries << ",";
-    //ss << m_numDepots;
-    //ss << m_lastAction.getID() << ",";
-    //m_lastAbility.writeToSS(ss);
 }
 
 json GameState::writeToJson(const CombatSearchParameters & params) const
