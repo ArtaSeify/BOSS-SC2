@@ -1121,8 +1121,10 @@ void GameState::printUnits() const
     std::cout << std::endl;
 }
 
-void GameState::writeToSS(std::stringstream & ss, const CombatSearchParameters & params, FracType currentValue, const std::vector<int>& chronoboostTargets) const
+std::string GameState::writeToSS(const CombatSearchParameters & params, FracType currentValue, const std::vector<int>& chronoboostTargets) const
 {    
+    std::string state = "";
+
     std::vector<int> unitCount = std::vector<int>(ActionTypes::GetRaceActionCount(m_race), 0);
     for (int index = 0; index < m_units.size(); ++index)
     {
@@ -1135,36 +1137,51 @@ void GameState::writeToSS(std::stringstream & ss, const CombatSearchParameters &
         }
         else
         {
-            m_units[index].writeToSS(ss);
-            ss << ",";
+            state += m_units[index].writeToSS();
+            state += ",";
         }
     }
     for (int i = 0; i < unitCount.size(); ++i)
     {
-        ss << unitCount[i] << ",";
+        state += std::to_string(unitCount[i]);
+        state += ",";
     }
 
     //ss << int(m_race) << ",";
-    ss << m_minerals << ",";
-    ss << m_gas << ",";
-    ss << m_currentSupply << ",";
-    ss << m_maxSupply << ",";
-    ss << m_currentFrame << ",";
+    state += std::to_string(m_minerals);
+    state += ",";
+    state += std::to_string(m_gas);
+    state += ",";
+    state += std::to_string(m_currentSupply);
+    state += ",";
+    state += std::to_string(m_maxSupply);
+    state += ",";
+    state += std::to_string(m_currentFrame);
+    state += ",";
     //ss << m_previousFrame << ",";
-    ss << params.getFrameTimeLimit() - m_currentFrame << ",";
-    ss << m_mineralWorkers << ",";
-    ss << m_gasWorkers << ",";
-    ss << m_buildingWorkers << ",";
-    ss << currentValue << ",";
-    ss << CONSTANTS::MPWPF << ",";
-    ss << CONSTANTS::GPWPF << ",";
-    ss << CONSTANTS::ERPF;
+    state += std::to_string(params.getFrameTimeLimit() - m_currentFrame);
+    state += ",";
+    state += std::to_string(m_mineralWorkers);
+    state += ",";
+    state += std::to_string(m_gasWorkers);
+    state += ",";
+    state += std::to_string(m_buildingWorkers);
+    state += ",";
+    state += std::to_string(currentValue);
+    state += ",";
+    state += std::to_string(CONSTANTS::MPWPF);
+    state += ",";
+    state += std::to_string(CONSTANTS::GPWPF);
+    state += ",";
+    state += std::to_string(CONSTANTS::ERPF);
 
     // chronoboost targets
     for (int target : chronoboostTargets)
     {
-        ss << "," << target;
+        state += ",";
+        state += std::to_string(target);
     }
+    return state;
 }
 
 json GameState::writeToJson(const CombatSearchParameters & params) const

@@ -74,7 +74,7 @@ public:
 
     std::string toString() const;
     // writes the data of a unit in CSV format to a ss
-    void        writeToSS(std::stringstream & ss) const;
+    std::string writeToSS() const;
     json        writeToJson() const;
 };
 

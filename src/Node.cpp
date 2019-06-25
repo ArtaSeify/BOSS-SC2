@@ -122,11 +122,10 @@ void Node::createChildrenEdges(const CombatSearchParameters & params, FracType c
 
     if (params.usePolicyValueNetwork() || params.usePolicyNetwork())
     {
-        std::stringstream ss;
-        m_state.writeToSS(ss, params, currentValue, getChronoboostTargets());
+        std::string state = m_state.writeToSS(params, currentValue, getChronoboostTargets());
 
         // push state into queue and wait until predictions are made
-        int predictionIndex = GPUQueue::getInstance().push_back(ss.str());
+        int predictionIndex = GPUQueue::getInstance().push_back(state);
         //m_mutex.unlock();
         GPUQueue::getInstance().wait();
         //m_mutex.lock();

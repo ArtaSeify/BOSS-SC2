@@ -297,20 +297,25 @@ std::string Unit::toString() const
     return ss.str();
 }
 
-void Unit::writeToSS(std::stringstream & ss) const
+std::string Unit::writeToSS() const
 {    
+    std::string unit;
     //ss << "[";
-    ss << m_id << ",";
+    unit += std::to_string(m_id);
+    unit += ",";
     //ss << m_frameStarted << ",";
     //ss << m_frameFinished << ",";
     //ss << m_builderID << ",";
-    ss << m_type.getRaceActionID() << ",";
+    unit += std::to_string(m_type.getRaceActionID());
+    unit += ",";
     //ss << m_addon.getID() << ",";
     //ss << m_buildType.getID() << ",";
-    ss << m_buildID << ",";
+    unit += std::to_string(m_buildID);
+    unit += ",";
     //ss << m_job << ",";
-    ss << m_timeUntilBuilt << ",";
-    ss << m_timeUntilFree;
+    unit += std::to_string(m_timeUntilBuilt);
+    unit += ",";
+    unit += std::to_string(m_timeUntilFree);
     //ss << m_timeChronoBoost << ",";
     //ss << m_timeChronoBoostAgain;
     //ss << m_numLarva << ", ";
@@ -319,6 +324,7 @@ void Unit::writeToSS(std::stringstream & ss) const
     //ss << m_morphID << ",";
     //ss << m_morphed;
     //ss << "]";
+    return unit;
 }
 
 json Unit::writeToJson() const

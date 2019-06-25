@@ -221,7 +221,7 @@ void CombatSearch_ParallelIntegralMCTS::MCTSSearch(int threadID)
                     // write state data
                     if (m_params.getSaveStates())
                     {
-                        m_currentRoot->getState().writeToSS(m_ssStates, m_params,
+                        m_ssStates << m_currentRoot->getState().writeToSS(m_params,
                             m_buildOrderIntegralChangedRoot.integral.getValueToThisPoint(), m_currentRoot->getChronoboostTargets());
 
                         std::vector<float> MCTSPolicy = std::vector<float>(ActionTypes::GetRaceActionCount(Races::Protoss), 0.f);
