@@ -71,19 +71,15 @@ void Node::cleanUp(int threads)
 
 void Node::createChildrenEdges(const CombatSearchParameters & params, FracType currentValue)
 {
-    //std::scoped_lock sl(m_mutex);
-    //m_mutex.lock();
     // if we already know it's a terminal node, just return
     if (m_isTerminalNode)
     {
-        //m_mutex.unlock();
         return;
     }
 
     // function already called by another thread
     if (m_edges.size() > 0)
     {
-        //m_mutex.unlock();
         return;
     }
 
@@ -116,7 +112,6 @@ void Node::createChildrenEdges(const CombatSearchParameters & params, FracType c
     if (m_edges.size() == 0)
     {
         m_isTerminalNode = true;
-        //m_mutex.unlock();
         return;
     }
 
@@ -126,11 +121,9 @@ void Node::createChildrenEdges(const CombatSearchParameters & params, FracType c
 
         // push state into queue and wait until predictions are made
         int predictionIndex = GPUQueue::getInstance().push_back(state);
-        //m_mutex.unlock();
         GPUQueue::getInstance().wait();
-        //m_mutex.lock();
         PyObject* values = GPUQueue::getInstance()[predictionIndex];
-        //std::cout << "grabbing value" << std::endl;
+
         PyObject* policyValues;
         PyObject* nodeValue;
         if (params.usePolicyValueNetwork())
@@ -171,7 +164,6 @@ void Node::createChildrenEdges(const CombatSearchParameters & params, FracType c
         }
     }
     //std::cout << "node finished and unlocking" << std::endl;
-    //m_mutex.unlock();
 }
 
 void Node::generateLegalActions(const GameState& state, ActionSetAbilities& legalActions, const CombatSearchParameters& params)
@@ -342,7 +334,7 @@ bool Node::doAction(Edge & edge, const CombatSearchParameters & params, bool mak
     }
     
     // expand node
-    if (edge.getChild() == nullptr && ((edge.realTimesVisited() == Edge::NODE_VISITS_BEFORE_EXPAND) || makeNode))
+    if (edge.getChild() == nullptr && ((edge.realTimesVisited() >= Edge::NODE_VISITS_BEFORE_EXPAND) || makeNode))
     {
         edge.setChild(shared_from_this());
         return true;
@@ -380,35 +372,39 @@ void Node::printChildren() const
 
 Edge & Node::selectChildEdge(FracType exploration_param, std::mt19937 & rnggen, const CombatSearchParameters & params)
 {
-    std::scoped_lock sl(m_mutex);
-
-    BOSS_ASSERT(m_edges.size() > 0, "selectChildEdge called when there are no edges.");
-    // uniform policy
-    //float policyValue = 1.f / m_edges.size();
-
+    {
+        std::scoped_lock sl(m_mutex);
+    }
+    if (m_edges.size() <= 0)
+    {
+        BOSS_ASSERT(m_edges.size() > 0, "selectChildEdge called when there are no edges.");
+    }
+    
     std::vector<int> unvisitedEdges;
     int totalChildVisits = 0;
     for (int index = 0; index < m_edges.size(); ++index )
     {
         Edge & edge = *m_edges[index];
 
-        int edgeTimesVisited = edge.realTimesVisited();
         // all unvisited edges are taken as an action first 
-        if (edgeTimesVisited == 0)
+        if (edge.realTimesVisited() == 0)
         {
             unvisitedEdges.push_back(index);
         }
 
-        totalChildVisits += edgeTimesVisited;
+        totalChildVisits += edge.totalTimesVisited();
     }
 
     // pick an unvisited edge at uniformly random
-    if (unvisitedEdges.size() > 0)
+    if (!params.usePolicyNetwork() && !params.usePolicyValueNetwork())
     {
-        std::uniform_int_distribution<> distribution(0, int(unvisitedEdges.size()) - 1);
-        Edge & edge = *m_edges[unvisitedEdges[distribution(rnggen)]];
-        edge.visited();
-        return edge;
+        if (unvisitedEdges.size() > 0)
+        {
+            std::uniform_int_distribution<> distribution(0, int(unvisitedEdges.size()) - 1);
+            Edge& edge = *m_edges[unvisitedEdges[distribution(rnggen)]];
+            edge.visited();
+            return edge;
+        }
     }
 
     float UCBValue = exploration_param *
@@ -424,14 +420,12 @@ Edge & Node::selectChildEdge(FracType exploration_param, std::mt19937 & rnggen, 
         // Q(s, a) + u(s, a)
         // we normalize the action value to a range of [0, 1] using the highest
         // value of the search thus far. 
-        //BOSS_ASSERT(edge->totalTimesVisited() == edge->realTimesVisited(), "Should be equal");
         float childUCBValue = (UCBValue * edge->getPolicyValue()) / (1 + edge->totalTimesVisited());
-        float actionValue = edge->getValue() / currentHighestValue;
+        float actionValue = (edge->getValue() - edge->getVirtualLossValue()) / currentHighestValue;
+
         BOSS_ASSERT(actionValue <= 1, "value of an action must be less than or equal to 1, but is %f", actionValue);
 
         float UCTValue = actionValue + childUCBValue;
-
-        //std::cout << edge->getAction().first.getName() << " " << actionValue << ", " << childUCBValue << std::endl;
 
         // store the index of this action
         if (maxActionValue < UCTValue)
@@ -442,7 +436,6 @@ Edge & Node::selectChildEdge(FracType exploration_param, std::mt19937 & rnggen, 
 
         ++index;
     }
-    //std::cout << std::endl;
     Edge& edge = *m_edges[maxIndex];
     edge.visited();
     return edge;
@@ -460,6 +453,8 @@ std::shared_ptr<Node> Node::notExpandedChild(Edge& edge, const CombatSearchParam
     // create a temporary node
     std::shared_ptr<Node> node = std::make_shared<Node>(m_state, edge);
 
+    std::scoped_lock newNodeLock(node->m_mutex);
+
     // if the node is expanded, we create the edges of the node
     if (node->doAction(edge, params, makeNode))
     {
@@ -471,7 +466,7 @@ std::shared_ptr<Node> Node::notExpandedChild(Edge& edge, const CombatSearchParam
 
 Edge & Node::getHighestValueChild(const CombatSearchParameters & params) const
 {
-    std::scoped_lock sl(m_mutex);
+    //std::scoped_lock sl(m_mutex);
 
     // get the node with the highest action value
     auto edge = std::max_element(m_edges.begin(), m_edges.end(),
@@ -479,17 +474,44 @@ Edge & Node::getHighestValueChild(const CombatSearchParameters & params) const
         { 
             if (lhs->getValue() == rhs->getValue())
             {
-                std::unique_ptr<Node> lhsNode = std::make_unique<Node>(*lhs->getParent());
-                std::unique_ptr<Node> rhsNode = std::make_unique<Node>(*rhs->getParent());
+                GameState* lhsState;
+                GameState* rhsState;
                 if (lhs->getChild() == nullptr)
                 {
-                    lhsNode->doAction(*lhs, params);
+                    const auto action = lhs->getAction();
+                    lhsState = new GameState(m_state);
+                    if (action.first.isAbility())
+                    {
+                        lhsState->doAbility(action.first, action.second.targetID);
+                    }
+                    else
+                    {
+                        lhsState->doAction(action.first);
+                    }
                 }
+                else
+                {
+                    lhsState = new GameState(lhs->getChild()->getState());
+                }
+
                 if (rhs->getChild() == nullptr)
                 {
-                    rhsNode->doAction(*rhs, params);
+                    const auto action = rhs->getAction();
+                    rhsState = new GameState(m_state);
+                    if (action.first.isAbility())
+                    {
+                        rhsState->doAbility(action.first, action.second.targetID);
+                    }
+                    else
+                    {
+                        rhsState->doAction(action.first);
+                    }
                 }
-                return Eval::StateBetter(rhsNode->getState(), lhsNode->getState());;
+                else
+                {
+                    rhsState = new GameState(rhs->getChild()->getState());
+                }
+                return Eval::StateBetter(*rhsState, *lhsState);;
             }
         
             return lhs->getValue() < rhs->getValue();

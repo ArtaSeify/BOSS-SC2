@@ -3,12 +3,13 @@
 
 using namespace BOSS;
 
-std::atomic<FracType> Edge::CURRENT_HIGHEST_VALUE = 1.f;
-std::atomic<int> Edge::NODE_VISITS_BEFORE_EXPAND = 1;
-std::atomic<bool> Edge::USE_MAX_VALUE = true;
-std::atomic<int> Edge::MAX_EDGE_VALUE_EXPECTED = 1;
-std::atomic<FracType> Edge::MIXING_VALUE = 0.0;
-std::atomic<int> Edge::VIRTUAL_LOSS_VALUE = 3;
+FracType Edge::CURRENT_HIGHEST_VALUE = 1.f;
+int Edge::NODE_VISITS_BEFORE_EXPAND = 1;
+bool Edge::USE_MAX_VALUE = true;
+int Edge::MAX_EDGE_VALUE_EXPECTED = 1;
+FracType Edge::MIXING_VALUE = 0.0;
+int Edge::VIRTUAL_LOSS_VALUE = 1;
+int Edge::VIRTUAL_LOSS_COUNT = 1;
 
 Edge::Edge()
     : m_timesVisited(0)

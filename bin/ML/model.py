@@ -435,7 +435,10 @@ class RelationsPolicyAndValueNetwork(Model):
         layer = layers.Dense(128, activation='elu', name="state_layer10")(layer)
 
         policy = layers.Dense(self.policy_shape, activation='linear', name="policy")(layer)
-        value = layers.Dense(1, activation='linear', name="value")(layer)
+
+        layer = layers.Dense(64, activation='elu', name="value_layer1")(layer)
+        layer = layers.Dense(64, activation='elu', name="value_layer2")(layer)
+        value = layers.Dense(1, activation='relu', name="value")(layer)
         
         self.model = tf.keras.Model(inputs=[units_input, extra_features_input], outputs=[policy, value])
         

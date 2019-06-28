@@ -15,12 +15,13 @@ namespace BOSS
     class Edge : public std::enable_shared_from_this<Edge>
     {
     public:
-        static std::atomic<FracType> CURRENT_HIGHEST_VALUE;
-        static std::atomic<int> NODE_VISITS_BEFORE_EXPAND;
-        static std::atomic<bool> USE_MAX_VALUE;
-        static std::atomic<int> MAX_EDGE_VALUE_EXPECTED;
-        static std::atomic<FracType> MIXING_VALUE;
-        static std::atomic<int> VIRTUAL_LOSS_VALUE;
+        static FracType CURRENT_HIGHEST_VALUE;
+        static int NODE_VISITS_BEFORE_EXPAND;
+        static bool USE_MAX_VALUE;
+        static int MAX_EDGE_VALUE_EXPECTED;
+        static FracType MIXING_VALUE;
+        static int VIRTUAL_LOSS_VALUE;
+        static int VIRTUAL_LOSS_COUNT;
 
     private:
         int m_timesVisited;
@@ -58,22 +59,23 @@ namespace BOSS
         }
         FracType getNetworkValue() const { std::scoped_lock sl(m_mutex); return m_valueNetwork; }
         
-        const ActionAbilityPair & getAction() const { return m_action; }
+        const ActionAbilityPair & getAction() const { std::scoped_lock sl(m_mutex); return m_action; }
 
         void setPolicyValue(FracType value) { std::scoped_lock sl(m_mutex); m_policyValue = value; }
         FracType getPolicyValue() const { std::scoped_lock sl(m_mutex); return m_policyValue; }
         
         std::shared_ptr<Node> getChild() { std::scoped_lock sl(m_mutex); return m_child; }
         void setChild(std::shared_ptr<Node> node);
-        std::shared_ptr<Node> getParent() { return m_parent; }
+        std::shared_ptr<Node> getParent() { std::scoped_lock sl(m_mutex); return m_parent; }
 
         int totalTimesVisited() const { std::scoped_lock sl(m_mutex); return m_timesVisited + m_virtualLoss; }
         int realTimesVisited() const { std::scoped_lock sl(m_mutex); return m_timesVisited; }
         //void incrementVisitCount() { std::scoped_lock sl(m_mutex); ++m_timesVisited; }
 
         int virtualLoss() const { std::scoped_lock sl(m_mutex); return m_virtualLoss; }
-        void incrementVirtualLoss()  { std::scoped_lock sl(m_mutex); m_virtualLoss += VIRTUAL_LOSS_VALUE; }
-        void decrementVirtualLoss() { std::scoped_lock sl(m_mutex); m_virtualLoss -= VIRTUAL_LOSS_VALUE; }
+        void incrementVirtualLoss()  { std::scoped_lock sl(m_mutex); m_virtualLoss += VIRTUAL_LOSS_COUNT; }
+        void decrementVirtualLoss() { std::scoped_lock sl(m_mutex); m_virtualLoss -= VIRTUAL_LOSS_COUNT; }
+        int getVirtualLossValue() const { std::scoped_lock sl(m_mutex); return m_virtualLoss * Edge::VIRTUAL_LOSS_VALUE; }
 
         void visited() { std::scoped_lock sl(m_mutex); ++m_timesVisited; incrementVirtualLoss(); }
         void decVisits()

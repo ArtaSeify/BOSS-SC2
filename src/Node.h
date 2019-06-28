@@ -80,7 +80,7 @@ namespace BOSS
         const GameState & getState() const { return m_state; }
         std::shared_ptr<Node> getParent() const { return m_parentEdge->getParent(); }
         int getNumEdges() const { return int(m_edges.size()); }
-        bool isTerminal() const { return m_isTerminalNode; }
+        bool isTerminal() const { std::scoped_lock sl(m_mutex); return m_isTerminalNode; }
 
         void clearChildren() { m_edges.clear(); }
 

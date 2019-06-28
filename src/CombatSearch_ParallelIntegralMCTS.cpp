@@ -25,14 +25,7 @@ CombatSearch_ParallelIntegralMCTS::CombatSearch_ParallelIntegralMCTS(const Comba
     , m_leafNodesVisited(0)
 {
     m_params = p;
-    Edge::USE_MAX_VALUE = m_params.getUseMaxValue();
-    if (m_params.usePolicyValueNetwork())
-    {
-        Edge::MIXING_VALUE = m_params.getMixingValue();
-    }
-    Edge::MAX_EDGE_VALUE_EXPECTED = m_params.getValueNormalization();
-    Edge::CURRENT_HIGHEST_VALUE = FracType(m_params.getValueNormalization());
-    Edge::NODE_VISITS_BEFORE_EXPAND = m_params.getNodeVisitsBeforeExpand();
+    
     if (m_params.getChangingRoot())
     {
         m_simulationsPerRoot = p.getSimulationsPerStep();
@@ -160,7 +153,7 @@ void CombatSearch_ParallelIntegralMCTS::MCTSSearch(int threadID)
         }*/
         //std::cout << m_threadsWaitingForChangeRoot << std::endl;
         // change the root of the tree. Remove all the nodes and edges that are now irrelevant
-        if (m_params.getChangingRoot() && m_numCurrentRootSimulations == m_simulationsPerRoot)
+        if (m_params.getChangingRoot() && m_numCurrentRootSimulations >= m_simulationsPerRoot)
         {
             // All threads wait for thread 0 to change the root
             if (threadID != 0)
@@ -193,7 +186,6 @@ void CombatSearch_ParallelIntegralMCTS::MCTSSearch(int threadID)
                 //std::cout << m_threadsWaitingForChangeRoot << std::endl;
                 {
                     std::lock_guard<std::mutex> lg(m_changeRootMutex);
-
                     BOSS_ASSERT(m_numCurrentRootSimulations == m_simulationsPerRoot,
                         "Number of simulations for a root %i must equal to the limit of simulations per root %i", m_numCurrentRootSimulations.load(), m_simulationsPerRoot);
 
@@ -253,7 +245,6 @@ void CombatSearch_ParallelIntegralMCTS::MCTSSearch(int threadID)
                     }
 
                     m_numCurrentRootSimulations = 0;
-
                     //m_simulationsPerStep = (int)round(m_simulationsPerStep * m_params.getSimulationsPerStepDecay());
 
                     std::shared_ptr<Edge> childEdge;
@@ -324,6 +315,7 @@ void CombatSearch_ParallelIntegralMCTS::MCTSSearch(int threadID)
                 m_changeRootCompleted.notify_all();
             }
         }
+        
 
         if (m_numTotalSimulations < m_params.getNumberOfSimulations() && m_numCurrentRootSimulations < m_simulationsPerRoot)
         {
@@ -340,11 +332,8 @@ void CombatSearch_ParallelIntegralMCTS::MCTSSearch(int threadID)
 
             else
             {
-                /*if ((m_numTotalSimulations % 1000) == 0)
-                {
-                    std::cout << "have run : " << m_numTotalSimulations << " simulations thus far." << std::endl;
-                }*/
-
+                //std::cout << "have run : " << m_numTotalSimulations << " simulations thus far." << std::endl;
+                
                 BuildOrderIntegral buildOrderIntegral(m_buildOrderIntegralChangedRoot);
 
                 std::shared_ptr<Node> promisingNode = getPromisingNode(*m_currentRoot, buildOrderIntegral);
@@ -355,11 +344,7 @@ void CombatSearch_ParallelIntegralMCTS::MCTSSearch(int threadID)
                     break;
                 }
 
-                // if the best node is a leaf node, we don't need to do a rollout
-                if (!promisingNode->isTerminal() && Edge::MIXING_VALUE != 1)
-                {
-                    randomPlayout(*promisingNode, buildOrderIntegral);
-                }
+                randomPlayout(*promisingNode, buildOrderIntegral);
 
                 // we have reached node limit 
                 if (m_nodeVisits > m_params.getNumberOfNodes())
@@ -403,7 +388,7 @@ std::shared_ptr<Node> CombatSearch_ParallelIntegralMCTS::getPromisingNode(Node &
 {    
     std::shared_ptr<Node> currentNode = node.shared_from_this();
 
-    while(currentNode->getNumEdges() > 0 && m_nodeVisits < m_params.getNumberOfNodes())
+    while(!currentNode->isTerminal() && m_nodeVisits < m_params.getNumberOfNodes())
     {
         // select the edge with the highest UCT value
         Edge & edge = currentNode->selectChildEdge(m_exploration_parameter, m_rnggen, m_params);
@@ -424,6 +409,7 @@ std::shared_ptr<Node> CombatSearch_ParallelIntegralMCTS::getPromisingNode(Node &
         // update build order and integral
         updateBOIntegral(*currentNode, edge.getAction(), buildOrderIntegral);
     }
+    BOSS_ASSERT(currentNode->isTerminal(), "This shouldn't happen if the node isn't terminal");
     return currentNode;
 }
 
@@ -432,9 +418,20 @@ void CombatSearch_ParallelIntegralMCTS::randomPlayout(Node node, BuildOrderInteg
     // mixing value of 1 means we only use network prediction
     if (m_params.getMixingValue() == 1)
     {
+        if (node.isTerminal())
+        {
+            GameState stateCopy(node.getState());
+            stateCopy.fastForward(m_params.getFrameTimeLimit());
+            buildOrderIntegral.integral.update(stateCopy, buildOrderIntegral.buildOrder, m_params, m_searchTimer, false);
+            buildOrderIntegral.integral.setState(stateCopy);
+        }
+        else
+        {
+            buildOrderIntegral.integral.setState(node.getState());
+        }
         return;
     }
-    bool leafNode = false;
+    bool leafNode = node.isTerminal();
     // do a rollout until we reach a terminal state
     while (!leafNode && m_nodeVisits < m_params.getNumberOfNodes())
     {
@@ -560,6 +557,10 @@ void CombatSearch_ParallelIntegralMCTS::updateNodeVisits(bool nodeExpanded, bool
     if (isTerminal)
     {
         ++m_leafNodesVisited;
+    }
+    if (nodeExpanded && isTerminal)
+    {
+        ++m_leafNodesExpanded;
     }
 }
 

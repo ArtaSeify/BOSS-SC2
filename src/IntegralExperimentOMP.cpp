@@ -260,6 +260,17 @@ IntegralExperimentOMP::IntegralExperimentOMP(const std::string& experimentName, 
         BOSS_ASSERT(exp["UseTotalTimeLimit"].is_boolean(), "UseTotalTimeLimit must be a bool");
         m_params.setUseTotalTimeLimit(exp["UseTotalTimeLimit"]);
     }
+
+    // set some global variables inside of Edge
+    Edge::USE_MAX_VALUE = m_params.getUseMaxValue();
+    if (m_params.usePolicyValueNetwork())
+    {
+        Edge::MIXING_VALUE = m_params.getMixingValue();
+    }
+    Edge::MAX_EDGE_VALUE_EXPECTED = m_params.getValueNormalization();
+    Edge::CURRENT_HIGHEST_VALUE = FracType(m_params.getValueNormalization());
+    Edge::VIRTUAL_LOSS_VALUE = int(m_params.getValueNormalization() * 0.20f);
+    Edge::NODE_VISITS_BEFORE_EXPAND = m_params.getNodeVisitsBeforeExpand();
 }
 
 void IntegralExperimentOMP::runExperimentThread(int run)
@@ -501,7 +512,8 @@ void IntegralExperimentOMP::run(int numberOfRuns)
     
     if (m_params.usePolicyNetwork() || m_params.usePolicyValueNetwork())
     {
-        int threads = 8;
+        
+        int threads = 12;
         #pragma omp parallel for num_threads(threads)
         for (int run = 0; run < numberOfRuns; ++run)
         {
@@ -518,6 +530,7 @@ void IntegralExperimentOMP::run(int numberOfRuns)
     else
     {
         int threads = std::max(1, int(float(std::thread::hardware_concurrency()) / m_params.getThreadsForMCTS()));
+        //threads = 1;
         #pragma omp parallel for num_threads(threads)
         for (int run = 0; run < numberOfRuns; ++run)
         {
