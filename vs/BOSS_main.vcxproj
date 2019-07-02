@@ -237,7 +237,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>$(SolutionDir)..\bin\BOSS.lib;%(AdditionalDependencies);</AdditionalDependencies>
+      <AdditionalDependencies>$(SolutionDir)..\bin\BOSS.lib;%(AdditionalDependencies);$(SolutionDir)..\libs\gsl.lib</AdditionalDependencies>
       <GenerateMapFile>true</GenerateMapFile>
       <AdditionalLibraryDirectories>$(SolutionDir)..\libs</AdditionalLibraryDirectories>
       <PerUserRedirection>true</PerUserRedirection>

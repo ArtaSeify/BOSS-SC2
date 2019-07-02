@@ -39,12 +39,19 @@ namespace BOSS
         void doAction(const Action & action, const CombatSearchParameters & params);
 
         // creates edges for this node
-        void createChildrenEdges(const CombatSearchParameters& params, FracType currentValue);
+        void createChildrenEdges(const CombatSearchParameters& params, FracType currentValue, bool rootNode = false);
+
+        // creates edges for thie node. This function is called when we create the edges and do network
+        // evaluation after an expanded node is visited a second time, not the first time
+        void createChildrenEdgesSecondVisit(const CombatSearchParameters& params, FracType currentValue);
         
         void printChildren() const;
         
         // selects a child based on UCB
-        Edge & selectChildEdge(FracType exploration_param, std::mt19937& rnggen, const CombatSearchParameters & params);
+        Edge & selectChildEdge(const CombatSearchParameters & params);
+
+        // make network prediction about state of node and store result in edges
+        void networkPrediction(const CombatSearchParameters& params, FracType currentValue) const;
 
         // creates a node that hasn't been expanded in the tree yet 
         std::shared_ptr<Node> notExpandedChild(Edge& edge, const CombatSearchParameters& params, FracType currentValue, bool makeNode = false);
@@ -59,7 +66,7 @@ namespace BOSS
         Edge & getHighestPolicyValueChild() const;
 
         // returns a child with probability proportional to visit count
-        Edge & getChildProportionalToVisitCount(std::mt19937& rnggen, const CombatSearchParameters& params) const;
+        Edge & getChildProportionalToVisitCount(const CombatSearchParameters& params) const;
 
         // gets a child at random
         Edge & getRandomEdge();

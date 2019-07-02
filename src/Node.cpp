@@ -1,6 +1,7 @@
 #include "Node.h"
 #include "Eval.h"
 #include "GPUQueue.h"
+#include "CombatSearch_ParallelIntegralMCTS.h"
 
 using namespace BOSS;
 
@@ -69,7 +70,7 @@ void Node::cleanUp(int threads)
     //std::cout << "all edges of this node cleaned up!" << std::endl;
 }
 
-void Node::createChildrenEdges(const CombatSearchParameters & params, FracType currentValue)
+void Node::createChildrenEdges(const CombatSearchParameters & params, FracType currentValue, bool rootNode)
 {
     // if we already know it's a terminal node, just return
     if (m_isTerminalNode)
@@ -117,42 +118,45 @@ void Node::createChildrenEdges(const CombatSearchParameters & params, FracType c
 
     if (params.usePolicyValueNetwork() || params.usePolicyNetwork())
     {
-        std::string state = m_state.writeToSS(params, currentValue, getChronoboostTargets());
+        networkPrediction(params, currentValue);
 
-        // push state into queue and wait until predictions are made
-        int predictionIndex = GPUQueue::getInstance().push_back(state);
-        GPUQueue::getInstance().wait();
-        PyObject* values = GPUQueue::getInstance()[predictionIndex];
-
-        PyObject* policyValues;
-        PyObject* nodeValue;
-        if (params.usePolicyValueNetwork())
+        // add dirichlet noise to root node edges
+        if (rootNode)
         {
-            policyValues = PyList_GetItem(values, 0);
-            nodeValue = PyList_GetItem(values, 1);
+            static const FracType epsilon = 0.25f;
+            const double alphas[70] = { 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5,
+                                        0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5,
+                                        0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5,
+                                        0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5,
+                                        0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5,
+                                        0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5,
+                                        0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5 };
+            double dirichlet_noise[70] = {};
+            gsl_ran_dirichlet(CombatSearch_ParallelIntegralMCTS::gsl_rng, m_edges.size(), alphas, dirichlet_noise);
+
+            std::cout << "noise values:" << std::endl;
+            for (int i = 0; i < m_edges.size(); ++i)
+            {
+                std::cout << dirichlet_noise[i] << " ";
+            }
+            std::cout << std::endl;
+
+            std::cout << "before noise:" << std::endl;
+            for (auto& edge : m_edges)
+            {
+                std::cout << edge->getPolicyValue() << " ";
+            }
+            std::cout << std::endl;
+
+            std::cout << "after noise:" << std::endl;
+            for (int index = 0; index < m_edges.size(); ++index)
+            {
+                auto edge = m_edges[index];
+                edge->setPolicyValue(FracType(((1 - epsilon) * edge->getPolicyValue()) + (epsilon * dirichlet_noise[index])));
+                std::cout << edge->getPolicyValue() << " ";
+            }
+            std::cout << std::endl;
         }
-        else
-        {
-            policyValues = values;
-        }
-
-        // Set policy values
-        for (auto& edge : m_edges)
-        {
-            //std::cout << "edge action: " << edge->getAction().first.getRaceActionID() << ", value: " 
-            //    << python::extract<FracType>(policyValues[edge->getAction().first.getRaceActionID()]) << std::endl;
-            // update the edge values
-            edge->setPolicyValue(static_cast<FracType>(PyFloat_AsDouble(PyList_GetItem(policyValues, edge->getAction().first.getRaceActionID()))));
-        }     
-
-        // set node value
-        if (params.usePolicyValueNetwork())
-        {
-            m_parentEdge->setNetworkValue(static_cast<FracType>(PyFloat_AsDouble(PyList_GetItem(nodeValue, 0))) * Edge::MAX_EDGE_VALUE_EXPECTED);
-            //std::cout << "parent network value: " << m_parentEdge->getNetworkValue() << std::endl;
-        }
-        GPUQueue::getInstance().decPredictionReference();
-        //std::cout << "finished with network in node" << std::endl;
     }
     // use uniform probability if we're not using a policy network
     else
@@ -164,6 +168,14 @@ void Node::createChildrenEdges(const CombatSearchParameters & params, FracType c
         }
     }
     //std::cout << "node finished and unlocking" << std::endl;
+}
+
+void Node::createChildrenEdgesSecondVisit(const CombatSearchParameters& params, FracType currentValue)
+{
+    BOSS_ASSERT(!params.usePolicyValueNetwork(), "This function should not be called when we are using a value network");
+
+    std::scoped_lock sl(m_mutex);
+    createChildrenEdges(params, currentValue);
 }
 
 void Node::generateLegalActions(const GameState& state, ActionSetAbilities& legalActions, const CombatSearchParameters& params)
@@ -289,6 +301,46 @@ void Node::generateLegalActions(const GameState& state, ActionSetAbilities& lega
     }
 }
 
+void Node::networkPrediction(const CombatSearchParameters & params, FracType currentValue) const
+{
+    std::string state = m_state.writeToSS(params, currentValue, getChronoboostTargets());
+
+    // push state into queue and wait until predictions are made
+    int predictionIndex = GPUQueue::getInstance().push_back(state);
+    GPUQueue::getInstance().wait();
+    PyObject* values = GPUQueue::getInstance()[predictionIndex];
+
+    PyObject* policyValues;
+    PyObject* nodeValue;
+    if (params.usePolicyValueNetwork())
+    {
+        policyValues = PyList_GetItem(values, 0);
+        nodeValue = PyList_GetItem(values, 1);
+    }
+    else
+    {
+        policyValues = values;
+    }
+
+    // Set policy values
+    for (auto& edge : m_edges)
+    {
+        //std::cout << "edge action: " << edge->getAction().first.getRaceActionID() << ", value: " 
+        //    << python::extract<FracType>(policyValues[edge->getAction().first.getRaceActionID()]) << std::endl;
+        // update the edge values
+        edge->setPolicyValue(static_cast<FracType>(PyFloat_AsDouble(PyList_GetItem(policyValues, edge->getAction().first.getRaceActionID()))));
+    }
+
+    // set node value
+    if (params.usePolicyValueNetwork())
+    {
+        m_parentEdge->setNetworkValue(static_cast<FracType>(PyFloat_AsDouble(PyList_GetItem(nodeValue, 0))) * Edge::MAX_EDGE_VALUE_EXPECTED);
+        //std::cout << "parent network value: " << m_parentEdge->getNetworkValue() << std::endl;
+    }
+    GPUQueue::getInstance().decPredictionReference();
+    //std::cout << "finished with network in node" << std::endl;
+}
+
 void Node::removeEdges(const Edge & edge)
 {
     for (auto it = m_edges.begin(); it != m_edges.end();)
@@ -370,44 +422,44 @@ void Node::printChildren() const
     std::cout << std::endl;
 }
 
-Edge & Node::selectChildEdge(FracType exploration_param, std::mt19937 & rnggen, const CombatSearchParameters & params)
+Edge & Node::selectChildEdge(const CombatSearchParameters & params)
 {
     {
         std::scoped_lock sl(m_mutex);
     }
-    if (m_edges.size() <= 0)
-    {
-        BOSS_ASSERT(m_edges.size() > 0, "selectChildEdge called when there are no edges.");
-    }
+    
+    BOSS_ASSERT(m_edges.size() > 0, "selectChildEdge called when there are no edges.");
     
     std::vector<int> unvisitedEdges;
     int totalChildVisits = 0;
+    bool visitEveryEdge = !params.usePolicyNetwork() && !params.usePolicyValueNetwork();
     for (int index = 0; index < m_edges.size(); ++index )
     {
         Edge & edge = *m_edges[index];
 
         // all unvisited edges are taken as an action first 
-        if (edge.realTimesVisited() == 0)
+        if (visitEveryEdge && edge.realTimesVisited() == 0)
         {
             unvisitedEdges.push_back(index);
         }
 
         totalChildVisits += edge.totalTimesVisited();
     }
-
-    // pick an unvisited edge at uniformly random
-    if (!params.usePolicyNetwork() && !params.usePolicyValueNetwork())
+    
+    // pick an unvisited edge at uniformly random. This is only done 
+    // in MCTS without network
+    if (visitEveryEdge)
     {
         if (unvisitedEdges.size() > 0)
         {
             std::uniform_int_distribution<> distribution(0, int(unvisitedEdges.size()) - 1);
-            Edge& edge = *m_edges[unvisitedEdges[distribution(rnggen)]];
+            Edge& edge = *m_edges[unvisitedEdges[distribution(CombatSearch_ParallelIntegralMCTS::rnggen)]];
             edge.visited();
             return edge;
         }
     }
 
-    float UCBValue = exploration_param *
+    float UCBValue = CombatSearch_ParallelIntegralMCTS::exploration_parameter *
         static_cast<FracType>(std::sqrt(totalChildVisits));
 
     float maxActionValue = 0;
@@ -421,7 +473,7 @@ Edge & Node::selectChildEdge(FracType exploration_param, std::mt19937 & rnggen, 
         // we normalize the action value to a range of [0, 1] using the highest
         // value of the search thus far. 
         float childUCBValue = (UCBValue * edge->getPolicyValue()) / (1 + edge->totalTimesVisited());
-        float actionValue = (edge->getValue() - edge->getVirtualLossValue()) / currentHighestValue;
+        float actionValue = edge->getValue() / currentHighestValue;
 
         BOSS_ASSERT(actionValue <= 1, "value of an action must be less than or equal to 1, but is %f", actionValue);
 
@@ -455,8 +507,10 @@ std::shared_ptr<Node> Node::notExpandedChild(Edge& edge, const CombatSearchParam
 
     std::scoped_lock newNodeLock(node->m_mutex);
 
-    // if the node is expanded, we create the edges of the node
-    if (node->doAction(edge, params, makeNode))
+    // if the node is expanded, we create the edges of the node and do network evaluation
+    // if our network outputs a value. if it doesn't output a value, we create the child edges
+    // the second time we come to this node for efficiency reasons
+    if (node->doAction(edge, params, makeNode) && (params.usePolicyValueNetwork() || makeNode))
     {
         node->createChildrenEdges(params, currentValue);
     }
@@ -511,7 +565,10 @@ Edge & Node::getHighestValueChild(const CombatSearchParameters & params) const
                 {
                     rhsState = new GameState(rhs->getChild()->getState());
                 }
-                return Eval::StateBetter(*rhsState, *lhsState);;
+                bool stateBetter = Eval::StateBetter(*rhsState, *lhsState);
+                delete lhsState;
+                delete rhsState;
+                return stateBetter;
             }
         
             return lhs->getValue() < rhs->getValue();
@@ -544,9 +601,12 @@ Edge & Node::getHighestPolicyValueChild() const
     return **edge;
 }
 
-Edge & Node::getChildProportionalToVisitCount(std::mt19937& rnggen, const CombatSearchParameters& params) const
+Edge & Node::getChildProportionalToVisitCount(const CombatSearchParameters& params) const
 {
     //std::scoped_lock sl(m_mutex);
+
+    /*std::cout << "actions: " << std::endl;
+    printChildren();*/
 
     int totalVisits = 0;
     for (const auto& edge : m_edges)
@@ -555,7 +615,7 @@ Edge & Node::getChildProportionalToVisitCount(std::mt19937& rnggen, const Combat
     }
 
     std::uniform_int_distribution<> distribution(1, totalVisits);
-    int randomVisitCount = distribution(rnggen);
+    int randomVisitCount = distribution(CombatSearch_ParallelIntegralMCTS::rnggen);
     
     for (const auto& edge : m_edges)
     {

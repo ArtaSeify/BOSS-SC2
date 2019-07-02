@@ -8,8 +8,7 @@ int Edge::NODE_VISITS_BEFORE_EXPAND = 1;
 bool Edge::USE_MAX_VALUE = true;
 int Edge::MAX_EDGE_VALUE_EXPECTED = 1;
 FracType Edge::MIXING_VALUE = 0.0;
-int Edge::VIRTUAL_LOSS_VALUE = 1;
-int Edge::VIRTUAL_LOSS_COUNT = 1;
+int Edge::VIRTUAL_LOSS_COUNT = 3;
 
 Edge::Edge()
     : m_timesVisited(0)

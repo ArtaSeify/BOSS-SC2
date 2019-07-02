@@ -35,10 +35,10 @@ CombatSearch_Integral::~CombatSearch_Integral()
         m_ssStates.str(std::string());
     }
 
-    std::ofstream fileHighestValue(m_dir + "/" + m_prefix + "_HighestValueOrdering.txt", std::ofstream::out | std::ofstream::trunc);
-    fileHighestValue << m_ssHighestValue.rdbuf();
-    fileHighestValue.close();
-    m_ssHighestValue.str(std::string());
+    //std::ofstream fileHighestValue(m_dir + "/" + m_prefix + "_HighestValueOrdering.txt", std::ofstream::out | std::ofstream::trunc);
+    //fileHighestValue << m_ssHighestValue.rdbuf();
+    //fileHighestValue.close();
+    //m_ssHighestValue.str(std::string());
 }
 
 void CombatSearch_Integral::recurse(const GameState & state, int depth)

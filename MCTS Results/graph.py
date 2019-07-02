@@ -72,7 +72,9 @@ for data_file in data_files:
             for run in data:
                 if len(data[run]) > 0:
                     max_simulations = max(max_simulations, data[run][-1]["NodeVisits"])
-                    max_value = max(max_value, data[run][-1]["SearchIntegral"])
+                    if data[run][-1]["SearchIntegral"] > max_value:
+                        max_value = data[run][-1]["SearchIntegral"]
+                        max_value_file = data_file + ", run: " + str(run)
 
 
 all_data = []
@@ -81,7 +83,7 @@ for data_file in data_files:
         with open(os.path.join(args.files_dir, data_file), "rb") as pickle_in:
             data = pickle.load(pickle_in)
             
-            # incomplete data is skipped
+            # incomplete data
             badData = False
             for run in data:
                 if int(run) > len(data):
@@ -117,7 +119,7 @@ for i in range(int(topk)):
     highestValues.append(all_data[i][1][-1])
     drawGraph(all_data[i][0], max_simulations, all_data[i][1], max_value, all_data[i][3])
 #drawGraph(range(int(topk)), topk-1, highestValues, (5/4)*max(highestValues), "ExIt")
-print("Highest value found in any search: {}".format(max_value))
+print("Highest value found: {}, in {}".format(max_value, max_value_file))
 
 if not os.path.isdir(args.save_dir):
     os.makedirs(args.save_dir)

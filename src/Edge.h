@@ -20,7 +20,6 @@ namespace BOSS
         static bool USE_MAX_VALUE;
         static int MAX_EDGE_VALUE_EXPECTED;
         static FracType MIXING_VALUE;
-        static int VIRTUAL_LOSS_VALUE;
         static int VIRTUAL_LOSS_COUNT;
 
     private:
@@ -75,7 +74,6 @@ namespace BOSS
         int virtualLoss() const { std::scoped_lock sl(m_mutex); return m_virtualLoss; }
         void incrementVirtualLoss()  { std::scoped_lock sl(m_mutex); m_virtualLoss += VIRTUAL_LOSS_COUNT; }
         void decrementVirtualLoss() { std::scoped_lock sl(m_mutex); m_virtualLoss -= VIRTUAL_LOSS_COUNT; }
-        int getVirtualLossValue() const { std::scoped_lock sl(m_mutex); return m_virtualLoss * Edge::VIRTUAL_LOSS_VALUE; }
 
         void visited() { std::scoped_lock sl(m_mutex); ++m_timesVisited; incrementVirtualLoss(); }
         void decVisits()

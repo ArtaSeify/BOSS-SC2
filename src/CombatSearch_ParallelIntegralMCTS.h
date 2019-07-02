@@ -4,6 +4,8 @@
 #include "Node.h"
 #include "GPUQueue.h"
 
+#include "gsl/gsl_rng.h"
+#include "gsl/gsl_randist.h"
 #include <random>
 #include <mutex>
 #include <atomic>
@@ -13,8 +15,10 @@ namespace BOSS
 {
     class CombatSearch_ParallelIntegralMCTS : public CombatSearch_Integral
     {
-        FracType m_exploration_parameter;
-        std::mt19937 m_rnggen;
+    public:
+        static FracType exploration_parameter;
+        static std::mt19937 rnggen;
+        static gsl_rng * gsl_rng;
      
     protected:
         struct BuildOrderIntegral

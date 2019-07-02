@@ -269,7 +269,6 @@ IntegralExperimentOMP::IntegralExperimentOMP(const std::string& experimentName, 
     }
     Edge::MAX_EDGE_VALUE_EXPECTED = m_params.getValueNormalization();
     Edge::CURRENT_HIGHEST_VALUE = FracType(m_params.getValueNormalization());
-    Edge::VIRTUAL_LOSS_VALUE = int(m_params.getValueNormalization() * 0.20f);
     Edge::NODE_VISITS_BEFORE_EXPAND = m_params.getNodeVisitsBeforeExpand();
 }
 
@@ -331,8 +330,8 @@ void IntegralExperimentOMP::runExperimentThread(int run)
     }
 
     combatSearch->search();
-    //#pragma omp critical
-    //combatSearch->printResults();
+    #pragma omp critical
+    combatSearch->printResults();
     combatSearch->writeResultsFile(outputDir, resultsFile);
 }
 
@@ -511,10 +510,10 @@ void IntegralExperimentOMP::run(int numberOfRuns)
     FileTools::MakeDirectory(m_outputDir);
     
     if (m_params.usePolicyNetwork() || m_params.usePolicyValueNetwork())
-    {
-        
-        int threads = 12;
-        #pragma omp parallel for num_threads(threads)
+    {        
+        //int threads = 12;
+        //#pragma omp parallel for num_threads(threads)
+        #pragma omp parallel for
         for (int run = 0; run < numberOfRuns; ++run)
         {
             if (m_params.getUseTotalTimeLimit())

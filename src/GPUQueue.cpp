@@ -4,7 +4,7 @@
 using namespace BOSS;
 
 const size_t GPUQueue::MAX_SIZE = 64;
-const int GPUQueue::TIMEOUT = 500;
+const int GPUQueue::TIMEOUT = 5000;
 
 GPUQueue::GPUQueue()
     : m_predictor()
@@ -65,7 +65,7 @@ void GPUQueue::makePrediction()
             m_networkOutput.clear();
         }
 
-        std::cout << "prediction size: " << m_inputsAdded << std::endl;
+        //std::cout << "prediction size: " << m_inputsAdded << std::endl;
 
         m_predictedValues = PyObject_CallMethod(m_predictor, "predict", "(s)", m_states.c_str());
         BOSS_ASSERT(m_predictedValues != NULL, "No prediction result returned from Python code");

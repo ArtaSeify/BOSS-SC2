@@ -5,12 +5,12 @@
     {   
         "test" :
         {
-            "Run"               : [ true, 1 ],
+            "Run"               : [ true, 12 ],
             "UseTotalTimeLimit" : false,
             "SearchType"        : [ "ParallelIntegralMCTS" ],
-            "SearchParameters"  : { "ExplorationConstant" : 1.25, "UseMax" : true, "TemperatureChangeFrame" : 2000, "MixingValue" : 1.00, 
-                                    "VisitsBeforeExpand" : 1, "ValueNormalization" : 1500000, "Threads" : 36 },
-            "ChangingRoot"      : { "Active": true, "Simulations": 1000, "Reset": true },
+            "SearchParameters"  : { "ExplorationConstant" : 2.5, "UseMax" : true, "TemperatureChangeFrame" : 2500, "MixingValue" : 0.00, 
+                                    "VisitsBeforeExpand" : 1, "ValueNormalization" : 65000, "Threads" : 12 },
+            "ChangingRoot"      : { "Active": true, "Simulations": 500, "Reset": true },
             "Threads"           : 7,
             "Race"              : "Protoss",
             "StartingState"     : "Protoss Start State",
@@ -24,8 +24,8 @@
             "OpeningBuildOrder" : "Empty",
             "SortActions"       : false,
             "SaveStates"        : true,
-            "UsePolicyNetwork"  : false,
-            "UsePolicyValueNetwork" : true
+            "UsePolicyNetwork"  : true,
+            "UsePolicyValueNetwork" : false
         }
     },
 
