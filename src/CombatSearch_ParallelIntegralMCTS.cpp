@@ -723,15 +723,15 @@ void CombatSearch_ParallelIntegralMCTS::writeRootDataHighestEdge()
     for (int i = 0; i < m_currentRoot->getNumEdges(); ++i)
     {
         const auto& edge = m_currentRoot->getEdge(i);
-        FracType edgeValue = edge.getValue();
-        /*if (m_params.getMixingValue() < 1)
+        FracType edgeValue; /*= edge.getValue()*/;
+        if (m_params.getMixingValue() < 1)
         {
             edgeValue = edge.getMax();
         }
         else
         {
             edgeValue = edge.getValue();
-        }*/
+        }
 
         if (edgeValue > maxValue)
         {
