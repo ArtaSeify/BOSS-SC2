@@ -30,14 +30,14 @@ class Driver:
         self.start_run = int(args.run) if args.run is not None else 0
         self.iterations = int(args.iterations)
         self.experiment_file_name = "Experiments"
-        self.twoHeads = True if args.two_heads=="True" else False
+        self.output_type = args.output_type
 
         self.numTestRuns = 20
 
         self.validation_split = 0.10
         self.training_samples = 0
         self.validation_samples = 0
-        self.TRAINING_SAMPLES_LIMIT = 250000
+        self.TRAINING_SAMPLES_LIMIT = 100000
         self.VALIDATION_SAMPLES_LIMIT = int(self.validation_split * self.TRAINING_SAMPLES_LIMIT)
 
         with open(BIN_PATH + "/" + self.experiment_file_name + ".txt", 'r') as experiment_file:
@@ -54,10 +54,10 @@ class Driver:
                     self.experiment_data["Experiments"][self.experiment_name]["UsePolicyNetwork"] = False
                     self.experiment_data["Experiments"][self.experiment_name]["UsePolicyValueNetwork"] = False
                 else:
-                    if self.twoHeads:
+                    if self.output_type == "B":
                         self.experiment_data["Experiments"][self.experiment_name]["UsePolicyValueNetwork"] = True
                         self.experiment_data["Experiments"][self.experiment_name]["UsePolicyNetwork"] = False
-                    else:
+                    elif self.output_type == "P":
                         self.experiment_data["Experiments"][self.experiment_name]["UsePolicyValueNetwork"] = False
                         self.experiment_data["Experiments"][self.experiment_name]["UsePolicyNetwork"] = True
                 self.experiment_data["Experiments"][self.experiment_name]["OutputDir"] = BIN_PATH + "/" + self.experiment_name + "/" + str(self.start_run)
@@ -72,10 +72,10 @@ class Driver:
         with open(BIN_PATH + "/" + self.strengthtest_file_name + ".txt", 'w') as strength_exp_file:
             strength_exp_json["Experiments"][self.experiment_name]["OutputDir"] = BIN_PATH + "/" + self.experiment_name + "/StrengthTest/WithReset/" + str(run)
             strength_exp_json["Experiments"][self.experiment_name]["Run"][1] = self.numTestRuns
-            if self.twoHeads:
+            if self.output_type == "B":
                 strength_exp_json["Experiments"][self.experiment_name]["UsePolicyValueNetwork"] = usePolicy
                 strength_exp_json["Experiments"][self.experiment_name]["UsePolicyNetwork"] = False
-            else:
+            elif self.output_type == "P":
                 strength_exp_json["Experiments"][self.experiment_name]["UsePolicyValueNetwork"] = False
                 strength_exp_json["Experiments"][self.experiment_name]["UsePolicyNetwork"] = usePolicy
             strength_exp_json["Experiments"][self.experiment_name]["SaveStates"] = False
@@ -163,24 +163,24 @@ class Driver:
 
             # rewrite the experiment file
             if run == 0:
-                if self.twoHeads:
+                if self.output_type == "B":
                     self.experiment_data["Experiments"][self.experiment_name]["UsePolicyValueNetwork"] = True
                     self.experiment_data["Experiments"][self.experiment_name]["UsePolicyNetwork"] = False
-                else:
+                elif self.output_type == "P":
                     self.experiment_data["Experiments"][self.experiment_name]["UsePolicyNetwork"] = True
                     self.experiment_data["Experiments"][self.experiment_name]["UsePolicyValueNetwork"] = False
                 with open(BIN_PATH + "/" + self.experiment_file_name + ".txt", 'w') as experiment_file:
                     json.dump(self.experiment_data, experiment_file)
 
                 if self.load_name is not None:
-                    print("calling command: ", python, BIN_PATH + "/ML/train.py", self.model_name, DATA_PATH + "/" + self.train_file_name, DATA_PATH + "/" + self.validation_file_name, "--two_heads={}".format(self.twoHeads))
-                    subprocess.call([python, BIN_PATH + "/ML/train.py", self.model_name, DATA_PATH + "/" + self.train_file_name, DATA_PATH + "/" + self.validation_file_name, "--two_heads={}".format(self.twoHeads)])
+                    print("calling command: ", python, BIN_PATH + "/ML/train.py", self.model_name, DATA_PATH + "/" + self.train_file_name, DATA_PATH + "/" + self.validation_file_name, self.output_type)
+                    subprocess.call([python, BIN_PATH + "/ML/train.py", self.model_name, DATA_PATH + "/" + self.train_file_name, DATA_PATH + "/" + self.validation_file_name, self.output_type])
                 else:
-                    print("calling command: ", python, BIN_PATH + "/ML/train.py", self.model_name, DATA_PATH + "/" + self.train_file_name, DATA_PATH + "/" + self.validation_file_name, "--two_heads={}".format(self.twoHeads))
-                    subprocess.call([python, BIN_PATH + "/ML/train.py", self.model_name, DATA_PATH + "/" + self.train_file_name, DATA_PATH + "/" + self.validation_file_name, "--two_heads={}".format(self.twoHeads)])
+                    print("calling command: ", python, BIN_PATH + "/ML/train.py", self.model_name, DATA_PATH + "/" + self.train_file_name, DATA_PATH + "/" + self.validation_file_name, self.output_type)
+                    subprocess.call([python, BIN_PATH + "/ML/train.py", self.model_name, DATA_PATH + "/" + self.train_file_name, DATA_PATH + "/" + self.validation_file_name, self.output_type])
             else:
-                print("calling command: ", python, BIN_PATH + "/ML/train.py", self.model_name, DATA_PATH + "/" + self.train_file_name, DATA_PATH + "/" + self.validation_file_name, "--two_heads={}".format(self.twoHeads))
-                subprocess.call([python, BIN_PATH + "/ML/train.py", self.model_name, DATA_PATH + "/" + self.train_file_name, DATA_PATH + "/" + self.validation_file_name, "--two_heads={}".format(self.twoHeads)])
+                print("calling command: ", python, BIN_PATH + "/ML/train.py", self.model_name, DATA_PATH + "/" + self.train_file_name, DATA_PATH + "/" + self.validation_file_name, self.output_type)
+                subprocess.call([python, BIN_PATH + "/ML/train.py", self.model_name, DATA_PATH + "/" + self.train_file_name, DATA_PATH + "/" + self.validation_file_name, self.output_type])
             
             # Test strength
             self.create_teststrength_file(run)
@@ -197,9 +197,9 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("save_name", help="Name of model to save")
     parser.add_argument("iterations", help="Number of times to iterate search and train")
+    parser.add_argument("output_type", help="One of Policy, Value, or Both")
     parser.add_argument("--load_model", help="Name of model to load")
     parser.add_argument("--run", help="The run to start from")
-    parser.add_argument("--two_heads", default=False, help="Policy and Value network or just policy")
     args = parser.parse_args()
 
     driver = Driver(args)

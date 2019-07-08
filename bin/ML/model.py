@@ -371,43 +371,23 @@ class RelationsPolicyNetwork(Model):
         self.model.compile(optimizer=tf.keras.optimizers.Adam(self.learning_rate),
                 loss = {"policy" : self.CCELogits},
                 metrics= {"policy" : ['categorical_accuracy', self.top_3_accuracy, self.accuracy]})
-                        
 
-class RelationsPolicyAndValueNetwork(Model):
-    def __init__(self, units_features_size, extra_features_size, policy_shape, model_name, batch_size, learning_rate, model_path, create_network=True):
+class RelationsValueNetwork(Model):
+    def __init__(self, units_features_size, extra_features_size, model_name, batch_size, learning_rate, model_path, create_network=True):
         self.model_name = model_name
         self.model_path = model_path
         self.units_features_size = units_features_size
         self.extra_features_size = extra_features_size
-        self.policy_shape = policy_shape
         self.batch_size = batch_size
         self.learning_rate = learning_rate
         self.epochs = 0
 
         #self.checkpoint_best = tf.keras.callbacks.ModelCheckpoint(self.model_path.split(".")[0] + "_bestCA.h5", monitor='categorical_accuracy', save_best_only=True, mode='max')
         self.checkpoint = tf.keras.callbacks.ModelCheckpoint(self.model_path)
-        self.early_stop = tf.keras.callbacks.EarlyStopping(monitor="val_policy_loss", patience=20, mode="min")
+        self.early_stop = tf.keras.callbacks.EarlyStopping(monitor="val_loss", patience=20, mode="min")
         
         if create_network:
             self.create()
-
-    #def exponential_decay(self, epoch, lr):
-    #    decay_rate = 0.70
-    #    reduce_every_epochs = 1.0
-    #    return lr * pow(decay_rate, math.floor((epoch+1) / reduce_every_epochs))
-
-    def top_3_accuracy(self, y_true, y_pred):
-        return tf.keras.metrics.top_k_categorical_accuracy(y_true, y_pred, k=3)
-
-    def CCELogits(self, y_true, y_pred):
-        return tf.keras.backend.categorical_crossentropy(y_true, y_pred, from_logits=True)
-
-    def accuracy(self, y_true, y_pred):
-        indices = tf.concat([tf.convert_to_tensor([[i] for i in range(self.batch_size)], dtype=tf.int64),
-                              tf.expand_dims(tf.keras.backend.argmax(y_pred, axis=-1), 1)], 1)
-        #indices = tf.keras.backend.argmax(y_pred, axis=-1)
-        nonzeros = tf.math.divide(tf.math.count_nonzero(tf.gather_nd(y_true, indices)),self.batch_size)
-        return nonzeros 
 
     def create(self):
         units_output_size = 512
@@ -434,11 +414,116 @@ class RelationsPolicyAndValueNetwork(Model):
         layer = layers.Dense(128, activation='elu', name="state_layer9")(layer)
         layer = layers.Dense(128, activation='elu', name="state_layer10")(layer)
 
-        policy = layers.Dense(self.policy_shape, activation='linear', name="policy")(layer)
-
-        layer = layers.Dense(64, activation='elu', name="value_layer1")(layer)
-        layer = layers.Dense(64, activation='elu', name="value_layer2")(layer)
         value = layers.Dense(1, activation='relu', name="value")(layer)
+        
+        self.model = tf.keras.Model(inputs=[units_input, extra_features_input], outputs=value)
+        
+        #self.lrs = tf.keras.callbacks.LearningRateScheduler(self.exponential_decay)
+
+        self.model.compile(optimizer=tf.keras.optimizers.Adam(self.learning_rate),
+                loss = 'mae',
+                metrics = ['mae'])
+
+    def train(self, iterator, epochs, steps_per_epoch, verbose, validation_iterator, validation_steps):
+        return self.model.fit(iterator, epochs=epochs, steps_per_epoch=steps_per_epoch, verbose=verbose, validation_data=validation_iterator, validation_steps=validation_steps,
+                                callbacks=[CustomTensorBoard(self.model, log_dir=os.path.join(os.getcwd(), os.path.join("logs", self.model_name)), write_graph=False, batch_size=self.batch_size), 
+                                        self.checkpoint, self.early_stop]) #self.checkpoint_best])
+
+    def evaluate(self, iterator, steps, verbose):
+        return self.model.evaluate(iterator, steps=steps, verbose=verbose)
+
+    def predict(self, nn_input, batch_size=None, steps=1, verbose=0):
+        predictions = softmax(self.model.predict(nn_input, batch_size=batch_size, steps=steps, verbose=verbose), axis=1)
+        output = []
+        for i in range(len(predictions)):
+            output.append(np.ndarray.tolist(predictions[i]))
+        return output
+
+    def predict_on_batch(self, nn_input):
+        return np.ndarray.tolist(np.squeeze(softmax(self.model.predict_on_batch(nn_input))))
+
+    def save(self, path):
+        tf.keras.models.save_model(self.model, path,)
+
+    def load(self, path):
+        self.model = tf.keras.models.load_model(path, compile=False)
+
+    def compile(self):
+        self.model.compile(optimizer=tf.keras.optimizers.Adam(self.learning_rate),
+                loss = 'mae',
+                metrics = 'mae')                      
+
+class RelationsPolicyAndValueNetwork(Model):
+    def __init__(self, units_features_size, extra_features_size, policy_shape, model_name, batch_size, learning_rate, model_path, create_network=True):
+        self.model_name = model_name
+        self.model_path = model_path
+        self.units_features_size = units_features_size
+        self.extra_features_size = extra_features_size
+        self.policy_shape = policy_shape
+        self.batch_size = batch_size
+        self.learning_rate = learning_rate
+        self.epochs = 0
+
+        #self.checkpoint_best = tf.keras.callbacks.ModelCheckpoint(self.model_path.split(".")[0] + "_bestCA.h5", monitor='categorical_accuracy', save_best_only=True, mode='max')
+        self.checkpoint = tf.keras.callbacks.ModelCheckpoint(self.model_path)
+        self.early_stop = tf.keras.callbacks.EarlyStopping(monitor="val_loss", patience=20, mode="min")
+        
+        if create_network:
+            self.create()
+
+    #def exponential_decay(self, epoch, lr):
+    #    decay_rate = 0.70
+    #    reduce_every_epochs = 1.0
+    #    return lr * pow(decay_rate, math.floor((epoch+1) / reduce_every_epochs))
+
+    def top_3_accuracy(self, y_true, y_pred):
+        return tf.keras.metrics.top_k_categorical_accuracy(y_true, y_pred, k=3)
+
+    def CCELogits(self, y_true, y_pred):
+        return tf.keras.backend.categorical_crossentropy(y_true, y_pred, from_logits=True)
+
+    def accuracy(self, y_true, y_pred):
+        indices = tf.concat([tf.convert_to_tensor([[i] for i in range(self.batch_size)], dtype=tf.int64),
+                              tf.expand_dims(tf.keras.backend.argmax(y_pred, axis=-1), 1)], 1)
+        #indices = tf.keras.backend.argmax(y_pred, axis=-1)
+        nonzeros = tf.math.divide(tf.math.count_nonzero(tf.gather_nd(y_true, indices)),self.batch_size)
+        return nonzeros 
+
+    def MAEWithScalar(self, y_true, y_pred):
+        return tf.math.multiply(tf.constant(10.0, shape=(self.batch_size,)), tf.keras.losses.MAE(y_true, y_pred))
+
+    def create(self):
+        units_output_size = 512
+        
+        units_input = tf.keras.Input(shape=(None, self.units_features_size), name="units_input")
+
+        layer_units = layers.Dense(1024, activation='elu', name="units_layer1")(units_input)
+        layer_units = layers.Dense(512, activation='elu', name="units_layer2")(layer_units)
+        layer_units = layers.Dense(512, activation='elu', name="units_layer3")(layer_units)
+        units_output = layers.Dense(units_output_size, activation='elu', name="units_output")(layer_units)
+        units_output = layers.Lambda(lambda x: tf.keras.backend.mean(x, axis=1), name="average_units_output")(units_output)
+        
+        extra_features_input = tf.keras.Input(shape=(self.extra_features_size, ), name="extra_features_input")
+        concatenate_layer = layers.Concatenate()([units_output, extra_features_input])
+
+        layer = layers.Dense(2048, activation='elu', name="state_layer1")(concatenate_layer)
+        layer = layers.Dense(1024, activation='elu', name="state_layer2")(layer)
+        layer = layers.Dense(512, activation='elu', name="state_layer3")(layer)
+        layer = layers.Dense(512, activation='elu', name="state_layer4")(layer)
+        layer = layers.Dense(256, activation='elu', name="state_layer5")(layer)
+        layer = layers.Dense(256, activation='elu', name="state_layer6")(layer)
+        layer = layers.Dense(256, activation='elu', name="state_layer7")(layer)
+        layer = layers.Dense(128, activation='elu', name="state_layer8")(layer)
+        layer = layers.Dense(128, activation='elu', name="state_layer9")(layer)
+        layer = layers.Dense(128, activation='elu', name="state_layer10")(layer)
+
+        policy_layer = layers.Dense(128, activation='elu', name="policy_layer1")(layer)
+        policy_layer = layers.Dense(128, activation='elu', name="policy_layer2")(policy_layer)
+        policy = layers.Dense(self.policy_shape, activation='linear', name="policy")(policy_layer)
+
+        value_layer = layers.Dense(64, activation='elu', name="value_layer1")(layer)
+        value_layer = layers.Dense(64, activation='elu', name="value_layer2")(value_layer)
+        value = layers.Dense(1, activation='relu', name="value")(value_layer)
         
         self.model = tf.keras.Model(inputs=[units_input, extra_features_input], outputs=[policy, value])
         
@@ -446,7 +531,7 @@ class RelationsPolicyAndValueNetwork(Model):
 
         self.model.compile(optimizer=tf.keras.optimizers.Adam(self.learning_rate),
                 loss = {"policy" : self.CCELogits,
-                            "value" : 'mse'},
+                            "value" : self.MAEWithScalar},
                 metrics= {"policy" : ['categorical_accuracy', self.top_3_accuracy, self.accuracy],
                           "value" : ['mae']})
 
@@ -474,12 +559,13 @@ class RelationsPolicyAndValueNetwork(Model):
 
     def load(self, path):
         self.model = tf.keras.models.load_model(path, compile=False,
-            custom_objects={"top_3_accuracy": self.top_3_accuracy, "CCELogits": self.CCELogits, "accuracy": self.accuracy})
+            custom_objects={"top_3_accuracy": self.top_3_accuracy, "CCELogits": self.CCELogits, "accuracy": self.accuracy
+                            , "MAEWithScalar": self.MAEWithScalar})
 
     def compile(self):
         self.model.compile(optimizer=tf.keras.optimizers.Adam(self.learning_rate),
                 loss = {"policy" : self.CCELogits,
-                            "value" : 'mse'},
+                            "value" : self.MAEWithScalar},
                 metrics= {"policy" : ['categorical_accuracy', self.top_3_accuracy, self.accuracy],
                           "value" : ['mae']})
                         

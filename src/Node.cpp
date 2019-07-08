@@ -5,6 +5,14 @@
 
 using namespace BOSS;
 
+const std::array<double, 70> Node::alphas = { 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5,
+                                                0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5,
+                                                0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5,
+                                                0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5,
+                                                0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5,
+                                                0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5,
+                                                0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5 };
+
 Node::Node()
     : m_parentEdge()
     , m_state()
@@ -70,7 +78,7 @@ void Node::cleanUp(int threads)
     //std::cout << "all edges of this node cleaned up!" << std::endl;
 }
 
-void Node::createChildrenEdges(const CombatSearchParameters & params, FracType currentValue, bool rootNode)
+void Node::createChildrenEdges(const CombatSearchParameters & params, FracType currentValue, bool rootNode, gsl_rng * gsl_r)
 {
     // if we already know it's a terminal node, just return
     if (m_isTerminalNode)
@@ -113,7 +121,6 @@ void Node::createChildrenEdges(const CombatSearchParameters & params, FracType c
     if (m_edges.size() == 0)
     {
         m_isTerminalNode = true;
-        return;
     }
 
     if (params.usePolicyValueNetwork() || params.usePolicyNetwork())
@@ -124,17 +131,11 @@ void Node::createChildrenEdges(const CombatSearchParameters & params, FracType c
         if (rootNode)
         {
             static const FracType epsilon = 0.25f;
-            const double alphas[70] = { 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5,
-                                        0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5,
-                                        0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5,
-                                        0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5,
-                                        0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5,
-                                        0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5,
-                                        0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5 };
-            double dirichlet_noise[70] = {};
-            gsl_ran_dirichlet(CombatSearch_ParallelIntegralMCTS::gsl_rng, m_edges.size(), alphas, dirichlet_noise);
+            
+            std::array<double, 70> dirichlet_noise;
+            gsl_ran_dirichlet(gsl_r, m_edges.size(), alphas.data(), dirichlet_noise.data());
 
-            std::cout << "noise values:" << std::endl;
+            /*std::cout << "noise values:" << std::endl;
             for (int i = 0; i < m_edges.size(); ++i)
             {
                 std::cout << dirichlet_noise[i] << " ";
@@ -148,18 +149,18 @@ void Node::createChildrenEdges(const CombatSearchParameters & params, FracType c
             }
             std::cout << std::endl;
 
-            std::cout << "after noise:" << std::endl;
+            std::cout << "after noise:" << std::endl;*/
             for (int index = 0; index < m_edges.size(); ++index)
             {
                 auto edge = m_edges[index];
                 edge->setPolicyValue(FracType(((1 - epsilon) * edge->getPolicyValue()) + (epsilon * dirichlet_noise[index])));
-                std::cout << edge->getPolicyValue() << " ";
+                //std::cout << edge->getPolicyValue() << " ";
             }
-            std::cout << std::endl;
+            //std::cout << std::endl;
         }
     }
     // use uniform probability if we're not using a policy network
-    else
+    else if (!m_isTerminalNode)
     {
         float uniformVal = 1.f / m_edges.size();
         for (auto& edge : m_edges)
@@ -303,7 +304,7 @@ void Node::generateLegalActions(const GameState& state, ActionSetAbilities& lega
 
 void Node::networkPrediction(const CombatSearchParameters & params, FracType currentValue) const
 {
-    std::string state = m_state.writeToSS(params, currentValue, getChronoboostTargets());
+    std::string state = m_state.getStateData(params, currentValue / Edge::MAX_EDGE_VALUE_EXPECTED, getChronoboostTargets());
 
     // push state into queue and wait until predictions are made
     int predictionIndex = GPUQueue::getInstance().push_back(state);
@@ -334,7 +335,7 @@ void Node::networkPrediction(const CombatSearchParameters & params, FracType cur
     // set node value
     if (params.usePolicyValueNetwork())
     {
-        m_parentEdge->setNetworkValue(static_cast<FracType>(PyFloat_AsDouble(PyList_GetItem(nodeValue, 0))) * Edge::MAX_EDGE_VALUE_EXPECTED);
+        m_parentEdge->setNetworkValue(static_cast<FracType>(PyFloat_AsDouble(PyList_GetItem(nodeValue, 0))));
         //std::cout << "parent network value: " << m_parentEdge->getNetworkValue() << std::endl;
     }
     GPUQueue::getInstance().decPredictionReference();
@@ -422,7 +423,7 @@ void Node::printChildren() const
     std::cout << std::endl;
 }
 
-Edge & Node::selectChildEdge(const CombatSearchParameters & params)
+Edge & Node::selectChildEdge(const CombatSearchParameters & params, std::mt19937 & rnggen)
 {
     {
         std::scoped_lock sl(m_mutex);
@@ -453,13 +454,13 @@ Edge & Node::selectChildEdge(const CombatSearchParameters & params)
         if (unvisitedEdges.size() > 0)
         {
             std::uniform_int_distribution<> distribution(0, int(unvisitedEdges.size()) - 1);
-            Edge& edge = *m_edges[unvisitedEdges[distribution(CombatSearch_ParallelIntegralMCTS::rnggen)]];
+            Edge& edge = *m_edges[unvisitedEdges[distribution(rnggen)]];
             edge.visited();
             return edge;
         }
     }
 
-    float UCBValue = CombatSearch_ParallelIntegralMCTS::exploration_parameter *
+    float UCBValue = params.getExplorationValue() *
         static_cast<FracType>(std::sqrt(totalChildVisits));
 
     float maxActionValue = 0;
@@ -528,12 +529,12 @@ Edge & Node::getHighestValueChild(const CombatSearchParameters & params) const
         { 
             if (lhs->getValue() == rhs->getValue())
             {
-                GameState* lhsState;
-                GameState* rhsState;
+                std::unique_ptr<GameState> lhsState;
+                std::unique_ptr<GameState> rhsState;
                 if (lhs->getChild() == nullptr)
                 {
                     const auto action = lhs->getAction();
-                    lhsState = new GameState(m_state);
+                    lhsState = std::make_unique<GameState>(m_state);
                     if (action.first.isAbility())
                     {
                         lhsState->doAbility(action.first, action.second.targetID);
@@ -545,13 +546,13 @@ Edge & Node::getHighestValueChild(const CombatSearchParameters & params) const
                 }
                 else
                 {
-                    lhsState = new GameState(lhs->getChild()->getState());
+                    lhsState = std::make_unique<GameState>(lhs->getChild()->getState());
                 }
 
                 if (rhs->getChild() == nullptr)
                 {
                     const auto action = rhs->getAction();
-                    rhsState = new GameState(m_state);
+                    rhsState = std::make_unique<GameState>(m_state);
                     if (action.first.isAbility())
                     {
                         rhsState->doAbility(action.first, action.second.targetID);
@@ -563,12 +564,9 @@ Edge & Node::getHighestValueChild(const CombatSearchParameters & params) const
                 }
                 else
                 {
-                    rhsState = new GameState(rhs->getChild()->getState());
+                    rhsState = std::make_unique<GameState>(rhs->getChild()->getState());
                 }
-                bool stateBetter = Eval::StateBetter(*rhsState, *lhsState);
-                delete lhsState;
-                delete rhsState;
-                return stateBetter;
+                return Eval::StateBetter(*rhsState, *lhsState);
             }
         
             return lhs->getValue() < rhs->getValue();
@@ -601,7 +599,7 @@ Edge & Node::getHighestPolicyValueChild() const
     return **edge;
 }
 
-Edge & Node::getChildProportionalToVisitCount(const CombatSearchParameters& params) const
+Edge & Node::getChildProportionalToVisitCount(const CombatSearchParameters& params, std::mt19937 & rnggen) const
 {
     //std::scoped_lock sl(m_mutex);
 
@@ -615,7 +613,7 @@ Edge & Node::getChildProportionalToVisitCount(const CombatSearchParameters& para
     }
 
     std::uniform_int_distribution<> distribution(1, totalVisits);
-    int randomVisitCount = distribution(CombatSearch_ParallelIntegralMCTS::rnggen);
+    int randomVisitCount = distribution(rnggen);
     
     for (const auto& edge : m_edges)
     {

@@ -53,7 +53,7 @@ namespace BOSS
         void setNetworkValue(FracType newValue) 
         { 
             std::scoped_lock sl(m_mutex);
-            m_valueNetwork = std::min(1.f, newValue); 
+            m_valueNetwork = std::min(1.f, newValue) * MAX_EDGE_VALUE_EXPECTED; 
             setNewEdgeValue();
         }
         FracType getNetworkValue() const { std::scoped_lock sl(m_mutex); return m_valueNetwork; }

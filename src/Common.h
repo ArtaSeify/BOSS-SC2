@@ -21,6 +21,7 @@
 #include <map>
 #include <set>
 #include <algorithm>
+#include <mutex>
 #include "json/json.hpp"
 
 using json = nlohmann::json;
@@ -69,6 +70,7 @@ namespace BOSS
         static NumUnits WorkersPerRefinery;     // number of workers per refinery
         static NumUnits WorkersPerDepot;        // number of workers allowed to gather minerals per depot
         static std::string ExecutablePath;      // path to this executable
+        static std::mutex SaveDataToFile;       // global mutex for storing data in file
     };
 
     namespace Races

@@ -101,10 +101,22 @@ void Edge::updateEdge(FracType simulationValue, FracType networkValue)
     
     if (USE_MAX_VALUE)
     {
-        if (m_valueSimulations < m_maxValue || m_valueNetwork < networkValue)
+        bool newEdgeValue = false;
+        if (m_valueSimulations < simulationValue)
         {
             m_valueSimulations = m_maxValue;
+            newEdgeValue = true;
+            
+        }
+
+        if (m_valueNetwork < networkValue)
+        {
             m_valueNetwork = networkValue;
+            newEdgeValue = true;
+        }
+
+        if (newEdgeValue)
+        {
             setNewEdgeValue();
         }
     }

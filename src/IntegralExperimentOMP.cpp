@@ -330,8 +330,8 @@ void IntegralExperimentOMP::runExperimentThread(int run)
     }
 
     combatSearch->search();
-    #pragma omp critical
-    combatSearch->printResults();
+    //#pragma omp critical
+    //combatSearch->printResults();
     combatSearch->writeResultsFile(outputDir, resultsFile);
 }
 
@@ -511,7 +511,7 @@ void IntegralExperimentOMP::run(int numberOfRuns)
     
     if (m_params.usePolicyNetwork() || m_params.usePolicyValueNetwork())
     {        
-        //int threads = 12;
+        //int threads = 1;
         //#pragma omp parallel for num_threads(threads)
         #pragma omp parallel for
         for (int run = 0; run < numberOfRuns; ++run)

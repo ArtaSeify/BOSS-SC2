@@ -12,12 +12,14 @@ parser.add_argument("save_name", help="Name of file to be saved")
 parser.add_argument("strings_in_data", help="The strings the data file name must include to be considered, seperated by commas")
 parser.add_argument("strings_not_in_data", help="The strings the data file must not include to be considered")
 parser.add_argument("--topk", help="Top k results to show")
+parser.add_argument("--xaxis", help="The data for X-axis")
 args = parser.parse_args()
 
 args.files_dir = os.path.join("parsed data", args.files_dir)
 
 strings_in_data = args.strings_in_data.split(",")
 strings_not_in_data = args.strings_not_in_data.split(",")
+xaxis = args.xaxis if args.xaxis is not None else "NodeVisits"
 plt.figure(figsize=(18.5, 10))
 
 def drawGraph(x, max_x, y, max_y, name):
@@ -71,7 +73,7 @@ for data_file in data_files:
             data = pickle.load(pickle_in)
             for run in data:
                 if len(data[run]) > 0:
-                    max_simulations = max(max_simulations, data[run][-1]["NodeVisits"])
+                    max_simulations = max(max_simulations, data[run][-1][xaxis])
                     if data[run][-1]["SearchIntegral"] > max_value:
                         max_value = data[run][-1]["SearchIntegral"]
                         max_value_file = data_file + ", run: " + str(run)
@@ -89,6 +91,7 @@ for data_file in data_files:
                 if int(run) > len(data):
                     badData = True
             if badData:
+                print("skipping: {}".format(data_file))
                 continue
 
             simulations = [[] for run in data]
@@ -96,7 +99,7 @@ for data_file in data_files:
             for run in data:
                 ind = int(run)
                 for data_point in data[run]:
-                    simulations[ind].append(data_point["NodeVisits"])
+                    simulations[ind].append(data_point[xaxis])
                     values[ind].append(data_point["SearchIntegral"])
             x, y, sd_y = fixData(simulations, values, max_simulations)
             all_data.append((x, y, sd_y, data_file))

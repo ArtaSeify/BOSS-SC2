@@ -89,7 +89,10 @@ class Network:
         # batch size 1
         if len(split_strings) == 1:
             units = split_strings[0][:-self.extra_features]
-            units = np.reshape(units, (1, int(len(units)/self.num_unit_features), self.num_unit_features))
+            if len(units) == 0:
+                units = np.zeros((1, 1, self.num_unit_features))
+            else:
+                units = np.reshape(units, (1, int(len(units)/self.num_unit_features), self.num_unit_features))
             extra_features = np.expand_dims(split_strings[0][-self.extra_features:], axis=0)
             return (units, extra_features)
         
@@ -100,8 +103,13 @@ class Network:
             for x in split_strings:
                 units = x[:-self.extra_features]
                 num_units = int(len(units)/self.num_unit_features)
-                highest_unit_count = max(highest_unit_count, num_units)
-                units = np.reshape(units, (num_units, self.num_unit_features))
+                
+                if num_units == 0:
+                    units = np.zeros((1, self.num_unit_features))
+                    highest_unit_count = max(highest_unit_count, 1)
+                else:
+                    units = np.reshape(units, (num_units, self.num_unit_features))
+                    highest_unit_count = max(highest_unit_count, num_units)
 
                 all_units.append(units)
                 extra_features = np.expand_dims(x[-self.extra_features:], axis=0)
@@ -135,6 +143,7 @@ class Network:
             print(actual + "\t\t", predicted)
 
     def predict(self, data, have_y=False):
+        #print(data)
         with self.sess.as_default():
             if self.value_shape == 0:
                 #parse_start = time.clock()
@@ -169,15 +178,18 @@ class Network:
             return output
 
 def test():
-    network = Network("testpolicy", "policy", False)
+    network = Network("test", "policy", False)
 
-    lines = "12,3,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,12,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,12,15,0,6720,12,0,0,0,0.0438,0.045,0.035\
-             \n12,3,13,0,272,13,33,-1,272,272,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,12,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,13,15,0,6720,12,0,0,0,0.0438,0.045,0.035"
+    lines = "0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,12,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50.000000,0.000000,12,15,0,6720,12,0,0,0.000000,0.043800,0.045000,0.035000\
+\n0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,12,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50.000000,0.000000,12,15,0,6720,12,0,0,0.000000,0.043800,0.045000,0.035000\
+\n0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,12,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50.000000,0.000000,12,15,0,6720,12,0,0,0.000000,0.043800,0.045000,0.035000\
+\n0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,12,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50.000000,0.000000,12,15,0,6720,12,0,0,0.000000,0.043800,0.045000,0.035000"
 
     # ,0,0,0,0.49,0.22,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.29,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.017
-    line = "12,3,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,12,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,12,15,0,6720,12,0,0,0,0.0438,0.045,0.035"
+    line = "0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,12,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,50,0,12,15,0,6720,12,0,0,0,0.0438,0.045,0.035"
+    line = "13,5,-1,195,195,14,33,-1,82,82,15,4,-1,400,400,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,12,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.0248032,0,13,15,333,6387,12,0,0,0,0.0438,0.045,0.035"
     #print(network.predict(line, False))
     #print(len(lines))
-    network.predict(lines, False)
+    print(network.predict(line, False))
 
 #test()

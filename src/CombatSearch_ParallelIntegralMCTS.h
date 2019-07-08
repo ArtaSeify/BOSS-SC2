@@ -14,12 +14,7 @@
 namespace BOSS
 {
     class CombatSearch_ParallelIntegralMCTS : public CombatSearch_Integral
-    {
-    public:
-        static FracType exploration_parameter;
-        static std::mt19937 rnggen;
-        static gsl_rng * gsl_rng;
-     
+    {     
     protected:
         struct BuildOrderIntegral
         {
@@ -32,18 +27,6 @@ namespace BOSS
             {
                 integral = newIntegral;
                 buildOrder = newBuildOrder;
-            }
-        };
-
-        struct NewNode
-        {
-            std::shared_ptr<Node> node;
-            bool isNewNode;
-
-            NewNode(std::shared_ptr<Node> newNode, bool newIsNewNode)
-            {
-                node = std::move(newNode);
-                isNewNode = newIsNewNode;
             }
         };
 
@@ -85,6 +68,15 @@ namespace BOSS
             
         };
 
+        struct StateData
+        {
+            std::string state;
+            std::string policy;
+            FracType stateValue;
+
+            StateData() : state(), policy(), stateValue() { }
+        };
+
         enum class ThreadMessage
         {
             RootNotChanged, RootChanged, SearchFinished
@@ -105,6 +97,10 @@ namespace BOSS
         BuildOrderIntegral                              m_bestResultFound;
         std::vector<ResultLog>                          m_resultLog;
         std::mutex                                      m_resultFileMutex;
+        std::vector<StateData>                          m_stateData;
+
+        std::mt19937 m_rnggen;
+        gsl_rng* m_gsl_r;
 
         std::atomic<uint8>  m_nodesExpanded;   // number of nodes expanded in the search
         std::atomic<uint8>  m_nodeVisits;      // number of nodes visited. Duplicates are counted
@@ -146,6 +142,9 @@ namespace BOSS
         void updateNodeVisits(bool nodeExpanded, bool isTerminal);
 
         void writeSummaryToQueue();
+
+        void writeRootData();
+        void writeRootDataHighestEdge();
 
         virtual void printResults();
 

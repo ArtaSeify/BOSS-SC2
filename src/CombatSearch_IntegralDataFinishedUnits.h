@@ -91,8 +91,8 @@ namespace BOSS
         FracType getCurrentStackValue() const { return m_integralStack.back().integral_UntilFrameLimit; }
         FracType getCurrentStackEval() const { return m_integralStack.back().eval; }
         FracType getBestStackValue() const { return m_bestIntegralValue; }
-        const GameState & getState() const { return m_bestIntegralGameState; }
 
+        const GameState& getState() const { return m_bestIntegralGameState; }
         void setState(const GameState& state) { m_bestIntegralGameState = state; }
     };
 }

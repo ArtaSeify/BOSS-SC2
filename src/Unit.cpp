@@ -297,7 +297,7 @@ std::string Unit::toString() const
     return ss.str();
 }
 
-std::string Unit::writeToSS() const
+std::string Unit::getData() const
 {    
     std::string unit;
     //ss << "[";

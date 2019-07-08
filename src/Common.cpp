@@ -13,6 +13,7 @@ FracType                CONSTANTS::SRPF;
 NumUnits                CONSTANTS::WorkersPerRefinery;
 NumUnits                CONSTANTS::WorkersPerDepot;
 std::string             CONSTANTS::ExecutablePath;
+std::mutex              CONSTANTS::SaveDataToFile;
 
 RaceID Races::GetRaceID(const std::string & race)
 {

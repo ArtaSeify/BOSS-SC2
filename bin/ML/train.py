@@ -11,13 +11,13 @@ parser = argparse.ArgumentParser()
 parser.add_argument("save_name", help="Name of model to save")
 parser.add_argument("trainset", help="Path to datafile to use for training")
 parser.add_argument("validset", help="Path to datafile for validation")
+parser.add_argument("output_type", help="One of Policy, Value, or Both")
 parser.add_argument("--load_model", help="Name of model to load")
 parser.add_argument("--epochs", help="Number of epochs to train")
-parser.add_argument("--two_heads", default=True, help="Policy and Value network or just policy")
+
 args = parser.parse_args()
 
 use_gpu = True
-print(args.two_heads)
 
 if not use_gpu:
     config = tf.ConfigProto(
@@ -40,24 +40,27 @@ epochs = 200 if not args.epochs else int(args.epochs)
 verbose = 1
 batch_size = 32
 shuffle = True
-twoHeads = True if args.two_heads=="True" else False
 
 trainset_samples = sum(1 for line in open(args.trainset))
 validset_samples = sum(1 for line in open(args.validset))
 
-train_dataset = DataLoader(NUM_UNIT_FEATURES, EXTRA_FEATURES, policy_shape, value_shape, trainset_samples, twoHeads, shuffle, batch_size, cpu_workers)
+train_dataset = DataLoader(NUM_UNIT_FEATURES, EXTRA_FEATURES, policy_shape, value_shape, trainset_samples, args.output_type, shuffle, batch_size, cpu_workers)
 train_iterator = train_dataset.make_iterator(sess, [args.trainset])
-validation_dataset = DataLoader(NUM_UNIT_FEATURES, EXTRA_FEATURES, policy_shape, value_shape, validset_samples, twoHeads, shuffle, batch_size, cpu_workers)
+validation_dataset = DataLoader(NUM_UNIT_FEATURES, EXTRA_FEATURES, policy_shape, value_shape, validset_samples, args.output_type, shuffle, batch_size, cpu_workers)
 valid_iterator = validation_dataset.make_iterator(sess, [args.validset])
 
 if not os.path.isdir("models"):
     os.makedirs("models")
 
-if twoHeads:
+if args.output_type == "B":
     network = model.RelationsPolicyAndValueNetwork(NUM_UNIT_FEATURES, EXTRA_FEATURES, policy_shape, args.save_name, batch_size, learning_rate, "models/" + args.save_name + ".h5", True if args.load_model is None else False)
-else:
+elif args.output_type == "P":
     network = model.RelationsPolicyNetwork(NUM_UNIT_FEATURES, EXTRA_FEATURES, policy_shape, args.save_name, batch_size, learning_rate, "models/" + args.save_name + ".h5", True if args.load_model is None else False)
-#network = model.PolicyAndValueNetwork(feature_shape, policy_shape, value_shape, args.save_name, batch_size, learning_rate, "models/" + args.save_name + ".h5", True if args.load_model is None else False)
+elif args.output_type == "V":
+    network = model.RelationsValueNetwork(NUM_UNIT_FEATURES, EXTRA_FEATURES, args.save_name, batch_size, learning_rate, "models/" + args.save_name + ".h5", True if args.load_model is None else False)
+else:
+    assert False
+
 if args.load_model:
     network.load("models/" + args.load_model + ".h5")
     network.compile()

@@ -279,6 +279,10 @@ BuildOrderAbilities CombatSearch_IntegralDataFinishedUnits::createBuildOrderEndT
     auto & finishedUnits = state.getFinishedUnits();
     auto & chronoBoostTargets = state.getChronoBoostTargets();
     int chronoboosts = 0;
+
+    //BOSS_ASSERT(integral_stack.size() - 1 == finishedUnits.size(), "Number of finished units on stack %i doesn't match the number of finished units %i in state",
+    //                                                                integral_stack.size() - 1, finishedUnits.size());
+
     for (int index = 0; index < int(integral_stack.size() - 1); ++index)
     {
         // chronoboost

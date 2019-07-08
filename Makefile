@@ -8,7 +8,9 @@ LIB=-lpython3.7m\
 	-lboost_filesystem \
 	-lboost_system \
 	-lboost_chrono \
-	-lpthread
+	-lpthread \
+	-lgsl \
+	-lgslcblas
 
 BOSS: ./src/*.cpp
 	g++ -O3 -std=c++17 $(LIBS) $(INC) ./src/*.cpp -o ./bin/BOSS_main -fopenmp $(LIB)

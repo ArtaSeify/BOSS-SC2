@@ -5,6 +5,9 @@
 #include "ActionSetAbilities.h"
 #include "CombatSearchParameters.h"
 #include "Edge.h"
+
+#include "gsl/gsl_rng.h"
+#include "gsl/gsl_randist.h"
 #include <random>
 #include <mutex>
 
@@ -17,6 +20,9 @@ namespace BOSS
         std::vector<std::shared_ptr<Edge>>  m_edges;            // each edge leads to a child node
         bool                                m_isTerminalNode;   // is this a terminal node (no edges)
         mutable std::mutex                  m_mutex;            // multiple threads can't read and write 
+
+        
+        static const std::array<double,70> alphas;              // dirichlet noise alpha value
         
     public:
         Node();
@@ -39,7 +45,7 @@ namespace BOSS
         void doAction(const Action & action, const CombatSearchParameters & params);
 
         // creates edges for this node
-        void createChildrenEdges(const CombatSearchParameters& params, FracType currentValue, bool rootNode = false);
+        void createChildrenEdges(const CombatSearchParameters& params, FracType currentValue, bool rootNode = false, gsl_rng * gsl_r = nullptr);
 
         // creates edges for thie node. This function is called when we create the edges and do network
         // evaluation after an expanded node is visited a second time, not the first time
@@ -48,7 +54,7 @@ namespace BOSS
         void printChildren() const;
         
         // selects a child based on UCB
-        Edge & selectChildEdge(const CombatSearchParameters & params);
+        Edge & selectChildEdge(const CombatSearchParameters & params, std::mt19937 & rnggen);
 
         // make network prediction about state of node and store result in edges
         void networkPrediction(const CombatSearchParameters& params, FracType currentValue) const;
@@ -66,7 +72,7 @@ namespace BOSS
         Edge & getHighestPolicyValueChild() const;
 
         // returns a child with probability proportional to visit count
-        Edge & getChildProportionalToVisitCount(const CombatSearchParameters& params) const;
+        Edge & getChildProportionalToVisitCount(const CombatSearchParameters& params, std::mt19937 & rnggen) const;
 
         // gets a child at random
         Edge & getRandomEdge();
