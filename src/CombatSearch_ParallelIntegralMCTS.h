@@ -144,7 +144,6 @@ namespace BOSS
         void writeSummaryToQueue();
 
         void writeRootData();
-        void writeRootDataHighestEdge();
 
         virtual void printResults();
 

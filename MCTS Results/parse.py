@@ -42,12 +42,17 @@ def parse(name_prepend, cwd):
             # get the data for that run
             data_files = os.listdir(file_path)
             if len(data_files) > 0:
-                results[name_prepend][run] = []
                 for data_file in data_files:
                     if "Results.csv" in data_file:
                         with open(os.path.join(file_path, data_file), "r") as results_csv:
-                            for line in results_csv:
-                                results[name_prepend][run].append(parseDataLine(line))
+                            all_lines = results_csv.readlines()
+                            # final value of search is 0, so nothing was stored
+                            if len(all_lines) == 0:
+                                results[name_prepend][run] = [parseDataLine("0,0,0,0,0,0, ,0,0")]
+                            else:
+                                results[name_prepend][run] = []
+                                for line in all_lines:
+                                    results[name_prepend][run].append(parseDataLine(line))
 
         # recurse
         else:

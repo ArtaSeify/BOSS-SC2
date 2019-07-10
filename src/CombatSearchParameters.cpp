@@ -314,6 +314,7 @@ bool CombatSearchParameters::usePolicyValueNetwork() const
 
 void CombatSearchParameters::setMixingValue(FracType value)
 {
+    BOSS_ASSERT(value >= 0 && value <= 1, "Mixing value must be between 0 and 1");
     m_mixingValue = value;
 }
 

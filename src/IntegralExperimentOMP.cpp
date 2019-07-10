@@ -111,6 +111,7 @@ IntegralExperimentOMP::IntegralExperimentOMP(const std::string& experimentName, 
         if (m_params.usePolicyValueNetwork())
         {
             BOSS_ASSERT(searchParameters.count("MixingValue") && searchParameters["MixingValue"].is_number_float(), "Must include a MixingValue float if using a value network");
+            BOSS_ASSERT(searchParameters["MixingValue"] >= 0 && searchParameters["MixingValue"] <= 1, "MixingValue must be between 0 and 1");
             m_params.setMixingValue(searchParameters["MixingValue"]);
         }
 
