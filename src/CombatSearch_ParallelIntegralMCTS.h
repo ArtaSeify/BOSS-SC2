@@ -70,7 +70,7 @@ namespace BOSS
 
         struct StateData
         {
-            std::string state;
+            std::pair<std::string, int> state;
             std::string policy;
             FracType stateValue;
 
@@ -129,10 +129,6 @@ namespace BOSS
 
         // updates values of the nodes explored in this iteration
         void backPropogation(Node & node, const BuildOrderIntegral& buildOrderIntegral);
-
-        // in a multithreaded setting, we do more simulations than the limit. We need to fix the edge
-        // statistics by reducing the visit count for the extra simulations
-        void fixEdgeVisits(Node & node);
 
         // sets the class variables to the best build order found during search
         //std::pair<BuildOrderAbilities, CombatSearch_IntegralDataFinishedUnits> pickBestBuildOrder(std::shared_ptr<Node> root, bool useVisitCount);

@@ -3,10 +3,9 @@
 
 using namespace BOSS;
 
-FracType Edge::CURRENT_HIGHEST_VALUE = 1.f;
 int Edge::NODE_VISITS_BEFORE_EXPAND = 1;
 bool Edge::USE_MAX_VALUE = true;
-int Edge::MAX_EDGE_VALUE_EXPECTED = 1;
+FracType Edge::MAX_EDGE_VALUE_EXPECTED = 1.f;
 FracType Edge::MIXING_VALUE = 0.0;
 int Edge::VIRTUAL_LOSS_COUNT = 3;
 
@@ -105,14 +104,19 @@ void Edge::updateEdge(FracType simulationValue, FracType networkValue)
         if (m_valueSimulations < simulationValue)
         {
             m_valueSimulations = m_maxValue;
-            newEdgeValue = true;
-            
+            if (MIXING_VALUE < 1)
+            {
+                newEdgeValue = true;
+            }
         }
 
         if (m_valueNetwork < networkValue)
         {
             m_valueNetwork = networkValue;
-            newEdgeValue = true;
+            if (MIXING_VALUE > 0)
+            {
+                newEdgeValue = true;
+            }
         }
 
         if (newEdgeValue)
@@ -138,13 +142,12 @@ void Edge::setNewEdgeValue()
 {
     std::scoped_lock sl(m_mutex);
 
-    //m_value = (MIXING_PARAMETER * m_valueNetwork) + ((1 - MIXING_PARAMETER)*m_valueSimulations);
     m_value = (MIXING_VALUE * m_valueNetwork) + ((1 - MIXING_VALUE) * m_valueSimulations);
 
-    /*if (m_value > CURRENT_HIGHEST_VALUE)
+    if (m_value > MAX_EDGE_VALUE_EXPECTED)
     {
-        CURRENT_HIGHEST_VALUE = m_value;
-    }*/
+        MAX_EDGE_VALUE_EXPECTED = m_value;
+    }
 }
 
 void Edge::printValues() const
@@ -153,6 +156,7 @@ void Edge::printValues() const
 
     std::cout << "Edge action: " << m_action.first.getName() << std::endl;
     std::cout << "Network Value: " << m_valueNetwork << std::endl;
+    std::cout << "Network policy: " << m_policyValue << std::endl;
     std::cout << "Simulations value: " << m_valueSimulations << " with " << m_timesVisited << " simulations " << std::endl;
     std::cout << "Edge Value: " << m_value << std::endl;
     std::cout << "Virtual Loss: " << m_virtualLoss << std::endl;

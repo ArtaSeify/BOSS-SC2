@@ -45,9 +45,9 @@ namespace BOSS
         }
 
         IntegralDataFinishedUnits()
-            : eval(0)
-            , integral_ToThisPoint(0)
-            , integral_UntilFrameLimit(0)
+            : eval(0.f)
+            , integral_ToThisPoint(0.f)
+            , integral_UntilFrameLimit(0.f)
             , timeStarted(0)
             , timeFinished(0)
             , id(0)

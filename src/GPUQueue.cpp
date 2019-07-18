@@ -19,6 +19,7 @@ GPUQueue::GPUQueue()
     , m_predictorThread()
     , m_waitingThreads()
     , m_waitTilPredictionsTaken()
+    , m_batchHighestUnitCount(0)
     , m_inputQueueFull()
     , m_predictionsTaken(0)
     , m_threadsWaiting(0)
@@ -26,7 +27,7 @@ GPUQueue::GPUQueue()
     m_networkOutput.reserve(MAX_SIZE);
 }
 
-int GPUQueue::push_back(const std::string & str)
+int GPUQueue::push_back(const std::pair<std::string, int> & str)
 {
     std::unique_lock<std::mutex> ulOverload(m_inputOverloadLock);
     m_inputQueueFull.wait(ulOverload, [this] { return m_inputsAdded < MAX_SIZE; });
@@ -42,7 +43,8 @@ int GPUQueue::push_back(const std::string & str)
     {
         m_states += "\n";
     }
-    m_states += str;
+    m_states += str.first;
+    m_batchHighestUnitCount = std::max(m_batchHighestUnitCount, str.second);
 
     // queue is full, notify the thread that calls prediction
     if (m_inputsAdded == MAX_SIZE)
@@ -67,8 +69,8 @@ void GPUQueue::makePrediction()
 
         //std::cout << "prediction size: " << m_inputsAdded << std::endl;
 
-        m_predictedValues = PyObject_CallMethod(m_predictor, "predict", "(s)", m_states.c_str());
-        BOSS_ASSERT(m_predictedValues != NULL, "No prediction result returned from Python code");
+        m_predictedValues = PyObject_CallMethod(m_predictor, "predict", "(s,i)", m_states.c_str(), m_batchHighestUnitCount);
+        BOSS_ASSERT(m_predictedValues != NULL, "No prediction result returned from Python code, %s, %i", m_states.c_str(), m_batchHighestUnitCount);
 
         for (int i = 0; i < m_inputsAdded; ++i)
         {

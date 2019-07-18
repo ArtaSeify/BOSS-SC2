@@ -12,6 +12,7 @@ namespace BOSS
     namespace Eval
     {
         static FracType GASWORTH = 1.0;
+        static std::string UnitWeightsString;
 
         //double ArmyCompletedResourceSum(const GameState & state);
         FracType ArmyInProgressResourceSum(const GameState & state);
@@ -24,6 +25,10 @@ namespace BOSS
         std::vector<FracType> CalculateUnitWeightVector(const GameState& state, const std::vector<int> & enemyUnits);
         const std::vector<FracType> & GetUnitWeightVector();
         void SetUnitWeightVector(const std::vector<FracType> & weights);
+        const std::vector<FracType>& GetUnitValuesVector();
+
+        void setUnitWeightsString();
+        std::string getUnitWeightsString();
 
         bool BuildOrderBetter(const BuildOrderAbilities & buildOrder, const BuildOrderAbilities & compareTo);
         bool StateBetter(const GameState & state, const GameState & compareTo);

@@ -5,7 +5,7 @@
     {   
         "test2" :
         {
-            "Run"               : [ true, 8 ],
+            "Run"               : [ true, 24 ],
             "UseTotalTimeLimit" : false,
             "SearchType"        : [ "ParallelIntegralMCTS" ],
             "SearchParameters"  : { "ExplorationConstant" : 2.5, "UseMax" : true, "TemperatureChangeFrame" : 0, "MixingValue" : 1.00, 
@@ -25,7 +25,7 @@
             "SortActions"       : false,
             "SaveStates"        : true,
             "UsePolicyNetwork"  : false,
-            "UsePolicyValueNetwork" : true
+            "UsePolicyValueNetwork" : false
         }
     },
 
