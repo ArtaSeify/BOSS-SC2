@@ -25,6 +25,7 @@ namespace BOSS
         std::atomic_int             m_predictionsReferences;
         std::atomic_int             m_predictionsTaken;
         std::atomic_int             m_threadsWaiting;
+        int                         m_batchHighestUnitCount;
         std::string                 m_states;
         
         std::vector<PyObject*>      m_networkOutput;
@@ -43,7 +44,7 @@ namespace BOSS
             return instance;
         }
 
-        int push_back(const std::string& str);
+        int push_back(const std::pair<std::string, int> & str);
         void makePrediction();
         void wait();
 

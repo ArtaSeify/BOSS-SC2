@@ -69,7 +69,26 @@ void Eval::CalculateUnitValues(const GameState & state)
         }
     }
 
+    
+
     UnitValues = unitValues;
+    
+}
+
+void Eval::setUnitWeightsString()
+{
+    std::stringstream ss;
+    for (int i = 0; i < UnitValues.size(); ++i)
+    {
+        ss << UnitValues[i] + UnitWeights[i] << ",";
+    }
+
+    UnitWeightsString = ss.str();
+}
+
+std::string Eval::getUnitWeightsString()
+{
+    return UnitWeightsString;
 }
 
 std::vector<FracType> Eval::CalculateUnitWeightVector(const GameState & state, const std::vector<int> & enemyUnits)
@@ -122,6 +141,11 @@ const std::vector<FracType> & Eval::GetUnitWeightVector()
 void Eval::SetUnitWeightVector(const std::vector<FracType> & weights)
 {
     UnitWeights = weights;
+}
+
+const std::vector<FracType> & Eval::GetUnitValuesVector()
+{
+    return UnitValues;
 }
 
 FracType Eval::UnitValueWithOpponent(const GameState & state, ActionType type, const CombatSearchParameters & params)

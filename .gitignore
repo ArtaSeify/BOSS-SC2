@@ -112,3 +112,5 @@ emscripten/BOSS.data
 /bin/HyperParameterTuning/Start State/Integral
 /bin/test_everything
 /bin/TestValueNetwork
+/bin/testasd
+/bin/testsave

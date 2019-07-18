@@ -304,7 +304,7 @@ void Node::generateLegalActions(const GameState& state, ActionSetAbilities& lega
 
 void Node::networkPrediction(const CombatSearchParameters & params, FracType currentValue) const
 {
-    std::string state = m_state.getStateData(params, currentValue / Edge::MAX_EDGE_VALUE_EXPECTED, getChronoboostTargets());
+    std::pair<std::string, int> state = m_state.getStateData(params, currentValue, getChronoboostTargets());
 
     // push state into queue and wait until predictions are made
     int predictionIndex = GPUQueue::getInstance().push_back(state);
@@ -336,7 +336,7 @@ void Node::networkPrediction(const CombatSearchParameters & params, FracType cur
     if (params.usePolicyValueNetwork())
     {
         m_parentEdge->setNetworkValue(static_cast<FracType>(PyFloat_AsDouble(PyList_GetItem(nodeValue, 0))));
-        //std::cout << "parent network value: " << m_parentEdge->getNetworkValue() << std::endl;
+        //std::cout << "edge: " << m_parentEdge->getAction().first.getName() << " edge value: " << m_parentEdge->getNetworkValue() << std::endl;
     }
     GPUQueue::getInstance().decPredictionReference();
     //std::cout << "finished with network in node" << std::endl;
@@ -434,17 +434,30 @@ Edge & Node::selectChildEdge(const CombatSearchParameters & params, std::mt19937
     std::vector<int> unvisitedEdges;
     int totalChildVisits = 0;
     bool visitEveryEdge = !params.usePolicyNetwork() && !params.usePolicyValueNetwork();
+    FracType currentHighestValue = 0;
     for (int index = 0; index < m_edges.size(); ++index )
     {
         Edge & edge = *m_edges[index];
+        edge.lock();
 
         // all unvisited edges are taken as an action first 
-        if (visitEveryEdge && edge.realTimesVisited() == 0)
+        if (visitEveryEdge && edge.realTimesVisitedNoLock() == 0)
         {
             unvisitedEdges.push_back(index);
         }
 
-        totalChildVisits += edge.totalTimesVisited();
+        if (unvisitedEdges.size() == 0)
+        {
+            totalChildVisits += edge.totalTimesVisitedNoLock();
+            currentHighestValue = std::max(edge.getValueNoLock(), currentHighestValue);
+        }
+
+        edge.unlock();
+    }
+
+    if (currentHighestValue == 0.f)
+    {
+        currentHighestValue = 1;
     }
     
     // pick an unvisited edge at uniformly random. This is only done 
@@ -463,32 +476,58 @@ Edge & Node::selectChildEdge(const CombatSearchParameters & params, std::mt19937
     float UCBValue = params.getExplorationValue() *
         static_cast<FracType>(std::sqrt(totalChildVisits));
 
-    float maxActionValue = 0;
     int maxIndex = 0;
-    int index = 0;
-    FracType currentHighestValue = Edge::CURRENT_HIGHEST_VALUE;
-    for (auto & edge : m_edges)
+    float maxActionValue = 0;
+    while (true)
     {
-        // calculate UCB value and get the total value of action
-        // Q(s, a) + u(s, a)
-        // we normalize the action value to a range of [0, 1] using the highest
-        // value of the search thus far. 
-        float childUCBValue = (UCBValue * edge->getPolicyValue()) / (1 + edge->totalTimesVisited());
-        float actionValue = edge->getValue() / currentHighestValue;
+        maxIndex = 0;
+        maxActionValue = 0;
+        float actionValue = 0;
 
-        BOSS_ASSERT(actionValue <= 1, "value of an action must be less than or equal to 1, but is %f", actionValue);
-
-        float UCTValue = actionValue + childUCBValue;
-
-        // store the index of this action
-        if (maxActionValue < UCTValue)
+        for (int index = 0; index < m_edges.size(); ++index)
         {
-            maxActionValue = UCTValue;
-            maxIndex = index;
-        }
+            const auto edge = m_edges[index];
+            edge->lock();
 
-        ++index;
+            // calculate UCB value and get the total value of action
+            // Q(s, a) + u(s, a)
+            // we normalize the action value to a range of [0, 1] using the highest
+            // value of the search thus far. 
+            float childUCBValue = (UCBValue * edge->getPolicyValueNoLock()) / (1 + edge->totalTimesVisitedNoLock());
+            actionValue = edge->getValueNoLock() / currentHighestValue;
+
+            edge->unlock();
+            // an edge was updated while we were picking a move, need to restart
+            if (actionValue > 1)
+            {
+                break;
+            }
+            //BOSS_ASSERT(actionValue <= 1, "value of an action must be less than or equal to 1, but is %f", actionValue);
+
+            float UCTValue = actionValue + childUCBValue;
+
+            // store the index of this action
+            if (maxActionValue < UCTValue)
+            {
+                maxActionValue = UCTValue;
+                maxIndex = index;
+            }
+        }
+        // an edge value was changed to be higher while we were deciding on an edge, so
+        // we have to redo it
+        if (actionValue > 1)
+        {
+            for (const auto & edge : m_edges)
+            {
+                currentHighestValue = std::max(edge->getValue(), currentHighestValue);
+            }
+        }
+        else
+        {
+            break;
+        }
     }
+    //BOSS_ASSERT(maxActionValue <= 1, "value of an action must be less than or equal to 1, but is %f", maxActionValue);
     Edge& edge = *m_edges[maxIndex];
     edge.visited();
     return edge;
@@ -604,7 +643,8 @@ Edge & Node::getChildProportionalToVisitCount(const CombatSearchParameters& para
     //std::scoped_lock sl(m_mutex);
 
     /*std::cout << "actions: " << std::endl;
-    printChildren();*/
+    printChildren();
+    std::cout << std::endl;*/
 
     int totalVisits = 0;
     for (const auto& edge : m_edges)

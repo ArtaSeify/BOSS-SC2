@@ -35,6 +35,7 @@ void CombatSearch::search()
     Tools::DoBuildOrder(initialState, m_buildOrder);
     Eval::CalculateUnitValues(initialState);
     Eval::SetUnitWeightVector(Eval::CalculateUnitWeightVector(initialState, m_params.getEnemyUnits()));
+    Eval::setUnitWeightsString();
 
     try
     {

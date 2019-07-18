@@ -284,7 +284,7 @@ class RelationsPolicyNetwork(Model):
 
         #self.checkpoint_best = tf.keras.callbacks.ModelCheckpoint(self.model_path.split(".")[0] + "_bestCA.h5", monitor='categorical_accuracy', save_best_only=True, mode='max')
         self.checkpoint = tf.keras.callbacks.ModelCheckpoint(self.model_path)
-        self.early_stop = tf.keras.callbacks.EarlyStopping(monitor="val_loss", patience=20, mode="min")
+        self.early_stop = tf.keras.callbacks.EarlyStopping(monitor="val_loss", patience=7, mode="min", restore_best_weights=True)
         
         if create_network:
             self.create()
@@ -338,7 +338,7 @@ class RelationsPolicyNetwork(Model):
         
         #self.lrs = tf.keras.callbacks.LearningRateScheduler(self.exponential_decay)
 
-        self.model.compile(optimizer=tf.keras.optimizers.Adam(self.learning_rate),
+        self.model.compile(optimizer=tf.keras.optimizers.Nadam(self.learning_rate),
                 loss = {"policy" : self.CCELogits},
                 metrics= {"policy" : ['categorical_accuracy', self.top_3_accuracy, self.accuracy]})
 
@@ -384,7 +384,7 @@ class RelationsValueNetwork(Model):
 
         #self.checkpoint_best = tf.keras.callbacks.ModelCheckpoint(self.model_path.split(".")[0] + "_bestCA.h5", monitor='categorical_accuracy', save_best_only=True, mode='max')
         self.checkpoint = tf.keras.callbacks.ModelCheckpoint(self.model_path)
-        self.early_stop = tf.keras.callbacks.EarlyStopping(monitor="val_loss", patience=20, mode="min")
+        self.early_stop = tf.keras.callbacks.EarlyStopping(monitor="val_loss", patience=7, mode="min", restore_best_weights=True)
         
         if create_network:
             self.create()
@@ -420,7 +420,7 @@ class RelationsValueNetwork(Model):
         
         #self.lrs = tf.keras.callbacks.LearningRateScheduler(self.exponential_decay)
 
-        self.model.compile(optimizer=tf.keras.optimizers.Adam(self.learning_rate),
+        self.model.compile(optimizer=tf.keras.optimizers.Nadam(self.learning_rate),
                 loss = 'mae',
                 metrics = ['mae'])
 
@@ -454,7 +454,7 @@ class RelationsValueNetwork(Model):
                 metrics = 'mae')                      
 
 class RelationsPolicyAndValueNetwork(Model):
-    def __init__(self, units_features_size, extra_features_size, policy_shape, model_name, batch_size, learning_rate, model_path, create_network=True):
+    def __init__(self, units_features_size, extra_features_size, policy_shape, value_normalize_factor, model_name, batch_size, learning_rate, model_path, create_network=True):
         self.model_name = model_name
         self.model_path = model_path
         self.units_features_size = units_features_size
@@ -466,15 +466,12 @@ class RelationsPolicyAndValueNetwork(Model):
 
         #self.checkpoint_best = tf.keras.callbacks.ModelCheckpoint(self.model_path.split(".")[0] + "_bestCA.h5", monitor='categorical_accuracy', save_best_only=True, mode='max')
         self.checkpoint = tf.keras.callbacks.ModelCheckpoint(self.model_path)
-        self.early_stop = tf.keras.callbacks.EarlyStopping(monitor="val_loss", patience=20, mode="min")
+        self.early_stop = tf.keras.callbacks.EarlyStopping(monitor="val_loss", patience=7, mode="min", restore_best_weights=True)
+
+        self.value_loss_scale = tf.keras.backend.variable(value_normalize_factor, dtype=tf.float32)
         
         if create_network:
             self.create()
-
-    #def exponential_decay(self, epoch, lr):
-    #    decay_rate = 0.70
-    #    reduce_every_epochs = 1.0
-    #    return lr * pow(decay_rate, math.floor((epoch+1) / reduce_every_epochs))
 
     def top_3_accuracy(self, y_true, y_pred):
         return tf.keras.metrics.top_k_categorical_accuracy(y_true, y_pred, k=3)
@@ -490,7 +487,11 @@ class RelationsPolicyAndValueNetwork(Model):
         return nonzeros 
 
     def MAEWithScalar(self, y_true, y_pred):
-        return tf.math.multiply(tf.constant(10.0, shape=(self.batch_size,)), tf.keras.losses.MAE(y_true, y_pred))
+        return tf.math.divide(tf.keras.losses.MAE(y_true, y_pred), self.value_loss_scale)
+        
+    def MSEWithScaling(self, y_true, y_pred):
+        return tf.keras.losses.MSE(tf.math.divide(y_true, 30000),
+                                   tf.math.divide(y_pred, 30000))
 
     def create(self):
         units_output_size = 512
@@ -529,11 +530,11 @@ class RelationsPolicyAndValueNetwork(Model):
         
         #self.lrs = tf.keras.callbacks.LearningRateScheduler(self.exponential_decay)
 
-        self.model.compile(optimizer=tf.keras.optimizers.Adam(self.learning_rate),
+        self.model.compile(optimizer=tf.keras.optimizers.Nadam(self.learning_rate),
                 loss = {"policy" : self.CCELogits,
                             "value" : self.MAEWithScalar},
                 metrics= {"policy" : ['categorical_accuracy', self.top_3_accuracy, self.accuracy],
-                          "value" : ['mae']})
+                          "value" : ['mae', 'msle']})
 
     def train(self, iterator, epochs, steps_per_epoch, verbose, validation_iterator, validation_steps):
         return self.model.fit(iterator, epochs=epochs, steps_per_epoch=steps_per_epoch, verbose=verbose, validation_data=validation_iterator, validation_steps=validation_steps,
@@ -563,9 +564,9 @@ class RelationsPolicyAndValueNetwork(Model):
                             , "MAEWithScalar": self.MAEWithScalar})
 
     def compile(self):
-        self.model.compile(optimizer=tf.keras.optimizers.Adam(self.learning_rate),
+        self.model.compile(optimizer=tf.keras.optimizers.Nadam(self.learning_rate),
                 loss = {"policy" : self.CCELogits,
                             "value" : self.MAEWithScalar},
                 metrics= {"policy" : ['categorical_accuracy', self.top_3_accuracy, self.accuracy],
-                          "value" : ['mae']})
+                          "value" : ['mae', 'msle']})
                         

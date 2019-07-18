@@ -31,18 +31,28 @@ tf.keras.backend.set_session(sess)
 # constants
 NUM_PROTOSS_UNITS = 70
 NUM_UNIT_FEATURES = 5
-EXTRA_FEATURES = 13 + NUM_PROTOSS_UNITS
+EXTRA_FEATURES = 13 + (2 * NUM_PROTOSS_UNITS)
 cpu_workers = 6
 policy_shape = NUM_PROTOSS_UNITS
 value_shape = 1
-learning_rate = 1e-4
+learning_rate = 5e-4
 epochs = 200 if not args.epochs else int(args.epochs)
 verbose = 1
-batch_size = 32
+batch_size = 128
 shuffle = True
 
-trainset_samples = sum(1 for line in open(args.trainset))
-validset_samples = sum(1 for line in open(args.validset))
+value_loss_scale = 0
+trainset_samples = 0
+validset_samples = 0
+for line in open(args.trainset):
+    value_loss_scale = max(value_loss_scale, float(line.split(",")[-1]))
+    trainset_samples += 1
+for line in open(args.validset):
+    value_loss_scale = max(value_loss_scale, float(line.split(",")[-1]))
+    validset_samples += 1
+
+# we want a value loss in range [0,4]
+value_loss_scale /= 4
 
 train_dataset = DataLoader(NUM_UNIT_FEATURES, EXTRA_FEATURES, policy_shape, value_shape, trainset_samples, args.output_type, shuffle, batch_size, cpu_workers)
 train_iterator = train_dataset.make_iterator(sess, [args.trainset])
@@ -53,7 +63,7 @@ if not os.path.isdir("models"):
     os.makedirs("models")
 
 if args.output_type == "B":
-    network = model.RelationsPolicyAndValueNetwork(NUM_UNIT_FEATURES, EXTRA_FEATURES, policy_shape, args.save_name, batch_size, learning_rate, "models/" + args.save_name + ".h5", True if args.load_model is None else False)
+    network = model.RelationsPolicyAndValueNetwork(NUM_UNIT_FEATURES, EXTRA_FEATURES, policy_shape, value_loss_scale, args.save_name, batch_size, learning_rate, "models/" + args.save_name + ".h5", True if args.load_model is None else False)
 elif args.output_type == "P":
     network = model.RelationsPolicyNetwork(NUM_UNIT_FEATURES, EXTRA_FEATURES, policy_shape, args.save_name, batch_size, learning_rate, "models/" + args.save_name + ".h5", True if args.load_model is None else False)
 elif args.output_type == "V":

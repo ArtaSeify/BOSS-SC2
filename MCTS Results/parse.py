@@ -6,6 +6,7 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("files_dir", help="Name of dir containing the data files")
 parser.add_argument("save_dir", help="Name of save dir")
+parser.add_argument("--reset", dest='reset', action='store_true', help="Parse everything")
 args = parser.parse_args()
 
 files_dir = args.files_dir
@@ -34,13 +35,14 @@ def parse(name_prepend, cwd):
         file_path = os.path.join(cwd, file)
 
         if "Run" in file:
-            run = file.split("Run")[1].split("\n")[0]
+            run = file.split("Run")[-1].split("\n")[0]
             # create the dict if it doesn't exist
             if name_prepend not in results:
                 results[name_prepend] = dict()
             
             # get the data for that run
             data_files = os.listdir(file_path)
+
             if len(data_files) > 0:
                 for data_file in data_files:
                     if "Results.csv" in data_file:
@@ -61,7 +63,9 @@ def parse(name_prepend, cwd):
                 if name_prepend is not "":
                     name += "_"
                 name += file 
-                parse(name, file_path)
+
+                if args.reset or not os.path.isfile(os.path.join(save_dir, name)):
+                    parse(name, file_path)
             else:
                 print("MISTAKE!!!")
 

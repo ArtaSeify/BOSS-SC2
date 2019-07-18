@@ -98,7 +98,7 @@ void CombatSearch_ParallelIntegralMCTS::recurse(const GameState& state, int dept
 
         for (const auto& data : m_stateData)
         {
-            m_ssStates << data.state << "," << data.policy << "," << data.stateValue / Edge::MAX_EDGE_VALUE_EXPECTED << "\n";
+            m_ssStates << data.state.first << "," << data.policy << "," << m_bestResultFound.integral.getCurrentStackValue() << "\n";
         }
 
         CONSTANTS::SaveDataToFile.lock();
@@ -240,7 +240,7 @@ void CombatSearch_ParallelIntegralMCTS::MCTSSearch(int threadID)
                     std::shared_ptr<Edge> childEdge;
                     // take the highest value child, but if it has lower value than the best found, we take the
                     // action in the best found build order instead
-                    if (!m_params.getChangingRootReset() || m_currentRoot->getState().getCurrentFrame() >= m_params.getTemperatureChange())
+                    if (m_currentRoot->getState().getCurrentFrame() >= m_params.getTemperatureChange())
                     {
                         if (m_bestResultFound.buildOrder.size() > m_buildOrderIntegralChangedRoot.buildOrder.size())
                         {
@@ -333,6 +333,8 @@ void CombatSearch_ParallelIntegralMCTS::MCTSSearch(int threadID)
                         // creating the children showed us this state is terminal, so we need to do another update
                         if (m_currentRoot->isTerminal())
                         {
+                            updateIntegralTerminal(*m_currentRoot, m_buildOrderIntegralChangedRoot);
+                            m_bestResultFound = m_buildOrderIntegralChangedRoot;
                             // write state data of terminal node
                             if (m_params.getSaveStates())
                             {
@@ -570,36 +572,14 @@ void CombatSearch_ParallelIntegralMCTS::backPropogation(Node & node, const Build
 
     // write to log file one thread at a time
     m_resultFileMutex.lock();
-    if (m_params.getMixingValue() < 1)
+    if (buildOrderIntegral.integral.getCurrentStackValue() > m_bestResultFound.integral.getCurrentStackValue() ||
+        ((buildOrderIntegral.integral.getCurrentStackValue() == m_bestResultFound.integral.getCurrentStackValue())
+            && Eval::StateBetter(buildOrderIntegral.integral.getState(), m_bestResultFound.integral.getState())))
     {
-        if (buildOrderIntegral.integral.getCurrentStackValue() > m_bestResultFound.integral.getCurrentStackValue() ||
-            ((buildOrderIntegral.integral.getCurrentStackValue() == m_bestResultFound.integral.getCurrentStackValue())
-                && Eval::StateBetter(buildOrderIntegral.integral.getState(), m_bestResultFound.integral.getState())))
-        {
-            m_bestResultFound = buildOrderIntegral;
-            writeSummaryToQueue();
-        }
-    }
-    else
-    {
-        if (networkValue > m_bestResultFound.integral.getCurrentStackValue())
-        {
-            m_bestResultFound = buildOrderIntegral;
-            writeSummaryToQueue();
-        }
+        m_bestResultFound = buildOrderIntegral;
+        writeSummaryToQueue();
     }
     m_resultFileMutex.unlock();
-}
-
-void CombatSearch_ParallelIntegralMCTS::fixEdgeVisits(Node & node)
-{
-    std::shared_ptr<Edge> parentEdge = node.shared_from_this()->getParentEdge();
-
-    while (parentEdge->getParent() != nullptr)
-    {
-        parentEdge->decVisits();
-        parentEdge = parentEdge->getParent()->getParentEdge();
-    }
 }
 
 void CombatSearch_ParallelIntegralMCTS::updateNodeVisits(bool nodeExpanded, bool isTerminal)
@@ -639,7 +619,7 @@ void CombatSearch_ParallelIntegralMCTS::writeRootData()
 
     StateData stateData;
     stateData.state = m_currentRoot->getState().getStateData(m_params,
-        m_buildOrderIntegralChangedRoot.integral.getCurrentStackValue() / Edge::MAX_EDGE_VALUE_EXPECTED, m_currentRoot->getChronoboostTargets());
+        m_buildOrderIntegralChangedRoot.integral.getCurrentStackValue(), m_currentRoot->getChronoboostTargets());
 
     std::vector<float> MCTSPolicy = std::vector<float>(ActionTypes::GetRaceActionCount(Races::Protoss), 0.f);
     FracType maxValue = -1;
@@ -650,14 +630,6 @@ void CombatSearch_ParallelIntegralMCTS::writeRootData()
     {
         const auto& edge = m_currentRoot->getEdge(i);
         FracType edgeValue = edge.getValue();
-        /*if (m_params.getMixingValue() < 1)
-        {
-            edgeValue = edge.getMax();
-        }
-        else
-        {
-            edgeValue = edge.getValue();
-        }*/
 
         if (edgeValue > maxValue)
         {
@@ -676,9 +648,7 @@ void CombatSearch_ParallelIntegralMCTS::writeRootData()
     if (m_currentRoot->getNumEdges() == 0)
     {
         maxIndices.push_back(0);
-        BOSS_ASSERT(m_buildOrderIntegralChangedRoot.integral.getCurrentStackValue() == m_bestResultFound.integral.getCurrentStackValue(), "these values should be equal, but are %i, %i",
-            m_buildOrderIntegralChangedRoot.integral.getCurrentStackValue(), m_bestResultFound.integral.getCurrentStackValue());
-        maxValue = m_bestResultFound.integral.getCurrentStackValue();
+        maxValue = m_buildOrderIntegralChangedRoot.integral.getCurrentStackValue();
     }
 
     if (maxIndices.size() == 0)

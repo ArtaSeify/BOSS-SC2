@@ -13,6 +13,7 @@
 //#include "DFSValue.h"
 //#include "DFSPolicyAndValue.h"
 #include "FileTools.h"
+#include "Eval.h"
 
 #include <boost/chrono.hpp>
 #include <chrono>
@@ -268,9 +269,12 @@ IntegralExperimentOMP::IntegralExperimentOMP(const std::string& experimentName, 
     {
         Edge::MIXING_VALUE = m_params.getMixingValue();
     }
-    Edge::MAX_EDGE_VALUE_EXPECTED = m_params.getValueNormalization();
-    Edge::CURRENT_HIGHEST_VALUE = FracType(m_params.getValueNormalization());
     Edge::NODE_VISITS_BEFORE_EXPAND = m_params.getNodeVisitsBeforeExpand();
+    Edge::MAX_EDGE_VALUE_EXPECTED = (FracType)m_params.getValueNormalization();
+
+    Eval::CalculateUnitValues(m_params.getInitialState());
+    Eval::SetUnitWeightVector(Eval::CalculateUnitWeightVector(m_params.getInitialState(), m_params.getEnemyUnits()));
+    Eval::setUnitWeightsString();
 }
 
 void IntegralExperimentOMP::runExperimentThread(int run)
@@ -329,10 +333,10 @@ void IntegralExperimentOMP::runExperimentThread(int run)
     {
         BOSS_ASSERT(false, "CombatSearch type not found: %s", m_searchType.c_str());
     }
-
+    
     combatSearch->search();
-    //#pragma omp critical
-    //combatSearch->printResults();
+    /*#pragma omp critical
+    combatSearch->printResults();*/
     combatSearch->writeResultsFile(outputDir, resultsFile);
 }
 

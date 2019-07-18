@@ -1121,11 +1121,15 @@ void GameState::printUnits() const
     std::cout << std::endl;
 }
 
-std::string GameState::getStateData(const CombatSearchParameters & params, FracType currentValue, const std::vector<int>& chronoboostTargets) const
+#include "Eval.h"
+
+std::pair<std::string, int> GameState::getStateData(const CombatSearchParameters & params, FracType currentValue, const std::vector<int>& chronoboostTargets) const
 {    
     std::stringstream state;
+    state.precision(4);
 
     std::vector<int> unitCount = std::vector<int>(ActionTypes::GetRaceActionCount(m_race), 0);
+    int unitsWritten = 0;
     for (int index = 0; index < m_units.size(); ++index)
     {
         const auto& unit = m_units[index];
@@ -1138,12 +1142,25 @@ std::string GameState::getStateData(const CombatSearchParameters & params, FracT
         else
         {
             state << m_units[index].getData() << ",";
+            ++unitsWritten;
         }
     }
     for (int i = 0; i < unitCount.size(); ++i)
     {
         state << unitCount[i] << ",";
     }
+
+    /*const auto unitValues = Eval::GetUnitValuesVector();
+    const auto unitWeights = Eval::GetUnitWeightVector();
+
+    BOSS_ASSERT(unitValues.size() == unitWeights.size() && unitValues.size() == unitCount.size(), 
+        "Sizes of these should be equal, but are %i, %i, %i", unitValues.size(), unitWeights.size(), unitCount.size());
+    for (int i = 0; i < unitWeights.size(); ++i)
+    {
+        state << unitValues[i] + unitWeights[i] << ",";
+    }*/
+
+    state << Eval::getUnitWeightsString();
 
     //ss << int(m_race) << ",";
     state << m_minerals;
@@ -1179,7 +1196,7 @@ std::string GameState::getStateData(const CombatSearchParameters & params, FracT
         state << ",";
         state << target;
     }
-    return state.str();
+    return std::make_pair(state.str(), unitsWritten);
 }
 
 json GameState::writeToJson(const CombatSearchParameters & params) const

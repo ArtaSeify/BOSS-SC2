@@ -3,19 +3,19 @@
 
     "Experiments" : 
     {   
-        "test2" :
+        "testasd2" :
         {
-            "Run"               : [ true, 8 ],
+            "Run"               : [ true, 10 ],
             "UseTotalTimeLimit" : false,
             "SearchType"        : [ "ParallelIntegralMCTS" ],
-            "SearchParameters"  : { "ExplorationConstant" : 2.5, "UseMax" : true, "TemperatureChangeFrame" : 0, "MixingValue" : 1.00, 
-                                    "VisitsBeforeExpand" : 1, "ValueNormalization" : 60000, "Threads" : 8 },
-            "ChangingRoot"      : { "Active": true, "Simulations": 100, "Reset": true },
+            "SearchParameters"  : { "ExplorationConstant" : 1.25, "UseMax" : true, "TemperatureChangeFrame" : 6721, "MixingValue" : 1.00, 
+                                    "VisitsBeforeExpand" : 1, "ValueNormalization" : 1000, "Threads" : 12 },
+            "ChangingRoot"      : { "Active": true, "Simulations": 1000, "Reset": false },
             "Threads"           : 7,
             "Race"              : "Protoss",
             "StartingState"     : "Protoss Start State",
             "PrintNewBest"      : false,
-            "OutputDir"         : "../bin/test2",
+            "OutputDir"         : "../bin/testasd/1.25",
             "SearchTimeLimitMS" : 200000000,
             "FrameTimeLimit"    : 6720,
             "RelevantActions"   : [ "Probe", "Pylon", "Nexus", "Assimilator", "Gateway", "CyberneticsCore", "Stalker", "Zealot", "Colossus", "FleetBeacon", "TwilightCouncil", "Stargate", "TemplarArchive", "DarkShrine", "RoboticsBay", "RoboticsFacility", "Zealot", "DarkTemplar", "Carrier", "VoidRay", "Immortal", "Adept", "Tempest", "Mothership"], 
@@ -25,7 +25,7 @@
             "SortActions"       : false,
             "SaveStates"        : true,
             "UsePolicyNetwork"  : false,
-            "UsePolicyValueNetwork" : true
+            "UsePolicyValueNetwork" : false
         }
     },
 
