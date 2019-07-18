@@ -97,18 +97,18 @@ class Driver:
 
             # No reset after changing root
             strength_exp_json["Experiments"][self.experiment_name + "_2"] = copy.deepcopy(strength_exp_json["Experiments"][self.experiment_name])
-            strength_exp_json["Experiments"][self.experiment_name]["OutputDir"] = BIN_PATH + "/" + self.experiment_name + "/StrengthTest/WithoutReset/" + str(run)
-            strength_exp_json["Experiments"][self.experiment_name]["Run"][1] = self.numTestRuns
+            strength_exp_json["Experiments"][self.experiment_name + "_2"]["OutputDir"] = BIN_PATH + "/" + self.experiment_name + "/StrengthTest/WithoutReset/" + str(run)
+            strength_exp_json["Experiments"][self.experiment_name + "_2"]["Run"][1] = self.numTestRuns
             if self.output_type == "B":
-                strength_exp_json["Experiments"][self.experiment_name]["UsePolicyValueNetwork"] = usePolicy
-                strength_exp_json["Experiments"][self.experiment_name]["UsePolicyNetwork"] = False
+                strength_exp_json["Experiments"][self.experiment_name + "_2"]["UsePolicyValueNetwork"] = usePolicy
+                strength_exp_json["Experiments"][self.experiment_name + "_2"]["UsePolicyNetwork"] = False
             elif self.output_type == "P":
-                strength_exp_json["Experiments"][self.experiment_name]["UsePolicyValueNetwork"] = False
-                strength_exp_json["Experiments"][self.experiment_name]["UsePolicyNetwork"] = usePolicy
-            strength_exp_json["Experiments"][self.experiment_name]["SaveStates"] = False
-            strength_exp_json["Experiments"][self.experiment_name]["ChangingRoot"]["Active"] = True
-            strength_exp_json["Experiments"][self.experiment_name]["ChangingRoot"]["Reset"] = False
-            strength_exp_json["Experiments"][self.experiment_name]["SearchParameters"]["TemperatureChangeFrame"] = 0
+                strength_exp_json["Experiments"][self.experiment_name + "_2"]["UsePolicyValueNetwork"] = False
+                strength_exp_json["Experiments"][self.experiment_name + "_2"]["UsePolicyNetwork"] = usePolicy
+            strength_exp_json["Experiments"][self.experiment_name + "_2"]["SaveStates"] = False
+            strength_exp_json["Experiments"][self.experiment_name + "_2"]["ChangingRoot"]["Active"] = True
+            strength_exp_json["Experiments"][self.experiment_name + "_2"]["ChangingRoot"]["Reset"] = False
+            strength_exp_json["Experiments"][self.experiment_name + "_2"]["SearchParameters"]["TemperatureChangeFrame"] = 0
 
             # Test policy of the network
             if run != "-1" or self.load_name is not None:
