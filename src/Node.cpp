@@ -323,13 +323,25 @@ void Node::networkPrediction(const CombatSearchParameters & params, FracType cur
         policyValues = values;
     }
 
+    // renormalize policy values
+    FracType totalPolicyValues = 0;
+    FracType uniformPolicy = 1.f / m_edges.size();
+    for (auto& edge : m_edges)
+    {
+        totalPolicyValues += static_cast<FracType>(PyFloat_AsDouble(PyList_GetItem(policyValues, edge->getAction().first.getRaceActionID())));
+    }
+
     // Set policy values
     for (auto& edge : m_edges)
     {
-        //std::cout << "edge action: " << edge->getAction().first.getRaceActionID() << ", value: " 
-        //    << python::extract<FracType>(policyValues[edge->getAction().first.getRaceActionID()]) << std::endl;
-        // update the edge values
-        edge->setPolicyValue(static_cast<FracType>(PyFloat_AsDouble(PyList_GetItem(policyValues, edge->getAction().first.getRaceActionID()))));
+        if (totalPolicyValues == 0)
+        {
+            edge->setPolicyValue(uniformPolicy);
+        }
+        else
+        {
+            edge->setPolicyValue(static_cast<FracType>(PyFloat_AsDouble(PyList_GetItem(policyValues, edge->getAction().first.getRaceActionID()))) / totalPolicyValues);
+        }
     }
 
     // set node value

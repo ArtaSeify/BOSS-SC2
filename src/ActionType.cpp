@@ -143,6 +143,8 @@ namespace ActionTypes
             allActionTypes.push_back(ActionType(i));
             nameMap[allActionTypes[i].getName()] = allActionTypes[i];
 
+            //std::cout << allActionTypes[i].getName() << " " << allActionTypes[i].getRaceActionID() << std::endl;
+
             if (allActionTypes[i].getRace() == Races::None)
             {
                 for (auto& race : raceActionTypes)

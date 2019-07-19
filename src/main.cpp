@@ -41,11 +41,11 @@ int main(int argc, char * argv[])
         json j;
         file >> j;
         std::string networkType;
-        if (j["Experiments"].back()["UsePolicyNetwork"])
+        if (j["Experiments"].front()["UsePolicyNetwork"])
         {
             networkType = "policy";
         }
-        if (j["Experiments"].back()["UsePolicyValueNetwork"])
+        if (j["Experiments"].front()["UsePolicyValueNetwork"])
         {
             networkType = "both";
         }

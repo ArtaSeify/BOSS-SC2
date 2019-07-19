@@ -104,7 +104,7 @@ void CombatSearch_ParallelIntegralMCTS::recurse(const GameState& state, int dept
         CONSTANTS::SaveDataToFile.lock();
         {            
             FileTools::MakeDirectory(CONSTANTS::ExecutablePath + "/SavedStates");
-            std::ofstream fileStates(CONSTANTS::ExecutablePath + "/SavedStates/" + m_name + ".csv", std::ofstream::out | std::ofstream::app | std::ofstream::binary);
+            std::ofstream fileStates(CONSTANTS::ExecutablePath + "/SavedStates/LatestData.csv", std::ofstream::out | std::ofstream::app | std::ofstream::binary);
             fileStates << m_ssStates.rdbuf();
             fileStates.close();
         }

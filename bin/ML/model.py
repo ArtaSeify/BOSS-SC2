@@ -373,7 +373,7 @@ class RelationsPolicyNetwork(Model):
                 metrics= {"policy" : ['categorical_accuracy', self.top_3_accuracy, self.accuracy]})
 
 class RelationsValueNetwork(Model):
-    def __init__(self, units_features_size, extra_features_size, model_name, batch_size, learning_rate, model_path, create_network=True):
+    def __init__(self, units_features_size, extra_features_size, value_normalize_factor, model_name, batch_size, learning_rate, model_path, create_network=True):
         self.model_name = model_name
         self.model_path = model_path
         self.units_features_size = units_features_size

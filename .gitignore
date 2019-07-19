@@ -114,3 +114,7 @@ emscripten/BOSS.data
 /bin/TestValueNetwork
 /bin/testasd
 /bin/testsave
+/bin/InitialOn0
+/bin/CombinedRun
+/bin/10StatesOnInitialValue
+/bin/10StatesOnInitial
