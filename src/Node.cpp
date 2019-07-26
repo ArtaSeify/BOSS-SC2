@@ -130,33 +130,7 @@ void Node::createChildrenEdges(const CombatSearchParameters & params, FracType c
         // add dirichlet noise to root node edges
         if (rootNode)
         {
-            static const FracType epsilon = 0.25f;
-            
-            std::array<double, 70> dirichlet_noise;
-            gsl_ran_dirichlet(gsl_r, m_edges.size(), alphas.data(), dirichlet_noise.data());
-
-            /*std::cout << "noise values:" << std::endl;
-            for (int i = 0; i < m_edges.size(); ++i)
-            {
-                std::cout << dirichlet_noise[i] << " ";
-            }
-            std::cout << std::endl;
-
-            std::cout << "before noise:" << std::endl;
-            for (auto& edge : m_edges)
-            {
-                std::cout << edge->getPolicyValue() << " ";
-            }
-            std::cout << std::endl;
-
-            std::cout << "after noise:" << std::endl;*/
-            for (int index = 0; index < m_edges.size(); ++index)
-            {
-                auto edge = m_edges[index];
-                edge->setPolicyValue(FracType(((1 - epsilon) * edge->getPolicyValue()) + (epsilon * dirichlet_noise[index])));
-                //std::cout << edge->getPolicyValue() << " ";
-            }
-            //std::cout << std::endl;
+            addNoise(gsl_r);
         }
     }
     // use uniform probability if we're not using a policy network
@@ -177,6 +151,35 @@ void Node::createChildrenEdgesSecondVisit(const CombatSearchParameters& params, 
 
     std::scoped_lock sl(m_mutex);
     createChildrenEdges(params, currentValue);
+}
+
+void Node::addNoise(gsl_rng* gsl_r)
+{
+    static const FracType epsilon = 0.25f;
+
+    std::array<double, 70> dirichlet_noise;
+    gsl_ran_dirichlet(gsl_r, m_edges.size(), alphas.data(), dirichlet_noise.data());
+
+    /*std::cout << "noise values:" << std::endl;
+    for (int i = 0; i < m_edges.size(); ++i)
+    {
+        std::cout << dirichlet_noise[i] << " ";
+    }
+    std::cout << std::endl;
+    std::cout << "before noise:" << std::endl;
+    for (auto& edge : m_edges)
+    {
+        std::cout << edge->getPolicyValue() << " ";
+    }
+    std::cout << std::endl;
+    std::cout << "after noise:" << std::endl;*/
+    for (int index = 0; index < m_edges.size(); ++index)
+    {
+        auto edge = m_edges[index];
+        edge->setPolicyValue(FracType(((1 - epsilon) * edge->getPolicyValue()) + (epsilon * dirichlet_noise[index])));
+        //std::cout << edge->getPolicyValue() << " ";
+    }
+    //std::cout << std::endl;
 }
 
 void Node::generateLegalActions(const GameState& state, ActionSetAbilities& legalActions, const CombatSearchParameters& params)

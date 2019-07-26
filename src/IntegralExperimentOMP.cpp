@@ -126,6 +126,18 @@ IntegralExperimentOMP::IntegralExperimentOMP(const std::string& experimentName, 
         {
             m_params.setTemperatureChange(0);
         }
+
+        BOSS_ASSERT(searchParameters.count("SimulationValueOnly") && searchParameters["SimulationValueOnly"].is_boolean(),
+            "Must include a boolean SimulationValueOnly");
+        m_params.setUseSimulationValueOnly(searchParameters["SimulationValueOnly"]);
+
+        BOSS_ASSERT(searchParameters.count("ValueTargetMix") && searchParameters["ValueTargetMix"].is_number_float(),
+            "Must include a float ValueTargetMix");
+        BOSS_ASSERT(searchParameters["ValueTargetMix"] >= 0.0f && searchParameters["ValueTargetMix"] <= 1.0f, "Mixing parameter must be between 0 and 1, inclusive");
+        m_params.setValueTargetMix(searchParameters["ValueTargetMix"]);
+
+        BOSS_ASSERT(!m_params.useSimulationValueOnly() || m_params.getValueTargetMix() > 0, "Can't use simulation value only with a target mix of 0");
+        BOSS_ASSERT(!m_params.useSimulationValueOnly() || m_params.getMixingValue() < 1.f, "Mixing value must be less than 1 if using simulation value as the target");
     }
 
     else if (searchType == "IntegralNMCS")

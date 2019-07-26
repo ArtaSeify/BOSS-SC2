@@ -50,6 +50,9 @@ namespace BOSS
         // creates edges for thie node. This function is called when we create the edges and do network
         // evaluation after an expanded node is visited a second time, not the first time
         void createChildrenEdgesSecondVisit(const CombatSearchParameters& params, FracType currentValue);
+
+        // adds Dirichlet noise to the policy
+        void addNoise(gsl_rng* gsl_r);
         
         void printChildren() const;
         

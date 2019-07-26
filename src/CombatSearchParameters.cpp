@@ -49,6 +49,8 @@ CombatSearchParameters::CombatSearchParameters()
     , m_temperatureChange(0)
     , m_nodeVisitsBeforeExpand(0)
     , m_valueNormalization(1)
+    , m_valueTargetMix(0)
+    , m_useSimulationValueOnly(false)
 {
     
 }
@@ -389,6 +391,26 @@ void CombatSearchParameters::setNodeVisitsBeforeExpand(int value)
 int CombatSearchParameters::getNodeVisitsBeforeExpand() const
 {
     return m_nodeVisitsBeforeExpand;
+}
+
+void CombatSearchParameters::setValueTargetMix(FracType value)
+{
+    m_valueTargetMix = value;
+}
+
+FracType CombatSearchParameters::getValueTargetMix() const
+{
+    return m_valueTargetMix;
+}
+
+void CombatSearchParameters::setUseSimulationValueOnly(bool value)
+{
+    m_useSimulationValueOnly = value;
+}
+
+bool CombatSearchParameters::useSimulationValueOnly() const
+{
+    return m_useSimulationValueOnly;
 }
 
 void CombatSearchParameters::print()

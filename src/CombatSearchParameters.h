@@ -124,6 +124,8 @@ namespace BOSS
         int m_temperatureChange;
         int m_valueNormalization;
         int m_nodeVisitsBeforeExpand;
+        FracType m_valueTargetMix;
+        bool m_useSimulationValueOnly;
 
     public:
 
@@ -231,6 +233,12 @@ namespace BOSS
 
         void setNodeVisitsBeforeExpand(int value);
         int getNodeVisitsBeforeExpand() const;
+
+        void setValueTargetMix(FracType value);
+        FracType getValueTargetMix() const;
+
+        void setUseSimulationValueOnly(bool value);
+        bool useSimulationValueOnly() const;
     
         void print();
     };

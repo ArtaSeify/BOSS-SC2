@@ -118,3 +118,5 @@ emscripten/BOSS.data
 /bin/CombinedRun
 /bin/10StatesOnInitialValue
 /bin/10StatesOnInitial
+/bin/testww
+/bin/testgeneral

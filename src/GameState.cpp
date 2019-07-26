@@ -177,7 +177,6 @@ bool GameState::isLegal(ActionType action) const
     // we can Chrono Boost as long as we have a Nexus
     if (action.isAbility() && m_race == Races::Protoss && numDepots == 0) { return false; }
 
-
     const NumUnits totalSupply = std::min(m_maxSupply + m_inProgressSupply, 200);
     // if it's a unit and we are out of supply and aren't making a supply providing unit, it's not legal
     if (!action.isMorphed() && !action.isSupplyProvider() && ((m_currentSupply + action.supplyCost()) > totalSupply)) { return false; }  

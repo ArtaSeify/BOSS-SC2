@@ -5,6 +5,7 @@ import argparse
 import model
 import json
 import copy
+import time
 import random
 
 if os.name == "nt":
@@ -33,12 +34,15 @@ class Driver:
         self.output_type = args.output_type
         self.args = args
 
+        self.time_limit = 86400   # time limit in second
+
         self.numTestRuns = 5
+        self.test_initial_state = False
 
         self.validation_split = 0.10
         self.training_samples = 0
         self.validation_samples = 0
-        self.TRAINING_SAMPLES_LIMIT = 200000
+        self.TRAINING_SAMPLES_LIMIT = 100000
         self.VALIDATION_SAMPLES_LIMIT = int(self.validation_split * self.TRAINING_SAMPLES_LIMIT)
 
         with open(BIN_PATH + "/" + self.experiment_file_name + ".txt", 'r') as experiment_file:
@@ -138,29 +142,30 @@ class Driver:
                     strength_exp_json["Experiments"][experiment_name + "_3"]["UsePolicyNetwork"] = True
                     strength_exp_json["Experiments"][experiment_name + "_3"]["SearchParameters"]["Simulations"] = -1
 
-            # test initial state
-            strength_exp_json["Experiments"][experiment_name + "_StartState_1"] = copy.deepcopy(strength_exp_json["Experiments"][experiment_name])
-            if len(self.experiment_names) == 1:
-                strength_exp_json["Experiments"][experiment_name + "_StartState_1"]["OutputDir"] = BIN_PATH + "/" + experiment_name + "/StartState/WithReset/" + str(run)
-            else:
-                strength_exp_json["Experiments"][experiment_name + "_StartState_1"]["OutputDir"] = BIN_PATH + "/CombinedRun/StartState/WithReset/" + str(run)
-            strength_exp_json["Experiments"][experiment_name + "_StartState_1"]["StartingState"] = "Protoss Start State"
-
-            strength_exp_json["Experiments"][experiment_name + "_StartState_2"] = copy.deepcopy(strength_exp_json["Experiments"][experiment_name + "_2"])
-            if len(self.experiment_names) == 1:
-                strength_exp_json["Experiments"][experiment_name + "_StartState_2"]["OutputDir"] = BIN_PATH + "/" + experiment_name + "/StartState/WithoutReset/" + str(run)
-            else:
-                strength_exp_json["Experiments"][experiment_name + "_StartState_2"]["OutputDir"] = BIN_PATH + "/CombinedRun/StartState/WithoutReset/" + str(run)
-            strength_exp_json["Experiments"][experiment_name + "_StartState_2"]["StartingState"] = "Protoss Start State"
-
-            # Test policy of the network
-            if run != "-1" or self.load_name is not None:
-                strength_exp_json["Experiments"][experiment_name + "_StartState_3"] = copy.deepcopy(strength_exp_json["Experiments"][experiment_name + "_3"])
+            if self.test_initial_state:
+                # test initial state
+                strength_exp_json["Experiments"][experiment_name + "_StartState_1"] = copy.deepcopy(strength_exp_json["Experiments"][experiment_name])
                 if len(self.experiment_names) == 1:
-                    strength_exp_json["Experiments"][experiment_name + "_StartState_3"]["OutputDir"] = BIN_PATH + "/" + experiment_name + "/StartState/Network/" + str(run)
+                    strength_exp_json["Experiments"][experiment_name + "_StartState_1"]["OutputDir"] = BIN_PATH + "/" + experiment_name + "/StartState/WithReset/" + str(run)
                 else:
-                    strength_exp_json["Experiments"][experiment_name + "_StartState_3"]["OutputDir"] = BIN_PATH + "/CombinedRun/StartState/Network/" + str(run)
-                strength_exp_json["Experiments"][experiment_name + "_StartState_3"]["StartingState"] = "Protoss Start State"
+                    strength_exp_json["Experiments"][experiment_name + "_StartState_1"]["OutputDir"] = BIN_PATH + "/CombinedRun/StartState/WithReset/" + str(run)
+                strength_exp_json["Experiments"][experiment_name + "_StartState_1"]["StartingState"] = "Protoss Start State"
+
+                strength_exp_json["Experiments"][experiment_name + "_StartState_2"] = copy.deepcopy(strength_exp_json["Experiments"][experiment_name + "_2"])
+                if len(self.experiment_names) == 1:
+                    strength_exp_json["Experiments"][experiment_name + "_StartState_2"]["OutputDir"] = BIN_PATH + "/" + experiment_name + "/StartState/WithoutReset/" + str(run)
+                else:
+                    strength_exp_json["Experiments"][experiment_name + "_StartState_2"]["OutputDir"] = BIN_PATH + "/CombinedRun/StartState/WithoutReset/" + str(run)
+                strength_exp_json["Experiments"][experiment_name + "_StartState_2"]["StartingState"] = "Protoss Start State"
+
+                # Test policy of the network
+                if run != "-1" or self.load_name is not None:
+                    strength_exp_json["Experiments"][experiment_name + "_StartState_3"] = copy.deepcopy(strength_exp_json["Experiments"][experiment_name + "_3"])
+                    if len(self.experiment_names) == 1:
+                        strength_exp_json["Experiments"][experiment_name + "_StartState_3"]["OutputDir"] = BIN_PATH + "/" + experiment_name + "/StartState/Network/" + str(run)
+                    else:
+                        strength_exp_json["Experiments"][experiment_name + "_StartState_3"]["OutputDir"] = BIN_PATH + "/CombinedRun/StartState/Network/" + str(run)
+                    strength_exp_json["Experiments"][experiment_name + "_StartState_3"]["StartingState"] = "Protoss Start State"
             
             json.dump(strength_exp_json, strength_exp_file)
 
@@ -201,6 +206,7 @@ class Driver:
         os.rename(os.path.join(DATA_PATH, self.data_file_name + ".csv"), os.path.join(DATA_PATH, self.data_file_name + "_" + str(run) + ".csv"))
 
     def start(self):
+        start_time = time.perf_counter()
         # initial strength test
         if self.start_run == 0:
             self.create_teststrength_file("-1")
@@ -215,6 +221,7 @@ class Driver:
                 subprocess.call([BIN_PATH + "/BOSS_main", self.strengthtest_file_name])
 
         for run in range(self.start_run, self.iterations + self.start_run):
+            # data generation
             if run == 0 and self.load_name is None:
                 print("calling command: ", BIN_PATH + "/BOSS_main.exe", self.experiment_file_name)
                 subprocess.call([BIN_PATH + "/BOSS_main", self.experiment_file_name])
@@ -226,6 +233,11 @@ class Driver:
             else:
                 print("calling command: ", BIN_PATH + "/BOSS_main.exe", self.experiment_file_name, self.model_name)
                 subprocess.call([BIN_PATH + "/BOSS_main", self.experiment_file_name, self.model_name])
+
+            # time limit reached
+            if time.perf_counter() - start_time > self.time_limit:
+                print("time limit reached!")
+                break
 
             self.split_training_data(run)
 
@@ -262,7 +274,12 @@ class Driver:
                 else:
                     self.experiment_data["Experiments"][experiment_name]["OutputDir"] = BIN_PATH + "/CombinedRun/" + experiment_name + "/" + str(run + 1)
             with open(BIN_PATH + "/" + self.experiment_file_name + ".txt", 'w') as experiment_file:
-                json.dump(self.experiment_data, experiment_file)            
+                json.dump(self.experiment_data, experiment_file)       
+                
+            # time limit reached
+            if time.perf_counter() - start_time > self.time_limit:
+                print("time limit reached!")
+                break
 
 def main():
     global driver
