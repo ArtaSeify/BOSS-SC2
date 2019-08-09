@@ -1181,13 +1181,11 @@ std::pair<std::string, int> GameState::getStateData(const CombatSearchParameters
     state << ",";
     state << m_buildingWorkers;
     state << ",";
-    state << currentValue;
-    state << ",";
+    //state << currentValue;
+    //state << ",";
     state << CONSTANTS::MPWPF;
     state << ",";
     state << CONSTANTS::GPWPF;
-    state << ",";
-    state << CONSTANTS::ERPF;
 
     // chronoboost targets
     for (int target : chronoboostTargets)

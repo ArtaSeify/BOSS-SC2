@@ -350,7 +350,7 @@ void Node::networkPrediction(const CombatSearchParameters & params, FracType cur
     // set node value
     if (params.usePolicyValueNetwork())
     {
-        m_parentEdge->setNetworkValue(static_cast<FracType>(PyFloat_AsDouble(PyList_GetItem(nodeValue, 0))));
+        m_parentEdge->setNetworkValue(static_cast<FracType>(PyFloat_AsDouble(PyList_GetItem(nodeValue, 0))) + currentValue);
         //std::cout << "edge: " << m_parentEdge->getAction().first.getName() << " edge value: " << m_parentEdge->getNetworkValue() << std::endl;
     }
     GPUQueue::getInstance().decPredictionReference();

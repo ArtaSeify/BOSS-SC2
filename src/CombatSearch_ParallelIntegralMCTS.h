@@ -73,8 +73,9 @@ namespace BOSS
             std::pair<std::string, int> state;
             std::string policy;
             FracType stateValue;
+            FracType highestFoundValue;
 
-            StateData() : state(), policy(), stateValue() { }
+            StateData() : state(), policy(), stateValue(), highestFoundValue() { }
         };
 
         enum class ThreadMessage
@@ -139,7 +140,7 @@ namespace BOSS
 
         void writeSummaryToQueue();
 
-        void writeRootData();
+        void writeRootData(const BuildOrderIntegral& rootIntegral);
 
         virtual void printResults();
 
