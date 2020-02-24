@@ -17,25 +17,25 @@ namespace BOSS
     public:
         static int NODE_VISITS_BEFORE_EXPAND;
         static bool USE_MAX_VALUE;
-        static FracType MAX_EDGE_VALUE_EXPECTED;
+        static FracType HIGHEST_VALUE_FOUND;
         static FracType MIXING_VALUE;
-        static int VIRTUAL_LOSS_COUNT;
+        static int VIRTUAL_LOSS;
 
     private:
-        int m_timesVisited;
+        int m_visits;
         int m_virtualLoss;
         FracType m_valueSimulations;
         FracType m_valueNetwork;
         FracType m_value;
-        FracType m_averageValue;
-        FracType m_maxValue;
-        FracType m_policyValue;
+        FracType m_average;
+        FracType m_max;
+        FracType m_policy;
         ActionAbilityPair m_action;
-
-        mutable std::recursive_mutex m_mutex;
 
         std::shared_ptr<Node> m_child;
         std::shared_ptr<Node> m_parent;
+
+        mutable std::mutex m_lock;
 
         void setNewEdgeValue();
 
@@ -44,48 +44,37 @@ namespace BOSS
         Edge(const ActionAbilityPair & action, std::shared_ptr<Node> parent);
         Edge(const Edge& edge);
 
-        void lock() { m_mutex.lock(); }
-        void unlock() { m_mutex.unlock(); }
-
         void cleanUp();
         void reset();
 
         void updateEdge(FracType simulationValue, FracType networkValue);
+        FracType calculatePUCT(FracType exploration, FracType totalVisitsSqrt, int normalization) const;
 
         void setNetworkValue(FracType newValue) 
         { 
-            std::scoped_lock sl(m_mutex);
             m_valueNetwork = newValue;
             setNewEdgeValue();
         }
-        FracType getNetworkValue() const { std::scoped_lock sl(m_mutex); return m_valueNetwork; }
+        FracType getNetworkValue() const { std::scoped_lock sl(m_lock); return m_valueNetwork; }
         
-        const ActionAbilityPair & getAction() const { std::scoped_lock sl(m_mutex); return m_action; }
+        const ActionAbilityPair & getAction() const { std::scoped_lock sl(m_lock); return m_action; }
 
-        void setPolicyValue(FracType value) { std::scoped_lock sl(m_mutex); m_policyValue = value; }
-        FracType getPolicyValue() const { std::scoped_lock sl(m_mutex); return m_policyValue; }
-        FracType getPolicyValueNoLock() const { return m_policyValue; }
+        void setPolicy(FracType newPolicy) { assert(newPolicy >= 0); m_policy = newPolicy; }
+        FracType getPolicyValue() const { return m_policy; }
         
-        std::shared_ptr<Node> getChild() { std::scoped_lock sl(m_mutex); return m_child; }
-        void setChild(std::shared_ptr<Node> node);
-        std::shared_ptr<Node> getParent() { std::scoped_lock sl(m_mutex); return m_parent; }
+        const std::shared_ptr<Node> & getChild() { std::scoped_lock sl(m_lock); return m_child; }
+        const std::shared_ptr<Node> & getParent() { std::scoped_lock sl(m_lock); return m_parent; }
 
-        int totalTimesVisited() const { std::scoped_lock sl(m_mutex); return m_timesVisited + m_virtualLoss; }
-        int totalTimesVisitedNoLock() const { return m_timesVisited + m_virtualLoss; }
-        int realTimesVisited() const { std::scoped_lock sl(m_mutex); return m_timesVisited; }
-        int realTimesVisitedNoLock() const { return m_timesVisited; }
-        //void incrementVisitCount() { std::scoped_lock sl(m_mutex); ++m_timesVisited; }
+        bool setChild(const std::shared_ptr<Node>& child);
 
-        int virtualLoss() const { std::scoped_lock sl(m_mutex); return m_virtualLoss; }
-        void incrementVirtualLoss()  { std::scoped_lock sl(m_mutex); m_virtualLoss += VIRTUAL_LOSS_COUNT; }
-        void decrementVirtualLoss() { std::scoped_lock sl(m_mutex); m_virtualLoss -= VIRTUAL_LOSS_COUNT; }
+        int realTimesVisited() const { std::scoped_lock sl(m_lock); return m_visits; }
+        int virtualLoss() const { return m_virtualLoss; }
 
-        void visited() { std::scoped_lock sl(m_mutex); ++m_timesVisited; incrementVirtualLoss(); }
+        void visited();
 
-        FracType getValue() const { std::scoped_lock sl(m_mutex); return m_value; }
-        FracType getValueNoLock() const { return m_value; }
-        FracType getMean() const { std::scoped_lock sl(m_mutex); return m_averageValue; }
-        FracType getMax() const { std::scoped_lock sl(m_mutex); return m_maxValue; }
+        FracType getValue() const { return m_value; }
+        FracType getMean() const { return m_average; }
+        FracType getMax() const { return m_max; }
 
         void printValues() const;
     };

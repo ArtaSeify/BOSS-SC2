@@ -100,7 +100,7 @@ namespace BOSS
         std::mutex                                      m_resultFileMutex;
         std::vector<StateData>                          m_stateData;
 
-        std::mt19937 m_rnggen;
+        RNG m_rnggen;
         gsl_rng* m_gsl_r;
 
         std::atomic<uint8>  m_nodesExpanded;   // number of nodes expanded in the search
@@ -114,22 +114,24 @@ namespace BOSS
 
         void evaluatePolicyNetwork();
         
-        std::shared_ptr<Node> getPromisingNode(Node & node, BuildOrderIntegral& buildOrderIntegral);
+        std::shared_ptr<Edge> getPromisingEdge(const std::shared_ptr<Node> & node, BuildOrderIntegral& buildOrderIntegral);
         
-        void randomPlayout(Node node, BuildOrderIntegral& buildOrderIntegral);
+        void rollout(GameState & state, BuildOrderIntegral& buildOrderIntegral, bool terminal);
         
         // does a random action
-        bool doRandomAction(Node & currentNode, BuildOrderIntegral & buildOrderIntegral);
+        bool doRandomAction(GameState & state, BuildOrderIntegral & buildOrderIntegral);
 
         //void getChronoBoostTargets(const Node & node, ActionSetAbilities & legalActions);
 
-        void updateIntegralTerminal(const Node & node, BuildOrderIntegral & buildOrderIntegral);
+        void updateIntegralTerminal(const GameState & state, BuildOrderIntegral & buildOrderIntegral);
     
         // updates both m_promisingNodeIntegral and m_promisingNodeBuildOrder
-        void updateBOIntegral(const Node & currNode, const ActionAbilityPair & action, BuildOrderIntegral & buildOrderIntegral);
+        void updateBOIntegral(const GameState & state, const ActionAbilityPair & action, BuildOrderIntegral & buildOrderIntegral, bool terminal);
 
         // updates values of the nodes explored in this iteration
-        void backPropogation(Node & node, const BuildOrderIntegral& buildOrderIntegral);
+        void backPropogation(const std::shared_ptr<Edge> & edge, const BuildOrderIntegral& buildOrderIntegral);
+
+        bool changeRoot(int threadID);
 
         // sets the class variables to the best build order found during search
         //std::pair<BuildOrderAbilities, CombatSearch_IntegralDataFinishedUnits> pickBestBuildOrder(std::shared_ptr<Node> root, bool useVisitCount);

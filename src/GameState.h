@@ -123,7 +123,7 @@ class GameState
     void                            printunitsbeingbuilt()              const;
     void                            printUnits()                        const;
     // returns <state representation as a csv, num_units in csv>
-    std::pair<std::string, int>     getStateData(const CombatSearchParameters & params, FracType currentValue, const std::vector<int> & chronoboostTargets)   const;
+    std::pair<std::string, int>     getStateData(const CombatSearchParameters & params)   const;
     json                            writeToJson(const CombatSearchParameters & params)               const;
 };
 }

@@ -1122,7 +1122,7 @@ void GameState::printUnits() const
 
 #include "Eval.h"
 
-std::pair<std::string, int> GameState::getStateData(const CombatSearchParameters & params, FracType currentValue, const std::vector<int>& chronoboostTargets) const
+std::pair<std::string, int> GameState::getStateData(const CombatSearchParameters & params) const
 {    
     std::stringstream state;
     state.precision(4);
@@ -1149,19 +1149,8 @@ std::pair<std::string, int> GameState::getStateData(const CombatSearchParameters
         state << unitCount[i] << ",";
     }
 
-    /*const auto unitValues = Eval::GetUnitValuesVector();
-    const auto unitWeights = Eval::GetUnitWeightVector();
-
-    BOSS_ASSERT(unitValues.size() == unitWeights.size() && unitValues.size() == unitCount.size(), 
-        "Sizes of these should be equal, but are %i, %i, %i", unitValues.size(), unitWeights.size(), unitCount.size());
-    for (int i = 0; i < unitWeights.size(); ++i)
-    {
-        state << unitValues[i] + unitWeights[i] << ",";
-    }*/
-
     state << Eval::getUnitWeightsString();
 
-    //ss << int(m_race) << ",";
     state << m_minerals;
     state << ",";
     state << m_gas;
@@ -1170,9 +1159,6 @@ std::pair<std::string, int> GameState::getStateData(const CombatSearchParameters
     state << ",";
     state << m_maxSupply;
     state << ",";
-    state << m_currentFrame;
-    state << ",";
-    //ss << m_previousFrame << ",";
     state << (params.getFrameTimeLimit() - m_currentFrame);
     state << ",";
     state << m_mineralWorkers;
@@ -1181,18 +1167,16 @@ std::pair<std::string, int> GameState::getStateData(const CombatSearchParameters
     state << ",";
     state << m_buildingWorkers;
     state << ",";
-    //state << currentValue;
-    //state << ",";
     state << CONSTANTS::MPWPF;
     state << ",";
     state << CONSTANTS::GPWPF;
 
     // chronoboost targets
-    for (int target : chronoboostTargets)
+    /*for (int target : chronoboostTargets)
     {
         state << ",";
         state << target;
-    }
+    }*/
     return std::make_pair(state.str(), unitsWritten);
 }
 

@@ -57,6 +57,8 @@ namespace BOSS
     using NumUnits = sint2;
     using FracType = float;
 
+    using RNG = std::mt19937;
+
     // constants declared in data file
     class GPUQueue;
     class CONSTANTS
