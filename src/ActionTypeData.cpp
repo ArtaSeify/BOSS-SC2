@@ -28,60 +28,102 @@ const std::vector<ActionTypeData> & ActionTypeData::GetAllActionTypeData()
     return AllActionTypeData;
 }
 
-void ActionTypeData::Init(const json & j)
+void ActionTypeData::CreateActionTypeData(const json & actions, RaceID race)
 {
-    // add the None type for error returns
-    AllActionTypeData.push_back(ActionTypeData());
-    ActionTypeNameMap["None"] = 0;
+    int raceActionID = 1;
 
-    // read all of the action types in the file
-    if (j.count("Types") && j["Types"].is_array())
+    for (ActionID a(1); a < actions.size() + 1; ++a)
     {
-        const json & actions = j["Types"];
-        for (ActionID a(1); a < actions.size(); ++a)
+        ActionTypeData data;
+        size_t index = a - 1;
+
+        JSONTools::ReadString("race", actions[index], data.raceName);
+        data.race = Races::GetRaceID(data.raceName);
+        if (data.race == race)
         {
-            ActionTypeData data;
-
             data.id = a;
-            JSONTools::ReadString("name",           actions[a], data.name);
-            JSONTools::ReadString("race",           actions[a], data.raceName);
-            data.race = Races::GetRaceID(data.raceName);
-            JSONTools::ReadInt("mineralCost",       actions[a], data.mineralCost);
-            JSONTools::ReadInt("gasCost",           actions[a], data.gasCost);
-            JSONTools::ReadFloat("supplyCost",      actions[a], data.supplyCost); // demical supply cost in SC2
-            JSONTools::ReadInt("energyCost",        actions[a], data.energyCost);
-            JSONTools::ReadInt("supplyProvided",    actions[a], data.supplyProvided);
-            JSONTools::ReadInt("buildTime",         actions[a], data.buildTime);
-            JSONTools::ReadInt("numProduced",       actions[a], data.numProduced);
-            JSONTools::ReadInt("startingEnergy",    actions[a], data.startingEnergy);
-            JSONTools::ReadInt("maxEnergy",         actions[a], data.maxEnergy);
-            JSONTools::ReadBool("isUnit",           actions[a], data.isUnit);
-            JSONTools::ReadBool("isUpgrade",        actions[a], data.isUpgrade);
-            JSONTools::ReadBool("isAbility",        actions[a], data.isAbility);
-            JSONTools::ReadBool("isBuilding",       actions[a], data.isBuilding);
-            JSONTools::ReadBool("isWorker",         actions[a], data.isWorker);
-            JSONTools::ReadBool("isRefinery",       actions[a], data.isRefinery);
-            JSONTools::ReadBool("isSupplyProvider", actions[a], data.isSupplyProvider);
-            JSONTools::ReadBool("isResourceDepot",  actions[a], data.isDepot);
-            JSONTools::ReadBool("isAddon",          actions[a], data.isAddon);
+            data.raceActionID = raceActionID;
+            JSONTools::ReadString("name", actions[index], data.name);
+            JSONTools::ReadInt("mineralCost", actions[index], data.mineralCost);
+            JSONTools::ReadInt("gasCost", actions[index], data.gasCost);
+            JSONTools::ReadFloat("supplyCost", actions[index], data.supplyCost); // demical supply cost is possible in SC2
+            JSONTools::ReadInt("energyCost", actions[index], data.energyCost);
+            JSONTools::ReadInt("supplyProvided", actions[index], data.supplyProvided);
+            JSONTools::ReadInt("buildTime", actions[index], data.buildTime);
+            JSONTools::ReadInt("numProduced", actions[index], data.numProduced);
+            JSONTools::ReadInt("startingEnergy", actions[index], data.startingEnergy);
+            JSONTools::ReadInt("maxEnergy", actions[index], data.maxEnergy);
+            JSONTools::ReadBool("isUnit", actions[index], data.isUnit);
+            JSONTools::ReadBool("isUpgrade", actions[index], data.isUpgrade);
+            JSONTools::ReadBool("isAbility", actions[index], data.isAbility);
+            JSONTools::ReadBool("isBuilding", actions[index], data.isBuilding);
+            JSONTools::ReadBool("isWorker", actions[index], data.isWorker);
+            JSONTools::ReadBool("isRefinery", actions[index], data.isRefinery);
+            JSONTools::ReadBool("isSupplyProvider", actions[index], data.isSupplyProvider);
+            JSONTools::ReadBool("isResourceDepot", actions[index], data.isDepot);
+            JSONTools::ReadBool("isAddon", actions[index], data.isAddon);
 
-            BOSS_ASSERT(actions[a].count("whatBuilds"), "no 'whatBuilds' member");
-            auto & whatBuilds = actions[a]["whatBuilds"];
-            data.whatBuildsStr = whatBuilds[0].get<std::string>();
+            BOSS_ASSERT(actions[index].count("whatBuilds"), "no 'whatBuilds' member");
+            auto & whatBuilds = actions[index]["whatBuilds"];
+            if (whatBuilds[0].is_array())
+            {
+                data.whatBuildsStr = whatBuilds[0][0].get<std::string>();
+                //data.whatBuildsStrSecond = whatBuilds[0][1].get<std::string>();
+            }
+            else
+            {
+                data.whatBuildsStr = whatBuilds[0].get<std::string>();
+            }
             data.whatBuildsCount = std::stoul(whatBuilds[1].get<std::string>());
             data.whatBuildsStatus = whatBuilds[2].get<std::string>();
+            if (data.whatBuildsStatus == "Morphed")
+            {
+                data.isMorphed = true;
+            }
             if (whatBuilds.size() == 4) { data.whatBuildsAddonStr = whatBuilds[3].get<std::string>(); }
 
-            BOSS_ASSERT(actions[a].count("required"), "no 'required' member");
-            for (auto & req : actions[a]["required"])
+            BOSS_ASSERT(actions[index].count("equivalent"), "no 'equivalent' member");
+            for (auto & equiv : actions[index]["equivalent"])
+            {
+                data.equivalentStrings.push_back(equiv);
+            }
+
+            BOSS_ASSERT(actions[index].count("required"), "no 'required' member");
+            for (auto & req : actions[index]["required"])
             {
                 data.requiredStrings.push_back(req);
             }
 
-            BOSS_ASSERT(actions[a].count("equivalent"), "no 'equivalent' member");
-            for (auto & equiv : actions[a]["equivalent"])
+            if (actions[index].count("strong"))
             {
-                data.equivalentStrings.push_back(equiv);
+                BOSS_ASSERT(actions[index]["strong"].size() == 3, "Missing a race in 'strong' memeber");
+                for (auto & raceStrong : actions[index]["strong"])
+                {
+                    data.strongStrings.push_back(raceStrong.get<std::vector<std::string>>());
+                }               
+            }
+            else
+            {
+                for (int i = 0; i < 3; ++i)
+                {
+                    data.strongStrings.push_back(std::vector<std::string>());
+                }
+            }
+
+            if (actions[index].count("weak"))
+            {
+                BOSS_ASSERT(actions[index]["weak"].size() == 3, "Missing a race in 'weak' memeber");
+                for (auto & raceWeak : actions[index]["weak"])
+                {
+                    data.weakStrings.push_back(raceWeak.get<std::vector<std::string>>());
+                }
+            }
+            else
+            {
+                for (int i = 0; i < 3; ++i)
+                {
+                    data.weakStrings.push_back(std::vector<std::string>());
+                }
             }
 
             // the name map stores the index that will hold this data, which is the current size
@@ -89,30 +131,36 @@ void ActionTypeData::Init(const json & j)
 
             // then we add the data to the vector
             AllActionTypeData.push_back(data);
-             
+
+            raceActionID++;
+
             //std::cout << AllActionTypeData.back().name << " " << AllActionTypeData.back().mineralCost << "\n";
         }
     }
+}
 
-    // Special actions: Chrono Boost, MULE, and Spawn Larvae
-    ActionTypeData data;
+void ActionTypeData::Init(const json & j)
+{
+    // add the None type for error returns
+    AllActionTypeData.push_back(ActionTypeData());
+    ActionTypeNameMap["None"] = 0;
 
-    data.id = ActionID(AllActionTypeData.size());
-    data.name = "ChronoBoost";
-    data.raceName = "Protoss";
-    data.race = Races::GetRaceID(data.raceName);
-    data.energyCost = 50;
-    data.buildTime = 320;
-    data.isAbility = true;
-    data.whatBuildsStr = "Nexus";
-    data.whatBuildsCount = 1;
-    data.whatBuildsStatus = "None";
+    std::vector<int> numUnitsEachRace;
 
-    // the name map stores the index that will hold this data, which is the current size
-    ActionTypeNameMap[data.name] = ActionID(AllActionTypeData.size());
+    // read all of the action types in the file
+    if (j.count("Types") && j["Types"].is_array())
+    {
+        const json & actions = j["Types"];
 
-    // then we add the data to the vector
-    AllActionTypeData.push_back(data);
+        CreateActionTypeData(actions, Races::Protoss);
+        numUnitsEachRace.push_back(AllActionTypeData.back().raceActionID + 1);
+
+        CreateActionTypeData(actions, Races::Terran);
+        numUnitsEachRace.push_back(AllActionTypeData.back().raceActionID + 1);
+
+        CreateActionTypeData(actions, Races::Zerg);
+        numUnitsEachRace.push_back(AllActionTypeData.back().raceActionID + 1);
+    }
 
     // now we have to re-iterate over all established types to get the ids
     for (auto & data : AllActionTypeData)
@@ -122,6 +170,15 @@ void ActionTypeData::Init(const json & j)
             // get the types of the thing that builds this type
             data.whatBuilds = ActionType(ActionTypeNameMap.at(data.whatBuildsStr));
         }
+        
+        /*if (data.whatBuildsStrSecond.size() > 0)
+        {
+            data.whatBuildsSecond = ActionType(ActionTypeNameMap.at(data.whatBuildsStrSecond));
+        }
+        else
+        {
+            data.whatBuildsSecond = ActionType(ActionTypeNameMap.at("None"));
+        }*/
 
         if (data.whatBuildsAddonStr.size() > 0) 
         {
@@ -143,6 +200,70 @@ void ActionTypeData::Init(const json & j)
                 data.required.push_back(ActionType(ActionTypeNameMap.at(data.requiredStrings[i])));
             }
         }
+        
+        
+        std::vector<size_t> raceOrdering = { 2, 0, 1 };
+        // the units this unit is strong against
+        if (data.strongStrings.size() > 0)
+        {
+            for (size_t i : raceOrdering)
+            {
+                std::vector<ActionType> strongAgainstTypes;
+                for (const std::string & unitName : data.strongStrings[i])
+                {
+                    strongAgainstTypes.push_back(ActionType(ActionTypeNameMap.at(unitName)));
+                }
+                data.strongAgainst.push_back(strongAgainstTypes);
+            }
+        }
+        else
+        {
+            for (int i = 0; i < 3; ++i)
+            {
+                data.strongAgainst.push_back(std::vector<ActionType>());
+            }
+        }
+
+        // the units this unit is weak against
+        if (data.weakStrings.size() > 0)
+        {
+            for (size_t i : raceOrdering)
+            {
+                std::vector<ActionType> weakAgainstTypes;
+                for (const std::string & unitName : data.weakStrings[i])
+                {
+                    weakAgainstTypes.push_back(ActionType(ActionTypeNameMap.at(unitName)));
+                }
+                data.weakAgainst.push_back(weakAgainstTypes);
+            }
+        }
+        else
+        {
+            for (int i = 0; i < 3; ++i)
+            {
+                data.weakAgainst.push_back(std::vector<ActionType>());
+            }
+        }
+    }
+
+    // whatBuildsVector contains a 1 in the slot pertaining to the raceActionID of
+    // the unit that produces this unit
+    for (auto & data : AllActionTypeData)
+    {
+        if (data.id == (ActionTypes::None).getID())
+        {
+            continue;
+        }
+
+        data.whatBuildsVector = std::vector<bool>(numUnitsEachRace[data.race], false);
+
+        if (data.whatBuildsStr.size() > 0)
+        {
+            data.whatBuildsVector[data.whatBuilds.getRaceActionID()] = true;
+        }
+        /*if (data.whatBuildsStrSecond.size() > 0)
+        {
+            data.whatBuildsVector[data.whatBuildsSecond.getRaceActionID()] = true;
+        }*/
     }
 }
-

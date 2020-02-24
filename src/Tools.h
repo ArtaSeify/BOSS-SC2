@@ -22,6 +22,6 @@ namespace Tools
     BuildOrder  GetNaiveBuildOrderAddWorkersOld(const GameState & state, const BuildOrderSearchGoal & goal, int maxWorkers);
     int         GetBuildOrderCompletionTime(const GameState & state, const BuildOrder & buildOrder);
     void        DoBuildOrder(GameState & state, const BuildOrder & buildOrder);
-    void        DoBuildOrder(GameState & state, const BuildOrderAbilities & buildOrder);
+    void        DoBuildOrder(GameState & state, BuildOrderAbilities & buildOrder);
 }
 }

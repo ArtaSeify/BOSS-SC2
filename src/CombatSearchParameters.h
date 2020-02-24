@@ -11,8 +11,6 @@ namespace BOSS
 
     class CombatSearchParameters
     {
-        void init();
-
         std::vector<int> m_maxActions;
 
         //      Flag which determines whether or not doubling macro actions will be used in search.
@@ -99,11 +97,35 @@ namespace BOSS
 
         GameState m_enemyInitialState;
         BuildOrderAbilities m_enemyBuildOrder;
+        std::vector<int>    m_enemyUnits;
+        RaceID              m_enemyRace;
 
         ActionSetAbilities m_relevantActions;
         int m_frameTimeLimit;
         bool m_printNewBest;
         bool m_sortActions;
+        bool m_saveStates;
+        FracType m_explorationValue;
+        bool m_changingRoot;
+        bool m_changingRootReset;
+        bool m_useMaxValue;
+        bool m_maximizeValue;
+        int m_numberOfSimulations;
+        uint8 m_numberOfNodes;
+        int m_simulationsPerStep;
+        FracType m_simulationsPerStepDecay;
+        bool m_usePolicyNetwork;
+        bool m_usePolicyValueNetwork;
+        FracType m_mixingValue;
+        int m_threadsForMCTS;
+        int m_numPlayouts;
+        int m_level;
+        bool m_useTotalTimeLimit;
+        int m_temperatureChange;
+        int m_valueNormalization;
+        int m_nodeVisitsBeforeExpand;
+        FracType m_valueTargetMix;
+        bool m_useSimulationValueOnly;
 
     public:
 
@@ -131,6 +153,12 @@ namespace BOSS
         void setEnemyBuildOrder(const BuildOrderAbilities & buildOrder);
         const BuildOrderAbilities & getEnemyBuildOrder() const;
 
+        void setEnemyUnits(const std::vector<int> & units);
+        const std::vector<int> & getEnemyUnits() const;
+
+        void setEnemyRace(RaceID race);
+        RaceID getEnemyRace() const;
+
         void setSearchTimeLimit(float timeLimitMS);
         float getSearchTimeLimit() const;
 
@@ -145,6 +173,72 @@ namespace BOSS
 
         void setSortActions(bool flag);
         bool getSortActions() const;
+
+        void setSaveStates(bool flag);
+        bool getSaveStates() const;
+
+        void setExplorationValue(FracType value);
+        FracType getExplorationValue() const;
+
+        void setChangingRoot(bool value);
+        bool getChangingRoot() const;
+
+        void setChangingRootReset(bool value);
+        bool getChangingRootReset() const;
+
+        void setUseMaxValue(bool value);
+        bool getUseMaxValue() const;
+
+        void setMaximizeValue(bool value);
+        bool getMaximizeValue() const;
+
+        void setNumberOfSimulations(int value);
+        int getNumberOfSimulations() const;
+
+        void setNumberOfNodes(uint8 value);
+        uint8 getNumberOfNodes() const;
+
+        void setSimulationsPerStep(int value);
+        int getSimulationsPerStep() const;
+
+        void setSimulationsPerStepDecay(FracType value);
+        FracType getSimulationsPerStepDecay() const;
+
+        void setUsePolicyNetwork(bool value);
+        bool usePolicyNetwork() const;
+
+        void setUsePolicyValueNetwork(bool value);
+        bool usePolicyValueNetwork() const;
+
+        void setMixingValue(FracType value);
+        FracType getMixingValue() const;
+
+        void setThreadsForMCTS(int threads);
+        int getThreadsForMCTS() const;
+
+        void setNumPlayouts(int value);
+        int getNumPlayouts() const;
+
+        void setLevel(int value);
+        int getLevel() const;
+
+        void setUseTotalTimeLimit(bool value);
+        bool getUseTotalTimeLimit() const;
+
+        void setTemperatureChange(int value);
+        int getTemperatureChange() const;
+
+        void setValueNormalization(int value);
+        int getValueNormalization() const;
+
+        void setNodeVisitsBeforeExpand(int value);
+        int getNodeVisitsBeforeExpand() const;
+
+        void setValueTargetMix(FracType value);
+        FracType getValueTargetMix() const;
+
+        void setUseSimulationValueOnly(bool value);
+        bool useSimulationValueOnly() const;
     
         void print();
     };

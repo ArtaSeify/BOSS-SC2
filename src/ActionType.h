@@ -21,6 +21,7 @@ namespace BOSS
         const std::string & getName() const;
 
         ActionID getID()             const;
+        ActionID getRaceActionID()   const;
         RaceID   getRace()           const;
     
         int  buildTime()        const;
@@ -44,10 +45,14 @@ namespace BOSS
         bool isMorphed()        const;
     
         ActionType whatBuilds() const;
+        //ActionType whatBuildsSecond() const;
+        const std::vector<bool> & whatBuildsVector() const;
         const std::string & whatBuildsStatus() const;
         ActionType whatBuildsAddon() const;
         const std::vector<ActionType> & required() const;
         const std::vector<ActionType> & equivalent() const;
+        const std::vector<ActionType> & strongAgainst(RaceID race) const;
+        const std::vector<ActionType> & weakAgainst(RaceID race) const;
         const ActionSetAbilities & getPrerequisiteActionCount() const;
         const ActionSetAbilities & getRecursivePrerequisiteActionCount() const;
 
@@ -60,12 +65,19 @@ namespace BOSS
     {
         void Init();
         const std::vector<ActionType> & GetAllActionTypes();
+        int GetRaceActionCount(RaceID raceID);
         ActionType GetWorker(RaceID raceID);
         ActionType GetSupplyProvider(RaceID raceID);
         ActionType GetRefinery(RaceID raceID);
         ActionType GetResourceDepot(RaceID raceID);
         ActionType GetSpecialAction(RaceID raceID);
+        ActionType GetDetector(RaceID raceID);
+        ActionType GetWarpGateResearch();
+        ActionType GetGatewayAction();
+        ActionType GetWarpgateAction();
         ActionType GetActionType(const std::string & name);
+        ActionType GetActionType(ActionID id);
+        ActionType GetRaceActionType(ActionID id, RaceID race);
         bool TypeExists(const std::string & name);
 
         ActionSetAbilities CalculatePrerequisites(ActionType action);

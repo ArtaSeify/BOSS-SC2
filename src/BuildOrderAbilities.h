@@ -10,8 +10,8 @@ namespace BOSS
 {
     class BuildOrderAbilities
     {
-        using ActionTargetPair = std::pair<ActionType, AbilityAction>;
-        using BuildOrder = std::vector<ActionTargetPair>;
+        using ActionAbilityPair = std::pair<ActionType, AbilityAction>;
+        using BuildOrder = std::vector<ActionAbilityPair>;
 
         BuildOrder m_buildOrder;
         std::vector<int> m_typeCount;
@@ -22,12 +22,18 @@ namespace BOSS
 
         void add(ActionType type);
         void add(ActionType type, const AbilityAction & ability);
+        void add(const ActionAbilityPair & pair);
         void add(ActionType type, int amount);
         void add(const BuildOrderAbilities & other);
+
+        void remove(int index);
+
         void clear();
-        const ActionTargetPair & back() const;
+        const ActionAbilityPair & back() const;
         void pop_back();
         void sortByPrerequisites();
+
+        void print() const;
 
         int size() const { return int(m_buildOrder.size()); }
         int getTypeCount(ActionType type) const;
@@ -39,19 +45,19 @@ namespace BOSS
         std::string getJSONString() const;
         std::string getNumberedString() const;
         std::string getIDString() const;
-        std::string getNameString(int charactersPerName = 0, int printUpToIndex = -1) const;
+        std::string getNameString(int charactersPerName = 0, int printUpToIndex = -1, bool withComma = false) const;
     
         // iterator
         using iterator = BuildOrder::iterator;
         using const_iterator = BuildOrder::const_iterator;
         iterator begin() { return m_buildOrder.begin(); }
-        const_iterator begin() const { return m_buildOrder.begin(); }
+        const_iterator begin() const { return m_buildOrder.cbegin(); }
         iterator end() { return m_buildOrder.end(); }
-        const_iterator end() const { return m_buildOrder.end(); }
+        const_iterator end() const { return m_buildOrder.cend(); }
 
         // index
-        const ActionTargetPair & operator [] (int i) const;
-        ActionTargetPair & operator [] (int i);
+        const ActionAbilityPair & operator [] (int i) const;
+        ActionAbilityPair & operator [] (int i);
     };
 
 }

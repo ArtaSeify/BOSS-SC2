@@ -1,183 +1,83 @@
-/* -*- c-basic-offset: 4 -*- */
+///* -*- c-basic-offset: 4 -*- */
+//
+//#define _CRT_NO_VA_START_VALIDATION
+//
 
-#define _CRT_NO_VA_START_VALIDATION
+#include <Python.h>
+#include <boost/filesystem/operations.hpp>
+#include <boost/filesystem/path.hpp>
 
 #include "BOSS.h"
 #include "GameState.h"
-#include "BOSSExperiments.h"
+#include "Experiments.h"
+#include "GPUQueue.h"
+
 #include <chrono>
 #include <thread>
-#include "CImg/CImg.h"
+#include <string>
 
 using namespace BOSS;
-using namespace cimg_library;
+namespace fs = boost::filesystem;
 
-#ifdef WIN32
-
-#include <Windows.h>
-
-bool GetKey(char key)
+int main(int argc, char * argv[])
 {
-    return GetKeyState(key) & 0x8000;
-}
+    BOSS_ASSERT(argc >= 2, "Missing experiment file name?");
 
-void cls( HANDLE hConsole )
-{
-   COORD coordScreen = { 0, 0 };    // home for the cursor 
-   DWORD cCharsWritten;
-   CONSOLE_SCREEN_BUFFER_INFO csbi; 
-   DWORD dwConSize;
+    // get path of this executable
+    fs::path full_path(fs::initial_path<fs::path>());
+    full_path = fs::system_complete(fs::path(argv[0]));
+    std::string parent_path = full_path.parent_path().string();
+    std::replace(parent_path.begin(), parent_path.end(), '\\', '/');
+    std::string path_string = parent_path + "/ML";
 
-    // Get the number of character cells in the current buffer. 
+    BOSS::CONSTANTS::ExecutablePath = parent_path;
+    PyThreadState* PythonState;
 
-   if( !GetConsoleScreenBufferInfo( hConsole, &csbi ))
-      return;
-   dwConSize = csbi.dwSize.X * csbi.dwSize.Y;
-
-   // Fill the entire screen with blanks.
-
-   if( !FillConsoleOutputCharacter( hConsole, (TCHAR) ' ',
-      dwConSize, coordScreen, &cCharsWritten ))
-      return;
-
-   // Get the current text attribute.
-
-   if( !GetConsoleScreenBufferInfo( hConsole, &csbi ))
-      return;
-
-   // Set the buffer's attributes accordingly.
-
-   if( !FillConsoleOutputAttribute( hConsole, csbi.wAttributes,
-      dwConSize, coordScreen, &cCharsWritten ))
-      return;
-
-   // Put the cursor at its home coordinates.
-
-   SetConsoleCursorPosition( hConsole, coordScreen );
-}
-
-void testBuildOrder()
-{
-    HANDLE hStdout;
-    hStdout = GetStdHandle(STD_OUTPUT_HANDLE);
-
-    GameState state;
-    state.addUnit(ActionTypes::GetActionType("Nexus"));
-    state.addUnit(ActionTypes::GetActionType("Probe"));
-    state.addUnit(ActionTypes::GetActionType("Probe"));
-    state.addUnit(ActionTypes::GetActionType("Probe"));
-    state.addUnit(ActionTypes::GetActionType("Probe"));
-    state.setMinerals(50.0f);
-
-    std::vector<std::string> bos = 
-        {"Probe", "Probe", "Probe", "Probe", "Pylon", "Pylon", "Pylon", "Probe", "Probe", "Gateway", "Probe",
-        "Assimilator", "Probe", "Probe", "CyberneticsCore", "Probe", "Pylon", "Probe", "Gateway", 
-        "Dragoon", "Gateway", "Dragoon", "Dragoon", "Probe", "Gateway", "Pylon", "Probe", "Dragoon", "Dragoon", "Dragoon"};
-
-    std::vector<ActionType> buildOrder;
-
-    for (auto & str : bos)
+    if (argc > 2)
     {
-        buildOrder.push_back(ActionTypes::GetActionType(str));
-    }
+        int expectedArguments = 2;
 
-    size_t buildOrderIndex = 0;
-    bool progress = true;
-
-    CImg<> image;
-    CImgList<> font_full = CImgList<>::font(17, false);
-    //font_full.remove(0,255);
-    unsigned char color[3] = {222, 222, 222};
-    //image.draw_text(0, 0, state.toString().c_str(), &color, 0, 1, font_full); 
-    CImgDisplay main_disp(image,"Click a point");
-
-    std::vector<GameState> states;
-
-    while(true)
-    {
-        if (progress || GetKey('D')) 
-        { 
-            state.fastForward(state.getCurrentFrame() + 4); 
-            states.push_back(state);
-        }
-        else if (!progress && GetKey('A'))
+        std::ifstream file(parent_path + "/" + argv[1] + ".txt");
+        json j;
+        file >> j;
+        std::string networkType;
+        if (j["Experiments"].front()["UsePolicyNetwork"])
         {
-            if (states.size() > 1)
-            {
-                state = states.back();
-                states.pop_back();
-            }
+            networkType = "policy";
+        }
+        if (j["Experiments"].front()["UsePolicyValueNetwork"])
+        {
+            networkType = "both";
         }
 
+        BOSS_ASSERT(argc == expectedArguments+1, "must provide %i argument, but got %i", expectedArguments, argc);
+        std::string command = "import sys\nsys.path.append(\"" + path_string + "\")\n";
 
-
-        CImg<unsigned char> image2;
-        image2.draw_text(0, 0, state.toString().c_str(), color, 0, 1, font_full); 
-        main_disp.display(image2);
-        main_disp.resize(image2);
+        Py_Initialize();
+        PyEval_InitThreads();
         
-        if (GetKey('S') && progress) { progress = false; }
-        if (GetKey('W') && !progress) { progress = true; }
+        PyRun_SimpleString(command.c_str());
 
-        if (buildOrderIndex < buildOrder.size())
-        {
-            if (state.canBuildNow(buildOrder[buildOrderIndex]))
-            {
-                state.doAction(buildOrder[buildOrderIndex]);
-                buildOrderIndex++;
-            }
-        }
-
-        std::this_thread::sleep_for(std::chrono::milliseconds(0));
+        PyObject* PyModule = PyImport_ImportModule("predictor");
+        PyObject* PyClass = PyObject_GetAttrString(PyModule, "Network");
+        GPUQueue::getInstance().setPredictorFunction(PyObject_CallFunction(PyClass, "ssi", std::string(argv[2]).c_str(), networkType.c_str(), true));
+        PythonState = PyEval_SaveThread();
+        GPUQueue::getInstance().getPythonInterpretor();
     }
 
-}
-
-#else
-void testBuildOrder() {}
-#endif
-
-#include "json/json.hpp"
-
-void testjson()
-{
-
-}
-
-int main(int /*!!! PROBLEM UNUSED argc*/, char * /*!!! PROBLEM UNUSED argv*/ [])
-{
     // Initialize all the BOSS internal data
-    //BOSS::Init("../bin/BWData.json");
+    BOSS::Init(parent_path + "/SC2Data.json");
 
-    // Read in the config parameters that will be used for experiments
-    //BOSS::BOSSConfig::Instance().ParseConfig("../bin/BOSS_Config.txt");
+    BOSS::BOSSConfig::Instance().ParseConfig(parent_path + "/" + argv[1] + ".txt");
+    BOSS::ExperimentsArta::RunExperiments(parent_path + "/" + argv[1] + ".txt");
 
-    //BOSS::Experiments::RunExperiments("../bin/BOSS_Config.txt");
-
-    //testBuildOrder();
-    
-    // Initialize all the BOSS internal data
-    BOSS::Init("../bin/SC2Data.json");
-
-    // Read in the config parameters that will be used for experiments
-    BOSS::BOSSConfig::Instance().ParseConfig("../bin/BOSS_SC2_Config.txt");
-
-    BOSS::Experiments::RunExperiments("../bin/BOSS_SC2_Config.txt");
-
-    return 0;
-}
-
-//#include "BoundedVector.h"
-/*int main()
-{
-    BoundedVector<int, 20> units1;
-
-    for (int i = 0; i < 20; ++i)
+    if (argc > 2)
     {
-        units1.push_back(0);
+        GPUQueue::getInstance().releasePythonInterpretor();
+        PyEval_RestoreThread(PythonState);
+        Py_DECREF(PyImport_ImportModule("threading"));
+        Py_Finalize();
     }
 
-    BoundedVector<int, 20> units2(units1);
-
     return 0;
-}*/
+}

@@ -36,7 +36,7 @@ GameState JSONTools::GetGameState(const json & j)
 
             for (int n(0); n < unit[1]; ++n)
             {
-                state.addUnit(ActionTypes::GetActionType(unit[0]));
+                state.addUnit(ActionTypes::GetActionType(unit[0].get<std::string>()));
             }
         }
     }
@@ -60,7 +60,7 @@ BuildOrderSearchGoal JSONTools::GetBuildOrderSearchGoal(const json & j)
         {
             BOSS_ASSERT(unit.is_array() && unit.size() == 2 && unit[0].is_string() && unit[1].is_number_integer(), "Goal entry has to be array of size 2");
 
-            goal.setGoal(ActionTypes::GetActionType(unit[0]), unit[1]);
+            goal.setGoal(ActionTypes::GetActionType(unit[0].get<std::string>()), unit[1]);
         }
     }
 
@@ -70,7 +70,7 @@ BuildOrderSearchGoal JSONTools::GetBuildOrderSearchGoal(const json & j)
         {
             BOSS_ASSERT(unit.is_array() && unit.size() == 2 && unit[0].is_string() && unit[1].is_number_integer(), "Goal max entry has to be array of size 2");
 
-            goal.setGoalMax(ActionTypes::GetActionType(unit[0u]), unit[1u]);
+            goal.setGoalMax(ActionTypes::GetActionType(unit[0u].get<std::string>()), unit[1u]);
         }
     }
 
@@ -85,19 +85,25 @@ BuildOrderAbilities JSONTools::GetBuildOrder(const json & j)
 
     for (auto & entry : j)
     {
-        if (entry.is_array())
+        std::string entry_str = entry.get<std::string>();
+
+        if (entry_str.find("_") != std::string::npos)
         {
-            BOSS_ASSERT(entry[0].is_string(), "Build order item is not a string");
-            BOSS_ASSERT(entry[1].is_string(), "Target of ability type is not a string");
-            BOSS_ASSERT(entry[2].is_number_integer(), "Target of ability is not an integer");
-            
-            AbilityAction ability(ActionTypes::GetActionType(entry[0]), 0, entry[2], -1, ActionTypes::GetActionType(entry[1]));
-            buildOrder.add(ActionTypes::GetActionType(entry[0]), ability);
+            std::stringstream ss(entry_str);
+            std::string sub_string;
+            std::vector<std::string> splittedStrings;
+            while (std::getline(ss, sub_string, '_'))
+            {
+                splittedStrings.push_back(sub_string);
+            }
+
+            AbilityAction ability(ActionTypes::GetActionType(splittedStrings[0]), 0, -1, -1, ActionTypes::GetActionType(splittedStrings[1]), ActionTypes::GetActionType(splittedStrings[2]));
+            buildOrder.add(ActionTypes::GetActionType(splittedStrings[0]), ability);
         }
 
         else
         {
-            buildOrder.add(ActionTypes::GetActionType(entry));
+            buildOrder.add(ActionTypes::GetActionType(entry_str));
         }
     }
     

@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\src\BOSSConfig.cpp" />
+    <ClCompile Include="..\src\main.cpp" />
+    <ClCompile Include="..\src\Experiments.cpp">
+      <Filter>Experiments - Arta</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\IntegralExperiment.cpp">
+      <Filter>Experiments - Arta</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\IntegralExperimentOMP.cpp">
+      <Filter>Experiments - Arta</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\BOSSConfig.h" />
+    <ClInclude Include="..\src\Experiments.h">
+      <Filter>Experiments - Arta</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\IntegralExperiment.h">
+      <Filter>Experiments - Arta</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\IntegralExperimentOMP.h">
+      <Filter>Experiments - Arta</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Experiments - Arta">
+      <UniqueIdentifier>{9dd9da0e-2324-4f41-be61-d9d52346ad76}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\bin\Experiments.txt" />
+  </ItemGroup>
+</Project>

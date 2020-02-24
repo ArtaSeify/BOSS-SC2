@@ -14,14 +14,20 @@ void BuildOrderAbilities::add(ActionType type)
 {
     BOSS_ASSERT((m_buildOrder.size() == 0) || (type.getRace() == m_buildOrder.back().first.getRace()), "Cannot have a build order with multiple races");
 
-    m_buildOrder.emplace_back(type, AbilityAction());
+    m_buildOrder.push_back(std::make_pair(type, AbilityAction()));
     m_typeCount[type.getID()]++;
 }
 
 void BuildOrderAbilities::add(ActionType type, const AbilityAction & ability)
 {
-    m_buildOrder.emplace_back(type, ability);
+    m_buildOrder.push_back(std::make_pair(type, ability));
     m_typeCount[type.getID()]++;
+}
+
+void BuildOrderAbilities::add(const ActionAbilityPair & pair)
+{
+    m_buildOrder.push_back(pair);
+    m_typeCount[pair.first.getID()]++;
 }
 
 void BuildOrderAbilities::add(ActionType type, int amount)
@@ -39,10 +45,25 @@ void BuildOrderAbilities::add(const BuildOrderAbilities & other)
     }
 }
 
+void BuildOrderAbilities::remove(int index)
+{
+    m_typeCount[m_buildOrder[index].first.getID()]--;
+    m_buildOrder.erase(m_buildOrder.begin() + index);
+}
+
 void BuildOrderAbilities::clear()
 {
     m_buildOrder.clear();
     m_typeCount.clear();
+}
+
+void BuildOrderAbilities::print() const
+{
+    for (int index = 0; index < m_buildOrder.size(); ++index)
+    {
+        auto & pair = m_buildOrder[index];
+        std::cout << index << " " << pair.first.getName() << ", " << pair.second.targetID << std::endl;
+    }
 }
 
 int BuildOrderAbilities::getTypeCount(ActionType type) const
@@ -63,17 +84,17 @@ void BuildOrderAbilities::pop_back()
     m_buildOrder.pop_back();
 }
 
-const BuildOrderAbilities::ActionTargetPair & BuildOrderAbilities::operator [] (int i) const
+const BuildOrderAbilities::ActionAbilityPair & BuildOrderAbilities::operator [] (int i) const
 {
     return m_buildOrder[i];
 }
 
-BuildOrderAbilities::ActionTargetPair & BuildOrderAbilities::operator [] (int i)
+BuildOrderAbilities::ActionAbilityPair & BuildOrderAbilities::operator [] (int i)
 {
     return m_buildOrder[i];
 }
 
-const BuildOrderAbilities::ActionTargetPair & BuildOrderAbilities::back() const
+const BuildOrderAbilities::ActionAbilityPair & BuildOrderAbilities::back() const
 {
     return m_buildOrder.back();
 }
@@ -141,7 +162,7 @@ std::string BuildOrderAbilities::getIDString() const
     return ss.str();
 }
 
-std::string BuildOrderAbilities::getNameString(int charactersPerName, int printUpToIndex) const
+std::string BuildOrderAbilities::getNameString(int charactersPerName, int printUpToIndex, bool withComma) const
 {
     std::stringstream ss;
 
@@ -158,14 +179,37 @@ std::string BuildOrderAbilities::getNameString(int charactersPerName, int printU
             if (charactersPerName == 0)
             {
                 name += "_" + m_buildOrder[i].second.targetType.getName();
+                name += "_" + m_buildOrder[i].second.targetProductionType.getName();
             }
             else
             {
                 name += "_" + m_buildOrder[i].second.targetType.getName().substr(0, charactersPerName);
+                name += "_" + m_buildOrder[i].second.targetProductionType.getName().substr(0, charactersPerName);
             }
         }
 
-        ss << name << " ";
+        if (withComma)
+        {
+            ss << "\"";
+        }
+        ss << name;
+
+        if (withComma)
+        {
+            ss << "\"";
+            if (i != printUpToIndex - 1)
+            {
+                ss << ",";
+            }
+        }
+
+        else
+        {
+            if (i < printUpToIndex - 1)
+            {
+                ss << " ";
+            }
+        }
     }
 
     return ss.str();

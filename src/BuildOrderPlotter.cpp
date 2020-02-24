@@ -100,7 +100,7 @@ void BuildOrderPlotter::writeBuildOrderPlot(const std::vector<BuildOrderPlotData
     
     int currentLayer = 0;
     int currentObject = plots[0].m_buildOrder.size();
-
+    
     for (size_t p(0); p < plots.size(); ++p)
     {
         const BuildOrderAbilities & buildOrder = plots[p].m_buildOrder;
@@ -114,7 +114,7 @@ void BuildOrderPlotter::writeBuildOrderPlot(const std::vector<BuildOrderPlotData
             std::stringstream pos;
 
             pos << "(boxWidthScale * " << rectCenterX << "),";
-            pos << "((boxHeight + boxHeightBuffer) * " << (plots[p].m_layers[i] + currentLayer) << " + boxHeight/2)";
+            pos << "((boxHeight + boxHeightBuffer) * " << (plots[p].m_layers[i].second + currentLayer) << " + boxHeight/2)";
             
             ss << "set object " << (currentObject+i+1) << " rect at ";
             ss << pos.str();
@@ -204,7 +204,7 @@ std::string BuildOrderPlotter::getPlotJSON(const std::vector<BuildOrderPlotData>
             ss << plots[p].m_finishTimes[i] << ", ";
             ss << plots[p].m_minerals[i].first << ", ";
             ss << plots[p].m_gas[i].first << ", ";
-            ss << plots[p].m_layers[i] << ", ";
+            ss << plots[p].m_layers[i].second << ", ";
             
             if (type.isWorker())
             {
@@ -280,6 +280,13 @@ std::string BuildOrderPlotter::RemoveFileExtension(const std::string & path)
     std::string temp(path);
 
     size_t period_idx = temp.rfind('.');
+
+    // period could be part of path (eg. ../bin
+    if (std::string::npos != period_idx && (temp.at(period_idx-1) == '.' || temp.at(period_idx+1 == '/')))
+    {
+        period_idx = std::string::npos;
+    }
+
     if (std::string::npos != period_idx)
     {
         temp.erase(period_idx);

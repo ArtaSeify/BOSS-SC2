@@ -5,12 +5,15 @@
 using namespace BOSS;
 
 // defining static variables
-FracType   CONSTANTS::MPWPF;
-FracType   CONSTANTS::GPWPF;
-FracType   CONSTANTS::ERPF;
-FracType   CONSTANTS::HRPF;
-FracType   CONSTANTS::SRPF;
-NumUnits   CONSTANTS::WorkersPerRefinery;
+FracType                CONSTANTS::MPWPF;
+FracType                CONSTANTS::GPWPF;
+FracType                CONSTANTS::ERPF;
+FracType                CONSTANTS::HRPF;
+FracType                CONSTANTS::SRPF;
+NumUnits                CONSTANTS::WorkersPerRefinery;
+NumUnits                CONSTANTS::WorkersPerDepot;
+std::string             CONSTANTS::ExecutablePath;
+std::mutex              CONSTANTS::SaveDataToFile;
 
 RaceID Races::GetRaceID(const std::string & race)
 {

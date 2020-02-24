@@ -1,10 +1,18 @@
 /* -*- c-basic-offset: 4 -*- */
 
-#pragma once
+//#if (!DEBUG)
+//    #undef _SECURE_SCL
+//    #define _SECURE_SCL 0
+//    #undef _HAS_ITERATOR_DEBUGGING
+//    #define _HAS_ITERATOR_DEBUGGING 0
+//    #undef _ITERATOR_DEBUG_LEVEL
+//    #define _ITERATOR_DEBUG_LEVEL 0
+//#endif // DEBUG
 
+#pragma once
+#include <Python.h>
 #include <cstdio>
 #include <cmath>
-#include <fstream>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -13,6 +21,7 @@
 #include <map>
 #include <set>
 #include <algorithm>
+#include <mutex>
 #include "json/json.hpp"
 
 using json = nlohmann::json;
@@ -48,16 +57,22 @@ namespace BOSS
     using NumUnits = sint2;
     using FracType = float;
 
+    using RNG = std::mt19937;
+
     // constants declared in data file
+    class GPUQueue;
     class CONSTANTS
     {
     public:
-        static FracType MPWPF;               // minerals per worker per frame
-        static FracType GPWPF;               // gas per worker per frame
-        static FracType ERPF;                // energy regen per frame
-        static FracType HRPF;                // health regen per frame
-        static FracType SRPF;                // shield regen per frame
-        static NumUnits WorkersPerRefinery;  // number of workers per refinery
+        static FracType MPWPF;                  // minerals per worker per frame
+        static FracType GPWPF;                  // gas per worker per frame
+        static FracType ERPF;                   // energy regen per frame
+        static FracType HRPF;                   // health regen per frame
+        static FracType SRPF;                   // shield regen per frame
+        static NumUnits WorkersPerRefinery;     // number of workers per refinery
+        static NumUnits WorkersPerDepot;        // number of workers allowed to gather minerals per depot
+        static std::string ExecutablePath;      // path to this executable
+        static std::mutex SaveDataToFile;       // global mutex for storing data in file
     };
 
     namespace Races

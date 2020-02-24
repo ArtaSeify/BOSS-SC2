@@ -8,6 +8,7 @@
 #include "BuildOrderAbilities.h"
 #include "CombatSearchParameters.h"
 #include "CombatSearchResults.h"
+#include <boost/chrono.hpp>
 
 namespace BOSS
 {
@@ -23,8 +24,9 @@ namespace BOSS
         CombatSearchParameters      m_params;            // parameters that will be used in this search
         CombatSearchResults         m_results;            // the results of the search so far
 
-        int                         m_upperBound;         // the current upper bound for search
+        //int                         m_upperBound;         // the current upper bound for search
         Timer                       m_searchTimer;
+        boost::chrono::thread_clock::time_point m_searchTimerCPU;
 
         BuildOrderAbilities         m_buildOrder;
 
@@ -40,8 +42,6 @@ namespace BOSS
     public:
 
         virtual void search();
-        virtual void continueSearch();
-        virtual void setBestBuildOrder();
         virtual void finishSearch();
         virtual void printResults();
         virtual void writeResultsFile(const std::string & dir, const std::string & prefix);

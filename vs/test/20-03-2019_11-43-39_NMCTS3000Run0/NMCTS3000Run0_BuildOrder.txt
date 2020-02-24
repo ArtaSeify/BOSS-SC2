@@ -1,0 +1,20 @@
+
+Pr Pr Py Pr Pr Pr Ga Py Ga Py Ze Ga Ze Ze Ze
+0 272 0 0 0 Probe
+299 571 0 0 0 Probe
+201 601 0 0 0 Pylon
+663 935 0 0 0 Probe
+1003 1275 0 0 0 Probe
+1321 1593 0 0 0 Probe
+601 1641 0 0 0 Gateway
+1471 1871 0 0 0 Pylon
+921 1961 0 0 0 Gateway
+1762 2162 0 0 0 Pylon
+1641 2249 1 0 751 Zealot
+1244 2284 1 35 751 Gateway
+1961 2569 2 320 1182 Zealot
+2249 2857 3 896 1325 Zealot
+2284 2892 4 1001 1433 Zealot
+
+Ran 10010 simulations in 13468.8ms @ 743.197 simulations/sec
+Nodes expanded: 2179. Total nodes visited: 106598, at a rate of 7914.41 nodes/sec

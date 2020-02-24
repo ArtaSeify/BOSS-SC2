@@ -17,17 +17,39 @@ namespace BOSS
 
     class CombatSearch_Integral : public CombatSearch
     {
+        virtual void recurse(const GameState & state, int depth);
+
+    protected:
         //CombatSearch_IntegralData   m_integral;
         CombatSearch_IntegralDataFinishedUnits  m_integral;
+        FracType                                m_highestValueFound;
 
-        virtual void recurse(const GameState & s, int depth);
+        std::ofstream                           m_fileStates;
+        std::stringstream                       m_ssStates;
+        std::vector<std::uint8_t>               m_jStates;
+        std::stringstream                       m_ssHighestValue;
+
+        int m_filesWritten;
+        int m_statesWritten;
+
+        std::string m_dir;
+        std::string m_prefix;
+        std::string m_name;
+
+    protected:
+        FracType recurseReturnValue(const GameState & state, int depth);
 
     public:
-    
-        CombatSearch_Integral(const CombatSearchParameters p = CombatSearchParameters());
+        static FracType highestValueThusFar;
+
+        CombatSearch_Integral(const CombatSearchParameters p = CombatSearchParameters(),
+            const std::string & dir = "", const std::string & prefix = "", const std::string & name = "");
+        ~CombatSearch_Integral();
+
+        BuildOrderAbilities createFinishedUnitsBuildOrder(const BuildOrderAbilities & buildOrder) const;
+        BuildOrderAbilities createUsefulBuildOrder(const BuildOrderAbilities & buildOrder) const;
     
         virtual void printResults();
-        virtual void setBestBuildOrder();
         virtual void writeResultsFile(const std::string & dir, const std::string & filename);
     };
 }

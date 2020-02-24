@@ -3,6 +3,7 @@
 #include "ActionSetAbilities.h"
 #include "ActionType.h"
 #include "CombatSearchParameters.h"
+#include "AbilityAction.h"
 
 using namespace BOSS;
 
@@ -73,7 +74,7 @@ void ActionSetAbilities::sort(const GameState & state, const CombatSearchParamet
     ActionSetAbilities sortedSet;
 
     const int totalSupply = state.getCurrentSupply() + state.getSupplyInProgress();
-    
+
     // if we have little supply free, give priority to supply providing units
     // ie. pylon/supply depot/overlord and nexus/command center/hatchery
     if (state.getMaxSupply() - totalSupply <= SupplyHeuristic)
@@ -153,14 +154,18 @@ int ActionSetAbilities::getAbilityTarget(int index) const
 }
 
 //  incorrect implementation
-/*void ActionSetAbilities::remove(const ActionSetAbilities & set)
+void ActionSetAbilities::remove(const ActionSetAbilities & set)
 {
-    for (const auto & val : set.m_actions)
+    for (auto & action : set)
     {
-        add(val);
+        remove(action.first);
     }
 }
-*/
+
+const ActionSetAbilities::ActionTargetPair & ActionSetAbilities::getRandomElement() const
+{
+    return m_actionsAndTargets[std::rand() % size()];
+}
 
 const std::string ActionSetAbilities::toString() const
 {

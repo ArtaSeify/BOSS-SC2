@@ -462,14 +462,18 @@ void Tools::DoBuildOrder(GameState & state, const BuildOrder & buildOrder)
     }
 }
 
-void Tools::DoBuildOrder(GameState & state, const BuildOrderAbilities & buildOrder)
+void Tools::DoBuildOrder(GameState & state, BuildOrderAbilities & buildOrder)
 {
-    for (const auto &x : buildOrder)
+    for (auto & x : buildOrder)
     {
         ActionType type = x.first;
         if (type.isAbility())
         {
+            std::cout << "casting ability inside DoBuildOrder" << std::endl;
+            state.getAbilityTargetUnit(x);
             state.doAbility(type, x.second.targetID);
+            std::cout << "ability successfully cast" << std::endl;
+            x.second.frameCast = state.getCurrentFrame();
         }
         else
         {
