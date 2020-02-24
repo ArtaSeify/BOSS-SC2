@@ -20,5 +20,9 @@ bin/results
 *.js
 emscripten/BOSS.data
 *.o
-/bin/WTF.txt
 /vs/x64
+/MCTS Results/*
+!/MCTS Results/*.py
+/bin/ML/logs
+/bin/ML/models
+/bin/ML/Chris Code
