@@ -18,16 +18,13 @@ using namespace BOSS;
 void CombatSearch::search()
 {
     m_searchTimer.start();
-    m_searchTimerCPU = boost::chrono::thread_clock::now();
+    //m_searchTimerCPU = boost::chrono::thread_clock::now();
     
-#ifdef __linux__
-    struct rusage buf;
-    getrusage(RUSAGE_THREAD, &buf);
-    double startCPUTime = ((buf.ru_utime.tv_sec) + (buf.ru_utime.tv_usec / 1000000.f) + (buf.ru_stime.tv_sec) + (buf.ru_stime.tv_usec / 1000000.f))*1000.0;
-#endif
-    /*FILETIME creation, exit, kernel, user;
-    auto th = GetCurrentThread();
-    BOSS_ASSERT(GetThreadTimes(th, &creation, &exit, &kernel, &user), "failed");*/
+//#ifdef __linux__
+//    struct rusage buf;
+//    getrusage(RUSAGE_THREAD, &buf);
+//    double startCPUTime = ((buf.ru_utime.tv_sec) + (buf.ru_utime.tv_usec / 1000000.f) + (buf.ru_stime.tv_sec) + (buf.ru_stime.tv_usec / 1000000.f))*1000.0;
+//#endif
 
     // apply the opening build order to the initial state    
     GameState initialState(m_params.getInitialState());
@@ -36,7 +33,7 @@ void CombatSearch::search()
 
     try
     {
-        recurse(initialState, 0);
+        run(initialState, 0);
     
         m_results.solved = true;
     }
@@ -49,45 +46,23 @@ void CombatSearch::search()
     }
 
     m_results.timeElapsed = m_searchTimer.getElapsedTimeInMilliSec();
-    m_results.timeElapsedCPU = boost::chrono::duration_cast<boost::chrono::duration<double, boost::milli>>(boost::chrono::thread_clock::now() - m_searchTimerCPU).count();
+    //.timeElapsedCPU = boost::chrono::duration_cast<boost::chrono::duration<double, boost::milli>>(boost::chrono::thread_clock::now() - m_searchTimerCPU).count();
     
-    #ifdef __linux__
-        struct rusage bufEnd;
-        getrusage(RUSAGE_THREAD, &bufEnd);
-        double endCPUTime = ((bufEnd.ru_utime.tv_sec) + (bufEnd.ru_utime.tv_usec / 1000000.f) + (bufEnd.ru_stime.tv_sec) + (bufEnd.ru_stime.tv_usec / 1000000.f))*1000.0;
-    
-        //std::cout << "CPU time according to boost: " << m_results.timeElapsedCPU << std::endl;
-        //std::cout << "CPU time accoding to Linux: " << endCPUTime - startCPUTime << std::endl;
-    #endif
-
-
-    /*FILETIME creationEnd, exitEnd, kernelEnd, userEnd;
-    BOSS_ASSERT(GetThreadTimes(th, &creationEnd, &exitEnd, &kernelEnd, &userEnd), "failed");
-
-    SYSTEMTIME stKernel, stKernelEnd, stUser, stUserEnd;
-    BOSS_ASSERT(FileTimeToSystemTime(&kernel, &stKernel), "failed");
-    BOSS_ASSERT(FileTimeToSystemTime(&user, &stUser), "failed");
-    BOSS_ASSERT(FileTimeToSystemTime(&kernelEnd, &stKernelEnd), "failed");
-    BOSS_ASSERT(FileTimeToSystemTime(&userEnd, &stUserEnd), "failed");
-
-    double totalStart = stKernel.wMilliseconds + stKernel.wSecond * 1000 + stKernel.wMinute * 60 * 1000 + stKernel.wHour * 60 * 60 * 1000 +
-        stUser.wMilliseconds + stUser.wSecond * 1000 + stUser.wMinute * 60 * 1000 + stUser.wHour * 60 * 60 * 1000;
-    double totalEnd = stKernelEnd.wMilliseconds + stKernelEnd.wSecond * 1000 + stKernelEnd.wMinute * 60 * 1000 + stKernelEnd.wHour * 60 * 60 * 1000 +
-        stUserEnd.wMilliseconds + stUserEnd.wSecond * 1000 + stUserEnd.wMinute * 60 * 1000 + stUserEnd.wHour * 60 * 60 * 1000;
-    
-    std::cout << "thread time through windows: " << totalEnd - totalStart << std::endl;
-    std::cout << "thread time through boost: " << m_results.timeElapsedCPU << std::endl;
-    std::cout << "kernel: " << stKernel.wMilliseconds + stKernel.wSecond * 1000 + stKernel.wMinute * 60 * 1000 + stKernel.wHour * 60 * 60 * 1000 << " "
-        << stKernelEnd.wMilliseconds + stKernelEnd.wSecond * 1000 + stKernelEnd.wMinute * 60 * 1000 + stKernelEnd.wHour * 60 * 60 * 1000 << std::endl;
-    std::cout << "user: " << stUser.wMilliseconds + stUser.wSecond * 1000 + stUser.wMinute * 60 * 1000 + stUser.wHour * 60 * 60 * 1000 << " "
-        << stUserEnd.wMilliseconds + stUserEnd.wSecond * 1000 + stUserEnd.wMinute * 60 * 1000 + stUserEnd.wHour * 60 * 60 * 1000 << std::endl;*/
+    //#ifdef __linux__
+    //    struct rusage bufEnd;
+    //    getrusage(RUSAGE_THREAD, &bufEnd);
+    //    double endCPUTime = ((bufEnd.ru_utime.tv_sec) + (bufEnd.ru_utime.tv_usec / 1000000.f) + (bufEnd.ru_stime.tv_sec) + (bufEnd.ru_stime.tv_usec / 1000000.f))*1000.0;
+    //
+    //    //std::cout << "CPU time according to boost: " << m_results.timeElapsedCPU << std::endl;
+    //    //std::cout << "CPU time accoding to Linux: " << endCPUTime - startCPUTime << std::endl;
+    //#endif
 }
 
 // This function generates the legal actions from a GameState based on the input search parameters
-void CombatSearch::generateLegalActions(const GameState & state, ActionSetAbilities & legalActions, const CombatSearchParameters & params)
+void CombatSearch::generateLegalActions(const GameState & state, ActionSet & legalActions, const CombatSearchParameters & params)
 {
     // prune actions we have too many of already
-    const ActionSetAbilities & allActions = params.getRelevantActions();
+    const ActionSet & allActions = params.getRelevantActions();
     for (auto it = allActions.begin(); it != allActions.end(); ++it)
     {
         ActionType action = it->first;
@@ -117,7 +92,7 @@ void CombatSearch::generateLegalActions(const GameState & state, ActionSetAbilit
 
     // if we enabled the always make workers flag, and workers are legal
     ActionType worker = ActionTypes::GetWorker(state.getRace());
-    ActionSetAbilities illegalActions;
+    ActionSet illegalActions;
     if (m_params.getAlwaysMakeWorkers() && legalActions.contains(worker))
     {
         bool actionLegalBeforeWorker = false;
@@ -125,7 +100,7 @@ void CombatSearch::generateLegalActions(const GameState & state, ActionSetAbilit
         // when can we make a worker
         int workerReady = state.whenCanBuild(worker);
 
-        if (workerReady > params.getFrameTimeLimit())
+        if (workerReady > params.getFrameLimit())
         {
             illegalActions.add(worker);
         }
@@ -145,7 +120,7 @@ void CombatSearch::generateLegalActions(const GameState & state, ActionSetAbilit
             int whenCanPerformAction = state.whenCanBuild(actionType, it->second);
 
             // if action goes past the time limit, it is illegal
-            if (whenCanPerformAction > params.getFrameTimeLimit())
+            if (whenCanPerformAction > params.getFrameLimit())
             {
                 illegalActions.add(actionType);
             }
@@ -174,7 +149,7 @@ void CombatSearch::generateLegalActions(const GameState & state, ActionSetAbilit
         else
         {
             legalActions.clear();
-            if (workerReady <= params.getFrameTimeLimit())
+            if (workerReady <= params.getFrameLimit())
             {
                 legalActions.add(worker);
             }
@@ -190,7 +165,7 @@ void CombatSearch::generateLegalActions(const GameState & state, ActionSetAbilit
             int whenCanPerformAction = state.whenCanBuild(actionType, it->second);
 
             // if action goes past the time limit, it is illegal
-            if (whenCanPerformAction > params.getFrameTimeLimit())
+            if (whenCanPerformAction > params.getFrameLimit())
             {
                 illegalActions.add(actionType);
             }
@@ -225,40 +200,14 @@ void CombatSearch::finishSearch()
 bool CombatSearch::isTerminalNode(const GameState & s, int /*!!! PROBLEM NOT USED depth */)
 {
   //!!! IMPROVEMENT: just say return s.getCurrent....
-    return s.getCurrentFrame() > m_params.getFrameTimeLimit();
+    return s.getCurrentFrame() > m_params.getFrameLimit();
 }
 
-void CombatSearch::recurse(const GameState & /*!!! PROBLEM NOT USED state*/, int /*!!! PROBLEM NOT USED depth*/)
+void CombatSearch::run(const GameState & /*!!! PROBLEM NOT USED state*/, int /*!!! PROBLEM NOT USED depth*/)
 {
     // This base class function should never be called, leaving the code
     // here as a basis to form child classes
-    BOSS_ASSERT(false, "Base CombatSearch recurse() should never be called");
-
-    //if (timeLimitReached())
-    //{
-    //    throw BOSS_COMBATSEARCH_TIMEOUT;
-    //}
-
-    //updateResults(state);
-
-    //if (isTerminalNode(state, depth))
-    //{
-    //    return;
-    //}
-
-    //ActionSet legalActions;
-    //generateLegalActions(state, legalActions, _params);
-    //
-    //for (size_t a(0); a < legalActions.size(); ++a)
-    //{
-    //    GameState child(state);
-    //    child.doAction(legalActions[a]);
-    //    _buildOrder.add(legalActions[a]);
-    //    
-    //    doSearch(child,depth+1);
-
-    //    _buildOrder.pop_back();
-    //}
+    BOSS_ASSERT(false, "Base CombatSearch run() should never be called");
 }
 
 void CombatSearch::updateResults(const GameState & /*!!! PROBLEM NOT USED state */)

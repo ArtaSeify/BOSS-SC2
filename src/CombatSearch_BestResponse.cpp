@@ -28,7 +28,7 @@ void CombatSearch_BestResponse::recurse(const GameState & state, int depth)
         return;
     }
 
-    ActionSetAbilities legalActions;
+    ActionSet legalActions;
     generateLegalActions(state, legalActions, m_params);
     
     for (int a(0); a < legalActions.size(); ++a)

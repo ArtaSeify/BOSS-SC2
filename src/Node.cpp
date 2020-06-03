@@ -1,7 +1,7 @@
 #include "Node.h"
 #include "Eval.h"
 #include "GPUQueue.h"
-#include "CombatSearch_ParallelIntegralMCTS.h"
+#include "CombatSearch_Integral_MCTS.h"
 
 using namespace BOSS;
 

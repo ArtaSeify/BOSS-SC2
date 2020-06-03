@@ -5,7 +5,7 @@
 #include "Common.h"
 #include "ActionType.h"
 #include "GameState.h"
-#include "BuildOrderAbilities.h"
+#include "BuildOrder.h"
 #include "Position.hpp"
 
 namespace BOSS
@@ -26,7 +26,7 @@ namespace BOSS
         friend class BuildOrderPlotter;
 
         const GameState                   m_initialState;
-        const BuildOrderAbilities         m_buildOrder;
+        const BuildOrder         m_buildOrder;
         std::vector<int>                  m_chronoBoosts;
         
         std::vector<int>                  m_startTimes;
@@ -48,7 +48,7 @@ namespace BOSS
 
     public:
 
-        BuildOrderPlotData(const GameState & initialState, const BuildOrderAbilities & buildOrder);
+        BuildOrderPlotData(const GameState & initialState, const BuildOrder & buildOrder);
 
     };
 }

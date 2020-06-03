@@ -1,9 +1,0 @@
-Max value found: 0
-Best build order (all): 
-Best build order (finished): 
-Nodes expanded: 4884
-Nodes traversed: 161607
-Leaf nodes expanded: 885
-Leaf nodes traversed: 10000
-Search time in ms: 11124.1
-Simulations: 10000

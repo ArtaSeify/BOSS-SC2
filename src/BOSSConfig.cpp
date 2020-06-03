@@ -25,7 +25,7 @@ void BOSSConfig::ParseConfig(const std::string & configFile)
 
     BOSS_ASSERT(j.count("States"), "No 'States' member found");
     BOSS_ASSERT(j.count("Build Orders"), "No 'Build Orders' member found");
-    BOSS_ASSERT(j.count("Game Data"), "No 'Game Data' member found");
+    //BOSS_ASSERT(j.count("Game Data"), "No 'Game Data' member found");
 
     // Parse all the States
     for (auto it = j["States"].begin(); it != j["States"].end(); ++it)
@@ -56,7 +56,7 @@ const GameState & BOSSConfig::GetState(const std::string & key)
     return m_stateMap[key];
 }
 
-const BuildOrderAbilities & BOSSConfig::GetBuildOrder(const std::string & key)
+const BuildOrder & BOSSConfig::GetBuildOrder(const std::string & key)
 {
     BOSS_ASSERT(m_buildOrderMap.find(key) != m_buildOrderMap.end(), "Couldn't find build order: %s", key.c_str());
 

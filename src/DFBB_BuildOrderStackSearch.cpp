@@ -125,7 +125,7 @@ void DFBB_BuildOrderStackSearch::generateLegalActions(const GameState & state, A
 
         for (int a(0); a < legalActions.size(); ++a)
         {
-            ActionType actionType = legalActions[a];
+            ActionType actionType = legalActions[a].first;
             const int whenCanPerformAction = state.whenCanBuild(actionType);
             if (whenCanPerformAction < workerReady)
             {
@@ -227,7 +227,7 @@ SEARCH_BEGIN:
     generateLegalActions(STATE, LEGAL_ACTIONS);
     for (CHILD_NUM = 0; CHILD_NUM < (int)LEGAL_ACTIONS.size(); ++CHILD_NUM)
     {
-        ACTION_TYPE = LEGAL_ACTIONS[CHILD_NUM];
+        ACTION_TYPE = LEGAL_ACTIONS[CHILD_NUM].first;
 
         actionFinishTime = STATE.whenCanBuild(ACTION_TYPE) + ACTION_TYPE.buildTime();
         heuristicTime    = STATE.getCurrentFrame() + Tools::GetLowerBound(STATE, m_params.m_goal);

@@ -20,37 +20,16 @@ CombatSearchParameters::CombatSearchParameters()
     , m_useLandmarkLowerBoundHeuristic(false)
     , m_useResourceLowerBoundHeuristic(false)
     , m_searchTimeLimit(0)
-    , m_frameTimeLimit(0)
+    , m_frameLimit(0)
     , m_initialUpperBound(0)
     , m_initialState(GameState())
-    , m_openingBuildOrder(BuildOrderAbilities())
-    , m_enemyBuildOrder(BuildOrderAbilities())
+    , m_openingBuildOrder(BuildOrder())
+    , m_enemyBuildOrder(BuildOrder())
     , m_printNewBest(false)
     , m_sortActions(false)
-    , m_saveStates(false)
-    , m_explorationValue(1)
-    , m_changingRoot(false)
-    , m_changingRootReset(false)
-    , m_useMaxValue(false)
     , m_maximizeValue(false)
-    , m_numberOfSimulations(std::numeric_limits<int>::max())
-    , m_numberOfNodes(std::numeric_limits<uint8>::max())
-    , m_simulationsPerStep(std::numeric_limits<int>::max())
-    , m_simulationsPerStepDecay(1)
-    , m_usePolicyNetwork(0)
-    , m_usePolicyValueNetwork(0)
-    , m_mixingValue(0)
-    , m_threadsForMCTS(1)
-    , m_numPlayouts(0)
-    , m_level(0)
     , m_enemyUnits()
     , m_enemyRace(Races::None)
-    , m_useTotalTimeLimit(false)
-    , m_temperatureChange(0)
-    , m_nodeVisitsBeforeExpand(0)
-    , m_valueNormalization(1)
-    , m_valueTargetMix(0)
-    , m_useSimulationValueOnly(false)
 {
     
 }
@@ -65,12 +44,12 @@ float CombatSearchParameters::getSearchTimeLimit() const
     return m_searchTimeLimit;
 }
 
-void CombatSearchParameters::setRelevantActions(const ActionSetAbilities & set)
+void CombatSearchParameters::setRelevantActions(const ActionSet & set)
 {
     m_relevantActions = set;
 }
 
-const ActionSetAbilities & CombatSearchParameters::getRelevantActions() const
+const ActionSet & CombatSearchParameters::getRelevantActions() const
 {
     return m_relevantActions;
 }
@@ -100,22 +79,22 @@ void CombatSearchParameters::setMaxActions(ActionType a, int max)
     m_maxActions[a.getID()] = max;
 }
 
-void CombatSearchParameters::setOpeningBuildOrder(const BuildOrderAbilities & buildOrder)
+void CombatSearchParameters::setOpeningBuildOrder(const BuildOrder & buildOrder)
 {
     m_openingBuildOrder = buildOrder;
 }
 
-const BuildOrderAbilities & CombatSearchParameters::getOpeningBuildOrder() const
+const BuildOrder & CombatSearchParameters::getOpeningBuildOrder() const
 {
     return m_openingBuildOrder;
 }
 
-void CombatSearchParameters::setEnemyBuildOrder(const BuildOrderAbilities & buildOrder)
+void CombatSearchParameters::setEnemyBuildOrder(const BuildOrder & buildOrder)
 {
     m_enemyBuildOrder = buildOrder;
 }
 
-const BuildOrderAbilities & CombatSearchParameters::getEnemyBuildOrder() const
+const BuildOrder & CombatSearchParameters::getEnemyBuildOrder() const
 {
     return m_enemyBuildOrder;
 }
@@ -155,9 +134,9 @@ int CombatSearchParameters::getRepetitions(ActionType a) const
     return m_repetitionValues[a.getID()]; 
 }
 
-void CombatSearchParameters::setFrameTimeLimit(int limit)
+void CombatSearchParameters::setFrameLimit(int limit)
 {
-    m_frameTimeLimit = limit;
+    m_frameLimit = limit;
 }
 
 void CombatSearchParameters::setAlwaysMakeWorkers(bool flag)
@@ -170,9 +149,9 @@ bool CombatSearchParameters::getAlwaysMakeWorkers() const
     return m_useAlwaysMakeWorkers;
 }   
 
-int CombatSearchParameters::getFrameTimeLimit() const
+int CombatSearchParameters::getFrameLimit() const
 {
-    return m_frameTimeLimit;
+    return m_frameLimit;
 }
 
 void CombatSearchParameters::setPrintNewBest(bool flag)
@@ -195,55 +174,7 @@ bool CombatSearchParameters::getSortActions() const
     return m_sortActions;
 }
 
-void CombatSearchParameters::setSaveStates(bool flag)
-{
-    m_saveStates = flag;
-}
 
-bool CombatSearchParameters::getSaveStates() const
-{
-    return m_saveStates;
-}
-
-void CombatSearchParameters::setExplorationValue(FracType value)
-{
-    m_explorationValue = value;
-}
-
-FracType CombatSearchParameters::getExplorationValue() const
-{
-    return m_explorationValue;
-}
-
-void CombatSearchParameters::setChangingRoot(bool value)
-{
-    m_changingRoot = value;
-}
-
-bool CombatSearchParameters::getChangingRoot() const
-{
-    return m_changingRoot;
-}
-
-void CombatSearchParameters::setChangingRootReset(bool value)
-{
-    m_changingRootReset = value;
-}
-
-bool CombatSearchParameters::getChangingRootReset() const
-{
-    return m_changingRootReset;
-}
-
-void CombatSearchParameters::setUseMaxValue(bool value)
-{
-    m_useMaxValue = value;
-}
-
-bool CombatSearchParameters::getUseMaxValue() const
-{
-    return m_useMaxValue;
-}
 
 void CombatSearchParameters::setMaximizeValue(bool value)
 {
@@ -253,164 +184,6 @@ void CombatSearchParameters::setMaximizeValue(bool value)
 bool CombatSearchParameters::getMaximizeValue() const
 {
     return m_maximizeValue;
-}
-
-void CombatSearchParameters::setNumberOfSimulations(int value)
-{
-    m_numberOfSimulations = value;
-}
-
-int CombatSearchParameters::getNumberOfSimulations() const
-{
-    return m_numberOfSimulations;
-}
-
-void CombatSearchParameters::setNumberOfNodes(uint8 value)
-{
-    m_numberOfNodes = value;
-}
-uint8 CombatSearchParameters::getNumberOfNodes() const
-{
-    return m_numberOfNodes;
-}
-
-void CombatSearchParameters::setSimulationsPerStep(int value)
-{
-    m_simulationsPerStep = value;
-}
-
-int CombatSearchParameters::getSimulationsPerStep() const
-{
-    return m_simulationsPerStep;
-}
-
-void CombatSearchParameters::setSimulationsPerStepDecay(FracType value)
-{
-    m_simulationsPerStepDecay = value;
-}
-
-FracType CombatSearchParameters::getSimulationsPerStepDecay() const
-{
-    return m_simulationsPerStepDecay;
-}
-
-void CombatSearchParameters::setUsePolicyNetwork(bool value)
-{
-    m_usePolicyNetwork = value;
-}
-
-bool CombatSearchParameters::usePolicyNetwork() const
-{
-    return m_usePolicyNetwork;
-}
-
-void CombatSearchParameters::setUsePolicyValueNetwork(bool value)
-{
-    m_usePolicyValueNetwork = value;
-}
-
-bool CombatSearchParameters::usePolicyValueNetwork() const
-{
-    return m_usePolicyValueNetwork;
-}
-
-void CombatSearchParameters::setMixingValue(FracType value)
-{
-    BOSS_ASSERT(value >= 0 && value <= 1, "Mixing value must be between 0 and 1");
-    m_mixingValue = value;
-}
-
-FracType CombatSearchParameters::getMixingValue() const
-{
-    return m_mixingValue;
-}
-
-void CombatSearchParameters::setThreadsForMCTS(int threads)
-{
-    m_threadsForMCTS = threads;
-}
-
-int CombatSearchParameters::getThreadsForMCTS() const
-{
-    return m_threadsForMCTS;
-}
-
-void CombatSearchParameters::setNumPlayouts(int value)
-{
-    m_numPlayouts = value;
-}
-int CombatSearchParameters::getNumPlayouts() const
-{
-    return m_numPlayouts;
-}
-
-void CombatSearchParameters::setLevel(int value)
-{
-    m_level = value;
-}
-int CombatSearchParameters::getLevel() const
-{
-    return m_level;
-}
-
-void CombatSearchParameters::setUseTotalTimeLimit(bool value)
-{
-    m_useTotalTimeLimit = value;
-}
-
-bool CombatSearchParameters::getUseTotalTimeLimit() const
-{
-    return m_useTotalTimeLimit;
-}
-
-void CombatSearchParameters::setTemperatureChange(int value)
-{
-    m_temperatureChange = value;
-}
-
-int CombatSearchParameters::getTemperatureChange() const
-{
-    return m_temperatureChange;
-}
-
-void CombatSearchParameters::setValueNormalization(int value)
-{
-    m_valueNormalization = value;
-}
-
-int CombatSearchParameters::getValueNormalization() const
-{
-    return m_valueNormalization;
-}
-
-void CombatSearchParameters::setNodeVisitsBeforeExpand(int value)
-{
-    m_nodeVisitsBeforeExpand = value;
-}
-
-int CombatSearchParameters::getNodeVisitsBeforeExpand() const
-{
-    return m_nodeVisitsBeforeExpand;
-}
-
-void CombatSearchParameters::setValueTargetMix(FracType value)
-{
-    m_valueTargetMix = value;
-}
-
-FracType CombatSearchParameters::getValueTargetMix() const
-{
-    return m_valueTargetMix;
-}
-
-void CombatSearchParameters::setUseSimulationValueOnly(bool value)
-{
-    m_useSimulationValueOnly = value;
-}
-
-bool CombatSearchParameters::useSimulationValueOnly() const
-{
-    return m_useSimulationValueOnly;
 }
 
 void CombatSearchParameters::print()

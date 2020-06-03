@@ -21,27 +21,27 @@
   <ItemGroup>
     <ClCompile Include="..\src\AbilityAction.cpp" />
     <ClCompile Include="..\src\ActionSet.cpp" />
-    <ClCompile Include="..\src\ActionSetAbilities.cpp" />
     <ClCompile Include="..\src\ActionType.cpp" />
     <ClCompile Include="..\src\ActionTypeData.cpp" />
     <ClCompile Include="..\src\BOSS.cpp" />
     <ClCompile Include="..\src\BOSSAssert.cpp" />
     <ClCompile Include="..\src\BOSSException.cpp" />
-    <ClCompile Include="..\src\BuildOrderAbilities.cpp" />
+    <ClCompile Include="..\src\BuildOrder.cpp" />
     <ClCompile Include="..\src\BuildOrderPlotter.cpp" />
     <ClCompile Include="..\src\BuildOrderPlotData.cpp" />
     <ClCompile Include="..\src\BuildOrderSearchGoal.cpp" />
     <ClCompile Include="..\src\CombatSearch.cpp" />
     <ClCompile Include="..\src\CombatSearchParameters.cpp" />
+    <ClCompile Include="..\src\CombatSearchParameters_MCTS.cpp" />
     <ClCompile Include="..\src\CombatSearchResults.cpp" />
     <ClCompile Include="..\src\CombatSearch_BestResponse.cpp" />
     <ClCompile Include="..\src\CombatSearch_BestResponseData.cpp" />
     <ClCompile Include="..\src\CombatSearch_Bucket.cpp" />
     <ClCompile Include="..\src\CombatSearch_BucketData.cpp" />
     <ClCompile Include="..\src\CombatSearch_Integral.cpp" />
+    <ClCompile Include="..\src\CombatSearch_Integral_DFS.cpp" />
     <ClCompile Include="..\src\CombatSearch_IntegralData.cpp" />
-    <ClCompile Include="..\src\CombatSearch_IntegralDataFinishedUnits.cpp" />
-    <ClCompile Include="..\src\CombatSearch_ParallelIntegralMCTS.cpp" />
+    <ClCompile Include="..\src\CombatSearch_IntegralData_FinishedUnits.cpp" />
     <ClCompile Include="..\src\DFBB_BuildOrderSearchParameters.cpp" />
     <ClCompile Include="..\src\DFBB_BuildOrderSearchResults.cpp" />
     <ClCompile Include="..\src\DFBB_BuildOrderSearchSaveState.cpp" />
@@ -49,44 +49,39 @@
     <ClCompile Include="..\src\DFBB_BuildOrderStackSearch.cpp" />
     <ClCompile Include="..\src\Eval.cpp" />
     <ClCompile Include="..\src\ExternalInterface.cpp" />
-    <ClCompile Include="..\src\BuildOrder.cpp" />
     <ClCompile Include="..\src\Common.cpp" />
     <ClCompile Include="..\src\FileTools.cpp" />
     <ClCompile Include="..\src\GameState.cpp" />
-    <ClCompile Include="..\src\GPUQueue.cpp" />
     <ClCompile Include="..\src\JSONTools.cpp" />
     <ClCompile Include="..\src\NaiveBuildOrderSearch.cpp" />
-    <ClCompile Include="..\src\Edge.cpp" />
-    <ClCompile Include="..\src\Node.cpp" />
     <ClCompile Include="..\src\Tools.cpp" />
     <ClCompile Include="..\src\Unit.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\AbilityAction.h" />
     <ClInclude Include="..\src\ActionSet.h" />
-    <ClInclude Include="..\src\ActionSetAbilities.h" />
     <ClInclude Include="..\src\ActionType.h" />
     <ClInclude Include="..\src\ActionTypeData.h" />
     <ClInclude Include="..\src\BOSS.h" />
     <ClInclude Include="..\src\BOSSAssert.h" />
     <ClInclude Include="..\src\BOSSException.h" />
     <ClInclude Include="..\src\BoundedVector.h" />
-    <ClInclude Include="..\src\BuildOrderAbilities.h" />
-    <ClInclude Include="..\src\BuildOrderPlotter.h" />
     <ClInclude Include="..\src\BuildOrder.h" />
+    <ClInclude Include="..\src\BuildOrderPlotter.h" />
     <ClInclude Include="..\src\BuildOrderPlotData.h" />
     <ClInclude Include="..\src\BuildOrderSearchGoal.h" />
     <ClInclude Include="..\src\CombatSearch.h" />
     <ClInclude Include="..\src\CombatSearchParameters.h" />
+    <ClInclude Include="..\src\CombatSearchParameters_MCTS.h" />
     <ClInclude Include="..\src\CombatSearchResults.h" />
     <ClInclude Include="..\src\CombatSearch_BestResponse.h" />
     <ClInclude Include="..\src\CombatSearch_BestResponseData.h" />
     <ClInclude Include="..\src\CombatSearch_Bucket.h" />
     <ClInclude Include="..\src\CombatSearch_BucketData.h" />
     <ClInclude Include="..\src\CombatSearch_Integral.h" />
+    <ClInclude Include="..\src\CombatSearch_Integral_DFS.h" />
     <ClInclude Include="..\src\CombatSearch_IntegralData.h" />
-    <ClInclude Include="..\src\CombatSearch_IntegralDataFinishedUnits.h" />
-    <ClInclude Include="..\src\CombatSearch_ParallelIntegralMCTS.h" />
+    <ClInclude Include="..\src\CombatSearch_IntegralData_FinishedUnits.h" />
     <ClInclude Include="..\src\Common.h" />
     <ClInclude Include="..\src\DFBB_BuildOrderSearchParameters.h" />
     <ClInclude Include="..\src\DFBB_BuildOrderSearchResults.h" />
@@ -96,12 +91,9 @@
     <ClInclude Include="..\src\Eval.h" />
     <ClInclude Include="..\src\FileTools.h" />
     <ClInclude Include="..\src\GameState.h" />
-    <ClInclude Include="..\src\GPUQueue.h" />
     <ClInclude Include="..\src\JSONTools.h" />
     <ClInclude Include="..\src\json\json.hpp" />
     <ClInclude Include="..\src\NaiveBuildOrderSearch.h" />
-    <ClInclude Include="..\src\Edge.h" />
-    <ClInclude Include="..\src\Node.h" />
     <ClInclude Include="..\src\Timer.hpp" />
     <ClInclude Include="..\src\Tools.h" />
     <ClInclude Include="..\src\Unit.h" />
@@ -213,10 +205,10 @@
     <ClCompile>
       <PrecompiledHeader>
       </PrecompiledHeader>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>EnableAllWarnings</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);C:\School Work\BOSS\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(SolutionDir)..\include</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
@@ -232,7 +224,7 @@
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
     </ProjectReference>
     <Lib>
-      <AdditionalLibraryDirectories>C:\School Work\BOSS\libs</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\libs</AdditionalLibraryDirectories>
       <LinkTimeCodeGeneration>false</LinkTimeCodeGeneration>
     </Lib>
   </ItemDefinitionGroup>
@@ -276,7 +268,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);C:\SchoolWork\BOSS\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(SolutionDir)..\include</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -299,7 +291,7 @@
       <PreserveSbr>true</PreserveSbr>
     </Bscmake>
     <Lib>
-      <AdditionalLibraryDirectories>C:\SchoolWork\BOSS\libs</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\libs</AdditionalLibraryDirectories>
       <LinkTimeCodeGeneration>true</LinkTimeCodeGeneration>
     </Lib>
     <ProjectReference>

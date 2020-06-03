@@ -1,16 +1,6 @@
 /* -*- c-basic-offset: 4 -*- */
 
-//#if (!DEBUG)
-//    #undef _SECURE_SCL
-//    #define _SECURE_SCL 0
-//    #undef _HAS_ITERATOR_DEBUGGING
-//    #define _HAS_ITERATOR_DEBUGGING 0
-//    #undef _ITERATOR_DEBUG_LEVEL
-//    #define _ITERATOR_DEBUG_LEVEL 0
-//#endif // DEBUG
-
 #pragma once
-#include <Python.h>
 #include <cstdio>
 #include <cmath>
 #include <fstream>
@@ -22,6 +12,7 @@
 #include <set>
 #include <algorithm>
 #include <mutex>
+#include <random>
 #include "json/json.hpp"
 
 using json = nlohmann::json;
@@ -48,8 +39,9 @@ namespace BOSS
     static_assert(sizeof(sint2) == 2, "unexpected size");
     static_assert(sizeof(sint4) == 4, "unexpected size");
     static_assert(sizeof(sint8) == 8, "unexpected size");
-
     static_assert(sizeof(int) >= 4, "unexpected size");
+    static_assert(sizeof(float) == 4, "unexpected size");
+    static_assert(sizeof(double) == 8, "unexpected size");
     
     using ActionID = uint2;
     using RaceID   = uint1;

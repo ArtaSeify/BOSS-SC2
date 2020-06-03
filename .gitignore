@@ -23,6 +23,3 @@ emscripten/BOSS.data
 /vs/x64
 /MCTS Results/*
 !/MCTS Results/*.py
-/bin/ML/logs
-/bin/ML/models
-/bin/ML/Chris Code

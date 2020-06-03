@@ -3,7 +3,6 @@
   <ItemGroup>
     <ClCompile Include="..\src\ActionType.cpp" />
     <ClCompile Include="..\src\ActionTypeData.cpp" />
-    <ClCompile Include="..\src\BuildOrder.cpp" />
     <ClCompile Include="..\src\GameState.cpp" />
     <ClCompile Include="..\src\BOSS.cpp">
       <Filter>common</Filter>
@@ -48,19 +47,10 @@
     <ClCompile Include="..\src\FileTools.cpp">
       <Filter>util</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\CombatSearch_Integral.cpp">
-      <Filter>search\CombatSearch\Integral</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\CombatSearch_IntegralData.cpp">
       <Filter>search\CombatSearch\Integral</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\CombatSearch_IntegralDataFinishedUnits.cpp">
-      <Filter>search\CombatSearch\Integral</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\AbilityAction.cpp">
-      <Filter>util</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\ActionSetAbilities.cpp">
       <Filter>util</Filter>
     </ClCompile>
     <ClCompile Include="..\src\CombatSearch_BucketData.cpp">
@@ -93,30 +83,29 @@
     <ClCompile Include="..\src\NaiveBuildOrderSearch.cpp">
       <Filter>search\NaiveSearch</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\ActionSet.cpp">
-      <Filter>util</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\BuildOrderSearchGoal.cpp">
       <Filter>search\BuildOrderSearch</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\BuildOrderAbilities.cpp" />
-    <ClCompile Include="..\src\CombatSearch_ParallelIntegralMCTS.cpp">
-      <Filter>search\CombatSearch\Integral\ParallelMCTS</Filter>
+    <ClCompile Include="..\src\CombatSearch_IntegralData_FinishedUnits.cpp">
+      <Filter>search\CombatSearch\Integral</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Edge.cpp">
-      <Filter>search\CombatSearch\Integral\ParallelMCTS</Filter>
+    <ClCompile Include="..\src\CombatSearch_Integral.cpp">
+      <Filter>search\CombatSearch\Integral</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Node.cpp">
-      <Filter>search\CombatSearch\Integral\ParallelMCTS</Filter>
+    <ClCompile Include="..\src\ActionSet.cpp">
+      <Filter>util</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\GPUQueue.cpp">
-      <Filter>search\CombatSearch\Integral\ParallelMCTS</Filter>
+    <ClCompile Include="..\src\BuildOrder.cpp" />
+    <ClCompile Include="..\src\CombatSearchParameters_MCTS.cpp">
+      <Filter>search\CombatSearch\Integral\MCTS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\CombatSearch_Integral_DFS.cpp">
+      <Filter>search\CombatSearch\Integral\DFS</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\ActionType.h" />
     <ClInclude Include="..\src\ActionTypeData.h" />
-    <ClInclude Include="..\src\BuildOrder.h" />
     <ClInclude Include="..\src\GameState.h" />
     <ClInclude Include="..\src\BOSS.h">
       <Filter>common</Filter>
@@ -164,19 +153,10 @@
     <ClInclude Include="..\src\FileTools.h">
       <Filter>util</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\CombatSearch_Integral.h">
-      <Filter>search\CombatSearch\Integral</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\CombatSearch_IntegralData.h">
       <Filter>search\CombatSearch\Integral</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\CombatSearch_IntegralDataFinishedUnits.h">
-      <Filter>search\CombatSearch\Integral</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\AbilityAction.h">
-      <Filter>util</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\ActionSetAbilities.h">
       <Filter>util</Filter>
     </ClInclude>
     <ClInclude Include="..\src\CombatSearch_BucketData.h">
@@ -209,27 +189,27 @@
     <ClInclude Include="..\src\NaiveBuildOrderSearch.h">
       <Filter>search\NaiveSearch</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\ActionSet.h">
-      <Filter>util</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\BuildOrderSearchGoal.h">
       <Filter>search\BuildOrderSearch</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\BuildOrderAbilities.h" />
     <ClInclude Include="..\src\BoundedVector.h">
       <Filter>util</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\CombatSearch_ParallelIntegralMCTS.h">
-      <Filter>search\CombatSearch\Integral\ParallelMCTS</Filter>
+    <ClInclude Include="..\src\CombatSearch_IntegralData_FinishedUnits.h">
+      <Filter>search\CombatSearch\Integral</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Edge.h">
-      <Filter>search\CombatSearch\Integral\ParallelMCTS</Filter>
+    <ClInclude Include="..\src\CombatSearch_Integral.h">
+      <Filter>search\CombatSearch\Integral</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Node.h">
-      <Filter>search\CombatSearch\Integral\ParallelMCTS</Filter>
+    <ClInclude Include="..\src\ActionSet.h">
+      <Filter>util</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\GPUQueue.h">
-      <Filter>search\CombatSearch\Integral\ParallelMCTS</Filter>
+    <ClInclude Include="..\src\BuildOrder.h" />
+    <ClInclude Include="..\src\CombatSearchParameters_MCTS.h">
+      <Filter>search\CombatSearch\Integral\MCTS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\CombatSearch_Integral_DFS.h">
+      <Filter>search\CombatSearch\Integral\DFS</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -266,20 +246,11 @@
     <Filter Include="search\CombatSearch\Integral">
       <UniqueIdentifier>{841059ad-587a-41f4-9642-a83478d31d49}</UniqueIdentifier>
     </Filter>
-    <Filter Include="search\CombatSearch\Integral\NMCS">
-      <UniqueIdentifier>{117c0c5b-8945-40cb-ab9d-a69dc5b223b0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="search\CombatSearch\Integral\Network">
-      <UniqueIdentifier>{0f037cb3-fdb6-4b22-aa45-9e606638c89f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="search\CombatSearch\Integral\NMCTS">
-      <UniqueIdentifier>{a8af9655-abf9-4561-a352-6efee6b3eb78}</UniqueIdentifier>
-    </Filter>
     <Filter Include="search\CombatSearch\Integral\MCTS">
-      <UniqueIdentifier>{d4bca63e-59b7-4207-848f-9cc0d95f7013}</UniqueIdentifier>
+      <UniqueIdentifier>{69e58385-d8b1-4da2-9d04-d06f571594bc}</UniqueIdentifier>
     </Filter>
-    <Filter Include="search\CombatSearch\Integral\ParallelMCTS">
-      <UniqueIdentifier>{86e77afc-3a62-484d-91c5-d3c77e2dbf8c}</UniqueIdentifier>
+    <Filter Include="search\CombatSearch\Integral\DFS">
+      <UniqueIdentifier>{7620906d-cea6-49fb-acbc-b5585b3f574e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

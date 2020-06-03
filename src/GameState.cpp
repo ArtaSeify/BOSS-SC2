@@ -31,14 +31,7 @@ GameState::GameState()
     , m_lastAction(ActionTypes::None)
     , m_lastAbility(AbilityAction())
 {
-    //using Vector_Unit = BoundedVector<Unit, 70>;
-    //using Vector_NumUnits = BoundedVector<NumUnits, 35>;
-    //using Vector_AbilityAction = BoundedVector<AbilityAction, 10>;
 
-    //Vector_Unit             m_units;
-    //Vector_NumUnits         m_unitsBeingBuilt;
-    //Vector_NumUnits         m_unitsSortedEndFrame; 
-    //Vector_AbilityAction    m_chronoBoosts;
 }
 
 GameState::GameState(const std::vector<Unit> & unitVector, RaceID race, FracType minerals, FracType gas,
@@ -112,7 +105,7 @@ GameState::GameState(const std::vector<Unit> & unitVector, RaceID race, FracType
     BOSS_ASSERT(calculatedSupply == currentSupply, "Actual current supply %i and the one calculated by BOSS %i are different", currentSupply, calculatedSupply);
     BOSS_ASSERT(m_currentSupply <= m_maxSupply, "Current supply %i must be less than or equal to max supply %i", m_currentSupply, m_maxSupply);
 
-    std::cout << "Race: " << Races::GetRaceName(m_race) << std::endl;
+    /*std::cout << "Race: " << Races::GetRaceName(m_race) << std::endl;
     std::cout << "Minerals: " << m_minerals << std::endl;
     std::cout << "Gas: " << m_gas << std::endl;
     std::cout << "Current Supply: " << m_currentSupply << std::endl;
@@ -125,7 +118,7 @@ GameState::GameState(const std::vector<Unit> & unitVector, RaceID race, FracType
     std::cout << "Num Refineries: " << m_numRefineries << std::endl;
     std::cout << "In Progress Refineries: " << m_inProgressRefineries << std::endl;
     std::cout << "Num Depots: " << m_numDepots << std::endl;
-    std::cout << "In Progress Depots: " << m_inProgressDepots << std::endl;
+    std::cout << "In Progress Depots: " << m_inProgressDepots << std::endl;*/
 }
 
 void GameState::getLegalActions(std::vector<ActionType> & legalActions) const
@@ -961,7 +954,7 @@ int GameState::timeUntilResearchDone(ActionType action) const
     return getUnit(m_unitTypes[action.getRaceActionID()][0]).getTimeUntilBuilt();
 }
 
-void GameState::getSpecialAbilityTargets(ActionSetAbilities & actionSet, int index) const
+void GameState::getSpecialAbilityTargets(ActionSet & actionSet, int index) const
 {
     if (m_race == Races::Protoss)
     {
@@ -970,7 +963,7 @@ void GameState::getSpecialAbilityTargets(ActionSetAbilities & actionSet, int ind
     }
 }
 
-int GameState::storeChronoBoostTargets(ActionSetAbilities & actionSet, int index) const
+int GameState::storeChronoBoostTargets(ActionSet & actionSet, int index) const
 {
     int numTargets = 0;
     for (auto & unit : m_units)
@@ -1159,7 +1152,7 @@ std::pair<std::string, int> GameState::getStateData(const CombatSearchParameters
     state << ",";
     state << m_maxSupply;
     state << ",";
-    state << (params.getFrameTimeLimit() - m_currentFrame);
+    state << (params.getFrameLimit() - m_currentFrame);
     state << ",";
     state << m_mineralWorkers;
     state << ",";
@@ -1215,7 +1208,7 @@ json GameState::writeToJson(const CombatSearchParameters & params) const
     j["MaxSupply"] = m_maxSupply;
     j["CurrentFrame"] = m_currentFrame;
     j["PreviousFrame"] = m_previousFrame;
-    j["FrameTimeLimit"] = params.getFrameTimeLimit();
+    j["FrameTimeLimit"] = params.getFrameLimit();
     j["MineralWorkers"] = m_mineralWorkers;
     j["GasWorkers"] = m_gasWorkers;
     j["BuildingWorkers"] = m_buildingWorkers;

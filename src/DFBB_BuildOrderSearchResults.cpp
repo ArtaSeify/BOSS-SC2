@@ -30,6 +30,6 @@ void DFBB_BuildOrderSearchResults::printBuildOrder() const
 {
     for (int i(0); i < buildOrder.size(); ++i)
     {
-        printf("%d ",buildOrder[i].getID());
+        printf("%d ",buildOrder[i].first.getID());
     }
 }

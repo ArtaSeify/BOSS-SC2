@@ -10,7 +10,7 @@ CombatSearch_IntegralData::CombatSearch_IntegralData()
     m_integralStack.push_back(IntegralData(0,0,0));
 }
 
-void CombatSearch_IntegralData::update(const GameState & state, const BuildOrderAbilities & buildOrder)
+void CombatSearch_IntegralData::update(const GameState & state, const BuildOrder & buildOrder)
 {
     float value = Eval::ArmyTotalResourceSum(state);
     TimeType timeElapsed = state.getCurrentFrame() - m_integralStack.back().timeAdded; 
@@ -56,7 +56,7 @@ void CombatSearch_IntegralData::print() const
     }
 }
 
-const BuildOrderAbilities & CombatSearch_IntegralData::getBestBuildOrder() const
+const BuildOrder & CombatSearch_IntegralData::getBestBuildOrder() const
 {
     return m_bestIntegralBuildOrder;
 }

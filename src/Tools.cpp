@@ -3,7 +3,6 @@
 #include "Tools.h"
 #include "BuildOrderSearchGoal.h"
 #include "NaiveBuildOrderSearch.h"
-#include "ActionSet.h"
 
 using namespace BOSS;
 
@@ -58,7 +57,7 @@ BuildOrder Tools::GetOptimizedNaiveBuildOrderOld(const GameState & state, const 
 
 BuildOrder Tools::GetNaiveBuildOrderAddWorkersOld(const GameState & state, const BuildOrderSearchGoal & goal, int maxWorkers)
 {
-    ActionSetAbilities wanted;
+    ActionSet wanted;
     int minWorkers = 8;
 
     ActionType worker = ActionTypes::GetWorker(state.getRace());
@@ -82,7 +81,7 @@ BuildOrder Tools::GetNaiveBuildOrderAddWorkersOld(const GameState & state, const
     }
 
     // Calculate which prerequisite units we need to build to achieve the units we want from the goal
-    ActionSetAbilities requiredToBuild;
+    ActionSet requiredToBuild;
     CalculatePrerequisitesRequiredToBuild(state, wanted, requiredToBuild);
 
     // Add the required units to a preliminary build order
@@ -138,7 +137,7 @@ BuildOrder Tools::GetNaiveBuildOrderAddWorkersOld(const GameState & state, const
         
         for (int a(0); a < buildOrder.size(); ++a)
         {
-            ActionType actionType = buildOrder[a];
+            ActionType actionType = buildOrder[a].first;
 
             if (actionType.isAddon())
             {
@@ -209,9 +208,9 @@ BuildOrder Tools::GetNaiveBuildOrderAddWorkersOld(const GameState & state, const
     {
         for (int j(i+1); j < buildOrder.size(); ++j)
         {
-            const ActionSetAbilities & recursivePre = buildOrder[i].getRecursivePrerequisiteActionCount();
+            const ActionSet & recursivePre = buildOrder[i].first.getRecursivePrerequisiteActionCount();
 
-            if (recursivePre.contains(buildOrder[j]))
+            if (recursivePre.contains(buildOrder[j].first))
             {
                 std::swap(buildOrder[i], buildOrder[j]);
             }
@@ -226,7 +225,7 @@ BuildOrder Tools::GetNaiveBuildOrderAddWorkersOld(const GameState & state, const
     {
         ActionType worker = ActionTypes::GetWorker(currentState.getRace());
         ActionType supplyProvider = ActionTypes::GetSupplyProvider(currentState.getRace());
-        ActionType nextAction = buildOrder[i];
+        ActionType nextAction = buildOrder[i].first;
         int maxSupply = currentState.getMaxSupply() + currentState.getSupplyInProgress();
         int numWorkers = currentState.getNumTotal(worker);
         int currentSupply = currentState.getCurrentSupply();
@@ -306,7 +305,7 @@ void Tools::InsertActionIntoBuildOrder(BuildOrder & result, const BuildOrder & b
             tempState.doAction(action);
             for (int a(insertIndex); a < buildOrder.size(); ++a)
             {
-                tempState.doAction(buildOrder[a]);
+                tempState.doAction(buildOrder[a].first);
             }
 
             int completionTime = tempState.getLastActionFinishTime();
@@ -318,9 +317,9 @@ void Tools::InsertActionIntoBuildOrder(BuildOrder & result, const BuildOrder & b
             }
         }
 
-        BOSS_ASSERT(runningState.isLegal(buildOrder[insertIndex]), "We have made the next action illegal somehow");
-        runningBuildOrder.add(buildOrder[insertIndex]);
-        runningState.doAction(buildOrder[insertIndex]);
+        BOSS_ASSERT(runningState.isLegal(buildOrder[insertIndex].first), "We have made the next action illegal somehow");
+        runningBuildOrder.add(buildOrder[insertIndex].first);
+        runningState.doAction(buildOrder[insertIndex].first);
     }
 
     result.clear();
@@ -346,7 +345,7 @@ int Tools::GetUpperBound(const GameState & state, const BuildOrderSearchGoal & g
 
 int Tools::GetLowerBound(const GameState & state, const BuildOrderSearchGoal & goal)
 {
-    ActionSetAbilities wanted;
+    ActionSet wanted;
 
     // add everything from the goal to the needed set
     for (ActionID a(0); a < ActionTypes::GetAllActionTypes().size(); ++a)
@@ -365,10 +364,10 @@ int Tools::GetLowerBound(const GameState & state, const BuildOrderSearchGoal & g
     return lowerBound;
 }
 
-void Tools::CalculatePrerequisitesRequiredToBuild(const GameState & state, const ActionSetAbilities & needed, ActionSetAbilities & added)
+void Tools::CalculatePrerequisitesRequiredToBuild(const GameState & state, const ActionSet & needed, ActionSet & added)
 {
     // if anything needed gas and we don't have a refinery, we need to add one
-    ActionSetAbilities allNeeded(needed);
+    ActionSet allNeeded(needed);
     ActionType refinery = ActionTypes::GetRefinery(state.getRace());
     if (!needed.contains(refinery) && (state.getNumCompleted(refinery) == 0) && !added.contains(refinery))
     {
@@ -408,7 +407,7 @@ void Tools::CalculatePrerequisitesRequiredToBuild(const GameState & state, const
 }
 
 // returns the amount of time necessary to complete the longest chain of sequential prerequisites
-int Tools::CalculatePrerequisitesLowerBound(const GameState & state, const ActionSetAbilities & needed, int timeSoFar, int depth)
+int Tools::CalculatePrerequisitesLowerBound(const GameState & state, const ActionSet & needed, int timeSoFar, int depth)
 {
     int max = 0;
     for (const auto & actionTargetPair : needed)
@@ -458,11 +457,11 @@ void Tools::DoBuildOrder(GameState & state, const BuildOrder & buildOrder)
 {
     for (const auto &x : buildOrder)
     {
-        state.doAction(x);
+        state.doAction(x.first);
     }
 }
 
-void Tools::DoBuildOrder(GameState & state, BuildOrderAbilities & buildOrder)
+void Tools::DoBuildOrder(GameState & state, BuildOrder & buildOrder)
 {
     for (auto & x : buildOrder)
     {

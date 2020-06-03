@@ -5,7 +5,7 @@
 #include "BOSS.h"
 #include "JSONTools.h"
 #include "BuildOrderSearchGoal.h"
-#include "BuildOrderAbilities.h"
+#include "BuildOrder.h"
 
 namespace BOSS
 {
@@ -15,7 +15,7 @@ namespace BOSS
         std::string                                 m_configFile;
 
         std::map<std::string, GameState>            m_stateMap;
-        std::map<std::string, BuildOrderAbilities>  m_buildOrderMap;
+        std::map<std::string, BuildOrder>  m_buildOrderMap;
         std::map<std::string, BuildOrderSearchGoal> m_buildOrderSearchGoalMap;
         
         BOSSConfig();
@@ -26,7 +26,7 @@ namespace BOSS
         void ParseConfig(const std::string & configFile);
 
         const GameState &               GetState(const std::string & key);
-        const BuildOrderAbilities &     GetBuildOrder(const std::string & key);
+        const BuildOrder &     GetBuildOrder(const std::string & key);
         const BuildOrderSearchGoal &    GetBuildOrderSearchGoalMap(const std::string & key);
     };
 }

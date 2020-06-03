@@ -3,10 +3,10 @@
 #pragma once
 
 #include "Common.h"
-#include "ActionSetAbilities.h"
 
 namespace BOSS
 {
+    class ActionSet;
 
     class ActionType
     {
@@ -53,8 +53,8 @@ namespace BOSS
         const std::vector<ActionType> & equivalent() const;
         const std::vector<ActionType> & strongAgainst(RaceID race) const;
         const std::vector<ActionType> & weakAgainst(RaceID race) const;
-        const ActionSetAbilities & getPrerequisiteActionCount() const;
-        const ActionSetAbilities & getRecursivePrerequisiteActionCount() const;
+        const ActionSet & getPrerequisiteActionCount() const;
+        const ActionSet & getRecursivePrerequisiteActionCount() const;
 
         bool operator == (ActionType rhs) const { return m_id == rhs.m_id; }
         bool operator != (ActionType rhs) const { return m_id != rhs.m_id; }
@@ -80,8 +80,8 @@ namespace BOSS
         ActionType GetRaceActionType(ActionID id, RaceID race);
         bool TypeExists(const std::string & name);
 
-        ActionSetAbilities CalculatePrerequisites(ActionType action);
-        void CalculateRecursivePrerequisites(ActionSetAbilities & count, ActionType action);
+        ActionSet CalculatePrerequisites(ActionType action);
+        void CalculateRecursivePrerequisites(ActionSet & allActions, ActionType action);
 
         extern ActionType None;
     }

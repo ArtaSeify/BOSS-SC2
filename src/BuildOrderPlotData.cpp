@@ -5,7 +5,7 @@
 
 using namespace BOSS;
 
-BuildOrderPlotData::BuildOrderPlotData(const GameState & initialState, const BuildOrderAbilities & buildOrder)
+BuildOrderPlotData::BuildOrderPlotData(const GameState & initialState, const BuildOrder & buildOrder)
     : m_initialState(initialState)
     , m_buildOrder(buildOrder)
     , m_maxLayer(0)

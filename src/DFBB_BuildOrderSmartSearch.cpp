@@ -196,7 +196,7 @@ void DFBB_BuildOrderSmartSearch::recurseOverStrictDependencies(ActionType action
         return;
     }
 
-    ActionSetAbilities recursivePrerequisites = actionType.getRecursivePrerequisiteActionCount();
+    ActionSet recursivePrerequisites = actionType.getRecursivePrerequisiteActionCount();
 
     for (const auto & actionTargetPair : recursivePrerequisites)
     {

@@ -10,7 +10,7 @@
 namespace BOSS
 {
     using ActionAbilityPair = std::pair<ActionType, AbilityAction>;
-    using Action = ActionSetAbilities::ActionTargetPair;
+    using Action = std::pair<ActionType, NumUnits>;
     class Node;
     class Edge : public std::enable_shared_from_this<Edge>
     {

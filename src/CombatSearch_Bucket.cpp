@@ -5,7 +5,7 @@
 using namespace BOSS;
 
 CombatSearch_Bucket::CombatSearch_Bucket(const CombatSearchParameters p)
-    : m_bucket(p.getFrameTimeLimit(), 200)
+    : m_bucket(p.getFrameLimit(), 200)
 {
     m_params = p;
    
@@ -31,7 +31,7 @@ void CombatSearch_Bucket::recurse(const GameState & state, int depth)
         //return;
     }
 
-    ActionSetAbilities legalActions;
+    ActionSet legalActions;
     generateLegalActions(state, legalActions, m_params);
     
     for (int a(0); a < legalActions.size(); ++a)

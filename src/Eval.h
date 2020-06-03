@@ -4,7 +4,7 @@
 
 #include "Common.h"
 #include "GameState.h"
-#include "BuildOrderAbilities.h"
+#include "BuildOrder.h"
 #include "CombatSearchParameters.h"
 
 namespace BOSS
@@ -30,7 +30,7 @@ namespace BOSS
         void setUnitWeightsString();
         std::string getUnitWeightsString();
 
-        bool BuildOrderBetter(const BuildOrderAbilities & buildOrder, const BuildOrderAbilities & compareTo);
+        bool BuildOrderBetter(const BuildOrder & buildOrder, const BuildOrder & compareTo);
         bool StateBetter(const GameState & state, const GameState & compareTo);
 
         bool StateDominates(const GameState & state, const GameState & other);

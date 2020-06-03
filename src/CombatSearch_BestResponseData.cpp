@@ -4,7 +4,7 @@
 
 using namespace BOSS;
 
-CombatSearch_BestResponseData::CombatSearch_BestResponseData(const GameState & enemyState, const BuildOrderAbilities & enemyBuildOrder)
+CombatSearch_BestResponseData::CombatSearch_BestResponseData(const GameState & enemyState, const BuildOrder & enemyBuildOrder)
     : m_enemyInitialState(enemyState)
     , m_enemyBuildOrder(enemyBuildOrder)
     , m_bestEval(std::numeric_limits<float>::max())
@@ -14,7 +14,7 @@ CombatSearch_BestResponseData::CombatSearch_BestResponseData(const GameState & e
     calculateArmyValues(m_enemyInitialState, m_enemyBuildOrder, m_enemyArmyValues);
 }
 
-void CombatSearch_BestResponseData::calculateArmyValues(const GameState & initialState, const BuildOrderAbilities & buildOrder, std::vector< std::pair<TimeType, FracType> > & values)
+void CombatSearch_BestResponseData::calculateArmyValues(const GameState & initialState, const BuildOrder & buildOrder, std::vector< std::pair<TimeType, FracType> > & values)
 {
     values.clear();
     GameState state(initialState);
@@ -25,7 +25,7 @@ void CombatSearch_BestResponseData::calculateArmyValues(const GameState & initia
     }
 }
 
-void CombatSearch_BestResponseData::update(const GameState & initialState, const GameState & currentState, const BuildOrderAbilities & buildOrder)
+void CombatSearch_BestResponseData::update(const GameState & initialState, const GameState & currentState, const BuildOrder & buildOrder)
 {
     float eval = compareBuildOrder(initialState, buildOrder);
 
@@ -39,7 +39,7 @@ void CombatSearch_BestResponseData::update(const GameState & initialState, const
     }
 }
 
-float CombatSearch_BestResponseData::compareBuildOrder(const GameState & initialState, const BuildOrderAbilities & buildOrder)
+float CombatSearch_BestResponseData::compareBuildOrder(const GameState & initialState, const BuildOrder & buildOrder)
 {
     calculateArmyValues(initialState, buildOrder, m_selfArmyValues);
 
@@ -96,7 +96,7 @@ int CombatSearch_BestResponseData::getStateIndex(const GameState & state)
     return 0;
 }
 
-const BuildOrderAbilities & CombatSearch_BestResponseData::getBestBuildOrder() const
+const BuildOrder & CombatSearch_BestResponseData::getBestBuildOrder() const
 {
     return m_bestBuildOrder;
 }

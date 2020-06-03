@@ -5,10 +5,9 @@
 #include "Common.h"
 #include "Timer.hpp"
 #include "Eval.h"
-#include "BuildOrderAbilities.h"
+#include "BuildOrder.h"
 #include "CombatSearchParameters.h"
 #include "CombatSearchResults.h"
-#include <boost/chrono.hpp>
 
 namespace BOSS
 {
@@ -26,12 +25,12 @@ namespace BOSS
 
         //int                         m_upperBound;         // the current upper bound for search
         Timer                       m_searchTimer;
-        boost::chrono::thread_clock::time_point m_searchTimerCPU;
+        //boost::chrono::thread_clock::time_point m_searchTimerCPU;
 
-        BuildOrderAbilities         m_buildOrder;
+        BuildOrder         m_buildOrder;
 
-        virtual void recurse(const GameState & s, int depth);
-        virtual void generateLegalActions(const GameState & state, ActionSetAbilities & legalActions, const CombatSearchParameters & params);
+        virtual void run(const GameState & s, int depth);
+        virtual void generateLegalActions(const GameState & state, ActionSet & legalActions, const CombatSearchParameters & params);
 
         //virtual double              eval(const GameState & state) const;
         virtual bool isTerminalNode(const GameState & s,int depth);

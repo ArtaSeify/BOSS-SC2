@@ -22,14 +22,12 @@
     <ClCompile Include="..\src\BOSSConfig.cpp" />
     <ClCompile Include="..\src\Experiments.cpp" />
     <ClCompile Include="..\src\IntegralExperiment.cpp" />
-    <ClCompile Include="..\src\IntegralExperimentOMP.cpp" />
     <ClCompile Include="..\src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\BOSSConfig.h" />
     <ClInclude Include="..\src\Experiments.h" />
     <ClInclude Include="..\src\IntegralExperiment.h" />
-    <ClInclude Include="..\src\IntegralExperimentOMP.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="BOSS.vcxproj">
@@ -165,7 +163,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(SolutionDir)..\bin\BOSS_d.lib;%(AdditionalDependencies);$(SolutionDir)..\libs\gsl.lib</AdditionalDependencies>
+      <AdditionalDependencies>$(SolutionDir)..\bin\BOSS_d.lib;%(AdditionalDependencies);</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)..\libs</AdditionalLibraryDirectories>
     </Link>
     <ProjectReference>
@@ -237,7 +235,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>$(SolutionDir)..\bin\BOSS.lib;%(AdditionalDependencies);$(SolutionDir)..\libs\gsl.lib</AdditionalDependencies>
+      <AdditionalDependencies>$(SolutionDir)..\bin\BOSS.lib;%(AdditionalDependencies);</AdditionalDependencies>
       <GenerateMapFile>true</GenerateMapFile>
       <AdditionalLibraryDirectories>$(SolutionDir)..\libs</AdditionalLibraryDirectories>
       <PerUserRedirection>true</PerUserRedirection>

@@ -1,5 +1,0 @@
-
-
-
-Ran 10000 simulations in 11124.1ms @ 898.951 simulations/sec
-Nodes expanded: 4884. Total nodes visited: 161607, at a rate of 14527.7 nodes/sec

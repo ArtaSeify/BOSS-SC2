@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "BuildOrderAbilities.h"
+#include "BuildOrder.h"
 #include "Common.h"
 #include "GameState.h"
 #include "Eval.h"
@@ -14,7 +14,7 @@ namespace BOSS
     {
     public:
         FracType eval;
-        BuildOrderAbilities buildOrder;
+        BuildOrder buildOrder;
         GameState state;
 
         BucketData()
@@ -38,7 +38,7 @@ namespace BOSS
         int numBuckets() const;
         int getBucketIndex(const GameState & state) const;
         
-        void update(const GameState & state, const BuildOrderAbilities & buildOrder);
+        void update(const GameState & state, const BuildOrder & buildOrder);
 
         bool isDominated(const GameState & state);
 

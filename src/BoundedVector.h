@@ -93,7 +93,6 @@ public:
         return data[n-1];
     }
 
-    //!!! ADDED BY ARTA
     const T &front() const
     {
         assert(n > 0);
@@ -108,7 +107,6 @@ public:
 
     int size() const { return n; }
 
-    //!!! ADDED BY ARTA
     bool empty() const { return n == 0; }
 
     void clear()

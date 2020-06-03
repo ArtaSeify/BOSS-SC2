@@ -15,7 +15,7 @@ void BuildOrderPlotter::setOutputDir(const std::string & dir)
     m_outputDir = dir;
 }
 
-void BuildOrderPlotter::addPlot(const std::string & name, const GameState & state, const BuildOrderAbilities & buildOrder)
+void BuildOrderPlotter::addPlot(const std::string & name, const GameState & state, const BuildOrder & buildOrder)
 {
     m_buildOrderNames.push_back(name);
     m_allPlots.push_back(BuildOrderPlotData(state, buildOrder));
@@ -103,7 +103,7 @@ void BuildOrderPlotter::writeBuildOrderPlot(const std::vector<BuildOrderPlotData
     
     for (size_t p(0); p < plots.size(); ++p)
     {
-        const BuildOrderAbilities & buildOrder = plots[p].m_buildOrder;
+        const BuildOrder & buildOrder = plots[p].m_buildOrder;
 
         for (int i(0); i < buildOrder.size(); ++i)
         {
@@ -191,7 +191,7 @@ std::string BuildOrderPlotter::getPlotJSON(const std::vector<BuildOrderPlotData>
 
     for (size_t p(0); p < plots.size(); ++p)
     {
-        const BuildOrderAbilities & buildOrder = plots[p].m_buildOrder;
+        const BuildOrder & buildOrder = plots[p].m_buildOrder;
         
         ss << "{ name : \"" << m_buildOrderNames[p] << "\", buildOrder : [";
 

@@ -7,6 +7,8 @@
 #include "BOSS.h"
 #include "JSONTools.h"
 #include "CombatSearchParameters_MCTS.h"
+#include "CombatSearchResults.h"
+#include "BuildOrder.h"
 
 namespace BOSS
 {
@@ -22,10 +24,10 @@ namespace BOSS
     public:
 
         IntegralExperiment();
-        IntegralExperiment(const std::string& experimentName, const json& exp);
+        IntegralExperiment(const std::string & experimentName, const json & exp);
 
-        void runExperimentThread(int run);
-        void runTotalTimeExperiment(int run);
+        void runExperimentThread(int thread, int numRuns, int startingIndex);
+        void runExperimentsTotalTimeThread(int thread, int numRuns, int startingIndex);
         void run(int numberOfRuns);
     };
 }

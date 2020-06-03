@@ -5,7 +5,7 @@
 #include "Common.h"
 #include "Timer.hpp"
 #include "Eval.h"
-#include "BuildOrderAbilities.h"
+#include "BuildOrder.h"
 #include "CombatSearch.h"
 #include "CombatSearchParameters.h"
 #include "CombatSearchResults.h"
@@ -20,7 +20,7 @@ namespace BOSS
 
         CombatSearch_BestResponseData m_bestResponseData;
 
-        BuildOrderAbilities m_bestBuildOrder;
+        BuildOrder m_bestBuildOrder;
 
     public:
     

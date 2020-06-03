@@ -3,7 +3,7 @@
 #pragma once
 
 #include "Common.h"
-#include "BuildOrderAbilities.h"
+#include "BuildOrder.h"
 #include "BuildOrderSearchGoal.h"
 
 namespace BOSS
@@ -36,7 +36,7 @@ namespace JSONTools
     std::string ReadFile(const std::string & filename);
 
     GameState GetGameState(const json & json);
-    BuildOrderAbilities GetBuildOrder(const json & json);
+    BuildOrder GetBuildOrder(const json & json);
     BuildOrderSearchGoal GetBuildOrderSearchGoal(const json & json);
     
     std::string GetBuildOrderString(const std::vector<ActionType> & buildOrder);

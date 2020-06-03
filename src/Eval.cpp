@@ -156,7 +156,7 @@ FracType Eval::UnitValueWithOpponent(const GameState & state, ActionType type, c
     return value;
 }
 
-bool Eval::BuildOrderBetter(const BuildOrderAbilities & buildOrder, const BuildOrderAbilities & compareTo)
+bool Eval::BuildOrderBetter(const BuildOrder & buildOrder, const BuildOrder & compareTo)
 {
     int numWorkers = 0;
     int numWorkersOther = 0;

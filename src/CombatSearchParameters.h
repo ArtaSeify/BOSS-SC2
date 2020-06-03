@@ -4,7 +4,8 @@
 
 #include "Common.h"
 #include "GameState.h"
-#include "BuildOrderAbilities.h"
+#include "BuildOrder.h"
+#include "ActionSet.h"
 
 namespace BOSS
 {
@@ -91,41 +92,35 @@ namespace BOSS
         //          it will use the value as an initial bound.
         int m_initialUpperBound;
             
-        //      Initial GameState used for the search. See GameState.h for details
+        //      Initial GameState used for the search. See GameState.h for details.
         GameState m_initialState;
-        BuildOrderAbilities m_openingBuildOrder;
+        BuildOrder m_openingBuildOrder;
 
+        //      Initial GameState for the enemy.
         GameState m_enemyInitialState;
-        BuildOrderAbilities m_enemyBuildOrder;
+        BuildOrder m_enemyBuildOrder;
+
+        //      Unit count for enemy. Used for countering enemy units based on unit 
+        //      strengths/weaknesses, as provided in unit data file.
         std::vector<int>    m_enemyUnits;
         RaceID              m_enemyRace;
 
-        ActionSetAbilities m_relevantActions;
-        int m_frameTimeLimit;
+        //      The actions that will be considered during search
+        ActionSet m_relevantActions;
+
+        //      The number of frames to search into the future.
+        int m_frameLimit;
+
+        //      Prints the best solution found while searching. 
         bool m_printNewBest;
+
+        //      Sorts actions. Need to implement the sort function inside ActionSet
+        //      before setting this flag.
         bool m_sortActions;
-        bool m_saveStates;
-        FracType m_explorationValue;
-        bool m_changingRoot;
-        bool m_changingRootReset;
-        bool m_useMaxValue;
+
+        //      Set this to true if you want the search to maximize the value directly,
+        //      instead of maximizing the integral.
         bool m_maximizeValue;
-        int m_numberOfSimulations;
-        uint8 m_numberOfNodes;
-        int m_simulationsPerStep;
-        FracType m_simulationsPerStepDecay;
-        bool m_usePolicyNetwork;
-        bool m_usePolicyValueNetwork;
-        FracType m_mixingValue;
-        int m_threadsForMCTS;
-        int m_numPlayouts;
-        int m_level;
-        bool m_useTotalTimeLimit;
-        int m_temperatureChange;
-        int m_valueNormalization;
-        int m_nodeVisitsBeforeExpand;
-        FracType m_valueTargetMix;
-        bool m_useSimulationValueOnly;
 
     public:
 
@@ -138,8 +133,8 @@ namespace BOSS
         void setMaxActions(ActionType a, int max);
         int getMaxActions(ActionType a) const;
 
-        void setRelevantActions(const ActionSetAbilities & set);
-        const ActionSetAbilities & getRelevantActions() const;
+        void setRelevantActions(const ActionSet & set);
+        const ActionSet & getRelevantActions() const;
 
         void setInitialState(const GameState & s);
         const GameState & getInitialState() const;
@@ -147,11 +142,11 @@ namespace BOSS
         void setEnemyInitialState(const GameState & s);
         const GameState & getEnemyInitialState() const;
 
-        void setOpeningBuildOrder(const BuildOrderAbilities & buildOrder);
-        const BuildOrderAbilities & getOpeningBuildOrder() const;
+        void setOpeningBuildOrder(const BuildOrder & buildOrder);
+        const BuildOrder & getOpeningBuildOrder() const;
 
-        void setEnemyBuildOrder(const BuildOrderAbilities & buildOrder);
-        const BuildOrderAbilities & getEnemyBuildOrder() const;
+        void setEnemyBuildOrder(const BuildOrder & buildOrder);
+        const BuildOrder & getEnemyBuildOrder() const;
 
         void setEnemyUnits(const std::vector<int> & units);
         const std::vector<int> & getEnemyUnits() const;
@@ -162,8 +157,8 @@ namespace BOSS
         void setSearchTimeLimit(float timeLimitMS);
         float getSearchTimeLimit() const;
 
-        void setFrameTimeLimit(int limit);
-        int getFrameTimeLimit() const;
+        void setFrameLimit(int limit);
+        int getFrameLimit() const;
 
         void setAlwaysMakeWorkers(bool flag);
         bool getAlwaysMakeWorkers() const;
@@ -174,72 +169,9 @@ namespace BOSS
         void setSortActions(bool flag);
         bool getSortActions() const;
 
-        void setSaveStates(bool flag);
-        bool getSaveStates() const;
-
-        void setExplorationValue(FracType value);
-        FracType getExplorationValue() const;
-
-        void setChangingRoot(bool value);
-        bool getChangingRoot() const;
-
-        void setChangingRootReset(bool value);
-        bool getChangingRootReset() const;
-
-        void setUseMaxValue(bool value);
-        bool getUseMaxValue() const;
-
         void setMaximizeValue(bool value);
         bool getMaximizeValue() const;
 
-        void setNumberOfSimulations(int value);
-        int getNumberOfSimulations() const;
-
-        void setNumberOfNodes(uint8 value);
-        uint8 getNumberOfNodes() const;
-
-        void setSimulationsPerStep(int value);
-        int getSimulationsPerStep() const;
-
-        void setSimulationsPerStepDecay(FracType value);
-        FracType getSimulationsPerStepDecay() const;
-
-        void setUsePolicyNetwork(bool value);
-        bool usePolicyNetwork() const;
-
-        void setUsePolicyValueNetwork(bool value);
-        bool usePolicyValueNetwork() const;
-
-        void setMixingValue(FracType value);
-        FracType getMixingValue() const;
-
-        void setThreadsForMCTS(int threads);
-        int getThreadsForMCTS() const;
-
-        void setNumPlayouts(int value);
-        int getNumPlayouts() const;
-
-        void setLevel(int value);
-        int getLevel() const;
-
-        void setUseTotalTimeLimit(bool value);
-        bool getUseTotalTimeLimit() const;
-
-        void setTemperatureChange(int value);
-        int getTemperatureChange() const;
-
-        void setValueNormalization(int value);
-        int getValueNormalization() const;
-
-        void setNodeVisitsBeforeExpand(int value);
-        int getNodeVisitsBeforeExpand() const;
-
-        void setValueTargetMix(FracType value);
-        FracType getValueTargetMix() const;
-
-        void setUseSimulationValueOnly(bool value);
-        bool useSimulationValueOnly() const;
-    
         void print();
     };
 }

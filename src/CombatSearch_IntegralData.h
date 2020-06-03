@@ -39,19 +39,19 @@ namespace BOSS
         std::vector<IntegralData> m_integralStack;
         std::vector<IntegralData> m_bestIntegralStack;
         FracType                  m_bestIntegralValue;
-        BuildOrderAbilities       m_bestIntegralBuildOrder;
+        BuildOrder       m_bestIntegralBuildOrder;
         GameState                 m_bestIntegralGameState;
 
     public:
 
         CombatSearch_IntegralData();
 
-        void update(const GameState & state, const BuildOrderAbilities & buildOrder);
+        void update(const GameState & state, const BuildOrder & buildOrder);
         void pop_back();
 
         void printIntegralData(int index) const;
         void print() const;
 
-        const BuildOrderAbilities & getBestBuildOrder() const;
+        const BuildOrder & getBestBuildOrder() const;
     };
 }

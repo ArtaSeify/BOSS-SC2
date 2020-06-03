@@ -5,7 +5,7 @@
 #include "Common.h"
 #include "GameState.h"
 #include "Eval.h"
-#include "BuildOrderAbilities.h"
+#include "BuildOrder.h"
 
 namespace BOSS
 {
@@ -13,33 +13,33 @@ namespace BOSS
     class CombatSearch_BestResponseData
     {
         GameState m_enemyInitialState;
-        BuildOrderAbilities m_enemyBuildOrder;
+        BuildOrder m_enemyBuildOrder;
 
         std::vector<GameState> m_enemyStates;
         std::vector< std::pair<TimeType, FracType>> m_enemyArmyValues;
         std::vector< std::pair<TimeType, FracType>> m_selfArmyValues;
 
         float m_bestEval;
-        BuildOrderAbilities m_bestBuildOrder;
+        BuildOrder m_bestBuildOrder;
         GameState m_bestState;
 
         float compareBuildOrder(const GameState & state,
-                                const BuildOrderAbilities & buildOrder);
+                                const BuildOrder & buildOrder);
         int getStateIndex(const GameState & state);
 
         void calculateArmyValues(const GameState & state,
-                                 const BuildOrderAbilities & buildOrder,
+                                 const BuildOrder & buildOrder,
                                  std::vector<std::pair<TimeType, FracType>> & values);
 
     public:
 
         CombatSearch_BestResponseData(const GameState & enemyState,
-                                      const BuildOrderAbilities & enemyBuildOrder);
+                                      const BuildOrder & enemyBuildOrder);
 
         void update(const GameState & initialState,
                     const GameState & currentState,
-                    const BuildOrderAbilities & buildOrder);
+                    const BuildOrder & buildOrder);
 
-        const BuildOrderAbilities & getBestBuildOrder() const;
+        const BuildOrder & getBestBuildOrder() const;
     };
 }

@@ -1,9 +1,10 @@
 /* -*- c-basic-offset: 4 -*- */
 
 #include "Experiments.h"
-#include "IntegralExperimentOMP.h"
+#include "IntegralExperiment.h"
 #include "BuildOrderPlotter.h"
 #include "FileTools.h"
+
 #include <thread>
 #include <future>
 #include <omp.h>
@@ -12,8 +13,11 @@ using namespace BOSS;
 
 void ExperimentsArta::RunExperiments(const std::string & experimentFilename)
 {
+    BOSS::BOSSConfig::Instance().ParseConfig(experimentFilename);
+
     omp_set_nested(true);
     omp_set_dynamic(true);
+
     std::ifstream file(experimentFilename);
     json j;
     file >> j;
@@ -140,7 +144,7 @@ void ExperimentsArta::RunDFSExperiment(const std::string & experimentName, const
 {
     std::cout << "DFS Integral Search Experiment - " << experimentName << std::endl;
 
-    IntegralExperimentOMP intexp(experimentName, exp);
+    IntegralExperiment intexp(experimentName, exp);
     intexp.run(numberOfRuns);
 
     std::cout << "    " << experimentName << " completed" << std::endl;
@@ -150,7 +154,7 @@ void ExperimentsArta::RunMCTSExperiment(const std::string & experimentName, cons
 {
     std::cout << "MCTS Search Experiment - " << experimentName << std::endl;
 
-    IntegralExperimentOMP intexp(experimentName, exp);
+    IntegralExperiment intexp(experimentName, exp);
     intexp.run(numberOfRuns);
 
     std::cout << "    " << experimentName << " completed" << std::endl;
@@ -160,7 +164,7 @@ void ExperimentsArta::RunNMCSExperiment(const std::string & experimentName, cons
 {
     std::cout << "NMCS Search Experiment - " << experimentName << std::endl;
 
-    IntegralExperimentOMP intexp(experimentName, exp);
+    IntegralExperiment intexp(experimentName, exp);
     intexp.run(numberOfRuns);
 
     std::cout << "    " << experimentName << " completed" << std::endl;
@@ -170,7 +174,7 @@ void ExperimentsArta::RunNMCTSExperiment(const std::string & experimentName, con
 {
     std::cout << "NMCTS Search Experiment - " << experimentName << std::endl;
 
-    IntegralExperimentOMP intexp(experimentName, exp);
+    IntegralExperiment intexp(experimentName, exp);
     intexp.run(numberOfRuns);
 
     std::cout << "    " << experimentName << " completed" << std::endl;

@@ -3,25 +3,19 @@
   <ItemGroup>
     <ClCompile Include="..\src\BOSSConfig.cpp" />
     <ClCompile Include="..\src\main.cpp" />
-    <ClCompile Include="..\src\Experiments.cpp">
-      <Filter>Experiments - Arta</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\IntegralExperiment.cpp">
       <Filter>Experiments - Arta</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\IntegralExperimentOMP.cpp">
+    <ClCompile Include="..\src\Experiments.cpp">
       <Filter>Experiments - Arta</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\BOSSConfig.h" />
-    <ClInclude Include="..\src\Experiments.h">
-      <Filter>Experiments - Arta</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\IntegralExperiment.h">
       <Filter>Experiments - Arta</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\IntegralExperimentOMP.h">
+    <ClInclude Include="..\src\Experiments.h">
       <Filter>Experiments - Arta</Filter>
     </ClInclude>
   </ItemGroup>

@@ -7,21 +7,15 @@
 #include "Unit.h"
 #include "AbilityAction.h"
 #include "BoundedVector.h"
-#include "BuildOrderAbilities.h"
+#include "BuildOrder.h"
 
 namespace BOSS
 {
-    //using Vector_Unit = BoundedVector<Unit, 70>;
-    //using Vector_BuildingUnits = BoundedVector<NumUnits, 25>;
-    //using Vector_FinishedUnits = BoundedVector<NumUnits, 50>;
-    //using Vector_AbilityAction = BoundedVector<AbilityAction, 7>;
+    class CombatSearchParameters;
+
 class GameState 
 {
     using UnitTypes = std::vector<std::vector<NumUnits>>;
-    //Vector_Unit             m_units;
-    //Vector_BuildingUnits    m_unitsBeingBuilt;      // indices of m_units which are not completed, sorted descending by finish time
-    //Vector_FinishedUnits    m_unitsSortedEndFrame;  // indices of m_units which are completed, in order
-    //Vector_AbilityAction    m_chronoBoosts;
     std::vector<Unit>           m_units;
     std::vector<NumUnits>       m_unitsBeingBuilt;      // indices of m_units which are not completed, sorted descending by finish time
     std::vector<NumUnits>       m_unitsSortedEndFrame;  // indices of m_units which are completed, in order
@@ -57,6 +51,7 @@ class GameState
 
   public: 
     GameState();
+    // use this constructor when you wasnt to integrate BOSS into a bot
     GameState(const std::vector<Unit> & unitVector, RaceID race, FracType minerals, FracType gas,
         NumUnits currentSupply, NumUnits maxSupply, NumUnits mineralWorkers, NumUnits gasWorkers,
         NumUnits builerWorkers, TimeType currentFrame, NumUnits numRefineries, NumUnits numDepots);
@@ -67,8 +62,8 @@ class GameState
     int                             getNextFinishTime(ActionType type)                      const;
     int                             timeUntilFirstPylonDone()                               const;
 
-    void                            getSpecialAbilityTargets(ActionSetAbilities & actionSet, int index)         const;
-    int                             storeChronoBoostTargets(ActionSetAbilities & actionSet, int index)          const;
+    void                            getSpecialAbilityTargets(ActionSet & actionSet, int index)         const;
+    int                             storeChronoBoostTargets(ActionSet & actionSet, int index)          const;
     bool                            chronoBoostableTarget(const Unit & unit)                                    const;
 
     int                             getNumInProgress(ActionType action)                     const;
